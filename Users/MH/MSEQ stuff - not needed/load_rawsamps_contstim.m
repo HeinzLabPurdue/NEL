@@ -1,0 +1,43 @@
+function rc = load_rawsamps_contstim(rp_num,data,sr)
+% LOAD_RAWSAMPS_CONTSTIM    Loads stimulus samples to the specified RP structure. 
+%                     The data is not actually sent to the device (Use RPset_params for this purpose).
+%                     'load_rawsamps_contstim' warns if the data sampling rate does not match the RP 
+%                     sampling rate.
+%
+%           USAGE:    rc = load_raw_samples(rp_num,data,sr);
+%                     where 'rp_num' is the RP number (currently 1 or 2),
+%                     'data' is the samples vercor, and 'sr' is the data sampling rate.
+%                     'rc' is 1 (success) or -1 (failure).
+%
+%           EXAMPLE:  [data,sr] = wavread('bla.wav');
+%                     rc  = load_raw_samples(1,data,sr);
+%                     if (rc), RPset_params(RP(1)); end
+
+
+% AF 9/21/01
+
+global RP
+
+tolerance = 1e-5;
+rc = 1;
+if (rp_num < 1  |  rp_num > length(RP))
+   nelerror(['LOAD_RAW_SAMPLES: Illegal ''rp_num'' (' int2str(rp_num) ')']);
+   rc = 0;
+   return
+end
+sr_ratio = RP(rp_num).sampling_rate / sr;
+if (abs(round(sr_ratio)/sr_ratio -1) > tolerance)
+   nelwarn(sprintf('Data sampling rate (%.1f) doesn''t match\nRP(%d)''s sampling rate (%.1f)', ...
+      sr, rp_num, RP(rp_num).sampling_rate));
+   %rc = 0;
+end
+if (max(abs(data)) >1)
+   nelwarn(sprintf('Data will be clipped during write to RP(%d)\nLimit you data to the range of [-1 1]', rp_num));
+   % rc = 0;
+   data(data >  1) =  1.0;
+   data(data < -1) = -1.0;
+end
+      
+RP(rp_num).params.buff_data  = data(:)';
+% RP(rp_num).params.buff_data  = buffer(round(2^15*data),2);
+RP(rp_num).params.buff_size  = length(RP(rp_num).params.buff_data);

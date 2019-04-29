@@ -1,0 +1,16 @@
+% DPOAE Instruction Block
+
+F2frqlo  =           0.500;	% low frequency (in kHz) bounds for data
+F2frqhi  =           16.00;	% high frequency (in kHz) bounds for data
+fstlin   =               0;	% # of linear frequency steps (set = 0 for log steps)
+fstoct   =               6;	% # of log freq. steps (per oct. OR per 10-dB BW for Qspaced) (= 0 for lin steps; NEGATIVE for Qspaced)
+ear      =               1;	% ear code (lft = 1, rgt = 2, both = 3
+ToneOn   =            2000;	% duration of tone presentation (ms)
+ToneOff  =            1000;	% duration of interstim interval (ms)
+Fratio   =             1.2;	% ratio of F2/F1
+ADdur    =       ToneOn+20;	% Duration to sample the microphone (add 20ms to allow for delays)
+Nreps    =               4;	% Number of reps per condition
+CalibSPL =           99.25+20*log10(5/2.828);	% dB SPL corresponding to 0 dB attenuation for ER2 (assuming 5v p-p, rather than 1v rms)
+L2_dBSPL =              75;	% dB SPL presentation level for F2
+L1_dBSPL =        L2_dBSPL;	% dB SPL presentation level for F1
+MicGain  =              40; % dB gain on mic signal
