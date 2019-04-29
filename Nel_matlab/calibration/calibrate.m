@@ -11,7 +11,7 @@ global root_dir func_dir object_dir PROG FIG Stimuli SRdata CDATA DDATA FREQS CO
 if nargin < 1
    func_dir = cd([root_dir 'calibration\private']);
    object_dir = [root_dir 'calibration\object'];
-   PROG = struct('name','CALrp2_PU.m','date',date,'version','rp2 v3.0');
+   PROG = struct('name','CALrp2_PU.m','date',date,'version','NEL1.2');
    
    push = cell2struct(cell(1,5),{'stop','close','calib','params','recall'},2);
    ax1  = cell2struct(cell(1,4),{'axes','line1','line2','ord_text'},2);
