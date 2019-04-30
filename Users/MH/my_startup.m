@@ -4,19 +4,25 @@ function my_startup
 % MH 12/14/01
 % 29Jun2004 added choice of experiment type (M.Heinz)
 
-global MH_root_dir MH_exp_type 
+global MH_root_dir MH_exp_type SKIPintro
 
 MH_root_dir = [fileparts(which('my_startup')) filesep];
 
 addpath([MH_root_dir  'myMfiles']);
 addpath([MH_root_dir  'Vowel Synthesis']);
 addpath([MH_root_dir  'Templates']);
-% exp_options = {'R03-AN', 'R03-CN', 'CN','AN_RLFs'};
-exp_options = {'AN_TTS_1','ISH2009','CHIM_BBN','R03-AN_CN', 'CN','AN_RLFs'};
-s = listdlg('PromptString','Select Experiment Type:',...
-    'SelectionMode','single',...
-    'ListString', exp_options);
-MH_exp_type = exp_options{s};
+
+if SKIPintro
+    disp('HARD CODED USER TEMPLATE list')
+    MH_exp_type = 'AN_TTS_1';
+else
+    % exp_options = {'R03-AN', 'R03-CN', 'CN','AN_RLFs'};
+    exp_options = {'AN_TTS_1','ISH2009','CHIM_BBN','R03-AN_CN', 'CN','AN_RLFs'};
+    s = listdlg('PromptString','Select Experiment Type:',...
+        'SelectionMode','single',...
+        'ListString', exp_options);
+    MH_exp_type = exp_options{s};
+end
 
 switch (MH_exp_type)
 case 'AN_TTS_1'

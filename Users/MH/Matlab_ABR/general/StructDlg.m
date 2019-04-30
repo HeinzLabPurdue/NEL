@@ -390,7 +390,7 @@ tooltipstr = sprintf('%s', [tooltipstr repmat(char(10),size(tooltipstr,1),1)]');
 return;
 
 %%%%%%%%
-function timer(t)
+function neltimer(t)
 tic;
 while(toc < t)
 end
@@ -552,7 +552,7 @@ for j = 1:reps
    end
    if (do_wait)
       drawnow;
-      timer(blink_period);
+      neltimer(blink_period);
    end
    for i = 1:length(AU_fnames)
       if (ishandle(h(i)))
@@ -562,7 +562,7 @@ for j = 1:reps
    end
    if (do_wait & j < reps)
       drawnow;
-      timer(blink_period);
+      neltimer(blink_period);
    end
 end
 drawnow;

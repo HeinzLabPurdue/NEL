@@ -7,10 +7,10 @@ global DING__ DINGSR__
 
 if (isempty(DING__))
    if (exist('c:\winnt\media\ding.wav','file')==2)
-      [DING__ DINGSR__] = wavread('c:\winnt\media\ding.wav');
+      [DING__ DINGSR__] = audioread('c:\winnt\media\ding.wav');
    else
       if (exist('c:\windows\media\ding.wav','file')==2)
-         [DING__ DINGSR__] = wavread('c:\windows\media\ding.wav');
+         [DING__ DINGSR__] = audioread('c:\windows\media\ding.wav');
       end
    end
 end

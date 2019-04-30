@@ -63,7 +63,7 @@ if (common.index == 0)
          call_user_func(static_pi.dispStatus.func,static_pi.dispStatus.handle,msg);
          RPset_params(RP(2),'ContFlag',1);
          if (static_bi.secondary.noise.adaptation > 0)
-            timer(static_bi.secondary.noise.adaptation);
+            neltimer(static_bi.secondary.noise.adaptation);
          end
       end
    end

@@ -9,10 +9,10 @@ if isempty(device) & ~length(get(FIG.push.stop,'userdata'))
     COMM.handle.SR530 = serial('COM1','BaudRate',19200,'Parity','none','DataBits',8,'StopBits',1,'Terminator','CR');
     
     fopen(COMM.handle.SR530);
-    timer(.5);
+    neltimer(.5);
     
     fprintf(COMM.handle.SR530,'%s\n','Z')   %reset
-    timer(.5);
+    neltimer(.5);
     
     fprintf(COMM.handle.SR530,'%s\n','W0')      %lockout panel inputs
     fprintf(COMM.handle.SR530,'%s\n','W')

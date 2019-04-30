@@ -3,7 +3,7 @@ function dirname = choose_data_dir(reactivate,recursive_flag)
 
 % AF 11/28/01
 
-global NelData data_dir
+global NelData data_dir SKIPintro
 
 if (exist('reactivate','var') ~= 1)
    reactivate = 'No';
@@ -13,36 +13,43 @@ if (exist('recursive_flag','var') ~= 1)
 end
 
 if (recursive_flag == 0)
-   reactivate = questdlg('Reactivate an existing data directory?', 'File Manager', 'Yes','No',reactivate);
+    if SKIPintro
+        reactivate = 'Yes';
+    else
+        reactivate = questdlg('Reactivate an existing data directory?', 'File Manager', 'Yes','No',reactivate);
+    end
 end
 last_data_dir = user_profile_get('last_data_dir');
 switch (reactivate)
 case 'Yes'
-   d = dir(data_dir);
-   d = d(find([d.isdir]==1 & strncmp('.',{d.name},1)==0)); % Only directories which are not '.' nor '..'
-   str = {d.name};
-   user_dirs = sort(str(strmatch(NelData.General.User,str)));
-   rest_dirs = sort(setdiff(str,user_dirs));
-   str = [user_dirs(end:-1:1)  rest_dirs(end:-1:1)];
-   if (~isempty(last_data_dir))
-      init_val = strmatch(last_data_dir,str,'exact');
-   else
-      init_val = '';
-   end
-   [selection ok] = listdlg('Name', 'File Manager', ...
-      'PromptString',   'Select an Existing Data Directory:',...
-      'SelectionMode',  'single',...
-      'ListSize',       [300,300], ...
-      'OKString',       'Re-Activate', ...
-      'CancelString',   'Create new Directory', ...
-      'InitialValue',    init_val, ...
-      'ListString',      str);
-   if (ok==0 | isempty(selection))
-      dirname = choose_data_dir('No',1);
-   else
-      dirname = str{selection};
-   end
-   
+    if SKIPintro
+        dirname = 'MH-2019_04_30-modernNELsetup';
+    else
+        d = dir(data_dir);
+        d = d(find([d.isdir]==1 & strncmp('.',{d.name},1)==0)); % Only directories which are not '.' nor '..'
+        str = {d.name};
+        user_dirs = sort(str(strmatch(NelData.General.User,str)));
+        rest_dirs = sort(setdiff(str,user_dirs));
+        str = [user_dirs(end:-1:1)  rest_dirs(end:-1:1)];
+        if (~isempty(last_data_dir))
+            init_val = strmatch(last_data_dir,str,'exact');
+        else
+            init_val = '';
+        end
+        [selection ok] = listdlg('Name', 'File Manager', ...
+            'PromptString',   'Select an Existing Data Directory:',...
+            'SelectionMode',  'single',...
+            'ListSize',       [300,300], ...
+            'OKString',       'Re-Activate', ...
+            'CancelString',   'Create new Directory', ...
+            'InitialValue',    init_val, ...
+            'ListString',      str);
+        if (ok==0 | isempty(selection))
+            dirname = choose_data_dir('No',1);
+        else
+            dirname = str{selection};
+        end
+    end
 case 'No'
    dflt_name = [NelData.General.User '-' strrep(datestr(date,29),'-','_')];
    descr = inputdlg({['Short Description' char(10) '(e.g. ''Chin1234_AN_normal'' ''Chin1234_AN_500OBN''):']},'Experiment''s Description',1,{''},200);

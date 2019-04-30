@@ -1,6 +1,6 @@
-function [P,units] = StructDlg(struct_def,title,dflt,visible,present_val,fig_pos)
-% StructDlg - dialog box for filling in structure fields.
-%     P = StructDlg(struct_def, 'title' dflt)
+function [P,units] = structdlg(struct_def,title,dflt,visible,present_val,fig_pos)
+% structdlg - dialog box for filling in structure fields.
+%     P = structdlg(struct_def, 'title' dflt)
 %     struct_def is a structure whose fields will be displayed and assigned to the returned P structure.
 %     The values of each of struct_def fields serve as a definition for the type and GUI appearance of 
 %     that field, as will be described below. 
@@ -11,7 +11,7 @@ function [P,units] = StructDlg(struct_def,title,dflt,visible,present_val,fig_pos
 %                     The default value can be a numeric vector, or a string that is a valid matlab
 %                     expression, which its evaluation result is a numeric row vector.
 %                     In the later case, you must specify a limits ([] is equivalent to [-Inf Inf]), 
-%                     so 'StructDlg' will interprate the field as a numeric field.
+%                     so 'structdlg' will interprate the field as a numeric field.
 %           Examples: S.center_frequency = { 2000 'Hz' [30 50000] }; -> default of 2000, allowed range:[30 50000].
 %                     S.my_parameter     = { 43 } -> default of 43, no limits.
 %                     S.size_of_matrix   = { [4 12] '' [1 Inf] }; -> default of [4 12], allowed range:[1 Inf].
@@ -48,7 +48,7 @@ function [P,units] = StructDlg(struct_def,title,dflt,visible,present_val,fig_pos
 %            Example: S.parameters_file = { {'uigetfile(''d:\my_dir\*.m'')'} };
 %
 %      Sub-Structure: S may contain substrucutres of the same format. The user will be able to push a
-%                     push-button that will call 'StructDlg' recursively for the sub-structure. 
+%                     push-button that will call 'structdlg' recursively for the sub-structure. 
 %                     The current values of the sub-structure can be viewed by placing the mouse over
 %                     the push-button.
 %
@@ -83,10 +83,10 @@ function [P,units] = StructDlg(struct_def,title,dflt,visible,present_val,fig_pos
 %                     S.Noise_specifications.Low_cutoff = { 1 'kHz' [0 50] };
 %                     S.Noise_specifications.High_cutoff = { 'min(this.Low_cutoff*2, this.Low_cutoff+8)' 'kHz' [0 50] };
 %                     S.Noise_specifications.Gating = { '{Positive}|Negative|Continuous' };
-%                     P = StructDlg(S,'Rate-Level Parameters');
+%                     P = structdlg(S,'Rate-Level Parameters');
 %                     % after doing some stuff, we can ask again for user input, 
 %                     % but this time, the default values will be the one he specified previously.
-%                     new_P = StructDlg(S,'Rate-Level Parameters',P);
+%                     new_P = structdlg(S,'Rate-Level Parameters',P);
 %
 %
 %    See also: Struct2str, Browse_Struct
@@ -157,10 +157,10 @@ if (isstruct(struct_def)) % Init
       'Name',                title, ...
       'Units',               'char', ...
       'position',            fig_pos, ...
-      'keypress',            'StructDlg(get(gcbf,''CurrentCharacter''));', ...
+      'keypress',            'structdlg(get(gcbf,''CurrentCharacter''));', ...
       'color',               get(0,'DefaultuicontrolBackgroundColor'),... 
       'Visible',             visible,... 
-      'DeleteFcn',           'StructDlg;', ...
+      'DeleteFcn',           'structdlg;', ...
       'WindowStyle',         'modal');
    
    lbl = zeros(1,length(fnames_lbl));
@@ -197,7 +197,7 @@ if (isstruct(struct_def)) % Init
       slider_step = fig_pos(4) / (abs(OK_vert_pos)+fig_pos(4));
       h_slider = uicontrol(h_fig, ...
          'style',         'slider', ...
-         'callback',      'StructDlg(''slider_change'');', ...
+         'callback',      'structdlg(''slider_change'');', ...
          'Units',         'char', ...
          'position',      [0  0  3  fig_pos(4)], ...
          'SliderStep',    [slider_step/5 slider_step], ...
@@ -207,7 +207,7 @@ if (isstruct(struct_def)) % Init
    end
    h_OK = uicontrol(h_fig, ...
       'style',         'pushbutton', ...
-      'callback',      'StructDlg(''ok'');', ...
+      'callback',      'structdlg(''ok'');', ...
       'Units',         'char', ...
       'position',      [fig_pos(3)-35  OK_vert_pos  16  1.75], ...
       'String',        'ok', ...
@@ -217,7 +217,7 @@ if (isstruct(struct_def)) % Init
    
    h_reset = uicontrol(h_fig, ...
       'style',         'pushbutton', ...
-      'callback',      'StructDlg(''reset'');', ...
+      'callback',      'structdlg(''reset'');', ...
       'Units',         'char', ...
       'position',      [fig_pos(3)-17  OK_vert_pos  16  1.75], ...
       'String',        'reset', ...
@@ -236,7 +236,7 @@ if (isstruct(struct_def)) % Init
    
    % Following are callbacks from the form
 elseif (iscell(struct_def) & ~isempty(struct_def)) 
-   StructDlgCB(struct_def{1}); % Callback from one of the regular input fields. Processed in 'StructDlgCB'.
+   structdlgCB(struct_def{1}); % Callback from one of the regular input fields. Processed in 'structdlgCB'.
    
 elseif (isstr(struct_def)) 
    % Other push buttons or context-menus in the form.
@@ -251,7 +251,7 @@ elseif (isstr(struct_def))
          
       case 'undo'
          undoCB(args{1},gcbf);
-         StructDlg(args);
+         structdlg(args);
          
       case {'reset', char(18)}
          ud    = get(gcbf,'UserData');
@@ -391,7 +391,7 @@ tooltipstr = sprintf('%s', [tooltipstr repmat(char(10),size(tooltipstr,1),1)]');
 return;
 
 %%%%%%%%
-function timer(t)
+function neltimer(t)
 tic;
 while(toc < t)
 end
@@ -504,7 +504,7 @@ for i = 1:length(fnames)
                'Label',         'Unlock', ...
                'Separator',     'on', ...
                'Tag',           [fnames{i} '_UnLock'], ...
-               'Callback',      ['StructDlg(''unlock(' fnames{i} ')'')'] );
+               'Callback',      ['structdlg(''unlock(' fnames{i} ')'')'] );
          end
       end
    end
@@ -553,7 +553,7 @@ for j = 1:reps
    end
    if (do_wait)
       drawnow;
-      timer(blink_period);
+      neltimer(blink_period);
    end
    for i = 1:length(AU_fnames)
       if (ishandle(h(i)))
@@ -563,7 +563,7 @@ for j = 1:reps
    end
    if (do_wait & j < reps)
       drawnow;
-      timer(blink_period);
+      neltimer(blink_period);
    end
 end
 drawnow;
@@ -723,13 +723,13 @@ if (isempty(h))
    cmenu = uicontextmenu;
    item1 = uimenu(cmenu, ...
       'Label',     item_label, ...
-      'Callback',  ['StructDlg(''reset(' f ')'')'] );
+      'Callback',  ['structdlg(''reset(' f ')'')'] );
    item2 = uimenu(cmenu, ...
       'Label',     'Undo', ...
       'Enable',    'off', ...
       'Separator', 'off', ...
       'Tag',       [f '_UNDO'], ...
-      'Callback',  ['StructDlg(''undo(' f ')'')'] );
+      'Callback',  ['structdlg(''undo(' f ')'')'] );
 
    h = uicontrol(h_fig, ...
       'style',      'edit', ...
@@ -743,7 +743,7 @@ if (isempty(h))
       'horizon',    'left', ...
       'Tag',        f, ...
       'UIContextMenu', cmenu, ...
-      'Callback',   ['StructDlg({''' f '''});']);	
+      'Callback',   ['structdlg({''' f '''});']);	
    set(item2,'Userdata',struct('uicontrol',h));
    if (ischar(val))
       h1 = uicontrol(h_fig, ...
@@ -777,7 +777,7 @@ if (isempty(h))
    cmenu = uicontextmenu;
    item1 = uimenu(cmenu, ...
       'Label',     ['Reset (to: ''' val ''')'], ...
-      'Callback',  ['StructDlg(''reset(' f ')'')'] );
+      'Callback',  ['structdlg(''reset(' f ')'')'] );
    
    h = uicontrol(h_fig, ...
       'style',      'edit', ...
@@ -790,7 +790,7 @@ if (isempty(h))
       'BackgroundColor', [1 1 1], ...
       'Tag',        f, ...
       'UIContextMenu', cmenu, ...
-      'Callback',   ['StructDlg({''' f '''});']);	
+      'Callback',   ['structdlg({''' f '''});']);	
 end
 set(h,'String',val);
 pos = get(h,'Position');
@@ -841,7 +841,7 @@ for val_i = 1:length(options)
    cmenu = uicontextmenu;
    item1 = uimenu(cmenu, ...
       'Label',     ['Reset (to: ''' selected_str ''')'], ...
-      'Callback',  ['StructDlg(''reset(' f ')'')'] );
+      'Callback',  ['structdlg(''reset(' f ')'')'] );
    
    if (~ishandle(h(val_i)))
       width = min(35, 10+length(options{val_i}));
@@ -856,7 +856,7 @@ for val_i = 1:length(options)
          'Value',          selected(val_i), ...
          'Tag',            f, ...
          'UIContextMenu',  cmenu, ...
-         'Callback',       ['StructDlg({''' f '''});']);	
+         'Callback',       ['structdlg({''' f '''});']);	
       sum_width = sum_width + width;
    else
       if (strcmp(get(h(val_i),'String'), selected_str))
@@ -887,7 +887,7 @@ if (isempty(h))
    cmenu = uicontextmenu;
    item1 = uimenu(cmenu, ...
       'Label',         ['Reset (to: ''' filter_spec ''')'], ...
-      'Callback',      ['StructDlg(''reset(' f ')'')'] );
+      'Callback',      ['structdlg(''reset(' f ')'')'] );
    
    h = [0 0];
    h(2) = uicontrol(h_fig, ...
@@ -901,7 +901,7 @@ if (isempty(h))
       'BackgroundColor', [1 1 1], ...
       'Tag',            f, ...
       'UIContextMenu',  cmenu, ...
-      'Callback',       ['StructDlg({''' f '''});']);
+      'Callback',       ['structdlg({''' f '''});']);
    h(1) = uicontrol(h_fig, ...
       'style',          'pushbutton', ...
       'Units',          'char', ...
@@ -911,7 +911,7 @@ if (isempty(h))
       'FontSize',       9, ...
       'Tag',            f, ...
       'UIContextMenu',  cmenu, ...
-      'callback',       ['StructDlg({''' f '''});']);
+      'callback',       ['structdlg({''' f '''});']);
    
    push_ud.cmd    = cmd;
    push_ud.params = h(2);
@@ -946,7 +946,7 @@ if (isempty(h))
    cmenu = uicontextmenu;
    item1 = uimenu(cmenu, ...
       'Label',         ['Reset (to: ''' opt_label ''')'], ...
-      'Callback',      ['StructDlg(''reset(' f ')'')'] );
+      'Callback',      ['structdlg(''reset(' f ')'')'] );
    
    h = uicontrol(h_fig, ...
       'style',          'checkbox', ...
@@ -957,7 +957,7 @@ if (isempty(h))
       'value',          selected, ...
       'Tag',            f, ...
       'UIContextMenu',  cmenu, ...
-      'Callback',       ['StructDlg({''' f '''});']);	
+      'Callback',       ['structdlg({''' f '''});']);	
 end
 set(h, 'value',      selected);
 lbl_str = get(h_lbl,'String');
@@ -1000,7 +1000,7 @@ if (isempty(h))
    cmenu = uicontextmenu;
    item1 = uimenu(cmenu, ...
       'Label',         ['Reset (to: ''' opt_label ''')'], ...
-      'Callback',      ['StructDlg(''reset(' f ')'')'] );
+      'Callback',      ['structdlg(''reset(' f ')'')'] );
    
    width = size(char(val),2) + 10;
    h = uicontrol(h_fig, ...
@@ -1015,7 +1015,7 @@ if (isempty(h))
       'Value',      selected, ...
       'Tag',        f, ...
       'UIContextMenu',  cmenu, ...
-      'Callback',   ['StructDlg({''' f '''});']);	
+      'Callback',   ['structdlg({''' f '''});']);	
 else
    set(h,'Value',  selected);
 end
@@ -1026,9 +1026,9 @@ return
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function ud = reset_sub_struct_field(h_fig,h,f,val,lbl_pos,ud,dflt_val,units);
 if (isfield(ud.vals,f));
-   [sub_vals,sub_units] = StructDlg(val,'',getfield(ud.vals,f),'off');
+   [sub_vals,sub_units] = structdlg(val,'',getfield(ud.vals,f),'off');
 else
-   [sub_vals,sub_units] = StructDlg(val,'',dflt_val,'off');
+   [sub_vals,sub_units] = structdlg(val,'',dflt_val,'off');
 end
 ud.vals  = setfield(ud.vals,f,sub_vals);
 ud.units = setfield(ud.units,{1},f,sub_units);
@@ -1043,16 +1043,16 @@ if (isempty(h))
       'FontSize',       9, ...
       'Tag',            f, ...
       'TooltipString',  tooltipstr, ...
-      'callback',       ['StructDlg({''' f '''});']);
+      'callback',       ['structdlg({''' f '''});']);
    
-   push_ud.cmd    = 'StructDlg';
+   push_ud.cmd    = 'structdlg';
    push_ud.params = units; % units are specified here for the tooltip string only
    set(h,'Userdata',push_ud);
 end
 return;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  MAIN CALL_BACK FUNCTION %%%%%%%%%%%%%%%%%%%%%%%%%
-function StructDlgCB(f)
+function structdlgCB(f)
 %
 hgcbf = gcbf;
 ud    = get(hgcbf,'UserData');
@@ -1135,7 +1135,7 @@ case 'pushbutton'
          update_uicontrol_width(push_ud.params, width)
       end
       
-   case 'StructDlg'
+   case 'structdlg'
       if (isempty(ud.error))
          title = [get(hgcbf,'Name') '->' f];
          if (isfield(ud.dflt,f))
@@ -1157,7 +1157,7 @@ case 'pushbutton'
          else
             rec_pos = [];
          end
-         ret_struct = StructDlg(getfield(ud.orig_def,f),title,dflt_val,'on',v,rec_pos);
+         ret_struct = structdlg(getfield(ud.orig_def,f),title,dflt_val,'on',v,rec_pos);
          tooltipstr = struct_tooltip(ret_struct,push_ud.params);
          set(hgcbo,'TooltipString', tooltipstr);
          ud.vals = setfield(ud.vals,f,ret_struct);

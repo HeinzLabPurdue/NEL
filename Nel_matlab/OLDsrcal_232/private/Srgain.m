@@ -36,7 +36,7 @@ while ~length(get(FIG.push.stop,'userdata'))
       set(FIG.ax2.ProgMess,'String','SRGAIN: Not communicating with Lock-In!');
       return
    end
-   timer(0.01);
+   neltimer(0.01);
    overload = 0;
    % Read the overload status byte nread times.  If set any one of these,
    % this is an overload.

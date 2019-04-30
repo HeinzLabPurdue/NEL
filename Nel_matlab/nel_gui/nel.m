@@ -94,10 +94,15 @@ end
 
 % --------------------------------------------------------------------
 function abort = Get_User_Info(hfig,handles)
-global NelData home_dir
+global NelData home_dir SKIPintro
 user = {''}; title = 'Nel Login'; abort = 0;
 while ((isempty(user) | isempty(user{1})))
-   user = inputdlg({'User Name:'},title,1,{NelData.General.User},180);
+
+    if SKIPintro
+        user = {'MH'};
+    else
+        user = inputdlg({'User Name:'},title,1,{NelData.General.User},180);
+    end
    if (isempty(user))
       Nel_Main_CloseRequestFcn(handles.Nel_Main, [], handles,{});
       if (~ishandle(hfig))
@@ -450,11 +455,11 @@ if (get(handles.Triggering_popup,'Value') == 1)
       set(handles.Triggering_popup,'BackgroundColor','r');
       drawnow
       if (ii <2)
-          timer(0.1); %Fixed M.Sayles. 20/11/15
+          neltimer(0.1); %Fixed M.Sayles. 20/11/15
 %          neltimer(0.1);
          set(handles.Triggering_popup,'BackgroundColor','w');
          drawnow
-         timer(0.1); %Fixed M.Sayles. 20/11/15
+         neltimer(0.1); %Fixed M.Sayles. 20/11/15
 %          neltimer(0.1);
       end
    end
@@ -1083,7 +1088,7 @@ activate_data_dir(handles,'No');
 
 % --------------------------------------------------------------------
 function activate_data_dir(handles,reactivate)
-global NelData
+global NelData 
 dirname = choose_data_dir(reactivate); % choose_data_dir updates NelData and the user-profiles
 update_nel_title(handles);
 % set(handles.Nel_Main,'Name',['Nel   -  ''' dirname '''   (' int2str(NelData.File_Manager.picture) ' Saved Pictures)']);

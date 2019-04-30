@@ -6,7 +6,8 @@ else
     fname = current_data_file([misc.fileExtension '_click'],1);
 end
 
-[pathstr name ext versn]=fileparts(fname);
+% [pathstr name ext versn]=fileparts(fname);
+[pathstr name ext]=fileparts(fname);
 aux_fname = fullfile(pathstr,['a' name(2:end)]);
 % aux_fname = fullfile(pathstr,['p' name(2:end)]);
 x.General.program_name  = PROG.name;

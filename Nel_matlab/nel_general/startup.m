@@ -1,4 +1,4 @@
-global root_dir home_dir data_dir signals_dir profiles_dir host icon_dir
+global root_dir home_dir data_dir signals_dir profiles_dir host icon_dir SKIPintro
 
 fs = filesep;
 root_dir = [fileparts(fileparts(which('startup'))) fs];
@@ -29,21 +29,40 @@ addpath([root_dir  'CAP']);
 addpath([root_dir  'NELanalysis_Mfiles']);
 % addpath([root_dir  'wiring_test']);   %LQ 10/29/04
 
-if (isunix)
-   [rc host] = dos('hostname');
-   host = lower(strtok(host,'.'));
-else
-   host = lower(getenv('hostname'));
-end
-host = host(~isspace(host));
+%% Decide whether to run FAKE_TDT (e.g., on a PC not connected to TDT) or REAL_TDT 
+% if (isunix)
+%    [rc host] = dos('hostname');
+%    host = lower(strtok(host,'.'));
+% else
+%    host = lower(getenv('hostname'));
+% end
+% host = host(~isspace(host));
 
-switch (host)
-   %case {'alon_home','chernoble','south-chamber','behemoth','providence'}
-case {'alon_home','chernoble','behemoth','providence','carassius'}
-   addpath([home_dir 'fake_tdt']);
-   fprintf( '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n');
-   fprintf( '!!          HOST: %-15s      !!\n', host);
-   fprintf( '!!     Using a fake tdt-interface      !!\n');
-   fprintf( '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n');
+%% FOR FASTER DEBUGGING, skip all questions
+SKIPintro=1;
+
+if SKIPintro
+    ButtonName='Real_TDT';
+else    
+    ButtonName=questdlg('Do you want to Emulate TDT?','TDT Emulation SETUP','Emulate_TDT','Real_TDT','Emulate_TDT');
+    
+    if strcmp(ButtonName,'Emulate_TDT')
+        addpath([home_dir 'fake_tdt']);
+        fprintf( '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n');
+        fprintf( '!!          HOST: %-15s      !!\n', host);
+        fprintf( '!!     Using a fake tdt-interface      !!\n');
+        fprintf( '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n');
+    end
 end
 nelinit
+
+% switch (host)
+%    %case {'alon_home','chernoble','south-chamber','behemoth','providence'}
+% case {'alon_home','chernoble','behemoth','providence','carassius'}
+%    addpath([home_dir 'fake_tdt']);
+%    fprintf( '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n');
+%    fprintf( '!!          HOST: %-15s      !!\n', host);
+%    fprintf( '!!     Using a fake tdt-interface      !!\n');
+%    fprintf( '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n');
+% end
+% nelinit

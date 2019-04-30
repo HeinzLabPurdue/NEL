@@ -81,7 +81,7 @@ plot_pnts = zeros(50,2);
 converge = 0;
 error = 0;
 %    if cycle == 5, break; end
-timer(0.01);
+neltimer(0.01);
 
 
 
