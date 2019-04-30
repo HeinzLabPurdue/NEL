@@ -127,7 +127,7 @@ if ~error & ~length(get(FIG.push.stop,'userdata'))
    
    %    for i=1:100,
 %       if length(get(FIG.push.stop,'userdata')), return; end
-%       timer(.01);
+%       neltimer(.01);
 %       no_ref = 0;
 %       no_lock = 0;
 %       fprintf(COMM.handle.SR530,'%s\n','Y2')				        % check ref status bit (=0, if not ref)

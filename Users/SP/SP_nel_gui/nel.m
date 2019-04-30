@@ -450,11 +450,11 @@ if (get(handles.Triggering_popup,'Value') == 1)
       set(handles.Triggering_popup,'BackgroundColor','r');
       drawnow
       if (ii <2)
-          timer(0.1); %Fixed M.Sayles. 20/11/15
+          neltimer(0.1); %Fixed M.Sayles. 20/11/15
 %          neltimer(0.1);
          set(handles.Triggering_popup,'BackgroundColor','w');
          drawnow
-         timer(0.1); %Fixed M.Sayles. 20/11/15
+         neltimer(0.1); %Fixed M.Sayles. 20/11/15
 %          neltimer(0.1);
       end
    end

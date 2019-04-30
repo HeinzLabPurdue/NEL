@@ -10,7 +10,7 @@ global default_rco NelData ProgName
 set(0,'DefaultTextInterpreter','none');  % so we can display strings with '_' properly
 set(0,'defaultTextColor','k');
 
-ProgName    = 'Nel 1.3';
+ProgName    = 'Nel 1.2.0';
 default_rco = [root_dir 'stimulate\object\control.rco'];
 
 if (~isempty(host) & exist(['hardware_setup_' host],'file'))

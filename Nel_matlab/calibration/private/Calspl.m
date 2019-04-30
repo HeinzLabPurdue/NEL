@@ -1,4 +1,4 @@
-function [error] = calspl(iseq)
+function [error] = Calspl(iseq)
 % Modified for TDT system at Purdue
 % July 20, 2006
 % M. Heinz/J. Swaminathan
@@ -8,7 +8,7 @@ function [error] = calspl(iseq)
 %         column 2 is SPL at which probe microphone calibration data was taken.
 %         column 3 is phase correction, phase = phase from lockin + column 3.
 %			    (note, no unwrapping has been done.)
-%         column 4 is pahse correction (if we had one)
+%         column 4 is phase correction (if we had one)
 %
 % dBSPL measured = 20*log10(RMS_V/1uV) - ProbeCalibData(col3) + dBSPL for ProbeCalibData(col2)
 
@@ -73,13 +73,13 @@ global FIG DDATA CDATA FREQS COMM SRdata
 % will be tolerated without interpolation.  NOTE: it doesn't make sense for
 % this number to be larger than the ratio of successive freqs in the calib-
 % ration file (typically 0.05-0.1 octave).
-slop = .002;
+slop = .05;
 
 % Assume no error to start, make sure iseq is within range.  iseq is
 % pointer to calibration data.
 out_of_range = 0;
 error = 0;
-if iseq < 1 | iseq > FREQS.ndat, iseq = 1; end
+if iseq < 1 || iseq > FREQS.ndat; iseq = 1; end
 
 % Loop through all data:  j and j1 index data points.
 % slop1 used to decide if current frequency is outside range of next
@@ -89,12 +89,12 @@ slop1 = 1 / (1 + slop);
 %   Find calibration frequency at or just below data frequency.  Assume that
 %   a frequency match will be found (isntrp=0)
 %   If frequency isn't found set out_of_range flag and break out of loop
-thfreq = DDATA(FREQS.ndpnts,1);
+thfreq = round(DDATA(FREQS.ndpnts,1)*1000)/1000;
 isntrp = 0;
-if thfreq < 0.01 | thfreq > 100.0, out_of_range = 1; end
+if thfreq < 0.01 || thfreq > 100.0, out_of_range = 1; end
 
-if ~out_of_range,
-   while thfreq < CDATA(iseq,1),
+if ~out_of_range
+   while round(thfreq*1000)/1000 < round(CDATA(iseq,1)*1000)/1000
       if iseq <= 1, out_of_range = 1; break; end
       iseq = iseq - 1;
    end
@@ -103,11 +103,10 @@ end
 %   Is this frequency near enough a calibration frequency?
 %   If not, then have to interpolate; is this frequency between CDATA(iseq,1)
 %   and CDATA(iseq+1,1)?
-
-if ~out_of_range,
-   if abs(thfreq-CDATA(iseq,1))/thfreq > slop,		
-      if iseq < FREQS.ndat,
-         while thfreq >= slop1*CDATA(iseq+1,1)
+if ~out_of_range
+   if abs(thfreq-CDATA(iseq,1))/thfreq > slop
+      if iseq < FREQS.ndat
+         while thfreq >= slop1*CDATA(iseq+1,1) && iseq+1<FREQS.ndat
             iseq = iseq + 1;
          end
          isntrp = 1;
