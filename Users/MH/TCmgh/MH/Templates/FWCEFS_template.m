@@ -14,7 +14,7 @@ tmplt = template_definition(fieldname);
 if (exist('stimulus_vals','var') == 1)    
    if (exist(stimulus_vals.Inloop.File,'file') ~= 0)
       list = {stimulus_vals.Inloop.File};
-      [data fs] = wavread(stimulus_vals.Inloop.File);
+      [data fs] = audioread(stimulus_vals.Inloop.File);
       playback_rate = 97656.25/(round(97656.25/fs)); % 97656.25 is the rco's sampling rate
       playdur = round(length(data)/playback_rate*1000);	%compute file duration based on sampling rate
       min_period = max(1000,ceil(1.7*playdur/100)*100);

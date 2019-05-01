@@ -8,7 +8,8 @@ global CurrentDataDir signals_dir
 data = [];
 sr   = [];
 rc = 1;
-eval('[data,sr] = wavread(fname);', 'rc=0;');
+% eval('[data,sr] = wavread(fname);', 'rc=0;');
+eval('[data,sr] = audioread(fname);', 'rc=0;');
 if (rc == 0)
    waitfor(errordlg(['Can''t read wavfile ''' fname ''''], 'nel_wavread'));
    return;

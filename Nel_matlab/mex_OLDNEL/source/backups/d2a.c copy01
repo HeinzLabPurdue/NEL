@@ -1,0 +1,141 @@
+/*********************************************************************
+*
+* d2a.c
+* mex file for D/A output from 6052e card.
+*
+* Written by LF and GE.  26Jun2002.
+*
+* Pin Connection Information: 
+*    The analog output signal(s) will be available at AO channel 0 and/or 1.
+*	 Trigger signal should be connected to PFI6.
+*
+*********************************************************************/
+
+/*
+ * Includes: 
+ */
+
+#include "mex.h"
+#include <stdlib.h>     /* malloc(), free(), strtoul() */
+#include <math.h>
+#include "nidaqex.h"
+
+
+/*
+ * Main: 
+ */
+
+void mexFunction( int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
+{
+    /*
+     * Local Variable Declarations: 
+     */
+
+	i16 iDevice = 2;
+	i16 Mode, iStatus, iRetVal, iNumChans;
+	f64 dUpdateRate;
+	u32 ulCountChan0 = 0;
+	u32 ulCountChan1 = 0;
+
+	i16 iChan = 1;	// ge debug: temp patch
+	static i16 piChanVect[1] = {1};	// ge debug: temp patch
+
+	
+ 	i16 iNumAllChans = 2;
+	//i16 iGroupAllChannels = 2;
+    static i16 piAllChanVect[2] = {0,1};
+
+	static f64 pdBuffer[5000] = {0};
+    static i16 piBuffer[5000] = {0};
+
+    i16 iOpSTART = 1;
+    i16 iOpCLEAR = 0;
+    i16 iIgnoreWarning = 0;
+    i16 iFIFOMode = 0;
+
+	i16 iGroup = 1;			// single group# assigned b/c only one group used at a time
+	i16 iUnits = 0;			// "pts per sec"
+	i16 iWhichClock = 0;	// use the "update clock"
+	i16 iDelayMode = 0;		// disable the delay clock
+
+    i16 iUpdateTB = 0;
+    u32 ulUpdateInt = 0;
+
+	/* Set both analog output channels back to initial state. */
+	iStatus = WFM_Group_Setup(iDevice, iNumAllChans, piAllChanVect,
+		iGroup);
+//    iRetVal = NIDAQErrorHandler(iStatus, "WFM_Group_Setup",
+ //        iIgnoreWarning);
+	iStatus = WFM_Group_Control(iDevice, iGroup, iOpCLEAR);
+//    iRetVal = NIDAQErrorHandler(iStatus, "WFM_Group_Control/CLEAR", iIgnoreWarning);
+	iStatus = AO_VWrite(iDevice, 0, 0.0);
+	iStatus = AO_VWrite(iDevice, 1, 0.0);
+
+      
+
+	/*  get the Mode for the function call. */
+	Mode = (i16) mxGetScalar(prhs[0]);
+	if ((Mode < 0) || (Mode > 1)) {
+		mexErrMsgTxt("Mode should be in the range of 0 to 1");
+	}
+
+
+	/***********************************************/
+	/*
+	 * MODE 0: Initialization only.
+	 */
+
+	if (Mode == 0) { 
+		return;
+	}
+
+	/***********************************************/
+	/*
+	 * MODE 1: Load buffer(s) to board and set up triggering.
+	 */
+	
+	if (Mode == 1) { 
+		iNumChans = 1;	// ge debug: will be passed as a parameter or determined from piChanVect
+		ulCountChan0 = 5000; // ge debug: will be passed as a parameter or determined from buffer itself
+	    dUpdateRate = 1000.0; // ge debug: will be passed
+
+		// ge debug: patch until buffers are passed as parameters to mex call.
+		iStatus = NIDAQMakeBuffer(pdBuffer, ulCountChan0, WFM_DATA_F64);
+		if (iStatus != 0){
+			printf(" The buffer was not made correctly. Check the parameters for NIDAQMakeBuffer.\n");
+		return;
+		}
+
+
+        iStatus = WFM_Group_Setup(iDevice, iNumChans, piChanVect,
+         iGroup);
+        iRetVal = NIDAQErrorHandler(iStatus, "WFM_Group_Setup",
+         iIgnoreWarning);
+
+        iStatus = WFM_Scale(iDevice, iChan, ulCountChan0, 1.0, pdBuffer,
+         piBuffer);
+        iRetVal = NIDAQErrorHandler(iStatus, "WFM_Scale",
+         iIgnoreWarning);
+
+        iStatus = WFM_Load(iDevice, iNumChans, piChanVect, piBuffer,
+         ulCountChan0, 1, iFIFOMode);
+        iRetVal = NIDAQErrorHandler(iStatus, "WFM_Load",
+         iIgnoreWarning);
+
+        iStatus = WFM_Rate(dUpdateRate, iUnits, &iUpdateTB,
+         &ulUpdateInt);
+        iRetVal = NIDAQErrorHandler(iStatus, "WFM_Rate",
+         iIgnoreWarning);
+
+        iStatus = WFM_ClockRate(iDevice, iGroup, iWhichClock,
+         iUpdateTB, ulUpdateInt, iDelayMode);
+        iRetVal = NIDAQErrorHandler(iStatus, "WFM_ClockRate",
+         iIgnoreWarning);
+
+ 		/* Set up triggering and "prime" board for output. */
+		iStatus = Select_Signal (iDevice, ND_OUT_EXTERNAL_GATE, ND_PFI_6, ND_PAUSE_ON_LOW);
+	    iStatus = WFM_Group_Control(iDevice, iGroup, iOpSTART);
+	    iRetVal = NIDAQErrorHandler(iStatus, "WFM_Group_Control/START", iIgnoreWarning);
+	}
+
+}

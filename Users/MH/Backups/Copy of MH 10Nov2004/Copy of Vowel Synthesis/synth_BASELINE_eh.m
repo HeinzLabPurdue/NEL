@@ -73,7 +73,7 @@ if mode<3
       %       sound(FULLvowel,Fs)
       %       disp(sprintf('\nPlaying New Synthesized Vowel'))
       %       pause(1)
-      %    [vowelORIG,FsORIG]=wavread('vow17_MH10k.wav');
+      %    [vowelORIG,FsORIG]=audioread('vow17_MH10k.wav');
       %        sound(vowelORIG,FsORIG)
       %    disp('Playing Resampled ORIGINAL Vowel (EH) from CN exps')
    else

@@ -25,9 +25,9 @@ vowel=vowel-mean(vowel);
 vowel=vowel/max(vowel);
 
 sound(vowel,Fs)
-disp(sprintf('\nPlaying Synthesized Vowel'))
+fprintf('\nPlaying Synthesized Vowel\n')
 pause(1)
-[stimORIG,FsORIG]=wavread('vow17_MH10k.wav');
+[stimORIG,FsORIG]=audioread('vow17_MH10k.wav');
 sound(stimORIG,FsORIG)
 disp('Playing Resampled Vowel from CN exps')
 

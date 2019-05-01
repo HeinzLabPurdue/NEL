@@ -37,9 +37,9 @@ if (exist('stimulus_vals','var') == 1)
       [Llist,Rlist] = read_rotate_list_file(List_File);
       if (~isempty(Llist) & ~isempty(Rlist)) 
          if (~isempty(Llist))
-            [data fs] = wavread(Llist{1});
+            [data fs] = audioread(Llist{1});
          elseif (~isempty(Rlist))
-            [data fs] = wavread(Rlist{1});
+            [data fs] = audioread(Rlist{1});
          end
          
          % Get sampling rate at which stimuli need to be played to shift SN to BF:

@@ -28,9 +28,10 @@ if (exist('stimulus_vals','var') == 1)
    
    PolarityFact=(strcmp(stimulus_vals.Inloop.InvertPolarity,'yes')-.5)*-2;  % For inverting waveform if necessary
    list = {stimulus_vals.Inloop.File};
-   [noise BASELINE_Fs] = wavread(stimulus_vals.Inloop.File);
+%    [noise BASELINE_Fs] = wavread(stimulus_vals.Inloop.File);
+   [noise, BASELINE_Fs] = audioread(stimulus_vals.Inloop.File);
    noise=noise*PolarityFact;  % Invert if necessary
-   [stimulus_vals units] = NI_check_gating_params(stimulus_vals, units);
+   [stimulus_vals, units] = NI_check_gating_params(stimulus_vals, units);
    dBreTONE=20*log10(sqrt(mean(noise.^2))/.707);
    
    if (BASELINE_Fs> NI6052UsableRate_Hz(Inf))

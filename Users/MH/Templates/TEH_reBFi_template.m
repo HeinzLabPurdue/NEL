@@ -1,4 +1,4 @@
-function [tmplt,DAL,stimulus_vals,units,errstr] = EH_reBFi_template(fieldname,stimulus_vals,units)
+function [tmplt,DAL,stimulus_vals,units,errstr] = TEH_reBFi_template(fieldname,stimulus_vals,units)
 % MH 24Mar2005: for R03 project
 % Modified version to allow interleaving with TONE, multi-levels, and hard-coded OCT-SHIFT list
 % Also changed calibration 3/25/05 to be based on individual Target Frequencies, rather than on 1 BaseTarget Frequency
@@ -83,7 +83,7 @@ if (exist('stimulus_vals','var') == 1)
       %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
       if (exist(stimulus_vals.Inloop.Compiled_FileName,'file') ~= 0)
          list = {stimulus_vals.Inloop.Compiled_FileName};
-         [vowel BASELINE_Fs] = wavread(stimulus_vals.Inloop.Compiled_FileName);
+         [vowel BASELINE_Fs] = audioread(stimulus_vals.Inloop.Compiled_FileName);
       else
          list = {};
       end

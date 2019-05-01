@@ -46,7 +46,7 @@ if (exist('stimulus_vals','var') == 1)
     %    if (exist(stimulus_vals.Inloop.List_File,'file') ~= 0)
     %       [Llist,Rlist] = read_rotate_list_file(stimulus_vals.Inloop.List_File);
     %       %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    %       [data fs] = wavread(Llist{1});
+    %       [data fs] = audioread(Llist{1});
     %       [stimulus_vals units] = NI_check_gating_params(stimulus_vals, units);%optional??
     %       [stimulus_vals.Mix units.Mix] = structdlg(tmplt.IO_def.Mix,'',stimulus_vals.Mix,'off');
     %       %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%       

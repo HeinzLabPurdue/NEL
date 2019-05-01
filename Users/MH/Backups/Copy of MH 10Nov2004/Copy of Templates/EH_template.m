@@ -18,7 +18,7 @@ tmplt = template_definition;
 if (exist('stimulus_vals','var') == 1)
    if (exist(stimulus_vals.Inloop.File,'file') ~= 0)
       list = {stimulus_vals.Inloop.File};
-      [data fs] = wavread(stimulus_vals.Inloop.File);
+      [data fs] = audioread(stimulus_vals.Inloop.File);
    else
       list = {};
    end
