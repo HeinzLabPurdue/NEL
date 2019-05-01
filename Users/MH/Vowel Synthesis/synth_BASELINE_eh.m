@@ -59,7 +59,7 @@ filename=sprintf('baseEH_F2at%05.f_F0at%03.f%s.wav',TargetFreq_Hz,NEWF0_Hz,FHtex
 if mode<3
    disp('***New vowel synthesized')
    if Fix2Harms
-      disp(sprintf('     - Formants: %s adjusted to be at harmonics',mat2str(AdjustedHarms)))   
+      fprintf('     - Formants: %s adjusted to be at harmonics\n',mat2str(AdjustedHarms))   
    end
    %% returned vowel will be 1 cycle, but any analysis and/or plotting will be done with a longer vowel
    FULLdur=0.6;   % This will be made to an integer number of periods (<=FULLdur)
@@ -78,7 +78,7 @@ if mode<3
       %       sound(FULLvowel,Fs)
       %       disp(sprintf('\nPlaying New Synthesized Vowel'))
       %       pause(1)
-      %    [vowelORIG,FsORIG]=wavread('vow17_MH10k.wav');
+      %    [vowelORIG,FsORIG]=audioread('vow17_MH10k.wav');
       %        sound(vowelORIG,FsORIG)
       %    disp('Playing Resampled ORIGINAL Vowel (EH) from CN exps')
    else

@@ -9,7 +9,7 @@ function rc = load_rawsamps_contstim(rp_num,data,sr)
 %                     'data' is the samples vercor, and 'sr' is the data sampling rate.
 %                     'rc' is 1 (success) or -1 (failure).
 %
-%           EXAMPLE:  [data,sr] = wavread('bla.wav');
+%           EXAMPLE:  [data,sr] = audioread('bla.wav');
 %                     rc  = load_raw_samples(1,data,sr);
 %                     if (rc), RPset_params(RP(1)); end
 

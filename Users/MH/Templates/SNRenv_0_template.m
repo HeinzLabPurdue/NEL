@@ -1,4 +1,4 @@
-function [tmplt,DAL,stimulus_vals,units,errstr] = Chimera_template(fieldname,stimulus_vals,units)
+function [tmplt,DAL,stimulus_vals,units,errstr] = SNRenv_0_template(fieldname,stimulus_vals,units)
 %  Written by GE, adapted from 'nel_rot_wavefile_template' written by AF (11/26/01).
 %   For implementation NI 6052e board, rather than TDT analog outputs.
 %  Modification dates: 06oct2003.
@@ -18,7 +18,7 @@ if (exist('stimulus_vals','var') == 1)
    if (exist(stimulus_vals.Inloop.List_File,'file') ~= 0)
       [Llist,Rlist] = read_rotate_list_file(stimulus_vals.Inloop.List_File);
       %% Rlist always empty here
-      [data fs] = wavread(Llist{1});
+      [data fs] = audioread(Llist{1});
       
 %       %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %       %%%% Generate CF tone wav files for NOISE FLOOR MEASURES
@@ -110,7 +110,7 @@ if (exist('stimulus_vals','var') == 1)
        max_dBSPL=[];
    end
    %load file
-   %[x,fs]=wavread('C:\NEL\Signals\MH\SNRenv\SNR_0\FLN_Stim_S_P.wav'); 
+   %[x,fs]=audioread('C:\NEL\Signals\MH\SNRenv\SNR_0\FLN_Stim_S_P.wav'); 
    %dBreTONE=20*log10(rms(x)/(5*.707));
    %Inloop.params.attens  = max_dBSPL-stimulus_vals.Inloop.Level+dBreTONE;   
    

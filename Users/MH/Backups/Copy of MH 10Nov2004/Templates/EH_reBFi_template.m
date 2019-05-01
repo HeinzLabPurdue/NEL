@@ -55,7 +55,7 @@ if (exist('stimulus_vals','var') == 1)
    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
    if (exist(stimulus_vals.Inloop.Compiled_FileName,'file') ~= 0)
       list = {stimulus_vals.Inloop.Compiled_FileName};
-      [vowel BASELINE_Fs] = wavread(stimulus_vals.Inloop.Compiled_FileName);
+      [vowel BASELINE_Fs] = audioread(stimulus_vals.Inloop.Compiled_FileName);
    else
       list = {};
    end

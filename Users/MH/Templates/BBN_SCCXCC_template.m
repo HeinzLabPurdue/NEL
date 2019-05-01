@@ -18,7 +18,7 @@ if (exist('stimulus_vals','var') == 1)
    if (exist(stimulus_vals.Inloop.List_File,'file') ~= 0)
       [Llist,Rlist] = read_rotate_list_file(stimulus_vals.Inloop.List_File);
       %% Rlist always empty here
-      [data fs] = wavread(Llist{1});
+      [data fs] = audioread(Llist{1});
       
       % Not necessary???? GE/MH 06Nov2003.
 %       [stimulus_vals units] = NI_check_gating_params(stimulus_vals, units);

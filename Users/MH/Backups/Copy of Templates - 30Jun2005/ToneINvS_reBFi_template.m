@@ -88,8 +88,8 @@ if (exist('stimulus_vals','var') == 1)
       if (exist(stimulus_vals.Inloop.Compiled_FileName,'file') ~= 0)
          Llist = {stimulus_vals.Inloop.Compiled_FileName};
          Rlist = {stimulus_vals.Inloop.Noise_FileName};
-         [vowel BASELINE_Fs] = wavread(stimulus_vals.Inloop.Compiled_FileName);
-         [noise BASENOISE_Fs] = wavread(stimulus_vals.Inloop.Noise_FileName);
+         [vowel BASELINE_Fs] = audioread(stimulus_vals.Inloop.Compiled_FileName);
+         [noise BASENOISE_Fs] = audioread(stimulus_vals.Inloop.Noise_FileName);
          if BASELINE_Fs~=BASENOISE_Fs
             nelerror('In ToneINvSreBFi_template: BASE sampling rates dont match between EH and NOISE!!');
          end

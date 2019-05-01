@@ -1,4 +1,4 @@
-function [tmplt,DAL,stimulus_vals,units,errstr] = CHrlv_quick_template(fieldname,stimulus_vals,units)
+function [tmplt,DAL,stimulus_vals,units,errstr] = SNRenvrlv_quick_template(fieldname,stimulus_vals,units)
 % MH 11Apr2005: for R03 project
 % Rate-level data with 20 reps for SAC analysis
 % Steps through several levels
@@ -28,7 +28,7 @@ if (exist('stimulus_vals','var') == 1)
    
    PolarityFact=(strcmp(stimulus_vals.Inloop.InvertPolarity,'yes')-.5)*-2;  % For inverting waveform if necessary
    list = {stimulus_vals.Inloop.File};
-   [noise BASELINE_Fs] = wavread(stimulus_vals.Inloop.File);
+   [noise BASELINE_Fs] = audioread(stimulus_vals.Inloop.File);
    noise=noise*PolarityFact;  % Invert if necessary
    [stimulus_vals units] = NI_check_gating_params(stimulus_vals, units);
    dBreTONE=20*log10(sqrt(mean(noise.^2))/.707);

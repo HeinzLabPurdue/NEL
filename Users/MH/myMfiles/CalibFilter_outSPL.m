@@ -38,7 +38,7 @@ if plotYes
 end
 
 %% load stim
-[stimOrg, fsOrg]= wavread(audio_fName);
+[stimOrg, fsOrg]= audioread(audio_fName);
 fs=20e3;
 qBYp=round(fsOrg/fs);
 fs=fsOrg/qBYp;

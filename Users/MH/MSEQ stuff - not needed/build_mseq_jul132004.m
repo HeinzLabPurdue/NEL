@@ -44,7 +44,7 @@ end
 
 fn=dir(filename);
 if ~isempty(fn) % We've already built one of these, just read it and return
-   [y,sr]=wavread(filename);
+   [y,sr]=audioread(filename);
    if ~isempty(y) & round(sr)==round(fs) % sampling rates are equal, we're done!
       return
    end

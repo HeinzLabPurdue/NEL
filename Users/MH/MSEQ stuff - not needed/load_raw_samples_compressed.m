@@ -1,4 +1,4 @@
-function rc = load_raw_samples(rp_num,data,sr)
+function rc = load_raw_samples_compressed(rp_num,data,sr)
 % LOAD_RAW_SAMPLES    Loads stimulus samples to the specified RP structure. 
 %                     The data is not actually sent to the device (Use RPset_params for this purpose).
 %                     'load_raw_samples' warns if the data sampling rate does not match the RP 
@@ -9,7 +9,7 @@ function rc = load_raw_samples(rp_num,data,sr)
 %                     'data' is the samples vercor, and 'sr' is the data sampling rate.
 %                     'rc' is 1 (success) or -1 (failure).
 %
-%           EXAMPLE:  [data,sr] = wavread('bla.wav');
+%           EXAMPLE:  [data,sr] = audioread('bla.wav');
 %                     rc  = load_raw_samples(1,data,sr);
 %                     if (rc), RPset_params(RP(1)); end
 

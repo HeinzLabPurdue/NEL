@@ -12,7 +12,7 @@ used_devices.File         = 'RP1.1';
 tmplt = template_definition(fieldname);
 if (exist('stimulus_vals','var') == 1)  
    
-   [data fs]=wavread(stimulus_vals.Inloop.File);
+   [data fs]=audioread(stimulus_vals.Inloop.File);
    playback_rate = 97656.25/(round(97656.25/fs)); % 97656.25 is the rco's sampling rate
    playdur = round(length(data)/playback_rate*1000);	%compute file duration based on sampling rate
    min_period = playdur + length(data)/97.656 * 0.55 + 250;

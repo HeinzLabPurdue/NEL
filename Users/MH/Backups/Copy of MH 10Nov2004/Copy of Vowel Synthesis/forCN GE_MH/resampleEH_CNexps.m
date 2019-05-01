@@ -18,7 +18,7 @@ set(0,'DefaultTextInterpreter','none')
 % Original sampling frequency
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 dur=0.6;
-[stim,Fs]=wavread('EDY - EH Sounds/vow17.wav');
+[stim,Fs]=audioread('EDY - EH Sounds/vow17.wav');
 stim=stim';
 durN=length(stim)/Fs;
 Nreps=ceil(dur/durN);  % Create full-duration waveform
