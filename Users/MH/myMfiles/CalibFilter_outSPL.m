@@ -1,5 +1,5 @@
 % function [filteredSPL, originalSPL]=CalibFilter_outSPL(audio_fName, calib_fName, plotYes, verbose)
-% Input 
+% Input
 %       audio_fName: filename for audio file
 %       calib_fName: filename for calibration file (MAT)
 %       plotYes: if 0 doesn't plot
@@ -12,7 +12,7 @@
 % use one calib file
 % use one broadband stimulus (probably (1) white noise and (2) speech)
 % 100 dB at 1 kHz in calib means if we play a 1-V P-P 1 kHz sinusoid, the
-% output will be 100 dB. 
+% output will be 100 dB.
 function [filteredSPL, originalSPL]=CalibFilter_outSPL(audio_fName, calib_IN, plotYes, verbose)
 
 if ischar(calib_IN)
@@ -46,7 +46,7 @@ stim= resample(stimOrg, 1, qBYp);
 t=(1:length(stim))/fs;
 
 %% load calib
-calibdata= loadPic(calibPicNum);
+calibdata= loadpic(calibPicNum);
 calibdata=calibdata.CalibData;
 
 %% remove anything above fs/2.
@@ -132,6 +132,7 @@ if plotYes
     
     grid on;
     set(gca, 'xscale', 'lin');
+end
 end
 
 function A_amp= db2mag(A_dB)

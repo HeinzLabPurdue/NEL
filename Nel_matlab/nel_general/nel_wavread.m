@@ -8,7 +8,7 @@ global NelData signals_dir
 data = [];
 sr   = [];
 rc = 1;
-eval('[data,sr] = wavread(fname);', 'rc=0;');
+eval('[data,sr] = audioread(fname);', 'rc=0;');
 if (rc == 0)
    nelerror(['nel_wavread: Can''t read wavfile ''' fname '''']);
    return;

@@ -30,21 +30,21 @@ if nargin < 1
    whitebg('w');
    
    %the following text handles are display parameters
-   if Stimuli.fstlin == 0,
+   if Stimuli.fstlin == 0
       log_txt = 'yes';
-   elseif Stimuli.fstoct == 0,
+   elseif Stimuli.fstoct == 0
       log_txt = 'no';
    end
    
    step_txt = max(Stimuli.fstlin, Stimuli.fstoct);
    
-   if Stimuli.ear == 1,
+   if Stimuli.ear == 1
       chan_txt = 'left';
    else
       chan_txt = 'right';
    end
    
-   if Stimuli.cal == 1,
+   if Stimuli.cal == 1
       spl_txt = 'yes';
    else
       spl_txt = 'no';
@@ -108,7 +108,7 @@ elseif strcmp(command_str,'calibrate')
       %    ndpnts = number of frequencies done so far
       
       % Get SPL calibration data if requested.
-      if Stimuli.cal,
+      if Stimuli.cal
          [error] = gtsplc;
       end
       % *** Main Data Collection Loop ***

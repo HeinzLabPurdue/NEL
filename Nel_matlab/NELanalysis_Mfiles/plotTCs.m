@@ -25,7 +25,7 @@ if ~exist('PLOTyes')
 end
 
 %%% READ in Calib Data
-xCAL=loadPic(CALIBpic);
+xCAL=loadpic(CALIBpic);
 CalibData = xCAL.CalibData(:,1:2);
 
 numTCs=length(PIClist);
@@ -54,7 +54,7 @@ end
 
 for ind=1:numTCs
    PICind=PIClist(ind);
-   x{ind}=loadPic(PICind);
+   x{ind}=loadpic(PICind);
    TCdata{ind}=x{ind}.TcData;
    TCdata{ind}=TCdata{ind}(find(TCdata{ind}(:,1)),:);  % Get rid of all 0 freqs
    TCdata{ind}=TCdata{ind}(find(TCdata{ind}(:,2)~=x{ind}.Stimuli.file_attlo),:);  % Get rid of all 'upper atten limit points'

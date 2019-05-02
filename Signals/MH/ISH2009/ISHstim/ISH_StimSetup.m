@@ -7,10 +7,10 @@ clear
 
 cd('C:\Documents and Settings\Mike\My Documents\Work\Research\R03 Experiments\Data Analysis\STMP Mfiles\ISHstim')
 
-[BBN_A Fs1]=wavread('BBN_A');
-[BBN_AN Fs2]=wavread('BBN_AN');
-[BoyFell Fs3]=wavread('Speech');
-[BoyFellN Fs4]=wavread('NSpeech');
+[BBN_A Fs1]=audioread('BBN_A');
+[BBN_AN Fs2]=audioread('BBN_AN');
+[BoyFell Fs3]=audioread('Speech');
+[BoyFellN Fs4]=audioread('NSpeech');
 Fs=Fs1;
 
 RMS(1)=sqrt(mean(BBN_A.^2));
@@ -119,10 +119,10 @@ wavwrite(BoyFell_N,Fs,'BoyFell_N.wav');
 
 % - RMS is different due to zero-padding
 %% TEST/VERIFY
-[BBN_A_2 Fs1]=wavread('BBN_A_');
-[BBN_A_N2 Fs2]=wavread('BBN_A_N');
-[BoyFell_2 Fs3]=wavread('BoyFell_');
-[BoyFell_N2 Fs4]=wavread('BoyFell_N');
+[BBN_A_2 Fs1]=audioread('BBN_A_');
+[BBN_A_N2 Fs2]=audioread('BBN_A_N');
+[BoyFell_2 Fs3]=audioread('BoyFell_');
+[BoyFell_N2 Fs4]=audioread('BoyFell_N');
 
 RMS3(1)=sqrt(mean(BBN_A_.^2));
 RMS3(2)=sqrt(mean(BBN_A_N.^2));

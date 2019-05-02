@@ -17,6 +17,9 @@ if (length(error_strs) > MAXerrlines)
    error_strs{MAXerrlines+1} = 'Too many errors for data file. For complete listing use the error log file.';
    error_strs = error_strs(1:MAXerrlines+1);
 end
+x.General.WinHostName    = NelData.General.WindowsHostName;
+x.General.WinUserName    = NelData.General.WindowsUserName;
+x.General.RootDir        = NelData.General.RootDir;
 x.General.program_name   = ProgName;
 x.General.picture_number = NelData.File_Manager.picture+1;
 x.General.track          = NelData.File_Manager.track.No;

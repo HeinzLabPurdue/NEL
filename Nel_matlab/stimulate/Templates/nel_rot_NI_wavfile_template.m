@@ -19,9 +19,9 @@ if (exist('stimulus_vals','var') == 1)
    if (exist(stimulus_vals.Inloop.List_File,'file') ~= 0)
       [Llist,Rlist] = read_rotate_list_file(stimulus_vals.Inloop.List_File);
       if (~isempty(Llist))
-         [data fs] = wavread(Llist{1});
+         [data fs] = audioread(Llist{1});
       elseif (~isempty(Rlist))
-         [data fs] = wavread(Rlist{1});
+         [data fs] = audioread(Rlist{1});
       end
   
       % Not necessary???? GE/MH 06Nov2003.

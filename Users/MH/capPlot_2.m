@@ -5,8 +5,8 @@ drWindow=[0.0075 0.0135];
 thresh_mag=10;
 capWavesYes=1; %produce a figure plotting the CAP waveforms
 
-x=loadPic(picNum);
-xx=loadPic(calibPicNum);
+x=loadpic(picNum);
+xx=loadpic(calibPicNum);
 capData=x.AD_Data.AD_Avg_V;
 gain=x.AD_Data.Gain;
 sf=x.Stimuli.RPsamprate_Hz;

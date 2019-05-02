@@ -6,6 +6,7 @@ function [tmplt,DAL,stimulus_vals,units,errstr] = SNRenv_SSN_template(fieldname,
 
 % persistent   prev_playdur  prev_min_period  prev_maxlen
 persistent prev_maxlen
+global NelData
 % We use the persistent variables to detect a change that requires some fields update.
 % For example, of the play duration is changed we would like to update the gating information.
 % We restict the automatic updates to allow the user the overide them.
@@ -110,7 +111,7 @@ if (exist('stimulus_vals','var') == 1)
        max_dBSPL=[];
    end
    %load file
-   [x,fs]=audioread('C:\NEL\Signals\MH\SNRenv\stimSetStationary\Stim_S_P.wav'); 
+   [x,fs]=audioread([NelData.General.RootDir 'Signals\MH\SNRenv\stimSetStationary\Stim_S_P.wav']); 
    dBreTONE=20*log10(rms(x)/(5*.707));
    
    Inloop.params.attens                 = max_dBSPL-stimulus_vals.Inloop.Level+dBreTONE;

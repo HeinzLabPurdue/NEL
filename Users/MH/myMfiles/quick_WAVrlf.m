@@ -27,7 +27,7 @@ figure(params.figNum); clf
 
 PICind=1;
 
-[rc{PICind} x{PICind}] = loadPic(RLFpic(PICind));
+[rc{PICind} x{PICind}] = loadpic(RLFpic(PICind));
 legtext{PICind}={'DRIV','SPONT'};   
 [driv{PICind} spont{PICind}] = compute_driv_spont_rates(x{PICind}, params);
 nameStr = sprintf ('picture p%04d rate-level [%s]', RLFpic,x{1}.Stimuli.short_description);
@@ -61,7 +61,7 @@ title(nameStr)
 set(gca,'Xdir','rev')
 
 %%#######################################################################
-function [rc, x] = loadPic(picNum)     % Load picture
+function [rc, x] = loadpic(picNum)     % Load picture
 picSearchString = sprintf('p%04d*.m', picNum);
 picMFile = dir(picSearchString);
 if (~isempty(picMFile))

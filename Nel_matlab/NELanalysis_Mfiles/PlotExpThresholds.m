@@ -4,7 +4,7 @@ function PlotExpThresholds(ExpDirName)
 % Plots TC Thresholds for a given experiment
 
 set(0,'DefaultTextInterpreter','none');
-ExpDataDir = 'C:\NEL\ExpData';
+ExpDataDir = [NelData.General.RootDir 'ExpData'];
 cd(ExpDataDir)
 
 if ~exist(ExpDirName,'dir')

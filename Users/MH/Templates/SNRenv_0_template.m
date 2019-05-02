@@ -115,7 +115,7 @@ if (exist('stimulus_vals','var') == 1)
    %Inloop.params.attens  = max_dBSPL-stimulus_vals.Inloop.Level+dBreTONE;   
    
    % updating to use calib filter at all freqs instead of just at CF calib: (Nov 28, 2018) [SP]
-   audio_fName='C:\NEL\Signals\MH\SNRenv\SNR_0\FLN_Stim_S_P.wav';
+   audio_fName=[NelData.General.RootDir 'Signals\MH\SNRenv\SNR_0\FLN_Stim_S_P.wav'];
    cdd;
    calibFiles= dir('*calib*');
    calib_picNum= getPicNum(calibFiles(end).name);

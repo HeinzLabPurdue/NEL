@@ -407,7 +407,7 @@ axis([0 f(npts/2)/1e3 -ht-5 noiseceil+5])
 % wavwrite(stim_matrix(51,:),sr,'stimtestn51_60.wav');
 % wavwrite(stim_matrix(100,:),sr,'stimtestb100.wav');
 % pwd
-% [stest,sr2,nbits]=wavread('stimtestnw1_60.wav'); stest=stest';
+% [stest,sr2,nbits]=audioread('stimtestnw1_60.wav'); stest=stest';
 
 %test if errors due to roundoff to 16 bit - no.  8 bit - possibly!
 %  note: need to comment out when not debugging, because causes system to miss stimuli

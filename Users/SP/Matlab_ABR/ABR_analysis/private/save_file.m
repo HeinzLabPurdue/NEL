@@ -6,7 +6,7 @@ default = strcat('chin',animal,'on',date);
 filename = inputdlg('File name:','Save Data',1,default);
 
 if ~isempty(filename)
-   filename2 = char(strcat('C:\NEL\ExpData\Summary\',filename,'.mat'));
+   filename2 = char(strcat(NelData.General.RootDir, 'ExpData\Summary\',filename,'.mat'));
    
    freq2=ones(1,num)*freq; replaced=0;
    

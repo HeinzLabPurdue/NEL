@@ -35,7 +35,7 @@ set(gcf, 'Name', nameStr);
 % CAL.CalibData(:,2)=trifilt(CAL.CalibData(:,2)',5)';  % Do some smoothing
 
 for PICind=1:Npicts
-   [rc{PICind} x{PICind}] = loadPic(RLFpics(PICind));
+   [rc{PICind} x{PICind}] = loadpic(RLFpics(PICind));
    if isfield(x{PICind}.Stimuli,'feature')
       legtext{PICind}=x{PICind}.Stimuli.feature;   
    else
@@ -86,7 +86,7 @@ legend(legtext,4)
 title(nameStr)
 
 %%#######################################################################
-function [rc, x] = loadPic(picNum)     % Load picture
+function [rc, x] = loadpic(picNum)     % Load picture
 picSearchString = sprintf('p%04d*.m', picNum);
 picMFile = dir(picSearchString);
 if (~isempty(picMFile))
