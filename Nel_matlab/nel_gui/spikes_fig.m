@@ -22,6 +22,7 @@ if ((nargin  == 0) | isnumeric(varargin{1}))
       if (isempty(spikes_fig_handles{i}) | ~ishandle(spikes_fig_handles{i}))
          spikes_fig_handles{i} = openfig(mfilename,'new');
          set(spikes_fig_handles{i},'Visible','off');
+         set(spikes_fig_handles{i},'GraphicsSmoothing','off');  % Added from MS - newgraphics
          set(spikes_fig_handles{i},'Name',['Channel #' int2str(i)]);
          cur_pos = get(spikes_fig_handles{i},'Position');
          set(spikes_fig_handles{i},'Userdata',struct( ...
@@ -208,8 +209,10 @@ for i = channels(:)'
    if (~isempty(raster_params))
       cont.haxes = handles.Cont_Axes;
       axes(cont.haxes);
-      delete(findobj(cont.haxes,'Type','line'));
-      cont.hraster = line(NaN,NaN);
+      %       delete(findobj(cont.haxes,'Type','line'));  %
+      delete(findobj(cont.haxes,'Type','animatedline'));
+      %       cont.hraster = line(NaN,NaN);
+      cont.hraster = animatedline(NaN,NaN);%MS 2017 - to reflect changes in matlab graphics from 2014b onwards
       cont.hxlabel = xlabel('Time (sec)');
       cont.hylabel = ylabel('');	
       if (~isfield(raster_params,'props'))
