@@ -1,4 +1,4 @@
-function my_startup
+function my_startup_MH
 % MY_STARTUP personlized startup file for nel users
 %
 % MH 12/14/01
