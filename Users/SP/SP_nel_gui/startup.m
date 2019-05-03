@@ -1,5 +1,5 @@
 p=pwd;
-cd ('C:\NEL\Nel_matlab\nel_general');
+cd ([NelData.General.RootDir 'Nel_matlab\nel_general']);
 startup;
 cd (p);
 

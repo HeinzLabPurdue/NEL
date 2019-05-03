@@ -6,6 +6,5 @@ function abr_setup
 %    addpath c:\Users\GE\Matlab_ABR\abr_analysis;
 % case {'north-chamber'}
 %    addpath d:\Users\GE\Matlab_ABR\abr_analysis;
-% end   
-addpath C:\NEL\Users\MH\Matlab_ABR\ABR_analysis
-
+% end
+addpath ([NelData.General.RootDir 'Users\MH\Matlab_ABR\ABR_analysis']);

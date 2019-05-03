@@ -8,8 +8,8 @@ global abr_FIG abr_Stimuli abr_root_dir abr_data_dir...
 
 
 host = lower(getenv('hostname'));
-abr_root_dir = 'C:\NEL\Users\MH\Matlab_ABR';  % added by GE 04Mar2004.
-abr_data_dir = 'C:\NEL\ExpData\'; % added by GE 04Mar2004.
+abr_root_dir = [NelData.General.RootDir 'Users\MH\Matlab_ABR'];  % added by GE 04Mar2004.
+abr_data_dir = [NelData.General.RootDir 'ExpData\']; % added by GE 04Mar2004.
 
 
 get_noise

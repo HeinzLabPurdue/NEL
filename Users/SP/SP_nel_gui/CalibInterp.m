@@ -12,7 +12,7 @@ function max_dBSPL=CalibInterp(cal_freq_kHz,calib)
 
 if length(calib)==1
     cdd;
-    xx=loadPic(calib);
+    xx=loadpic(calib);
     calib=xx.CalibData;
     rdd;
 end

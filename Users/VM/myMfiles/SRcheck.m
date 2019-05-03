@@ -3,12 +3,12 @@
 function spontrate = SRcheck(picnum)
 if length(picnum) > 1
     for i = 1:length(picnum)
-        x = loadPic(picnum(i));
+        x = loadpic(picnum(i));
         numspikes = length(x.spikes{:});
         spontrate(i,:) = [numspikes/30 picnum(i)];
     end
 else
-    x = loadPic(picnum);
+    x = loadpic(picnum);
     numspikes = length(x.spikes{:});
     spontrate = numspikes/30;
 end

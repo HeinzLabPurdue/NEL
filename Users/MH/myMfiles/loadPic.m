@@ -1,4 +1,4 @@
-function x = loadPic(picNum)     % Load picture
+function x = loadpic(picNum)     % Load picture
 picSearchString = sprintf('p%04d*.m', picNum);
 picMFile = dir(picSearchString);
 if (~isempty(picMFile))

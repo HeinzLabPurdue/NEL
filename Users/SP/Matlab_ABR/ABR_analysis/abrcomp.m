@@ -4,7 +4,7 @@ global abr_data_dir han_abrcomp dd colorr numfiles
 
 %
 
-abr_data_dir = 'C:\NEL\ExpData\'; % added by GE 04Mar2004.
+abr_data_dir = [NelData.General.RootDir 'ExpData\']; % added by GE 04Mar2004.
 
 if nargin < 1
 	

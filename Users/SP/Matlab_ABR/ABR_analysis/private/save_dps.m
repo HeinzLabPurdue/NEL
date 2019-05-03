@@ -7,7 +7,7 @@ filename = inputdlg('File name:','Save Data',1,default);
 
 
 if ~isempty(filename)
-	filename2 = char(strcat('C:\NEL\ExpData\Summary\',filename,'.mat'));
+	filename2 = char(strcat(NelData.General.RootDir, 'ExpData\Summary\',filename,'.mat'));
 	dpoae.data=z.DpoaeData;
 
 	if day_of(filename2) < 733976

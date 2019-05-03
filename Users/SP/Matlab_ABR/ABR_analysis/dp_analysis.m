@@ -4,7 +4,7 @@ global dp_data_dir han_dp z zanimal zdate
 
 %
 
-dp_data_dir = 'C:\NEL\ExpData\'; 
+dp_data_dir = [NelData.General.RootDir 'ExpData\']; 
 
 if nargin < 1
 	

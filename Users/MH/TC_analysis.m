@@ -46,10 +46,10 @@ redflag=0;
 if ~exist('PLOTyes','var')
 	PLOTyes=1;
 end
-x=loadPic(PicNum);
+x=loadpic(PicNum);
 
 %%% READ in Calib Data
-xCAL=loadPic(CALIBpic);
+xCAL=loadpic(CALIBpic);
 CalibData = xCAL.CalibData(:,1:2);
 
 % numTCs=length(PIClist);
@@ -77,7 +77,7 @@ end
 
 % for ind=1:numTCs
 %    PICind=PIClist(ind);
-%    x=loadPic(PICind);
+%    x=loadpic(PICind);
 TCdata=x.TcData;
 TCdata=TCdata(find(TCdata(:,1)),:);   % Get rid of all 0 freqs
 TCdata=TCdata(TCdata(:,2)~=x.Stimuli.file_attlo,:);  % Get rid of all 'upper atten limit points'

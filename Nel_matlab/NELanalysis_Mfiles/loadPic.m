@@ -1,5 +1,5 @@
-function [x,errorMSG]=loadPic(picNum)
-% function x=loadPic(picIND)
+function [x,errorMSG]=loadpic(picNum)
+% function x=loadpic(picIND)
 % Created: M. Heinz 18Mar2004
 % Modified from GE version, 29Jul2004
 %

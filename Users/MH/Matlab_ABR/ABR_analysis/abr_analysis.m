@@ -8,15 +8,15 @@ global abr_FIG abr_Stimuli abr_root_dir abr_data_dir
 host = lower(getenv('hostname'));
 % switch (host)
 % case {'north-chamber'}
-abr_root_dir = 'C:\NEL\Users\MH\Matlab_ABR';  % added by GE 04Mar2004.
-abr_data_dir = 'C:\NEL\ExpData\'; % added by GE 04Mar2004.
+abr_root_dir = [NelData.General.RootDir 'Users\MH\Matlab_ABR'];  % added by GE 04Mar2004.
+abr_data_dir = [NelData.General.RootDir 'ExpData\']; % added by GE 04Mar2004.
 % case {'south-chamber'}
 % 	abr_root_dir = 'c:\Users\GE\Matlab_ABR';  % added by GE 04Mar2004.
 % 	abr_data_dir = 'c:\ExpData\'; % added by GE 04Mar2004.
-% end   
-   
-if nargin < 1
+% end
 
+if nargin < 1
+    
     %CREATING STRUCTURES HERE
     PROG = struct('name','ABR.m','date',date,'version','rp2 v2.0');
     
@@ -28,8 +28,8 @@ if nargin < 1
     
     get_analysis_ins; %script creates struct Stimuli
     if ~exist('abr_Stimuli')|~isfield(abr_Stimuli, 'cal_pic')
-      % LQ 01/09/04 when get_analysis_ins is corrupted        
-      instruct_error;
+        % LQ 01/09/04 when get_analysis_ins is corrupted
+        instruct_error;
     end
     
     abr_FIG.handle = figure('NumberTitle','off','Name','ABR Analysis','Units','normalized','Visible','off','position',[0 0 1 .95],'CloseRequestFcn','abr_analysis(''close'');');
@@ -39,10 +39,10 @@ if nargin < 1
     abr_FIG.push.process = uicontrol(abr_FIG.handle,'callback','abr_analysis(''process'');','style','pushbutton','Units','normalized','position',[.05 .85 .1 .05],'string','Process');
     abr_FIG.push.print   = uicontrol(abr_FIG.handle,'callback','abr_analysis(''print'');','style','pushbutton','Units','normalized','position',[.2125 .85 .1 .05],'string','Print');
     abr_FIG.push.file   = uicontrol(abr_FIG.handle,'callback','abr_analysis(''file'');','style','pushbutton','Units','normalized','position',[.375 .85 .1 .05],'string','Save as File');
-%     abr_FIG.push.edit    = uicontrol(abr_FIG.handle,'style','edit','Units','normalized','position',[.32 .08 .1 .04],'string',[],'FontSize',12);								
+    %     abr_FIG.push.edit    = uicontrol(abr_FIG.handle,'style','edit','Units','normalized','position',[.32 .08 .1 .04],'string',[],'FontSize',12);
     abr_FIG.push.edit    = uicontrol(abr_FIG.handle,'style','edit', 'callback', 'abr_analysis(''edit'');', ...
-       'Units','normalized','position',[.32 .08 .1 .04],'string',[],'FontSize',12);								
-  
+        'Units','normalized','position',[.32 .08 .1 .04],'string',[],'FontSize',12);
+    
     abr_FIG.ax1.axes = axes('Position',[.1 .45 .35 .3]);
     abr_FIG.ax1.line1 = plot(0,0,'b-','LineWidth',2,'Visible','off');
     hold on;
@@ -54,7 +54,7 @@ if nargin < 1
     
     axes('Position',[.1 .1 .35 .4]);
     axis('off');
-%    text(.2,.65,'Directory:','fontsize',10,'color','k','horizontalalignment','left','VerticalAlignment','middle');
+    %    text(.2,.65,'Directory:','fontsize',10,'color','k','horizontalalignment','left','VerticalAlignment','middle');
     text(.2,.55,'Calibration File:','fontsize',10,'color','k','horizontalalignment','left','VerticalAlignment','middle');
     text(.2,.45,'ABR Files:','fontsize',10,'color','k','horizontalalignment','left','VerticalAlignment','middle');
     text(.2,.37,'ABR Min:','fontsize',10,'color','k','horizontalalignment','left','VerticalAlignment','middle');
@@ -75,11 +75,11 @@ if nargin < 1
     
     left = .55; bottom = .2; width = .35; height = .7;  % added by GE 14Apr2004.
     abr_FIG.a2.axesR = axes('Position',[left+width bottom 0.001 height]); % for labelling right axis
-	set(gca, 'FontSize', 12);
-	set(gca, 'XTickMode', 'manual');
-	set(gca, 'YAxisLocation', 'right');
-	set(gca, 'YTickMode', 'manual');
-
+    set(gca, 'FontSize', 12);
+    set(gca, 'XTickMode', 'manual');
+    set(gca, 'YAxisLocation', 'right');
+    set(gca, 'YTickMode', 'manual');
+    
     abr_FIG.ax2.axes = axes('Position',[left bottom width height]);  % modified by GE 14Apr2004
     abr_FIG.abrs.abr1 = plot(0,0,'b-','LineWidth',2,'Visible','off');
     hold on;
@@ -90,42 +90,42 @@ if nargin < 1
     abr_FIG.ax2.ylab = ylabel('Stimulus level (dB SPL)','FontSize',14,'Interpreter','tex');
     abr_FIG.ax2.rect = rectangle;  % added by GE 04Mar2004.
     abr_FIG.ax2.rect2 = rectangle;  % added by GE 14Apr2004.
-
+    
     set(abr_FIG.handle,'Userdata',struct('handles',abr_FIG));
     set(abr_FIG.handle,'Visible','on');
     drawnow;
     
 elseif strcmp(command_str,'stimulus')
-% MH 27Apr2004:  We'll change the calib # if we want!
-   %         if parm_num == 1
-%             warndlg('Do not change calibration picture!','Analysis Error');
-%             set(abr_FIG.push.edit,'string',[]);
-%             
-%             
-         if length(get(abr_FIG.push.edit,'string'))
-            new_value = get(abr_FIG.push.edit,'string');
-            set(abr_FIG.push.edit,'string',[]);
-            set(abr_FIG.parm_txt(parm_num),'string',upper(new_value));
-            switch parm_num
-                case 1,
-                   abr_Stimuli.cal_pic = new_value;              
-                case 2,
-                   abr_Stimuli.abr_pic = new_value;
-%                    abr_analysis('process');  % added by GE 14Apr2004
-                case 3,
-                   abr_Stimuli.start_resp = str2num(new_value);
-                case 4,
-                   abr_Stimuli.end_resp = str2num(new_value);
-                case 5,
-                   abr_Stimuli.start_back = str2num(new_value);
-                case 6,
-                   abr_Stimuli.end_back = str2num(new_value);
-                case 7,
-                   abr_Stimuli.scale = str2num(new_value);
-            end
-         else
-            set(abr_FIG.push.edit,'string','ERROR');
-         end
+    % MH 27Apr2004:  We'll change the calib # if we want!
+    %         if parm_num == 1
+    %             warndlg('Do not change calibration picture!','Analysis Error');
+    %             set(abr_FIG.push.edit,'string',[]);
+    %
+    %
+    if length(get(abr_FIG.push.edit,'string'))
+        new_value = get(abr_FIG.push.edit,'string');
+        set(abr_FIG.push.edit,'string',[]);
+        set(abr_FIG.parm_txt(parm_num),'string',upper(new_value));
+        switch parm_num
+            case 1
+                abr_Stimuli.cal_pic = new_value;
+            case 2
+                abr_Stimuli.abr_pic = new_value;
+                %                    abr_analysis('process');  % added by GE 14Apr2004
+            case 3
+                abr_Stimuli.start_resp = str2num(new_value);
+            case 4
+                abr_Stimuli.end_resp = str2num(new_value);
+            case 5
+                abr_Stimuli.start_back = str2num(new_value);
+            case 6
+                abr_Stimuli.end_back = str2num(new_value);
+            case 7
+                abr_Stimuli.scale = str2num(new_value);
+        end
+    else
+        set(abr_FIG.push.edit,'string','ERROR');
+    end
     
 elseif strcmp(command_str,'directory')
     abr_Stimuli.dir = get_directory;
@@ -147,7 +147,7 @@ elseif strcmp(command_str,'file')
     pic_dir = fullfile(abr_data_dir,'pictures');
     if ~exist(pic_dir)
         mkdir(abr_data_dir,'pictures');
-    end 
+    end
     
     filename = inputdlg('Name the file:','File Manager',1);
     if isempty(filename)
@@ -157,10 +157,10 @@ elseif strcmp(command_str,'file')
         print('-depsc','-noui',fullfile(pic_dir,char(filename))); %crashes this computer!!!!
         uiwait(msgbox('File has been saved.','File Manager','modal'));
     end
-
+    
 elseif strcmp(command_str,'edit') % added by GE 15Apr2004
-%    abr_analysis('stimulus',2);
-
+    %    abr_analysis('stimulus',2);
+    
 elseif strcmp(command_str,'close')
     update_params;
     closereq;

@@ -1,4 +1,4 @@
-function [tmplt,DAL,stimulus_vals,units,errstr] = PST_template(fieldname,stimulus_vals,units)
+function [tmplt,DAL,stimulus_vals,units,errstr] = PSTlong_template(fieldname,stimulus_vals,units)
 %
 % Modified by M.Heinz 12Nov2003, from nel_rate_level_template.m
 

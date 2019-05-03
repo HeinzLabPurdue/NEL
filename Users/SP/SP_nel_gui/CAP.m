@@ -351,7 +351,7 @@ elseif strcmp(command_str,'load_calib') %SP 24Jan2016
       
 
     
-elseif strcmp(command_str,'close');
+elseif strcmp(command_str,'close')
     set(FIG.push.close,'Userdata',1);
-    cd('C:\NEL\Nel_matlab\nel_general');
+    cd([NelData.General.RootDir 'Nel_matlab\nel_general']);
 end

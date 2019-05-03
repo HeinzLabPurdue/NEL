@@ -132,7 +132,7 @@ h = uicontrol(fig, ...
 
 function loadwav(RP2,out,wavfile)
 % load wav file
-[data,sr] = wavread(wavfile);   
+[data,sr] = audioread(wavfile);   
 ratio = round(double(invoke(RP2,'GetSFreq'))/sr);
 invoke(RP2,'SetTagVal',['length' out],length(data));
 invoke(RP2,'SetTagVal',['ratio' out],ratio);   
