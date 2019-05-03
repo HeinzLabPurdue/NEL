@@ -379,8 +379,11 @@ block_info.fully_presented_stimuli = number_of_presented_stims;
 block_info.fully_presented_lines = number_of_presented_lines;
 block_info.bad_lines=bad_lines;
 block_info.line_errors=line_errors;
-%% This refreshes the contPlot in case it was minimized during loop
-call_user_func(contPlotParams.func,{},contPlotParams,[],[],1:nChannels); % Allow contplot to set all the data points.
+% %% This refreshes the contPlot in case it was minimized during loop
+% call_user_func(contPlotParams.func,{},contPlotParams,[],[],1:nChannels); % Allow contplot to set all the data points.
+% % Allow contplot to set all the data points. MS 2017 - nolonger necessary
+% since implemented new version of graphics using animatedline class.
+
 %%%cleanup
 call_user_func(DAL.Inloop.Name);
 msdl(0);
