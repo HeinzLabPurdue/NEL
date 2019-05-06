@@ -4,17 +4,10 @@
 global signals_dir
 
 files ={
-'FLN_Stim0dB_SN_P.wav',
-'FLN_Stim_S_N.wav',
-'SSN_Stim0dB_N_N.wav',
-'FLN_Stim_S_P.wav',       
-'FLN_Stim0dB_N_N.wav',   
-'SSN_Stim0dB_N_P.wav',   
-'FLN_Stim0dB_N_P.wav',  
-'SSN_Stim0dB_SN_N.wav',  
-'FLN_Stim0dB_SN_N.wav',  
-'SSN_Stim0dB_SN_P.wav'  
-};
+    'FLN_Stim0dB_SN_P.wav', 'FLN_Stim_S_N.wav', 'SSN_Stim0dB_N_N.wav', ...
+    'FLN_Stim_S_P.wav', 'FLN_Stim0dB_N_N.wav', 'SSN_Stim0dB_N_P.wav', ...
+    'FLN_Stim0dB_N_P.wav','SSN_Stim0dB_SN_N.wav','FLN_Stim0dB_SN_N.wav','SSN_Stim0dB_SN_P.wav' ...
+    };
 
 Lchannel.file_list = cell(length(files),1);
 

@@ -424,7 +424,6 @@ end
 
 %----------------------------------------------------------------------------------------
 function tmplt = template_definition(fieldname)
-global signals_dir
 persistent prev_unit_bf
 %%%%%%%%%%%%%%%%%%%%
 %% Inloop Section 
