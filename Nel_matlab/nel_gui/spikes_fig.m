@@ -256,8 +256,8 @@ for i = channels(:)'
       if (~isempty(plot_info.XYprops))
          set(perline.haxes, strcat('Y',fieldnames(plot_info.XYprops))', struct2cell(plot_info.XYprops)');
       end
-      set(perline.hdriven,'Ydata',xdata, 'Xdata', repmat(NaN,size(rate_params.var_vals)));
-      set(perline.hspont, 'Ydata',xdata, 'Xdata', repmat(NaN,size(rate_params.var_vals)));
+      set(perline.hdriven,'Ydata',xdata, 'Xdata', NaN(size(rate_params.var_vals)));
+      set(perline.hspont, 'Ydata',xdata, 'Xdata', NaN(size(rate_params.var_vals)));
       rate_params.cache(i) = perline;
    end
 

@@ -10,7 +10,8 @@ if ~isempty(spk)
         if ~isempty(spk{i})
             %             set(raster_params.cache(i).hraster,'xdata',spk{i}(:,2),'ydata',raster_params.var_vals(spk{i}(:,1)));
             Xvals = spk{i}(:,2);
-            Yvals = spk{i}(:,1);
+%             Yvals = spk{i}(:,1);
+            Yvals = raster_params.var_vals(spk{i}(:,1)); % added SP: 6May19
             addpoints(raster_params.cache(i).hraster,Xvals,Yvals);
             drawnow limitrate;
         end
@@ -31,7 +32,7 @@ if (exist('refresh_channels','var') == 1)
         clearpoints(saved_raster_params.cache(ch).hraster);
         last_spike = spikes.last(ch);
         Xvals = spikes.times{ch}(1:last_spike,2);
-        Yvals = spikes.times{ch}(1:last_spike,1);
+        Yvals = raster_params.var_vals(spikes.times{ch}(1:last_spike,1));
         addpoints(saved_raster_params.cache(ch).hraster,Xvals,Yvals);
         drawnow limitrate;
         
