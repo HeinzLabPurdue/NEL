@@ -1,9 +1,9 @@
-global root_dir home_dir data_dir signals_dir profiles_dir host icon_dir SKIPintro
+global root_dir home_dir data_dir signals_dir profiles_dir icon_dir SKIPintro
 
 fs = filesep;
 root_dir = [fileparts(fileparts(which('startup'))) fs];
 % root_dir = [fileparts(fileparts(which('XXXstartup'))) fs]; %testing for renamed startup file
-home_dir = [fileparts(fileparts(root_dir))];
+home_dir = fileparts(fileparts(root_dir));
 if (~isequal(home_dir(end),'\'))
    home_dir = [home_dir '\'];
 end
@@ -44,7 +44,7 @@ SKIPintro=1;
 if SKIPintro
     ButtonName='Real_TDT';
 else    
-    ButtonName=questdlg('Do you want to Emulate TDT?','TDT Emulation SETUP','Emulate_TDT','Real_TDT','Emulate_TDT');
+    ButtonName=questdlg('Do you want to Emulate TDT?','TDT Emulation SETUP','Emulate_TDT','Real_TDT','Emulate_TDT'); %#ok<*UNRCH>
     
     if strcmp(ButtonName,'Emulate_TDT')
         addpath([home_dir 'fake_tdt']);

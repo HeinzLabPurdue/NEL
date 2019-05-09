@@ -13,7 +13,7 @@ set(0,'defaultTextColor','k');
 ProgName    = 'Nel 1.2.0';
 default_rco = [root_dir 'stimulate\object\control.rco'];
 
-if (~isempty(host) & exist(['hardware_setup_' host],'file'))
+if (~isempty(host) && exist(['hardware_setup_' host],'file'))
     eval(['hardware_setup_' host]);
 else
     hardware_setup_default;
@@ -50,6 +50,7 @@ end
 NelData = saved.NelData;
 NelData.File_Manager.track.No = -1;
 NelData.File_Manager.unit.No = -1;
+NelData.File_Manager.unit.SR = -1; %SP on 8May19
 NelData.General.save_fname = save_fname;
 NelData.General.Nel_Templates = Nel_Templates;
 NelData.General.User_templates = [];
