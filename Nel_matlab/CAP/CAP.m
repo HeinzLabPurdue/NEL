@@ -3,7 +3,7 @@ function h_fig = CAP(command_str)
 % ge debug ABR 26Apr2004: replace "CAP" with more generalized nomenclature, throughout entire system.
 
 global PROG FIG Stimuli CAP_Gating root_dir prog_dir NelData devices_names_vector Display
-global data_dir RunThroughABRFlag
+global data_dir RunThroughABRFlag interface_type
 
 h_fig = findobj('Tag','CAP_Main_Fig');    %% Finds handle for TC-Figure
 
@@ -34,8 +34,34 @@ if nargin < 1
         colordef none;
         whitebg('w');
         
-        CAP_loop_plot;
-        CAP_loop;
+        if ~strcmp(interface_type, 'FFR')
+            CAP_loop_plot;
+            CAP_loop;
+        elseif strcmp(interface_type,'FFR')
+            %             interface_type=questdlg('Which
+            %             FFR:','','FFR','SFR','SFR-mask','SFR'); %SP 30Jun2016
+            %-->
+            %SP 14Nov2018
+            % commented SFR-mask, using that button space for
+            % EFR_harm_complex = EFR_HrmCpx
+            interface_type=questdlg('Which FFR:','','FFR','SFR','SFR_pink','SFR');
+            %<--
+            if ishandle(h_fig)
+                delete(h_fig);
+            end
+            
+            if strcmp(interface_type, 'SFR')
+                h_fig = FFR_SNRenv;
+            elseif strcmp(interface_type, 'FFR')
+                h_fig = FFR;
+            elseif strcmp(interface_type, 'SFR-mask')
+                h_fig = SFR_pink_mask_SNRenv;
+            elseif strcmp(interface_type, 'SFR_pink')
+                h_fig = SFR_pink_mask_tdt;
+            elseif strcmp(interface_type, 'EFR_HrmCpx')
+                h_fig = EFR_Harm_Cmplx;
+            end
+        end
     else
         cd([NelData.General.RootDir 'Users\SP\SP_nel_gui']);
         CAP;
