@@ -44,19 +44,22 @@ if numel(RunLevels_params.attenMask)~=1
    warning('Length of RunLevels_params.attenMask should be one'); 
 end
 
-FFRdataAvg_NP=cell(size(RunLevels_params.attenMask));  % Average data not polarized %zz 04nov11
-FFRdataAvg_PO=cell(size(RunLevels_params.attenMask));  % Average data polarized     %zz 04nov11
-% FFRdataAvg = cell(size(RunLevels_params.attenMask));   % Bobby
-FFRdataStoreNP = cell(size(RunLevels_params.attenMask));
-FFRdataStorePO = cell(size(RunLevels_params.attenMask));
+%%
+% updated by SP on 22Jul19: before it was saving the weighted average for
+% plotting in the data-file. it should be saving the unweighted average in
+% the final data-file
+FFRdataAvg_PO_plot=cell(size(RunLevels_params.attenMask));  % Average data polarized     %zz 04nov11
+FFRdataAvg_NP_plot=cell(size(RunLevels_params.attenMask));  % Average data not polarized %zz 04nov11
+FFRdataAvg_PO_save= cell(size(RunLevels_params.attenMask));
+FFRdataAvg_NP_save= cell(size(RunLevels_params.attenMask));
 
 %% not storing all repetitions zz 04nov11
-FFRdataReps=cell(size(RunLevels_params.attenMask));  % All Reps
+FFRdataReps_outer=cell(size(RunLevels_params.attenMask));  % All Reps
 FFRattens=cell(size(RunLevels_params.attenMask));
 
 %% Main Loop
 % Not looping through attens for SFR. Assuming single attenutation. 
-for attenIND=1
+for attenIND= 1
     attenLevel= Stimuli.atten_dB;
     set(FIG.ax.line3,'ydata',[]);
     rejections=0; %for artifact rejection KHZZ 2011 Nov 4
@@ -65,15 +68,20 @@ for attenIND=1
 
     set(FIG.statText.status, 'String', sprintf('STATUS: averaging at -%d dB...', attenLevel));
     
-    FFRdataAvg_NP{attenIND} = zeros(1, FFRnpts); 
-    FFRdataAvg_PO{attenIND} = zeros(1, FFRnpts); 
+    FFRdataAvg_NP_plot{attenIND} = zeros(1, FFRnpts); 
+    FFRdataAvg_PO_plot{attenIND} = zeros(1, FFRnpts); 
     
-    for nnnnnnnn=1:2*RunLevels_params.nPairs
-        FFRdataReps{nnnnnnnn} = zeros(1,FFRnpts); % 2*RunLevels_params.nPairs changed to 1 DA 7/24/13
-    end
+    
+    %     for nnnnnnnn=1:2*RunLevels_params.nPairs
+    %         FFRdataReps{nnnnnnnn} = zeros(1,FFRnpts); % 2*RunLevels_params.nPairs changed to 1 DA 7/24/13
+    %     end
+    FFRdataReps= cell(1, 2*RunLevels_params.nPairs); % SP on 22Jul19
     
     % 28Apr2004 M.Heinz: Setup to skip 1st pulse pair, which is sometimes from previous level condition
-    for currStim = 1:2*RunLevels_params.nPairs
+    % 7/22/19 if we want to skip first pair, should start at
+    % for currStim= -1:2*RunLevels_params.nPairs and we should be checking
+    % if currStim is >0 in if statements
+    for currStim = 1:2*RunLevels_params.nPairs 
         
         if currStim
             set(FIG.statText.status, 'String', sprintf('STATUS: averaging at -%ddB (%d %d)...', ...
@@ -110,16 +118,19 @@ for attenIND=1
                         bNoSampleObtained = 0;
                         % Need to skip 1st pair, which is from last stimulus
                         
-                        if currStim>2
-                            weight = 1/ceil(currStim/2);
-                            if mod(currStim,2)
-                                FFRdataAvg_NP{attenIND} = FFRdataAvg_NP{attenIND}*(1 - weight) + weight*FFRdata;
-                                disp('debug1');
-                            else
-                                FFRdataAvg_PO{attenIND} = FFRdataAvg_PO{attenIND}*(1 - weight) + weight*FFRdata;
-                                disp('debug2');
-                            end
+                        % if currStim>2 %Commented by SP on 7/22/19| not
+                        % sure if this is happening anymore. Plus we have
+                        % been saving all reps (including the first two reps)
+                        weight = 1/ceil(currStim/2);
+                        if mod(currStim,2)
+                            % Important: Before 7/22/19, all FFR data saved
+                            % had POS and NEG polarity switched in the
+                            % average
+                            FFRdataAvg_PO_plot{attenIND} = FFRdataAvg_PO_plot{attenIND}*(1 - weight) + weight*FFRdata;
+                        else
+                            FFRdataAvg_NP_plot{attenIND} = FFRdataAvg_NP_plot{attenIND}*(1 - weight) + weight*FFRdata;
                         end
+                        % end
                     
                     if currStim
                         FFRdataReps{currStim}=FFRdata; %added DA 7/23/13
@@ -145,15 +156,22 @@ for attenIND=1
                 %                'ydata',FFRdataAvg_NP{attenIND}*Display.PlotFactor); drawnow;
             else
                 set(FIG.ax.line,'xdata',0:(1/Stimuli.RPsamprate_Hz):FFR_SNRenv_Gating.FFRlength_ms/1000, ...
-                    'ydata',(FFRdataAvg_PO{attenIND}+FFRdataAvg_NP{attenIND})*Display.PlotFactor/2);
+                    'ydata',(FFRdataAvg_PO_plot{attenIND}+FFRdataAvg_NP_plot{attenIND})*Display.PlotFactor/2);
                 drawnow;
             end
         end
     end
     
+    % Odd that 1 is negative polarity - need to check if it's correct % SP
+    % on 7/22/19
+    FFRdataAvg_PO_save{attenIND}= nanmean(cell2mat(FFRdataReps(1:2:end)'), 1);
+    FFRdataAvg_NP_save{attenIND}= nanmean(cell2mat(FFRdataReps(2:2:end)'), 1);
+    FFRdataReps_outer{attenIND}= FFRdataReps;
+    
     if (bAbort == 1 || save == 1) % not sure if the right place to abort/save
         break;
     end
+    
 end
 
 if (bAbort == 0)
@@ -176,8 +194,8 @@ if (bAbort == 0)
         PAset([120;120;120;120]);
         set(FIG.statText.status, 'String', 'STATUS: saving data...');
         NelData= make_FFR_Se_text_file(misc, Stimuli, PROG, NelData, comment, ...
-            RunLevels_params, FFR_SNRenv_Gating, FFRdataAvg_PO, FFRdataAvg_NP, FFRdataStoreNP, ...
-            FFRdataStorePO, Display, FFRattens, FFRdataReps, interface_type);
+            RunLevels_params, FFR_SNRenv_Gating, FFRdataAvg_PO_plot, FFRdataAvg_NP_plot, FFRdataAvg_PO_save, ...
+            FFRdataAvg_NP_save, Display, FFRattens, FFRdataReps, interface_type);
         
         current_data_file('FFR',1); %strcat(FILEPREFIX,num2str(FNUM),'.m');
         uiresume; % Allow Nel's main window to update the Title

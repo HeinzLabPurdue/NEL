@@ -40,15 +40,15 @@ name_org=sprintf('FM_%d_%d_%g_%g_org.wav',F0,fm_freq,T*1000,fm_range);
 name_inv=sprintf('FM_%d_%d_%g_%g_inv.wav',F0,fm_freq,T*1000,fm_range);
 filename=fullfile('C:','NEL2','Nel_matlab','FFR','signals',name_org); % updated to NEL2 file path from NEL_debug DA 11/3/16
 
-wavwrite(pin,fs,filename);
+audiowrite(filename, pin, round(fs));
 
 % if signal needs to be polarized, creates the inverse signal
 % otherwise, creates the same signal with the name inv zz 20oct11
 if(pol)
     filename_inv=fullfile('C:','NEL2','Nel_matlab','FFR','Signals',name_inv);% updated to NEL2 file path from NEL_debug DA 11/3/16
     pin = -1 * pin;
-    wavwrite(pin,fs,filename_inv);
+    audiowrite(filename_inv, pin, round(fs));
 else
     filename_inv=fullfile('C:','NEL2','Nel_matlab','FFR','Signals',name_inv);% updated to NEL2 file path from NEL_debug DA 11/3/16
-    wavwrite(pin,fs,filename_inv);
+    audiowrite(filename_inv, pin, round(fs));
 end

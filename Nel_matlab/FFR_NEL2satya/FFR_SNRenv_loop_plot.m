@@ -28,8 +28,9 @@ set(FIG.bg.spl.parent,'SelectionChangeFcn','FFR_SNRenv(''update_stim'',''spl'');
 
 %% 14 stim/ 22 stim buttongroup
 FIG.bg.stim.parent= uibuttongroup('visible','on','Position',[.5 .12 .24 .05],'BackgroundColor',gray_light);
-FIG.bg.stim.stim14=uicontrol('parent',FIG.bg.stim.parent,'style','radio','Enable','on','Units','normalized','position',[0 0 .5 1],'string','14-stim','fontsize',12,'BackgroundColor',gray_light,'value',1);
-FIG.bg.stim.stim22=uicontrol('parent',FIG.bg.stim.parent,'callback','FFR_SNRenv(''update_stim'',18);','style','radio','Enable','on','Units','normalized','position',[.5 0 .5 1],'string','22-stim','fontsize',12,'BackgroundColor',gray_light,'value',1);
+FIG.bg.stim.stim14=uicontrol('parent',FIG.bg.stim.parent,'callback','FFR_SNRenv(''update_stim'',14);','style','radio','Enable','on','Units','normalized','position',[0 0 .5 1],'string','14-stim','fontsize',12,'BackgroundColor',gray_light,'value',1);
+FIG.bg.stim.stim22=uicontrol('parent',FIG.bg.stim.parent,'callback','FFR_SNRenv(''update_stim'',18);','style','radio','Enable','on','Units','normalized','position',[.33 0 .5 1],'string','22-stim','fontsize',12,'BackgroundColor',gray_light,'value',1);
+FIG.bg.stim.stimDir=uicontrol('parent',FIG.bg.stim.parent,'callback','FFR_SNRenv(''update_stim'',-1);','style','radio','Enable','on','Units','normalized','position',[.67 0 .5 1],'string','Dir_Based','fontsize',12,'BackgroundColor',gray_light,'value',1);
 set(FIG.bg.stim.parent, 'SelectedObject', FIG.bg.stim.stim14);
 set(FIG.bg.stim.parent,'SelectionChangeFcn','FFR_SNRenv(''update_stim'',''list'');');
 

@@ -1,10 +1,10 @@
 % FFR Instruction Block
-function [misc,Stimuli, RunLevels_params, Display, interface_type]=SFR_pink_mask_SNRenv_ins()
+function [misc,Stimuli, RunLevels_params, Display, interface_type]=SFR_pink_mask_SNRenv_ins(NelData)
 
-% SNRenvStimDir='C:\NEL1_2\Users\SP\SNRenv_stimuli\stimSetStationary\'; %
+% SNRenvStimDir='C:\NEL2\Users\SP\SNRenv_stimuli\stimSetStationary\'; %
 % This was the data dir for pilot data before DTU. (Q313 and Q314).
 
-SNRenvStimDir='C:\NEL1_2\Users\SP\SNRenv_stimuli\FFRSNRenv_short_ssn_pink_masker\';
+SNRenvStimDir= [NelData.General.RootDir 'Users\SP\SNRenv_stimuli\FFRSNRenv_short_ssn_pink_masker\'];
 % This is new.
 
 
@@ -30,8 +30,8 @@ switch interface_type
             'atten_dB', 10, ...
             'NoiseType',0,... % 0 for stationary, 1 for fluctuating
             'maxSPL', 90, ...
-            'STIMfile', 'C:\NEL1_2\Nel_matlab\FFR\Signals\tone_org.wav', ...
-            'UPDdir', 'C:\NEL1_2\Nel_matlab\FFR\FFRSNRenv_short_stationary_run\', ... (copy resampled files here) 
+            'STIMfile', [NelData.General.RootDir 'Nel_matlab\FFR\Signals\tone_org.wav'], ...
+            'UPDdir', [NelData.General.RootDir 'Nel_matlab\FFR\FFRSNRenv_short_stationary_run\'], ... (copy resampled files here) 
             ... % ideally this should be in data dir (SP --> to-do) 
             'OLDDir', SNRenvStimDir, ... (from here)
             ...
@@ -94,7 +94,7 @@ switch interface_type
             ...%'dur',1,...%zz 31oct2011
             'pol',1,...%zz 31oct2011
             'mod',1,...
-            'filename','C:\NEL1_2\Nel_matlab\FFR\object\tone_org.wav',...%zz 31oct2011
+            'filename', [NelData.General.RootDir 'Nel_matlab\FFR\object\tone_org.wav'],...%zz 31oct2011
             ...%'freq_hz',2000, ...
             'atten_dB', 40, ...
             'noNoise', 1, ...

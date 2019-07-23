@@ -2,18 +2,61 @@
 
 % global root_dir NelData
 
-global prog_dir PROG data_dir NelData
+global prog_dir PROG data_dir NelData RP
+comhandle = cell2struct(cell(1,3),{'TDT_Calib','RP2_1','RP2_2'},2);
+COMM = struct('handle',comhandle);
+[COMM.handle.RP2_1,COMM.handle.RP2_2] = deal(RP(:).activeX); % Copied from ReturnCal : SP on 17July19
 
 if ~(double(invoke(RP1,'GetTagVal', 'Stage')) == 2)
     FFR_set_attns(-120,-120,Stimuli.channel,Stimuli.KHosc,RP1,RP2); %% Check with MH
 end
 
-% RP* should be initialized already
-% invoke(RP1,'ClearCOF');
-% invoke(RP1,'LoadCOF',[prog_dir 'object\FFR_wav_polIN_RX8_SNRenv_pink_600Hz.rcx']);
+invoke(RP1,'ClearCOF');
+invoke(RP1,'LoadCOF',[prog_dir 'object\FFR_wav_polIN_RX8_SNRenv_pink_600Hz.rcx']);
+
+useFIRfilter = 0;
+if useFIRfilter
+    curDir= pwd;
+    cdd;
+    useFIRfilter= false;
+    all_Calib_files= dir('p*calib*');
+    lastCoef1= dir(sprintf('coef_%04d_calib*', getPicNum(all_Calib_files(end).name)-1));
+    lastCoef2= dir(sprintf('coef_%04d_calib*', getPicNum(all_Calib_files(end).name)));
+    if ~isempty(lastCoef1) && isempty(lastCoef2)
+        % means org calib + coef generated + reran to check calib
+        useFIRfilter= true;
+    elseif ~isempty(lastCoef2) && isempty(lastCoef1)
+        % means forgot to rerun calib to test FIR filter works properly
+        useFIRfilter= true;
+    else
+        % ODD - error here. What's going on?
+    end
+    
+    % Confirm user wants to use FIR filter
+    inStr= questdlg('FIR coefs exist- Use for FFR?', 'FIR for FFR?', 'Yes', 'No', 'Yes');
+    if strcmpi(inStr, 'No')
+        useFIRfilter= false;
+        b= [1 zeros(1, 255)];
+    elseif strcmpi(inStr, 'Yes')
+        all_Coefs_Files= dir('coef*');
+        all_Coefs_picNums= cell2mat(cellfun(@(x) sscanf(x, 'coef_%04f_calib*'), {all_Coefs_Files.name}', 'UniformOutput', false));
+        [~, max_ind] = max(all_Coefs_picNums);
+        temp = load(all_Coefs_Files(max_ind).name);
+        b= temp.b(:)';
+    end
+    e1= COMM.handle.RP2_1.WriteTagV('FIR_Coefs', 0, b);
+    if e1
+        fprintf('FIR_Coefs loaded successfully \n');
+    else
+        fprintf('Could not load FIR_Coefs\n');
+    end
+    
+    cd(curDir);
+    
+end
+
 % invoke(RP1,'LoadCOF',[prog_dir 'object\FFR_wav_polIN_RX8_SNRenv_pink_1500Hz.rcx']);
 % invoke(RP1,'LoadCOF',[prog_dir 'object\FFR_wav_polIN_RXsp.rcx']);
-
 set_RP_tagvals(RP1, RP2, FFR_SNRenv_Gating, Stimuli);
 
 FFRnpts=ceil(FFR_SNRenv_Gating.FFRlength_ms/1000*Stimuli.RPsamprate_Hz);
@@ -81,7 +124,7 @@ while isempty(get(FIG.push.close,'Userdata'))
     invoke(RP1,'SoftTrg',1);
     
     while(1)  % loop until "close" request
-        if (invoke(RP2,'GetTagVal','BufFlag') == 1)
+        if (invoke(RP1,'GetTagVal','BufFlag') == 1)
             FFRdata = invoke(RP2,'ReadTagV','ADbuf',0,FFRnpts);
             FFRobs=max(abs(FFRdata));
             
@@ -100,7 +143,7 @@ while isempty(get(FIG.push.close,'Userdata'))
                 if ~firstSTIM
                     set(FIG.ax.line3,'ydata',FFRobs);
                     %KHZZ 2011 Nov 4 - artifact rejection while ensuring polarity remains the same
-                    stim_inv_pol = invoke(RP2,'GetTagVal','ORG');
+                    stim_inv_pol = invoke(RP1,'GetTagVal','ORG');
                     mod(misc.n,2);
                     if ((FFRobs <= Stimuli.threshV) && (stim_inv_pol == mod(misc.n,2)))
                         misc.n = mod(misc.n + 1,100);    % counter for stimuli for polarity zz 31oct11
@@ -150,7 +193,7 @@ while isempty(get(FIG.push.close,'Userdata'))
             else
                 veryfirstSTIM=0;
             end
-            invoke(RP2,'SoftTrg',2);
+            invoke(RP1,'SoftTrg',2);
         end
         
         if get(FIG.push.close,'Userdata')
@@ -177,15 +220,12 @@ while isempty(get(FIG.push.close,'Userdata'))
                 case 2
                     % upon moving the created AM Tone, or a specific WAV file,
                     % reloads the COF, resets the plots
-                    invoke(RP2,'Halt');
-                    invoke(RP2,'ClearCOF');
+                    invoke(RP1,'Halt');
+                    invoke(RP1,'ClearCOF');
                     %                     invoke(RP1,'LoadCOF',[prog_dir '\object\FFR_wav_polIN_RXsp.rcx']);
                     %                     invoke(RP1,'LoadCOF',[prog_dir '\object\FFR_wav_polIN_RX8_SNRenv_pink_1500Hz.rcx']);
-                    %                     invoke(RP1,'LoadCOF',[prog_dir 'object\FFR_wav_polIN_RX8_SNRenv_pink_600Hz.rcx']);
-                    %                     invoke(RP1,'LoadCOF',[prog_dir 'object\FFR_wav_polIN_RXsp.rcx']);
-                    %                     invoke(RP1,'LoadCOF',[prog_dir 'object\FFR_wav_polIN_RXsp.rcx']);
-                    
-                    invoke(RP2,'LoadCOF',[prog_dir '\object\FFR_right2.rcx']);
+                    invoke(RP1,'LoadCOF',[prog_dir 'object\FFR_wav_polIN_RX8_SNRenv_pink_600Hz.rcx']);
+%                     e1= COMM.handle.RP2_1.WriteTagV('FIR_Coefs', 0, b);
                     
                     set_RP_tagvals(RP1, RP2, FFR_SNRenv_Gating, Stimuli);
                     

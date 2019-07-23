@@ -72,15 +72,15 @@ samtone=y/max(abs(y))*0.99.*ramp'; %changed on 06/25/2007
 % %     polarizer = [p1 -1]
 %     samtone = samtone .* (polarizer.');
 % end
-wavwrite(samtone,fs,filename);
+audiowrite(filename,samtone,round(fs));
 
 % if signal needs to be polarized, creates the inverse signal
 % otherwise, creates the same signal with the name inv zz 20oct11
 if(pol)
     filename_inv=fullfile('C:','NEL2','Nel_matlab','FFR','Signals',name_inv);
     samtone = -1 * samtone;
-    wavwrite(samtone,fs,filename_inv);
+    audiowrite(filename_inv,samtone,round(fs));
 else
     filename_inv=fullfile('C:','NEL2','Nel_matlab','FFR','Signals',name_inv);
-    wavwrite(samtone,fs,filename_inv);
+    audiowrite(filename_inv,samtone,round(fs));
 end

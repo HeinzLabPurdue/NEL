@@ -6,7 +6,6 @@
 function [filename, filename_inv] = amtoneFFR(fc,fm,dur,pol,mod,fs)
 
 %x=(1+Msin 2pifmt)cos 2pifct
-fs=round(fs); %for audiowrite
 
 
 
@@ -51,7 +50,7 @@ ramp = [ramp_up ones(1,a(1)-2*b(1)) ramp_down];
 %Y=(1+M*sin (2*pi*fm*t)).*cos (2*pi*fc*t);
 
 % OUTPUT FILENAME zz 20oct11
-% NEEDS TO BE CHANGEd WHEN MOVING INTO NEL from NEL1_2
+% NEEDS TO BE CHANGEd WHEN MOVING INTO NEL from NEL_DEBUG
 name_org=sprintf('AM_%d_%d_%g_%g_org.wav',fc,fm,dur*1000,mod*100);
 name_inv=sprintf('AM_%d_%d_%g_%g_inv.wav',fc,fm,dur*1000,mod*100);
 filename=fullfile('C:','NEL1_2','Nel_matlab','FFR','signals',name_org);
@@ -73,15 +72,15 @@ samtone=y/max(abs(y))*0.99.*ramp'; %changed on 06/25/2007
 % %     polarizer = [p1 -1]
 %     samtone = samtone .* (polarizer.');
 % end
-audiowrite(filename,samtone,fs);
+audiowrite(filename,samtone,round(fs));
 
 % if signal needs to be polarized, creates the inverse signal
 % otherwise, creates the same signal with the name inv zz 20oct11
 if(pol)
     filename_inv=fullfile('C:','NEL1_2','Nel_matlab','FFR','Signals',name_inv);
     samtone = -1 * samtone;
-    audiowrite(filename_inv,samtone,fs);
+    audiowrite(filename_inv,samtone,round(fs));
 else
     filename_inv=fullfile('C:','NEL1_2','Nel_matlab','FFR','Signals',name_inv);
-    audiowrite(filename_inv,samtone,fs);
+    audiowrite(filename_inv,samtone,round(fs));
 end

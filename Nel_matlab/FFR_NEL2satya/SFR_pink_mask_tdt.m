@@ -2,7 +2,7 @@ function h_fig = SFR_pink_mask_tdt(command_str,eventdata)
 
 % ge debug ABR 26Apr2004: replace "FFR" with more generalized nomenclature, throughout entire system.
 
-global RP PROG FIG Stimuli FFR_Gating root_dir prog_dir Display FFR_SNRenv_Gating
+global RP PROG FIG Stimuli FFR_Gating root_dir prog_dir Display FFR_SNRenv_Gating NelData
 %Stimuli.OLDDir
 % global fc fm pol dur
 prog_dir = [root_dir 'FFR\'];
@@ -14,7 +14,7 @@ RP2 = RP1;      %MW10062016  only one device with RX8
 if nargin < 1
     PROG = struct('name','FFR(v1.ge_mh.1).m');  % modified by GE 26Apr2004.
     [FIG, h_fig]=get_FIG_ffr_srnenv(); % Initialize FIG
-    [misc, Stimuli, RunLevels_params, Display, interface_type]=SFR_pink_mask_tdt_ins(); ...
+    [misc, Stimuli, RunLevels_params, Display, interface_type]=SFR_pink_mask_tdt_ins(NelData); ...
         %#ok<ASGLU> % should already be populated by CAP_ins
     
     %     FFR_set_attns(-120,-120,Stimuli.channel,Stimuli.KHosc,RP.activeX,RP.activeX);
@@ -61,10 +61,10 @@ elseif strcmp(command_str,'update_stim')
         case 'noise_type'
             FIG.NewStim = 2;
             if get(FIG.bg.nt.nt_ssn,'value')
-                Stimuli.OLDDir='C:\NEL1_2\Users\SP\SNRenv_stimuli\stimSetStationary\';
+                Stimuli.OLDDir= [NelData.General.RootDir 'Users\SP\SNRenv_stimuli\stimSetStationary\'];
                 Stimuli.NoiseType=0;
             elseif get(FIG.bg.nt.nt_f,'value')
-                Stimuli.OLDDir='C:\NEL1_2\Users\SP\SNRenv_stimuli\stimSetFluctuating\';
+                Stimuli.OLDDir= [NelData.General.RootDir 'Users\SP\SNRenv_stimuli\stimSetFluctuating\'];
                 Stimuli.NoiseType=1;
             end
             updStimFlag= 1;
@@ -120,7 +120,7 @@ elseif strcmp(command_str,'update_stim')
     %
     %     copyfile([Stimuli.UPDdir Stimuli.filename],Stimuli.STIMfile,'f');
     %         copyfile([Stimuli.UPDdir Stimuli.filename(1:end-5) 'N' Stimuli.filename(end-3:end)],  ...
-    %             'C:\NEL1_2\Nel_matlab\FFR\Signals\tone_inv.wav','f');
+    %             'C:\NEL2\Nel_matlab\FFR\Signals\tone_inv.wav','f');
     %     end
     
 elseif strcmp(command_str,'fast')
@@ -288,5 +288,5 @@ elseif strcmp(command_str,'YLim')
     
 elseif strcmp(command_str,'close')
     set(FIG.push.close,'Userdata',1);
-    cd('C:\NEL1_2\Nel_matlab\nel_general');
+    cd([NelData.General.RootDir 'Nel_matlab\nel_general']);
 end

@@ -14,10 +14,6 @@ prog_dir = [root_dir 'FFR\'];
 % amtone(fc,fm,dur,pol);
 
 h_fig = findobj('Tag','FFR_Main_Fig');    %% Finds handle for TC-Figure
-while length(h_fig)>=2
-    delete(h_fig(end));
-    warning('h_fig is not properly assigned!'); %#ok<WNTAG>
-end
 
 if nargin < 1
     
@@ -165,10 +161,6 @@ elseif strcmp(command_str,'logSwept_amtone')
 
 % WAV file loader, copies file from original location to default locaton
 % zz 31oct11
-
-%%% WHY NEED TEXT EDIT???
-%% ADD: new button - "Wavefile" to open uidirectory??? to pick wav file
-
 elseif strcmp(command_str,'wavfile')
    FIG.NewStim = 6;
    
@@ -180,29 +172,6 @@ elseif strcmp(command_str,'wavfile')
    copyfile(Stimuli.filename,'C:\NEL1_2\Nel_matlab\FFR\Signals\tone_org.wav','f');
    copyfile(Stimuli.filename,'C:\NEL1_2\Nel_matlab\FFR\Signals\tone_inv.wav','f');
 
-elseif strcmp(command_str,'select_wavfile') % For the push button
-   FIG.NewStim = 6;
-   
-   [name, filePath]= uigetfile([root_dir 'FFR' filesep 'Signals' filesep '*.wav']);
-   name= [filePath name];
-   cellname = cellstr(name);
-   Stimuli.filename = cell2str(cellname);
-   
-   [sig, fs_sig]= audioread(name);
-   sig= resample(sig, round(Stimuli.RPsamprate_Hz), fs_sig);
-   
-   % hard-coding for now: all Stimuli gating params
-   if Stimuli.fast.duration_ms*1e3 ~= length(sig)/round(Stimuli.RPsamprate_Hz)
-       Stimuli.fast.duration_ms= length(sig)/round(Stimuli.RPsamprate_Hz)*1e3;
-       Stimuli.fast.period_ms= Stimuli.fast.duration_ms+500; 
-       Stimuli.fast.XendPlot_ms= Stimuli.fast.period_ms;
-       Stimuli.fast.FFRlength_ms= Stimuli.fast.duration_ms+200;
-   end
-   FFR_Gating=Stimuli.fast;
-   % copies file to both "original" and "polarized" locations
-%    copyfile(Stimuli.filename,'C:\NEL1_2\Nel_matlab\FFR\Signals\tone_org.wav','f');
-   audiowrite('C:\NEL1_2\Nel_matlab\FFR\Signals\tone_org.wav', sig, round(Stimuli.RPsamprate_Hz));
-   copyfile(Stimuli.filename,'C:\NEL1_2\Nel_matlab\FFR\Signals\tone_inv.wav','f'); % don't need this as TDT gating controls +/- polarity
 
 elseif strcmp(command_str,'fast')
    if get(FIG.radio.fast, 'value') == 1
@@ -443,7 +412,7 @@ elseif strcmp(command_str,'YLim')
    end
    set(FIG.edit.yscale,'string', num2str(Display.YLim_atAD));
    
-elseif strcmp(command_str,'close');
+elseif strcmp(command_str,'close')
    set(FIG.push.close,'Userdata',1);
 end
 

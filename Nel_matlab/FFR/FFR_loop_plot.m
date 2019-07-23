@@ -14,7 +14,6 @@ FIG.wavfile.func = uicontrol(FIG.handle,'style','edit','Units','normalized','Use
 FIG.push.amtone = uicontrol(FIG.handle,'callback','FFR(''amtone'');','style','pushbutton','Units','normalized','position',[.5825 .125 .06 .04],'string','AM Tone','fontsize',12,'fontangle','normal','fontweight','normal');
 FIG.push.logSwept_amtone = uicontrol(FIG.handle,'callback','FFR(''logSwept_amtone'');','style','pushbutton','Units','normalized','position',[.68 .125 .12 .04],'string','Lg-swpt AM Tone','fontsize',12,'fontangle','normal','fontweight','normal');
 FIG.push.fmtone = uicontrol(FIG.handle,'callback','FFR(''fmtone'');','style','pushbutton','Units','normalized','position',[.4825 .125 .06 .04],'string','FM Tone','fontsize',12,'fontangle','normal','fontweight','normal');
-FIG.push.fmtone = uicontrol(FIG.handle,'callback','FFR(''select_wavfile'');','style','pushbutton','Units','normalized','position',[.3825 .125 .06 .04],'string','Select Wav','fontsize',12,'fontangle','normal','fontweight','normal');
 
 
 % Frequency slider removed, replaced with AM Tone generator and WAV function loader
@@ -82,7 +81,6 @@ end
 if (FFR_set_attns(0,0,2,0) == 0)
     set(FIG.radio.right,'Enable','off');
 end
-rc = PAset(120.0); % added by SP/MH, 6Jun2019.  To force all attens to 120
 set(FIG.handle,'Userdata',struct('handles',FIG));
 set(FIG.handle,'Visible','on');
 

@@ -2,28 +2,19 @@ function h_fig = FFR_SNRenv(command_str,eventdata)
 
 % ge debug ABR 26Apr2004: replace "FFR" with more generalized nomenclature, throughout entire system.
 
-global RP PROG FIG Stimuli FFR_Gating root_dir prog_dir Display FFR_SNRenv_Gating
+global RP PROG FIG Stimuli FFR_Gating root_dir prog_dir Display FFR_SNRenv_Gating NelData
 %Stimuli.OLDDir
 % global fc fm pol dur
 prog_dir = [root_dir 'FFR\'];
-% RP1= RP.activeX;        %MW10062016  use global control object rather than reinitialize
-% RP2 = RP1;      %MW10062016  only one device with RX8
-RP1=actxcontrol('RPco.x',[0 0 1 1]);
-invoke(RP1,'ConnectRP2','USB',1);
-invoke(RP1,'ClearCOF');
-invoke(RP1,'LoadCOF',[prog_dir '\object\FFR_wav_polIN.rcx']);
-
-RP2=actxcontrol('RPco.x',[0 0 1 1]);
-invoke(RP2,'ConnectRP2','USB',2);
-invoke(RP2,'ClearCOF');
-invoke(RP2,'LoadCOF',[prog_dir '\object\FFR_right2.rcx']);
+RP1= RP.activeX;        %MW10062016  use global control object rather than reinitialize
+RP2 = RP1;      %MW10062016  only one device with RX8
 
 
 %%
 if nargin < 1
     PROG = struct('name','FFR(v1.ge_mh.1).m');  % modified by GE 26Apr2004.
     [FIG, h_fig]=get_FIG_ffr_srnenv(); % Initialize FIG
-    [misc, Stimuli, RunLevels_params, Display, interface_type]=FFR_SNRenv_ins(); ...
+    [misc, Stimuli, RunLevels_params, Display, interface_type]=FFR_SNRenv_ins(NelData); ...
         %#ok<ASGLU> % should already be populated by CAP_ins
     
     %     FFR_set_attns(-120,-120,Stimuli.channel,Stimuli.KHosc,RP.activeX,RP.activeX);
@@ -53,23 +44,44 @@ elseif strcmp(command_str,'update_stim')
                 fName=load([fileparts(Stimuli.OLDDir(1:end-1)) filesep 'SNRenv_stimlist14.mat']);
             elseif get(FIG.bg.stim.stim22,'value')
                 fName=load([fileparts(Stimuli.OLDDir(1:end-1)) filesep 'SNRenv_stimlist22.mat']);
+            elseif get(FIG.bg.stim.stimDir,'value')
+                fName.SNRenv_stimlist=dir([Stimuli.OLDDir '*.wav']);
             end
-            Stimuli.list=fName.SNRenv_stimlist;
-            FIG.popup.stims = uicontrol(FIG.handle,'callback', 'FFR_SNRenv(''update_stim'',0);','style', ...
-                'popup','Units' ,'normalized', 'Userdata',Stimuli.filename,'position',[.4 .175 .425 .04], ...
-                'string',struct2cell(Stimuli.list),'fontsize',12);
+            
+            if ~get(FIG.bg.stim.stimDir,'value')
+                Stimuli.list=fName.SNRenv_stimlist;
+                FIG.popup.stims = uicontrol(FIG.handle,'callback', 'FFR_SNRenv(''update_stim'',0);','style', ...
+                    'popup','Units' ,'normalized', 'Userdata',Stimuli.filename,'position',[.4 .175 .425 .04], ...
+                    'string',struct2cell(Stimuli.list),'fontsize',12);
+            else
+                
+                Stimuli.list= repmat(struct('name', ''), length(fName.SNRenv_stimlist), 1);
+                for stimVar= 1:length(Stimuli.list)
+                    Stimuli.list(stimVar).name= fName.SNRenv_stimlist(stimVar).name;
+                end
+                Stimuli.filename= Stimuli.list(1).name;
+                FIG.popup.stims = uicontrol(FIG.handle,'callback', 'FFR_SNRenv(''update_stim'',0);','style', ...
+                    'popup','Units' ,'normalized', 'Userdata',Stimuli.filename,'position',[.4 .175 .425 .04], ...
+                    'string',({fName.SNRenv_stimlist.name}),'fontsize',12);
+            end
             
         case 'noise_type'
             FIG.NewStim = 2;
             if get(FIG.bg.nt.nt_ssn,'value')
-                Stimuli.OLDDir='C:\NEL1_2\Users\SP\SNRenv_stimuli\stimSetStationary\';
+                Stimuli.OLDDir= [NelData.General.RootDir 'Users\SP\SNRenv_stimuli\stimSetStationary\'];
                 Stimuli.NoiseType=0;
             elseif get(FIG.bg.nt.nt_f,'value')
-                Stimuli.OLDDir='C:\NEL1_2\Users\SP\SNRenv_stimuli\stimSetFluctuating\';
+                Stimuli.OLDDir= [NelData.General.RootDir 'Users\SP\SNRenv_stimuli\stimSetFluctuating\'];
                 Stimuli.NoiseType=1;
             end
             
-        case 'newStim'
+%         case 0
+%             FIG.NewStim = 2;
+%             StimInd= get(FIG.popup.stims, 'value');
+%             Stimuli.filename=Stimuli.list(StimInd).name;
+%             set(FIG.popup.stims, 'value', StimInd);
+
+        case {'newStim', 0} % remove 0 later, should be 'newStim' only 
             FIG.NewStim = 2;
             StimInd= get(FIG.popup.stims, 'value');
             Stimuli.filename=Stimuli.list(StimInd).name;
@@ -97,25 +109,6 @@ elseif strcmp(command_str,'update_stim')
     xpr=resample(xp,round(Stimuli.RPsamprate_Hz), fsp);
     audiowrite([Stimuli.UPDdir Stimuli.filename], xpr, round(Stimuli.RPsamprate_Hz));
     copyfile([Stimuli.UPDdir Stimuli.filename],Stimuli.STIMfile,'f');
-    
-    %% Remove
-    % copies file to both "original" and "polarized" locations
-    %     [xp,fsp]=wavread([Stimuli.OLDDir Stimuli.filename]);
-    %     [xn,fsn]=wavread([Stimuli.OLDDir Stimuli.filename(1:end-5) 'N' Stimuli.filename(end-3:end)]);
-    %     if fsp~=fsn
-    %         error('sampling frequencies do not match (file: FFRSNRenv, L105)');
-    %     else
-    %     xpr=resample(xp,round(Stimuli.RPsamprate_Hz), fsp);
-    %         xnr=resample(xn,round(Stimuli.RPsamprate_Hz), fsn);
-    %
-    %     wavwrite(xpr, round(Stimuli.RPsamprate_Hz), [Stimuli.UPDdir Stimuli.filename]);
-    %         wavwrite(xnr, round(Stimuli.RPsamprate_Hz), ...
-    %             [Stimuli.UPDdir Stimuli.filename(1:end-5) 'N' Stimuli.filename(end-3:end)]);
-    %
-    %     copyfile([Stimuli.UPDdir Stimuli.filename],Stimuli.STIMfile,'f');
-    %         copyfile([Stimuli.UPDdir Stimuli.filename(1:end-5) 'N' Stimuli.filename(end-3:end)],  ...
-    %             'C:\NEL1_2\Nel_matlab\FFR\Signals\tone_inv.wav','f');
-    %     end
     
 elseif strcmp(command_str,'fast')
     if get(FIG.radio.fast, 'value') == 1
@@ -176,6 +169,7 @@ elseif strcmp(command_str,'slide_atten')
     FIG.NewStim = 101;
     Stimuli.atten_dB = floor(-get(FIG.asldr.slider,'value'));
     set(FIG.asldr.val,'string',num2str(-Stimuli.atten_dB));
+    set_RP_tagvals(RP1, RP2, FFR_SNRenv_Gating, Stimuli);
     
     % LQ 01/31/05
 elseif strcmp(command_str, 'slide_atten_text')
@@ -192,7 +186,7 @@ elseif strcmp(command_str, 'slide_atten_text')
         Stimuli.atten_dB = -new_atten;
         set(FIG.asldr.slider, 'value', new_atten);
     end
-    
+    set_RP_tagvals(RP1, RP2, FFR_SNRenv_Gating, Stimuli);
     
 elseif strcmp(command_str,'memReps')
     FIG.NewStim = 3;
@@ -279,5 +273,5 @@ elseif strcmp(command_str,'YLim')
     
 elseif strcmp(command_str,'close')
     set(FIG.push.close,'Userdata',1);
-    cd('C:\NEL1_2\Nel_matlab\nel_general');
+    cd([NelData.General.RootDir 'Nel_matlab\nel_general']);
 end

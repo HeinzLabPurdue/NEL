@@ -51,10 +51,10 @@ elseif strcmp(command_str,'update_stim')
         case 'noise_type'
             FIG.NewStim = 2;
             if get(FIG.bg.nt.nt_ssn,'value')
-                Stimuli.OLDDir='C:\NEL1_2\Users\SP\SNRenv_stimuli\stimSetStationary\';
+                Stimuli.OLDDir= [NelData.General.RootDir 'Users\SP\SNRenv_stimuli\stimSetStationary\'];
                 Stimuli.NoiseType=0;
             elseif get(FIG.bg.nt.nt_f,'value')
-                Stimuli.OLDDir='C:\NEL1_2\Users\SP\SNRenv_stimuli\stimSetFluctuating\';
+                Stimuli.OLDDir= [NelData.General.RootDir 'Users\SP\SNRenv_stimuli\stimSetFluctuating\'];
                 Stimuli.NoiseType=1;
             end
             
@@ -86,25 +86,6 @@ elseif strcmp(command_str,'update_stim')
     xpr=resample(xp,round(Stimuli.RPsamprate_Hz), fsp);
     audiowrite([Stimuli.UPDdir Stimuli.filename], xpr, round(Stimuli.RPsamprate_Hz));
     copyfile([Stimuli.UPDdir Stimuli.filename],Stimuli.STIMfile,'f');
-    
-    %% Remove
-    % copies file to both "original" and "polarized" locations
-    %     [xp,fsp]=wavread([Stimuli.OLDDir Stimuli.filename]);
-    %     [xn,fsn]=wavread([Stimuli.OLDDir Stimuli.filename(1:end-5) 'N' Stimuli.filename(end-3:end)]);
-    %     if fsp~=fsn
-    %         error('sampling frequencies do not match (file: FFRSNRenv, L105)');
-    %     else
-    %     xpr=resample(xp,round(Stimuli.RPsamprate_Hz), fsp);
-    %         xnr=resample(xn,round(Stimuli.RPsamprate_Hz), fsn);
-    %
-    %     wavwrite(xpr, round(Stimuli.RPsamprate_Hz), [Stimuli.UPDdir Stimuli.filename]);
-    %         wavwrite(xnr, round(Stimuli.RPsamprate_Hz), ...
-    %             [Stimuli.UPDdir Stimuli.filename(1:end-5) 'N' Stimuli.filename(end-3:end)]);
-    %
-    %     copyfile([Stimuli.UPDdir Stimuli.filename],Stimuli.STIMfile,'f');
-    %         copyfile([Stimuli.UPDdir Stimuli.filename(1:end-5) 'N' Stimuli.filename(end-3:end)],  ...
-    %             'C:\NEL1_2\Nel_matlab\FFR\Signals\tone_inv.wav','f');
-    %     end
     
 elseif strcmp(command_str,'fast')
     if get(FIG.radio.fast, 'value') == 1
@@ -268,5 +249,5 @@ elseif strcmp(command_str,'YLim')
     
 elseif strcmp(command_str,'close')
     set(FIG.push.close,'Userdata',1);
-    cd('C:\NEL1_2\Nel_matlab\nel_general');
+    cd([NelData.General.RootDir 'Nel_matlab\nel_general']);
 end
