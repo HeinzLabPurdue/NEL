@@ -13,9 +13,6 @@ switch interface_type
 		   'n',0 ...%zz oct2011
           ); 
       
-      
-
-       
 		Stimuli = struct( ...
            'fc',1000,...%zz 31oct2011
            'fm',140,...%zz 31oct2011
@@ -132,7 +129,7 @@ end
 % Stimuli.RPsamprate_Hz=12207.03125;  % Hard coded for now, eventually get from RP
 
 
-Stimuli.RPsamprate_Hz=25e6/512; %48828.125  % Hard coded for now, eventually get from RP
+Stimuli.RPsamprate_Hz=50e6/1024; %48828.125  % Hard coded for now, eventually get from RP
               
 % AEH Fs for HTC stimuli 1/27/14
 % Stimuli.RPsamprate_Hz=25e6/1024; %24...

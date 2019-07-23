@@ -81,7 +81,7 @@ for attenLevel = Stimuli.atten_dB + RunLevels_params.stepdB*RunLevels_params.att
             set(FIG.ax.line3,'xdata',0.5,'ydata',FFRobs1); drawnow;
             % zz 05nov11
             % fixing the function to make sure the polarity matches, starts with 1, which must match with 1 for original
-            if (FFRobs1 <= critVal & (invoke(RP1,'GetTagVal','ORG') == mod(currStim,2)))
+            if (FFRobs1 <= critVal && (invoke(RP1,'GetTagVal','ORG') == mod(currStim,2)))
                %            if FFRobs1 <= critVal 
                bNoSampleObtained = 0;
                % Need to skip 1st pair, which is from last stimulus

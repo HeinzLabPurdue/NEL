@@ -49,6 +49,7 @@ if nargin < 1
     colordef none;
     whitebg('w');
     FFR_loop_plot;
+    FFR('amtone');
     FFR_loop;
     
     
@@ -415,4 +416,3 @@ elseif strcmp(command_str,'YLim')
 elseif strcmp(command_str,'close')
    set(FIG.push.close,'Userdata',1);
 end
-

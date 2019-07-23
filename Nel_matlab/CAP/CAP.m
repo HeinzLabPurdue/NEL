@@ -50,10 +50,10 @@ if nargin < 1
                 delete(h_fig);
             end
             
-            if strcmp(interface_type, 'SFR')
-                h_fig = FFR_SNRenv;
-            elseif strcmp(interface_type, 'FFR')
-                h_fig = FFR;
+            if strcmp(interface_type, 'FFR')
+                h_fig = FFR();
+            elseif strcmp(interface_type, 'SFR')
+                h_fig = FFR_SNRenv();
             elseif strcmp(interface_type, 'SFR-mask')
                 h_fig = SFR_pink_mask_SNRenv;
             elseif strcmp(interface_type, 'SFR_pink')
