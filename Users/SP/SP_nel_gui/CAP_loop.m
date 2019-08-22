@@ -51,7 +51,7 @@ invoke(RP2,'SetTagVal','ADdur', CAP_Gating.CAPlength_ms);
 invoke(RP2,'Run');
 
 CAP_set_attns(Stimuli.atten_dB,Stimuli.channel,Stimuli.KHosc,RP1,RP2);  %% debug deal with later Khite
-CAPnpts=ceil(CAP_Gating.CAPlength_ms/1000*Stimuli.RPsamprate_Hz);
+CAPnpts=floor(CAP_Gating.CAPlength_ms/1000*Stimuli.RPsamprate_Hz); % SP: Changed from ceil to floor on 21Aug19: one extra point was collected in ABR serial buffer
 if Stimuli.CAPmem_reps>0
     CAP_memFact=exp(-1/Stimuli.CAPmem_reps);
 else
@@ -60,7 +60,7 @@ end
 firstSTIM=1;
 veryfirstSTIM=1;  % The very first CAPdata when program starts is all zeros, so skip this, debug later MH 18Nov2003 
 
-while ~length(get(FIG.push.close,'Userdata')),
+while isempty(get(FIG.push.close,'Userdata'))
     if (ishandle(FIG.ax.axis))
         delete(FIG.ax.axis);
     end
@@ -94,6 +94,14 @@ while ~length(get(FIG.push.close,'Userdata')),
     ylabel('Max AD Voltage (1 rep)','fontsize',12,'FontWeight','Bold');
     box on;
     
+    debugging= 1; % For free-run. runLevel and autolevel: DC shift correction for plotting
+    if debugging
+        debugAmp= 0;
+    else 
+        debugAmp= 1;
+    end
+    
+    
     invoke(RP1,'SoftTrg',1);
     %    tspan = CAP_Gating.period_ms/1000;
     bAbort = 0;
@@ -102,7 +110,7 @@ while ~length(get(FIG.push.close,'Userdata')),
             CAPdata = invoke(RP2,'ReadTagV','ADbuf',0,CAPnpts);
             %           CAPdata = ones(size(CAPdata)); % ge debug
             
-            CAPobs=max(abs(CAPdata(1:end-2)-mean(CAPdata(1:end-2)))); %KH 08Jun2011 
+            CAPobs=max(abs(CAPdata(1:end-2)-debugAmp*mean(CAPdata(1:end-2)))); %KH 08Jun2011 
             % ^^ added SP (because there is a dc shift probably affects the whole signal except the last point)
             
             if ~veryfirstSTIM  % MH 18Nov2003 Skip very first, all zeros
@@ -112,17 +120,19 @@ while ~length(get(FIG.push.close,'Userdata')),
                     if CAPobs <= Stimuli.threshV  %KH 2011 June 08 - artifact rejection
                         CAPdataAvg_freerun = CAP_memFact * CAPdataAvg_freerun ...
                             + (1 - CAP_memFact)*CAPdata;
-                        CAPdataAvg_freerun=CAPdataAvg_freerun-mean(CAPdataAvg_freerun); %added demean SP Aug 21 2018
+                        CAPdataAvg_freerun=CAPdataAvg_freerun-debugAmp*mean(CAPdataAvg_freerun); %added demean SP Aug 21 2018
                     end
                     
                 else
                     CAPdataAvg_freerun = CAPdata;
                     firstSTIM=0;
                 end
-                set(FIG.ax.line,'xdata',[0:(1/Stimuli.RPsamprate_Hz):CAP_Gating.CAPlength_ms/1000], ...
+%                 set(FIG.ax.line,'xdata',[0:(1/Stimuli.RPsamprate_Hz):CAP_Gating.CAPlength_ms/1000], ...
+%                     'ydata',CAPdataAvg_freerun*Display.PlotFactor);
+                set(FIG.ax.line,'xdata',(1:length(CAPdataAvg_freerun))/Stimuli.RPsamprate_Hz, ...
                     'ydata',CAPdataAvg_freerun*Display.PlotFactor);
                 
-                set(FIG.ax.line2(1),'ydata',CAPobs-mean(CAPobs)); %KH 10Jan2012 % added demean SP (Aug 21 2018)
+                set(FIG.ax.line2(1),'ydata',CAPobs-debugAmp*mean(CAPobs)); %KH 10Jan2012 % added demean SP (Aug 21 2018)
                 
                 drawnow;
             else
@@ -149,7 +159,8 @@ while ~length(get(FIG.push.close,'Userdata')),
                 invoke(RP1,'SetTagVal','StmOn',CAP_Gating.duration_ms);
                 invoke(RP1,'SetTagVal','StmOff',CAP_Gating.period_ms-CAP_Gating.duration_ms);
                 invoke(RP2,'SetTagVal','ADdur',CAP_Gating.CAPlength_ms);
-                CAPnpts=ceil((CAP_Gating.CAPlength_ms/1000)*Stimuli.RPsamprate_Hz);
+%                 CAPnpts=ceil((CAP_Gating.CAPlength_ms/1000)*Stimuli.RPsamprate_Hz);
+                CAPnpts=floor((CAP_Gating.CAPlength_ms/1000)*Stimuli.RPsamprate_Hz);
                 firstSTIM = 1;
                 FIG.NewStim = 0;
                 break
@@ -258,15 +269,15 @@ while ~length(get(FIG.push.close,'Userdata')),
                         AutoLevel_params.AutoThresh1=main_abr_bb(dataDIR,CalibPIC,picstoSEND)
                         
                         if isnan(AutoLevel_params.AutoThresh1)
-                            AutoLevel_params.AutoThresh1=45;
+                            AutoLevel_params.AutoThresh1=25;
                             disp('You must be debuggin, else something is wrong!');
                             ding;
                         elseif AutoLevel_params.AutoThresh1<0
-                            AutoLevel_params.AutoThresh1=45;
+                            AutoLevel_params.AutoThresh1=25;
                             disp('You must be debuggin, else something is wrong!');
                             ding;
                         elseif AutoLevel_params.AutoThresh1>80
-                            AutoLevel_params.AutoThresh1=45;
+                            AutoLevel_params.AutoThresh1=25;
                             disp('You must be debuggin, else something is wrong!');
                             ding;
                         end

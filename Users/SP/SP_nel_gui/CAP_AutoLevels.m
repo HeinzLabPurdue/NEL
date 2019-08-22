@@ -152,8 +152,8 @@ for zfrequency = frequencies %New outer loop, KH 10Jan2012
                 end
             end
             if currPair
-                set(FIG.ax.line,'xdata',[0:(1/Stimuli.RPsamprate_Hz):CAP_Gating.CAPlength_ms/1000], ...
-                    'ydata',(CAPdataAvg{freqIND,attenIND}-mean(CAPdataAvg{freqIND,attenIND}))/(2*currPair)*Display.PlotFactor); 
+                set(FIG.ax.line,'xdata',(1:CAPnpts)/Stimuli.RPsamprate_Hz, ...
+                    'ydata',(CAPdataAvg{freqIND,attenIND}-debugAmp*mean(CAPdataAvg{freqIND,attenIND}))/(2*currPair)*Display.PlotFactor); 
                 set(FIG.ax.line2(1),'ydata',max([CAPobs1 CAPobs2])); %KH 2011 June 08
                 drawnow;
             end
@@ -162,8 +162,8 @@ for zfrequency = frequencies %New outer loop, KH 10Jan2012
             break;
         end
         CAPdataAvg{freqIND,attenIND} = CAPdataAvg{freqIND,attenIND} / (2*AutoLevel_params.nPairs);
-        set(FIG.ax.line,'xdata',[0:(1/Stimuli.RPsamprate_Hz):CAP_Gating.CAPlength_ms/1000], ...
-            'ydata',(CAPdataAvg{freqIND,attenIND}-mean(CAPdataAvg{freqIND,attenIND}))*Display.PlotFactor); drawnow;
+        set(FIG.ax.line,'xdata',(1:CAPnpts)/Stimuli.RPsamprate_Hz, ...
+            'ydata',(CAPdataAvg{freqIND,attenIND}-debugAmp*mean(CAPdataAvg{freqIND,attenIND}))*Display.PlotFactor); drawnow;
     end
     if (bAbort == 1)
         break;

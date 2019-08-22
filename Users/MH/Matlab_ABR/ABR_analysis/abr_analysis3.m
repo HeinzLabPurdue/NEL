@@ -4,7 +4,7 @@ function abr_analysis3(command_str,parm_num)
 
 global abr_FIG abr_Stimuli abr_root_dir abr_data_dir...
 	num dt line_width abr freq attn spl upper_y_bound lower_y_bound y_shift animal date...
-	freq_level data han
+	freq_level data han NelData
 
 
 host = lower(getenv('hostname'));

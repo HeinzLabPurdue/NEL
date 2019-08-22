@@ -22,7 +22,7 @@ set(FIG.push.run_levels,'string','Abort');
 bAbort = 0;
 set(FIG.ax.line,'xdata',[],'ydata',[]); drawnow;  % clear the plot.
 
- 
+
 CAPdataAvg=cell(size(rejections));  % Average data, KH 10Jan2012
 CAPdataReps=cell(size(rejections));  % All Reps
 
@@ -44,7 +44,7 @@ for zfrequency = frequencies %New outer loop, KH 10Jan2012
         CAP_set_attns(attenLevel,Stimuli.channel,Stimuli.KHosc,RP1,RP2);
         
         set(FIG.asldr.val, 'string', ['-' num2str(attenLevel)]);
-        set(FIG.asldr.SPL,'string',sprintf('%.1f dBSPL',Stimuli.MaxdBSPLCalib-attenLevel));        
+        set(FIG.asldr.SPL,'string',sprintf('%.1f dBSPL',Stimuli.MaxdBSPLCalib-attenLevel));
         
         
         CAPdataAvg{freqIND,attenIND} = zeros(1, CAPnpts);
@@ -103,8 +103,8 @@ for zfrequency = frequencies %New outer loop, KH 10Jan2012
                 end
             end
             if currPair
-                set(FIG.ax.line,'xdata',[0:(1/Stimuli.RPsamprate_Hz):CAP_Gating.CAPlength_ms/1000], ...
-                    'ydata',(CAPdataAvg{freqIND,attenIND}-mean(CAPdataAvg{freqIND,attenIND}))/(2*currPair)*Display.PlotFactor); 
+                set(FIG.ax.line,'xdata',(1:CAPnpts)/Stimuli.RPsamprate_Hz, ...
+                    'ydata',(CAPdataAvg{freqIND,attenIND}-debugAmp*mean(CAPdataAvg{freqIND,attenIND}))/(2*currPair)*Display.PlotFactor);
                 set(FIG.ax.line2(1),'ydata',max([CAPobs1 CAPobs2])); %KH 2011 June 08
                 drawnow;
             end
@@ -113,9 +113,9 @@ for zfrequency = frequencies %New outer loop, KH 10Jan2012
             break;
         end
         CAPdataAvg{freqIND,attenIND} = CAPdataAvg{freqIND,attenIND} / (2*RunLevels_params.nPairs);
-        set(FIG.ax.line,'xdata',[0:(1/Stimuli.RPsamprate_Hz):CAP_Gating.CAPlength_ms/1000], ...
-            'ydata',(CAPdataAvg{freqIND,attenIND}-mean(CAPdataAvg{freqIND,attenIND}))*Display.PlotFactor); drawnow;
-	end
+        set(FIG.ax.line,'xdata',(1:CAPnpts)/Stimuli.RPsamprate_Hz, ...
+            'ydata',(CAPdataAvg{freqIND,attenIND}-debugAmp*mean(CAPdataAvg{freqIND,attenIND}))*Display.PlotFactor); drawnow;
+    end
 end
 
 rc = PAset([120;120;120;120]); % added by GE/MH, 17Jan2003.  To force all attens to 120
@@ -130,7 +130,7 @@ if (bAbort == 0)
     ButtonName=questdlg('Do you wish to save these data?', ...
         'Save Prompt', ...
         'Yes','No','Comment','Yes');
-
+    
     switch ButtonName,
         case 'Yes',
             comment='No comment.';
@@ -139,7 +139,7 @@ if (bAbort == 0)
         case 'Comment'
             comment=add_comment_line;	%add a comment line before saving data file
     end
-
+    
     %    disp(sprintf(ButtonName))
     if ~strcmp(ButtonName,'No')
         set(FIG.statText.status, 'String', 'STATUS: saving data...');
@@ -152,7 +152,7 @@ if (bAbort == 0)
         
         filename = current_data_file('CAP',1); %strcat(FILEPREFIX,num2str(FNUM),'.m');
         uiresume; % Allow Nel's main window to update the Title
-
+        
         %% From NEL: "update_nel_title"
         if (strncmp(data_dir,NelData.File_Manager.dirname,length(data_dir)))
             display_dir = strrep(NelData.File_Manager.dirname(length(data_dir)+1:end),'\','');
@@ -160,8 +160,8 @@ if (bAbort == 0)
             display_dir = NelData.File_Manager.dirname;
         end
         set(NelData.General.main_handle,'Name',['Running CAP ...  -  ''' display_dir '''   (' int2str(NelData.File_Manager.picture) ' Saved Pictures)']);
-
-
+        
+        
     end
 end
 
