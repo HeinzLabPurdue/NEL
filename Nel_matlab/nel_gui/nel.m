@@ -1209,6 +1209,18 @@ while (ishandle(h_calib))
 end
 external_run_checkout(handles);
 
+function varargout = Menu_Tools_calibrateOLD_Callback(h, eventdata, handles, varargin)
+external_run_checkin(handles);
+currDIR=pwd;
+cd('C:\NEL1_2\Nel_matlab\calibrationOLD') 
+h_calib = calibrate;
+while (ishandle(h_calib))
+    uiwait(h_calib);
+    update_nel_title(handles);
+end
+external_run_checkout(handles);
+cd(currDIR)
+
 % --------------------------------------------------------------------
 function varargout = Menu_Tools_CAP_Callback(h, eventdata, handles, varargin)
 external_run_checkin(handles);

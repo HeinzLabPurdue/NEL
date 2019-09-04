@@ -31,7 +31,7 @@ box on;
 % filename = strcat(EXPS.currunit.FilePrefix,num2str(EXPS.currunit.fnum),'.m');
 % FIG.ax2.ProgHead = text(.5,3.45,{'Program:' 'Date:' 'File Name:'},'fontsize',12,'verticalalignment','top','horizontalalignment','left');
 % FIG.ax2.ProgData = text(1,3.45,{PROG.name PROG.date filename},'fontsize',12,'color',[.1 .1 .6],'verticalalignment','top','horizontalalignment','right');
-FIG.ax2.ProgMess = text(.5,.5,'Push calibration button to begin...','fontsize',12,'fontangle','normal','fontweight','normal','color',[.6 .1 .1],'verticalalignment','middle','horizontalalignment','center','EraseMode','back');
+FIG.ax2.ProgMess = text(.5,.5,sprintf('Push calibration button to begin...\n\nNEW CALIB'),'fontsize',12,'fontangle','normal','fontweight','normal','color',[.6 .1 .1],'verticalalignment','middle','horizontalalignment','center','EraseMode','back');
 text(-.34,1.12,'Frequency (kHz)','fontsize',18,'fontangle','normal','fontweight','normal','Horiz','center');
 
 FIG.ax3.axes = axes('position',[ .1 .005 .3 .32]);	%set axis size to accommodate dimensions of image file

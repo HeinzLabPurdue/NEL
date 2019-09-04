@@ -326,7 +326,7 @@ elseif strcmp(command_str,'load_calib') %SP 24Jan2016
         cdd
         allFiles= dir('*calib*');
         lastCalibFileName= allFiles(end).name;
-        lastCalibFileNum= getpicNum(lastCalibFileName);
+        lastCalibFileNum= getPicNum(lastCalibFileName);
         
         if ~CalibFileRefresh % Runs only during ABR initialization
             PicFileNum=inputdlg('Enter Calibration File Number','Load Calib File', 1,{num2str(lastCalibFileNum)});

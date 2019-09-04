@@ -16,6 +16,6 @@ global Stimuli FREQS
 % above frqcnr:
 iatn = Stimuli.syslv;
 if FREQS.freq > Stimuli.frqcnr & Stimuli.lvslp ~= 0,
-   iatn = iatn + (0.5 + Stimuli.lvslp*log(FREQS.freq/Stimuli.frqcnr)/log(2));
+   iatn = iatn + 0.5    +    Stimuli.lvslp * log(FREQS.freq/Stimuli.frqcnr) / log(2);
 end
 FREQS.atnn = max(0, min(iatn, 99.9));

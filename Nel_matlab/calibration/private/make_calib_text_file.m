@@ -36,8 +36,9 @@ x.Stimuli.crit       = Stimuli.crit;
 x.Line    = [];
 %store the data in three columns (freq SPL phase)
 % DDATA = DDATA(1:min(find(DDATA(:,1)<=0))-1,1:3);
-DDATA = DDATA(1:min(find(DDATA(:,1)<=0))-1,:);
+DDATA = DDATA(1:find(DDATA(:,1)<=0, 1 )-1,:);
 x.CalibData = DDATA;
+x.RawData= cell2mat(raw_data(cellfun(@(x) ~isempty(x), raw_data)));
 x.User = [];
 
 x.Hardware.mic        = Stimuli.nmic;
@@ -48,7 +49,7 @@ end
 rc = write_nel_data(fname,x,0);
 while (rc < 0)
    title_str = ['Choose a different file name! Can''t write to ''' fname ''''];
-   [fname dirname] = uiputfile([fileparts(fname) filesep '*.m'],title_str);
+   [fname, dirname] = uiputfile([fileparts(fname) filesep '*.m'],title_str);
    rc = write_nel_data(fullfile(dirname,fname),x,0);
 end
 NelData.File_Manager.picture = NelData.File_Manager.picture+1;
