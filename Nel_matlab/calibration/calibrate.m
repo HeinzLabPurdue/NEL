@@ -6,7 +6,7 @@ function h_fig = calibrate(command_str)
 %
 % THIS IS THE MAIN PROGRAM FOR THE TDT-RP2 based Calibration
 
-global root_dir func_dir object_dir PROG FIG Stimuli SRdata CDATA DDATA FREQS COMM root_dir prog_dir NelData devices_names_vector
+global root_dir newCalib func_dir object_dir PROG FIG Stimuli SRdata CDATA DDATA FREQS COMM root_dir prog_dir NelData devices_names_vector
 
 if nargin < 1
     func_dir = cd([root_dir 'calibration\private']);
@@ -239,6 +239,14 @@ elseif strcmp(command_str,'calibrate')
         %update_params;
         filename = current_data_file('calib'); %strcat(FILEPREFIX,num2str(FNUM),'.m');
         uiresume; % Allow Nel's main window to update the Title
+        
+        if newCalib
+            [~, temp_picName] = fileparts(fname);
+            get_inv_calib_fir_coeff(getPicNum(temp_picName), 0);
+        else
+            % Do nothing
+        end
+
     end
     
     %****** End of data collection loop ********
