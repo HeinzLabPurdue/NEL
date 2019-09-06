@@ -45,7 +45,7 @@ error = 0;
 no_ref = 0;
 no_lock = 0;
 
-if FREQS.isinit == 1,
+if FREQS.isinit == 1
    getatn;
    [error] = make_tone;
    attenuator(Stimuli.ear,0);
@@ -55,7 +55,7 @@ end
 % On first trial, initialize ndad. Set freq. into digital oscillator. If this
 % frequency equals previous, advance to next by incrementing ndad.  If new freq
 % is beyond frqhi, return done flag (ierror=-1) and exit, WITHOUT CHANGING SETTINGS.
-if ~error & ~length(get(FIG.push.stop,'userdata'))
+if ~error && isempty(get(FIG.push.stop,'userdata'))
    if FREQS.ndpnts <= 0, FREQS.ndad = 0; end
    comfrq;
    if FREQS.freq <= Stimuli.frqhi

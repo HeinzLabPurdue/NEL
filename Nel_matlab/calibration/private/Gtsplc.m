@@ -49,4 +49,7 @@ eval(command_line);
 FREQS.ndat   = length(mic.CalData);
 SRdata.dBV   = mic.dBV;
 SRdata.date  = mic.date;
-CDATA(:,1:4) = mic.CalData;
+CDATA = mic.CalData;
+if size(CDATA,2)~=4
+    error('nCols should be 4');
+end

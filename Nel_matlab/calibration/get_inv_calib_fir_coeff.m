@@ -38,7 +38,7 @@ filter_gain(freq_near11k:end)= linspace(filter_gain(freq_near11k), 0, numel(filt
 %% design filter
 fs=  48828.125000;
 Nfilter= 255;
-b = fir2(Nfilter, [0; .1; freq_kHz; 20; fs/2/1e3]/(fs/2/1e3), [1; 1; db2mag(filter_gain); 0; 0]);
+b = fir2(Nfilter, [0; freq_kHz; 20; fs/2/1e3]/(fs/2/1e3), [db2mag(filter_gain(1)); db2mag(filter_gain); db2mag(filter_gain(end)); 0]);
 % b = fir2(Nfilter, [0; .1; freq_kHz; 20; fs/2/1e3]/(fs/2/1e3), [0; 0; db2mag(filter_gain-max(filter_gain)); 0; 0]);
 % b_nogain = fir2(Nfilter, [0; .1; freq_kHz; 20; fs/2/1e3]/(fs/2/1e3), [1; 1; db2mag(zeros(size(filter_gain))); 0; 0]);
 b_nogain= [1 zeros(1, Nfilter)];

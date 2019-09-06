@@ -85,7 +85,7 @@ elseif strcmp(command_str,'calibrate')
     set(FIG.push.close,'Enable','off');
     set(FIG.push.params,'Enable','off');
     error = 0;
-    DDATA = zeros(300,5);
+    DDATA = zeros(1000,5);
     set(FIG.push.stop,'Userdata',[]);
     set(FIG.push.close,'Userdata',DDATA);
     set(FIG.ax1.line1,'XData',DDATA(:,1),'YData',DDATA(:,2));
@@ -132,9 +132,11 @@ elseif strcmp(command_str,'calibrate')
         %       end
         
         % Read amplitude of response
-        if ~error & isempty(get(FIG.push.stop,'userdata'))
+        if ~error && isempty(get(FIG.push.stop,'userdata'))
             converge = 0;
+            tic;
             [error,converge, ADdata_V_raw] = TDTdaq;
+            temp_calib_time=toc;
         end
         % Correct for probe microphone calibration IF a calibration file was
         % loaded
@@ -143,11 +145,12 @@ elseif strcmp(command_str,'calibrate')
         %   frequency range, must crash.  ndpnts decremented to delete this
         %   point, ndad incremented to go on to next frequency (see SETLAB()
         %   and COMFRQ().
-        if ~error & isempty(get(FIG.push.stop,'userdata'))
+        if ~error && isempty(get(FIG.push.stop,'userdata'))
             
             % Track number of completed data points.
             FREQS.ndpnts = FREQS.ndpnts + 1;
             raw_data{FREQS.ndpnts}= ADdata_V_raw;
+            calib_time(FREQS.ndpnts)= temp_calib_time;
             
             % Save data in buffer arrays.
             DDATA(FREQS.ndpnts,1) = FREQS.freq;  % current frequency in kHz

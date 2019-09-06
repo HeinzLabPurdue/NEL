@@ -15,7 +15,7 @@ if ~exist('pad', 'var')
 else
     params.pad=pad;
 end
-params.tapers= [2 3];
+params.tapers= [1 1];
 N=length(in_data);
 p=1-1/N;
 [~,~,~,~,~,~,params]=getparams(params);
@@ -36,54 +36,36 @@ end
 elec_RMS= sqrt(2)*abs(Amps{1});
 dbAmpVal= 20*log10(elec_RMS*1e6);
 
-
-
-
-do_correction= 1;
-
-if do_correction
-    % Frequency correction for ER7C beyond 11 kHz
-    correction_freq_low= 11e3; % 11 kHz
-    correction_freq_high= 20e3;
-    correction_max_dB= 10;
-    
-    if freq_out>correction_freq_low
-        correction_dB= correction_max_dB*log10(freq_out/correction_freq_low)/log10(correction_freq_high/correction_freq_low);
-        dbAmpVal= dbAmpVal+correction_dB;
-    end
-end
 phiValRad= angle(Amps{1});
-
-
-plotDebug= 0;
-if plotDebug
-    figure(11)
-    clf;
-    hold on;
-    plot(f, Fval)
-    plot(freq_out, Fval(line_ind), '*')
-end
-
-Fval_line= Fval(dsearchn(f(:),freq_out));
-
-rem_dbSPL= 20*log10(rms(in_data-datafit)*10^6);
-
-
-if plotVar
-    xtick_vals= [50 100 500];
-    xtick_labs= cellfun(@(x) num2str(x), num2cell(xtick_vals), 'UniformOutput', false);
-    figure(12);
-    clf;
-    hold on;
-    %     yrange=32;
-    plot_dpss_psd(in_data, fs_data, 'nw', params.tapers(1));
-    plot_dpss_psd(datafit, fs_data, 'nw', params.tapers(1));
-    set(gca, 'XTick', xtick_vals, 'XTickLabel', xtick_labs);
-end
 
 out_cos_amp= elec_RMS*cos(phiValRad);
 out_sin_amp= elec_RMS*sin(phiValRad);
 
+if nargout>2
+    Fval_line= Fval(dsearchn(f(:),freq_out));
+    rem_dbSPL= 20*log10(rms(in_data-datafit)*10^6);
+    
+    if plotVar
+        xtick_vals= [50 100 500];
+        xtick_labs= cellfun(@(x) num2str(x), num2cell(xtick_vals), 'UniformOutput', false);
+        figure(12);
+        clf;
+        hold on;
+        %     yrange=32;
+        plot_dpss_psd(in_data, fs_data, 'nw', params.tapers(1));
+        plot_dpss_psd(datafit, fs_data, 'nw', params.tapers(1));
+        set(gca, 'XTick', xtick_vals, 'XTickLabel', xtick_labs);
+    end
+    
+    plotDebug= 0;
+    if plotDebug
+        figure(11)
+        clf;
+        hold on;
+        plot(f, Fval)
+        plot(freq_out, Fval(line_ind), '*')
+    end
+end
 
 end
 

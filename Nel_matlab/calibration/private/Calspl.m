@@ -104,12 +104,16 @@ end
 %   If not, then have to interpolate; is this frequency between CDATA(iseq,1)
 %   and CDATA(iseq+1,1)?
 if ~out_of_range
-   if abs(thfreq-CDATA(iseq,1))/thfreq > slop
-      if iseq < FREQS.ndat
-         while thfreq >= slop1*CDATA(iseq+1,1) && iseq+1<FREQS.ndat
-            iseq = iseq + 1;
-         end
-         isntrp = 1;
+    if abs(thfreq-CDATA(iseq,1))/thfreq > slop
+        if iseq < FREQS.ndat
+            try
+                while thfreq >= slop1*CDATA(iseq+1,1) && iseq+1<FREQS.ndat
+                    iseq = iseq + 1;
+                end
+                isntrp = 1;
+            catch
+                disp('debugging');
+            end
       end
    end
    %Current frequency matches CDATA(iseq,1) if isntrp=0 or is between

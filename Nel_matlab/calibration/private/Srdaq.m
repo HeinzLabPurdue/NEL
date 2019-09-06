@@ -113,7 +113,7 @@ while restart & ~length(get(FIG.push.stop,'userdata'))
          vmag = xval*xval + yval*yval;
          if vmag > 0, vmag = sqrt(vmag); end
          drawnow;
-         if length(get(FIG.push.stop,'userdata')), break; end
+         if ~isempty(get(FIG.push.stop,'userdata')), break; end
          end
       end
    end

@@ -149,13 +149,13 @@ for index = 1:15   % THIS IS THE LOOP TO RUN UNTIL VALUES CONVERGE
     
     
     %%
-    old0_new1=1;
-    if old0_new1==0
+    useXcorr0_useMT1=1;
+    if useXcorr0_useMT1==0
         ADsignal_V=ADsignal_V-mean(ADsignal_V);
         
         %---Cross correlate the signal and acquired data-------
-        nsignal=[0:length(ADsignal_V)];
-        ndata=[0:length(ADdata_V)];
+        nsignal=0:length(ADsignal_V);
+        ndata=0:length(ADdata_V);
         [ADsignal,nsignal]=sigfold(ADsignal_V,nsignal);
         %%% CONVOLUTION METHOD
         %    [rxy,nrxy]=conv_m(ADdata_V,ndata,ADsignal,nsignal);
@@ -163,7 +163,7 @@ for index = 1:15   % THIS IS THE LOOP TO RUN UNTIL VALUES CONVERGE
         
         %% FFT METHOD
         nyb = nsignal(1)+ndata(1); nye=nsignal(length(ADsignal))+ndata(length(ADdata_V));
-        nrxy=[nyb:nye];
+        nrxy=nyb:nye;
         X = fft([ADsignal zeros(1,length(ADdata_V)-1)]);
         Y = fft([ADdata_V zeros(1,length(ADsignal)-1)]);
         rxy = real(ifft(X.*Y));
@@ -187,7 +187,7 @@ for index = 1:15   % THIS IS THE LOOP TO RUN UNTIL VALUES CONVERGE
         %     magsqrd(j)=realcalib(j)^2+imgcalib(j)^2;  % vmag^2
         %--------------------------------------------------
         
-    else
+    elseif useXcorr0_useMT1==1
         plotVar= 0;
         cur_freq= FREQS.freq*1e3;
         [xval, yval]= find_line_spectrum(ADdata_V, SR_Hz, plotVar, cur_freq);
@@ -226,7 +226,7 @@ for index = 1:15   % THIS IS THE LOOP TO RUN UNTIL VALUES CONVERGE
     
     
     %%
-    if COMM.SRdata.ndata >= 1,
+    if COMM.SRdata.ndata >= 1
         xval = xavg/COMM.SRdata.ndata;  % mean real part
         yval = yavg/COMM.SRdata.ndata;  % mean imag part
         COMM.SRdata.rmag = xval*xval + yval*yval;

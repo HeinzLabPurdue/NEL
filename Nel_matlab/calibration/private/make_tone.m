@@ -1,4 +1,4 @@
-function [error] = make_tone
+function [error] = make_tone()
 
 global object_dir COMM FIG Stimuli newCalib
 

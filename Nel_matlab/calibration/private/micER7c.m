@@ -1,4 +1,4 @@
-function mic = micER7c;
+function mic = micER7c
 % Modified from mic067g.m
 % % % % Calibration file for microphone/probe '067g'.
 % % % % dBV = absolute mic calib = dB re 1V from B&K amp with 0 dB B&K gain
@@ -19,12 +19,13 @@ function mic = micER7c;
 %
 % dBSPL measured = 20*log10(RMS_V/1uV) - ProbeCalibData(col3) + dBSPL for ProbeCalibData(col2)
 
-freqs_kHz=logspace(log10(200), log10(20000), 34)'/1000;
+freqs_kHz=logspace(log10(50), log10(20000), 34)'/1000;
 dBSPLforCalib=84*ones(size(freqs_kHz));  % from ER7C data sheet
 
 % Rough approximation based on ER7C data sheet
 FreqCorner_kHz = 11;
 Slope_dBoct =-6;
+ProbeCalib_dBre1uV= 84*ones(size(freqs_kHz));
 for i = 1:length(freqs_kHz)
     if freqs_kHz(i)<FreqCorner_kHz
         ProbeCalib_dBre1uV(i)=84;
@@ -32,7 +33,7 @@ for i = 1:length(freqs_kHz)
         ProbeCalib_dBre1uV(i)=84+Slope_dBoct*log2(freqs_kHz(i)/FreqCorner_kHz);
     end
 end
-ProbeCalib_dBre1uV=ProbeCalib_dBre1uV';
+ProbeCalib_dBre1uV=ProbeCalib_dBre1uV(:);
 
 phase_rad=0*ones(size(freqs_kHz));
 

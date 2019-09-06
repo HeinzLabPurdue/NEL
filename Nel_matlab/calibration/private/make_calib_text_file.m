@@ -36,9 +36,11 @@ x.Stimuli.crit       = Stimuli.crit;
 x.Line    = [];
 %store the data in three columns (freq SPL phase)
 % DDATA = DDATA(1:min(find(DDATA(:,1)<=0))-1,1:3);
-DDATA = DDATA(1:find(DDATA(:,1)<=0, 1 )-1,:);
+
+DDATA = DDATA(1:find(DDATA(:,1)<=0, 1)-1,:);
 x.CalibData = DDATA;
-x.RawData= cell2mat(raw_data(cellfun(@(x) ~isempty(x), raw_data)));
+% x.RawData= cell2mat(raw_data(cellfun(@(x) ~isempty(x), raw_data)));
+% x.calib_time= calib_time;
 x.User = [];
 
 x.Hardware.mic        = Stimuli.nmic;
