@@ -262,7 +262,7 @@ for index = 1:15   % THIS IS THE LOOP TO RUN UNTIL VALUES CONVERGE
     end
     
     drawnow;
-    if length(get(FIG.push.stop,'userdata')), break; end
+    if ~isempty(get(FIG.push.stop,'userdata')), break; end
 end
 
 % invoke(PA5,'SetAtten',120)

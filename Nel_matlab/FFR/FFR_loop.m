@@ -1,16 +1,25 @@
+%% For stimulus
 RP1=actxcontrol('RPco.x',[0 0 1 1]);
 invoke(RP1,'ConnectRP2','USB',1);
 invoke(RP1,'ClearCOF');
 
 invoke(RP1,'LoadCOF',[prog_dir '\object\FFR_wav_polIN.rcx']);
 
+%% For bit-select
 RP2=actxcontrol('RPco.x',[0 0 1 1]);
 invoke(RP2,'ConnectRP2','USB',2);
 invoke(RP2,'ClearCOF');
-% invoke(RP2,'LoadCOF',[prog_dir '\object\FFR_right.rco']); % MH/KH Dec 8 2011
-invoke(RP2,'LoadCOF',[prog_dir '\object\FFR_right2.rcx']);
-invoke(RP2,'SetTagVal','ADdur', FFR_Gating.FFRlength_ms);
+invoke(RP2,'LoadCOF',[prog_dir '\object\FFR_BitSet.rcx']);
 invoke(RP2,'Run');
+
+%% For ADC (data in)
+RP3=actxcontrol('RPco.x',[0 0 1 1]);
+invoke(RP3,'ConnectRP2','USB',3);
+invoke(RP3,'ClearCOF');
+% invoke(RP2,'LoadCOF',[prog_dir '\object\FFR_right.rco']); % MH/KH Dec 8 2011
+invoke(RP3,'LoadCOF',[prog_dir '\object\FFR_ADC.rcx']);
+invoke(RP3,'SetTagVal','ADdur', FFR_Gating.FFRlength_ms);
+invoke(RP3,'Run');
 
 FFR_set_attns(Stimuli.atten_dB,(Stimuli.noiseLevel*(1-Stimuli.noNoise)...
     +(Stimuli.noNoise)*(Stimuli.atten_dB-120)),Stimuli.channel,Stimuli.KHosc,RP1,RP2); %% debug deal with later Khite
@@ -77,8 +86,8 @@ while isempty(get(FIG.push.close,'Userdata'))
     invoke(RP1,'SoftTrg',1);
     
     while(1)  % loop until "close" request
-        if (invoke(RP2,'GetTagVal','BufFlag') == 1)
-            FFRdata = invoke(RP2,'ReadTagV','ADbuf',0,FFRnpts);
+        if (invoke(RP3,'GetTagVal','BufFlag') == 1)
+            FFRdata = invoke(RP3,'ReadTagV','ADbuf',0,FFRnpts);
             FFRobs=max(abs(FFRdata));
             
             % THE ABOVE LINE HAS A LOGIC FLAW, NEEDS TO BE REPLACED
@@ -101,16 +110,12 @@ while isempty(get(FIG.push.close,'Userdata'))
                         misc.n = mod(misc.n + 1,100);    % counter for stimuli for polarity zz 31oct11
                         %                if FFRobs <= Stimuli.threshV  %KHZZ 2011 Nov 4 - artifact rejection
                         if mod(misc.n,2)
-                            FFRdataAvg_freerun_np = FFR_memFact * FFRdataAvg_freerun_np ...
-                                + (1 - FFR_memFact)*FFRdata;
+                            FFRdataAvg_freerun_np = FFR_memFact * FFRdataAvg_freerun_np + (1 - FFR_memFact)*FFRdata;
                             
                         else
-                            FFRdataAvg_freerun_po = FFR_memFact * FFRdataAvg_freerun_po ...
-                                + (1 - FFR_memFact)*FFRdata;
+                            FFRdataAvg_freerun_po = FFR_memFact * FFRdataAvg_freerun_po + (1 - FFR_memFact)*FFRdata;
                             
                         end
-                        %                else
-                        
                     end
                     
                 else
@@ -131,15 +136,13 @@ while isempty(get(FIG.push.close,'Userdata'))
                     %                FFR_xdata = decimate(0:(1/Stimuli.RPsamprate_Hz):FFR_Gating.FFRlength_ms/1000,4);
                     %                FFR_ydata = decimate(FFRdataAvg_freerun_np*Display.PlotFactor,4);
                     %                set(FIG.ax.line,'xdata',FFR_xdata,'ydata',FFR_ydata);
-                    set(FIG.ax.line,'xdata',(0:(1/Stimuli.RPsamprate_Hz):FFR_Gating.FFRlength_ms/1000), ...
-                        'ydata',FFRdataAvg_freerun_np*Display.PlotFactor);
+                    set(FIG.ax.line,'xdata',(0:(1/Stimuli.RPsamprate_Hz):FFR_Gating.FFRlength_ms/1000), 'ydata',FFRdataAvg_freerun_np*Display.PlotFactor);
                     
                 else
                     %                FFR_xdata = decimate(0:(1/Stimuli.RPsamprate_Hz):FFR_Gating.FFRlength_ms/1000,4);
                     %                FFR_ydata = decimate(FFRdataAvg_freerun_po*Display.PlotFactor,4);
                     %                set(FIG.ax.line2,'xdata',FFR_xdata,'ydata',FFR_ydata);
-                    set(FIG.ax.line2,'xdata',(0:(1/Stimuli.RPsamprate_Hz):FFR_Gating.FFRlength_ms/1000), ...
-                        'ydata',FFRdataAvg_freerun_po*Display.PlotFactor);
+                    set(FIG.ax.line2,'xdata',(0:(1/Stimuli.RPsamprate_Hz):FFR_Gating.FFRlength_ms/1000), 'ydata',FFRdataAvg_freerun_po*Display.PlotFactor);
                 end
                 %             FFRxCOMB = [0:(1/Stimuli.RPsamprate_Hz):FFR_Gating.FFRlength_ms/1000 0:(1/Stimuli.RPsamprate_Hz):FFR_Gating.FFRlength_ms/1000];
                 %             FFRdataCOMB = [FFRdataAvg_freerun_np FFRdataAvg_freerun_po];
@@ -149,7 +152,7 @@ while isempty(get(FIG.push.close,'Userdata'))
             else
                 veryfirstSTIM=0;
             end
-            invoke(RP2,'SoftTrg',2);
+            invoke(RP3,'SoftTrg',2);
         end
         
         if get(FIG.push.close,'Userdata')
@@ -172,7 +175,7 @@ while isempty(get(FIG.push.close,'Userdata'))
                 case 4
                     invoke(RP1,'SetTagVal','StmOn',FFR_Gating.duration_ms);
                     invoke(RP1,'SetTagVal','StmOff',(FFR_Gating.period_ms-FFR_Gating.duration_ms));
-                    invoke(RP2,'SetTagVal','ADdur',FFR_Gating.FFRlength_ms);
+                    invoke(RP3,'SetTagVal','ADdur',FFR_Gating.FFRlength_ms);
                     FFRnpts=ceil((FFR_Gating.FFRlength_ms/1000)*Stimuli.RPsamprate_Hz);
                     pair1 = 1;
                     pair2 = 1;
@@ -269,6 +272,7 @@ rc = PAset([120;120;120;120]); % added by GE/MH, 17Jan2003.  To force all attens
 
 invoke(RP1,'Halt');
 invoke(RP2,'Halt');
+invoke(RP3,'Halt');
 
 delete(FIG.handle);
 clear FIG;

@@ -17,6 +17,7 @@ end
 cdd;
 
 fName_calib=getFileName(calibPicNum);
+fName_calib= strrep(fName_calib, '_raw', '');
 
 data= loadPic(calibPicNum);
 data=data.CalibData;
@@ -27,7 +28,10 @@ dBspl_at0dB_atten=data(:,2);
 %% figure out inverse filter gains
 % ER2 technical specs says gain at 1V rms should be 100 dB
 % https://www.etymotic.com/auditory-research/insert-earphones-for-research/er2.html
-dBSPL_ideal= 91;
+% We are playing = 10V pp (TDT max Output)
+% RMS= 10/sqrt(2); : should be ~(100+17)=~117 dB
+% 117 dB: too loud. So set ideal dB SPL to something between 90-100 dB
+dBSPL_ideal= 90; 
 filter_gain= dBSPL_ideal-dBspl_at0dB_atten;
 
 % Suppress high frequency gain (Taper to zero?)
@@ -36,7 +40,7 @@ filter_gain(freq_near11k:end)= linspace(filter_gain(freq_near11k), 0, numel(filt
 
 
 %% design filter
-fs=  48828.125000;
+fs=  48828.125;
 Nfilter= 255;
 b = fir2(Nfilter, [0; freq_kHz; 20; fs/2/1e3]/(fs/2/1e3), [db2mag(filter_gain(1)); db2mag(filter_gain); db2mag(filter_gain(end)); 0]);
 % b = fir2(Nfilter, [0; .1; freq_kHz; 20; fs/2/1e3]/(fs/2/1e3), [0; 0; db2mag(filter_gain-max(filter_gain)); 0; 0]);

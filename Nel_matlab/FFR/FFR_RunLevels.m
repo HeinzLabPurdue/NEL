@@ -64,7 +64,7 @@ for attenLevel = Stimuli.atten_dB + RunLevels_params.stepdB*RunLevels_params.att
             attenLevel, currStim, rejections));
          %set(FIG.statText.status, 'String', sprintf('STATUS: averaging at -%ddB (%d)...', attenLevel, currStim));
       end
-      if (strcmp(get(FIG.push.forget_now, 'Userdata'), 'save') & ~mod(currStim,2))
+      if (strcmp(get(FIG.push.forget_now, 'Userdata'), 'save') && ~mod(currStim,2))
          save = 1;
          RunLevels_params.nPairs_actual = currStim/2;
          break;
@@ -75,8 +75,8 @@ for attenLevel = Stimuli.atten_dB + RunLevels_params.stepdB*RunLevels_params.att
       end
       bNoSampleObtained = 1;
       while(bNoSampleObtained)
-         if(invoke(RP2,'GetTagVal','BufFlag') == 1)
-            FFRdata = invoke(RP2,'ReadTagV','ADbuf',0,FFRnpts);
+         if(invoke(RP3,'GetTagVal','BufFlag') == 1)
+            FFRdata = invoke(RP3,'ReadTagV','ADbuf',0,FFRnpts);
             FFRobs1 = max(abs(FFRdata)); %Artifact rejection KHZZ 2011 Nov 4
             set(FIG.ax.line3,'xdata',0.5,'ydata',FFRobs1); drawnow;
             % zz 05nov11
@@ -113,23 +113,23 @@ for attenLevel = Stimuli.atten_dB + RunLevels_params.stepdB*RunLevels_params.att
 %             else
                rejections=rejections+1;
             end                          %End for artifact rejection KH 2011 June 08
-            invoke(RP2,'SoftTrg',2);
+            invoke(RP3,'SoftTrg',2);
          end
       end
       % Get second of paired samples: - removed zz 04nov11
       % No need to get second of paired samples, as they are interweaved zz 04nov11
       %       bNoSampleObtained = 1;
       %       while(bNoSampleObtained)
-      %          if(invoke(RP2,'GetTagVal','BufFlag') == 1)
+      %          if(invoke(RP3,'GetTagVal','BufFlag') == 1)
       %             if(invoke(RP1,'GetTagVal','ampPolarity') < 0 | (Stimuli.fixedPhase == 1)) % check for stim polarity, if necessary
-      %                FFRdata2 = invoke(RP2,'ReadTagV','ADbuf',0,FFRnpts);
+      %                FFRdata2 = invoke(RP3,'ReadTagV','ADbuf',0,FFRnpts);
       %                bNoSampleObtained = 0;
       %                if currStim
       % %                   FFRdataReps{attenIND}(2*currStim,:) = FFRdata2;
       %                   FFRdataAvg{attenIND} = FFRdataAvg{attenIND} + FFRdataReps{attenIND}(2*currStim,:);
       %                end
       %             end
-      %             invoke(RP2,'SoftTrg',2);
+      %             invoke(RP3,'SoftTrg',2);
       %          end
       %       end                 
       if currStim

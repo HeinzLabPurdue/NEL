@@ -25,7 +25,7 @@ COMM.asr1 = asr1;
 
 
 COMM.RP2_2=actxcontrol('RPco.x',[0 0 1 1]);
-invoke(COMM.RP2_2,'ConnectRP2','GB',2);
+invoke(COMM.RP2_2,'ConnectRP2','GB',3);
 invoke(COMM.RP2_2,'ClearCOF');
 invoke(COMM.RP2_2,'LoadCOFsf',fullfile(root_dir,'signal_averager','object','averager.rco'),1);
 

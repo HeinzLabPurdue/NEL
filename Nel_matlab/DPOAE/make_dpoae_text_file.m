@@ -1,4 +1,4 @@
-global data_dir NelData
+global NelData
 
 fname = current_data_file('dpoae',1);
 
@@ -19,9 +19,9 @@ x.Stimuli.file_frqhi     = PARAMS(2);
 x.Stimuli.file_fstlin    = PARAMS(3);
 x.Stimuli.file_fstoct    = PARAMS(4);
 
-if logstps > 0,
+if logstps > 0
    x.Stimuli.FreqSteps   ='log';
-elseif logstps < 0,
+elseif logstps < 0
    x.Stimuli.FreqSteps   ='Q';
 else
    x.Stimuli.FreqSteps   ='linear';
@@ -51,7 +51,7 @@ x.Hardware.amp_vlt   = VOLTS;
 rc = write_nel_data(fname,x,0);
 while (rc < 0)
    title_str = ['Choose a different file name! Can''t write to ''' fname ''''];
-   [fname dirname] = uiputfile([fileparts(fname) filesep '*.m'],title_str);
+   [fname, dirname] = uiputfile([fileparts(fname) filesep '*.m'],title_str);
    rc = write_nel_data(fullfile(dirname,fname),x,0);
 end
 NelData.File_Manager.picture = NelData.File_Manager.picture+1;

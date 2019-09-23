@@ -10,7 +10,7 @@ ax = cell2struct(cell(1,7),{'axis', 'axis2', 'line', 'line2', 'line3', 'line4', 
 NewStim=0;
 popup=cell2struct(cell(1,1),{'stims'},2);
 
-FIG   = struct('handle',[],'push',push,'radio',radio,'statText', statText,'bg',bg,'edit',edit,'asldr',asldr,'ax',ax, ...
+FIG = struct('handle',[],'push',push,'radio',radio,'statText', statText,'bg',bg,'edit',edit,'asldr',asldr,'ax',ax, ...
     'NewStim',NewStim, 'popup', popup);
 
 

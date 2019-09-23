@@ -9,6 +9,8 @@ gray_light=[1 1 1];
 % gray_dark=[1 1 1]/1.5;
 
 %% 
+FIG.radio.invCalib = uicontrol(FIG.handle,'callback','FFR_SNRenv(''invCalib'');','style','radio','Enable','on','Units','normalized','position',[.125 .355 .08 .03],'string','invCalib','fontsize',12,'BackgroundColor','w','value',1); %added by KH 06Jan2012
+
 FIG.radio.fast   = uicontrol(FIG.handle,'callback','FFR_SNRenv(''fast'');','style','radio','Enable','on','Units','normalized','position',[.125 .315 .08 .03],'string','Fast','fontsize',12,'BackgroundColor','w','value',1);
 FIG.radio.slow   = uicontrol(FIG.handle,'callback','FFR_SNRenv(''slow'');','style','radio','Enable','on','Units','normalized','position',[.125 .285 .08 .03],'string','Slow','fontsize',12,'BackgroundColor','w','value',0);
 

@@ -1,7 +1,7 @@
 % make_CAP_text_file_subfunc1.m
 
 fname = current_data_file([misc.fileExtension '_' num2str(Stimuli.freq_hz)],1);
-[pathstr name ext versn]=fileparts(fname);
+[pathstr, name, ext]=fileparts(fname);
 aux_fname = fullfile(pathstr,['a' name(2:end)]);
 
 x.General.program_name  = PROG.name;

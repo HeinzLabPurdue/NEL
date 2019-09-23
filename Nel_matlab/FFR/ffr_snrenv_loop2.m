@@ -4,13 +4,21 @@ if ~(double(invoke(RP1,'GetTagVal', 'Stage')) == 2)
     FFR_set_attns(-120,-120,Stimuli.channel,Stimuli.KHosc,RP1,RP2); %% Check with MH
 end
 
+%% For stimulus
+% RP*={1,2,3} are already defined (in FFR_SNRenv)
 invoke(RP1,'ClearCOF');
 invoke(RP1,'LoadCOF',[prog_dir '\object\FFR_wav_polIN_sp.rcx']);
 
+%% For bit-select
 invoke(RP2,'ClearCOF');
-invoke(RP2,'LoadCOF',[prog_dir '\object\FFR_right2.rcx']);
-invoke(RP2,'SetTagVal','ADdur', FFR_Gating.FFRlength_ms);
+invoke(RP2,'LoadCOF',[prog_dir '\object\FFR_BitSet.rcx']);
 invoke(RP2,'Run');
+
+%% For ADC (data in)
+invoke(RP3,'ClearCOF');
+invoke(RP3,'LoadCOF',[prog_dir '\object\FFR_ADC.rcx']);
+invoke(RP3,'SetTagVal','ADdur', FFR_Gating.FFRlength_ms);
+invoke(RP3,'Run');
 
 % Avoiding using set_RP_tagvals: somehow set_RP_tagvals doesn't let FFR
 % loops run as expected. 
@@ -84,8 +92,8 @@ while isempty(get(FIG.push.close,'Userdata'))
     invoke(RP1,'SoftTrg',1);
     
     while(1)  % loop until "close" request
-        if (invoke(RP2,'GetTagVal','BufFlag') == 1)
-            FFRdata = invoke(RP2,'ReadTagV','ADbuf',0,FFRnpts);
+        if (invoke(RP3,'GetTagVal','BufFlag') == 1)
+            FFRdata = invoke(RP3,'ReadTagV','ADbuf',0,FFRnpts);
             FFRobs=max(abs(FFRdata));
             
             % THE ABOVE LINE HAS A LOGIC FLAW, NEEDS TO BE REPLACED
@@ -109,11 +117,9 @@ while isempty(get(FIG.push.close,'Userdata'))
                         misc.n = mod(misc.n + 1,100);    % counter for stimuli for polarity zz 31oct11
                         %                if FFRobs <= Stimuli.threshV  %KHZZ 2011 Nov 4 - artifact rejection
                         if mod(misc.n,2)
-                            FFRdataAvg_freerun_np = FFR_memFact * FFRdataAvg_freerun_np ...
-                                + (1 - FFR_memFact)*FFRdata;
+                            FFRdataAvg_freerun_np = FFR_memFact * FFRdataAvg_freerun_np + (1 - FFR_memFact)*FFRdata;
                         else
-                            FFRdataAvg_freerun_po = FFR_memFact * FFRdataAvg_freerun_po ...
-                                + (1 - FFR_memFact)*FFRdata;
+                            FFRdataAvg_freerun_po = FFR_memFact * FFRdataAvg_freerun_po + (1 - FFR_memFact)*FFRdata;
                         end
                         
                     end
@@ -153,7 +159,7 @@ while isempty(get(FIG.push.close,'Userdata'))
             else
                 veryfirstSTIM=0;
             end
-            invoke(RP2,'SoftTrg',2);
+            invoke(RP3,'SoftTrg',2);
         end
         
         if get(FIG.push.close,'Userdata')
@@ -226,7 +232,7 @@ while isempty(get(FIG.push.close,'Userdata'))
                     % Stimulate and acquire FFR curves at levels based on
                     %AttenMask around the current freq/atten combo.
                     [firstSTIM, NelData]=FFR_SNRenv_RunLevels2(FIG,Stimuli,RunLevels_params, misc, FFR_Gating, ...
-                        FFRnpts,interface_type, Display, NelData, data_dir, RP1, RP2, PROG);
+                        FFRnpts,interface_type, Display, NelData, data_dir, RP1, RP3, PROG);
                     veryfirstSTIM=1; ...
                         % misc.n = int(~(invoke(RP1,'GetTagVal','ORG')));
                 case 5 ...
@@ -265,6 +271,7 @@ rc = PAset([120;120;120;120]); % added by GE/MH, 17Jan2003.  To force all attens
 
 invoke(RP1,'Halt');
 invoke(RP2,'Halt');
+invoke(RP3,'Halt');
 
 delete(FIG.handle);
 clear FIG;

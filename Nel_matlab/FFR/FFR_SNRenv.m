@@ -12,6 +12,8 @@ if strcmp(NelData.General.WindowsHostName, '1353lyl303501d') % means NEL1
     invoke(RP1,'ConnectRP2','USB',1);
     RP2=actxcontrol('RPco.x',[0 0 1 1]);
     invoke(RP2,'ConnectRP2','USB',2);
+    RP3=actxcontrol('RPco.x',[0 0 1 1]);
+    invoke(RP3,'ConnectRP2','USB',3);
 else % means NEL2??
     RP1= RP.activeX;        %MW10062016  use global control object rather than reinitialize
     RP2 = RP1;      %MW10062016  only one device with RX8
@@ -32,6 +34,7 @@ if nargin < 1
     if ~(double(invoke(RP1,'GetTagVal', 'Stage')) == 2)
         FFR_set_attns(-120,-120,Stimuli.channel,Stimuli.KHosc,RP1,RP2); %% Check with MH
     end
+    FFR_SNRenv('invCalib'); % Initialize RP2_4 with InvFilter
     FFR_SNRenv('update_stim', 'spl');
     ffr_snrenv_loop2; % Working
     
@@ -45,7 +48,7 @@ elseif strcmp(command_str,'update_stim')
                 Stimuli.atten_dB = Stimuli.maxSPL-85;
             end
             set(FIG.asldr.val,'string',num2str(-Stimuli.atten_dB));
-%             set_RP_tagvals(RP1, RP2, FFR_SNRenv_Gating, Stimuli);
+            %             set_RP_tagvals(RP1, RP2, FFR_SNRenv_Gating, Stimuli);
             
         case 'list'
             FIG.NewStim = 2;
@@ -178,7 +181,7 @@ elseif strcmp(command_str,'slide_atten')
     FIG.NewStim = 0;
     Stimuli.atten_dB = floor(-get(FIG.asldr.slider,'value'));
     set(FIG.asldr.val,'string',num2str(-Stimuli.atten_dB));
-%     set_RP_tagvals(RP1, RP2, FFR_SNRenv_Gating, Stimuli);
+    %     set_RP_tagvals(RP1, RP2, FFR_SNRenv_Gating, Stimuli);
     
     % LQ 01/31/05
 elseif strcmp(command_str, 'slide_atten_text')
@@ -195,7 +198,7 @@ elseif strcmp(command_str, 'slide_atten_text')
         Stimuli.atten_dB = -new_atten;
         set(FIG.asldr.slider, 'value', new_atten);
     end
-%     set_RP_tagvals(RP1, RP2, FFR_SNRenv_Gating, Stimuli);
+    %     set_RP_tagvals(RP1, RP2, FFR_SNRenv_Gating, Stimuli);
     
 elseif strcmp(command_str,'memReps')
     FIG.NewStim = 3;
@@ -280,7 +283,12 @@ elseif strcmp(command_str,'YLim')
     end
     set(FIG.edit.yscale,'string', num2str(Display.YLim_atAD));
     
+elseif strcmp(command_str,'invCalib')
+    Stimuli.invCalib= get(FIG.radio.invCalib,'value');
+    Stimuli.coefNum_invCalib= run_invCalib(Stimuli.invCalib);
+    
 elseif strcmp(command_str,'close')
+    run_invCalib(false); % Initialize with allpass RP2_3
     set(FIG.push.close,'Userdata',1);
     cd([NelData.General.RootDir 'Nel_matlab\nel_general']);
 end

@@ -6,7 +6,7 @@ function h_fig = calibrate(command_str)
 %
 % THIS IS THE MAIN PROGRAM FOR THE TDT-RP2 based Calibration
 
-global root_dir newCalib func_dir object_dir PROG FIG Stimuli SRdata CDATA DDATA FREQS COMM root_dir prog_dir NelData devices_names_vector
+global root_dir newCalib coefFileNum func_dir object_dir PROG FIG Stimuli SRdata CDATA DDATA FREQS COMM root_dir prog_dir NelData devices_names_vector
 
 if nargin < 1
     func_dir = cd([root_dir 'calibration\private']);
@@ -121,7 +121,7 @@ elseif strcmp(command_str,'calibrate')
     
     %% Main data collection Loop
     raw_data= cell(size(DDATA,1),1);
-    while ~error & isempty(get(FIG.push.stop,'userdata'))
+    while ~error && isempty(get(FIG.push.stop,'userdata'))
         %Set up TDT system for next stimulus:
         [error] = setlab;
         FREQS.isinit = 0;
@@ -237,19 +237,24 @@ elseif strcmp(command_str,'calibrate')
             comment=add_comment_line;	%add a comment line before saving data file
     end
     
-    if strcmp(ButtonName,'Yes') |  strcmp(ButtonName,'Comment')
-        make_calib_text_file;
-        %update_params;
-        filename = current_data_file('calib'); %strcat(FILEPREFIX,num2str(FNUM),'.m');
-        uiresume; % Allow Nel's main window to update the Title
+    if strcmp(ButtonName,'Yes') ||  strcmp(ButtonName,'Comment')
+        fname = current_data_file('calib',1);  % MH/GE 11/03/03 added suppress_unitno flag to generalize
+        if newCalib
+            fname= strcat(fname, '_raw');
+        else
+            fname= sprintf('%s_inv%d', fname, coefFileNum);
+        end
         
+        NelData=make_calib_text_file(fname, NelData, Stimuli, comment, PROG, DDATA, SRdata);
+        %update_params;
+%         filename = current_data_file('calib'); %strcat(FILEPREFIX,num2str(FNUM),'.m');
+        uiresume; % Allow Nel's main window to update the Title
         if newCalib
             [~, temp_picName] = fileparts(fname);
             get_inv_calib_fir_coeff(getPicNum(temp_picName), 0);
         else
             % Do nothing
         end
-
     end
     
     %****** End of data collection loop ********
@@ -290,5 +295,6 @@ elseif strcmp(command_str,'recall')
     drawnow;
     
 elseif strcmp(command_str,'close')
+    coefFileNum= run_invCalib(false);
     delete(FIG.handle);
 end

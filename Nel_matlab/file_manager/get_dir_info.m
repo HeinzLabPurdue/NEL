@@ -6,7 +6,10 @@ function get_dir_info(dirname)
 
 global NelData
 
-NelData.File_Manager.picture = val_from_filename([dirname 'p*.m'], 'p%d_u');
+% NelData.File_Manager.picture = val_from_filename([dirname 'p*.m'],
+% 'p%d_u'); % Commented SP: on 22Sep19
+NelData.File_Manager.picture = max(val_from_filename([dirname 'p*'], 'p%d_u'), val_from_filename([dirname 'a*'], 'a%d_u'));
+
 track.No = val_from_filename([dirname 'Track_*.m'], 'Track_%d');
 if (track.No == 0)
    new_track(0); % This will update NelData with track.No=0 and Unit.No=0

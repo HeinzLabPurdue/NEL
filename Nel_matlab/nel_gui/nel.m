@@ -964,7 +964,7 @@ if (error_ud.log.index > 0)
         fid = fopen(fname,'a');
         while (fid < 0)
             title_str = ['Choose a different file name! Can''t write to ''' fname ''''];
-            [fname dirname] = uiputfile([fileparts(fname) filesep '*.txt'],title_str);
+            [fname, dirname] = uiputfile([fileparts(fname) filesep '*.txt'],title_str);
             fid = fopen(fullfile(dirname,fname),'a');
         end
         for i = 1:length(error_str)

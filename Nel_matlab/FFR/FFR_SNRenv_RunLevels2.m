@@ -1,7 +1,7 @@
 %% Working
 
 function [firstSTIM, NelData]=FFR_SNRenv_RunLevels2(FIG,Stimuli,RunLevels_params, misc, FFR_SNRenv_Gating,...
-    FFRnpts,interface_type, Display, NelData, data_dir, RP1, RP2, PROG)
+    FFRnpts,interface_type, Display, NelData, data_dir, RP1, RP3, PROG)
 
 % RP1=RP.activeX;
 % RP2=RP.activeX;
@@ -68,8 +68,8 @@ for attenIND= 1
     
     set(FIG.statText.status, 'String', sprintf('STATUS: averaging at -%d dB...', attenLevel));
     
-    FFRdataAvg_NP_plot{attenIND} = zeros(1, FFRnpts);
     FFRdataAvg_PO_plot{attenIND} = zeros(1, FFRnpts);
+    FFRdataAvg_NP_plot{attenIND} = zeros(1, FFRnpts);
     
     
     %     for nnnnnnnn=1:2*RunLevels_params.nPairs
@@ -81,7 +81,7 @@ for attenIND= 1
     % 7/22/19 if we want to skip first pair, should start at
     % for currStim= -1:2*RunLevels_params.nPairs and we should be checking
     % if currStim is >0 in if statements
-    for currStim = 1:2*RunLevels_params.nPairs
+    for currStim = 0:2*RunLevels_params.nPairs
         
         if currStim
             set(FIG.statText.status, 'String', sprintf('STATUS: averaging at -%ddB (%d %d)...', ...
@@ -102,8 +102,8 @@ for attenIND= 1
         bNoSampleObtained = 1;
         
         while bNoSampleObtained
-            if invoke(RP2,'GetTagVal','BufFlag') == 1
-                FFRdata = invoke(RP2,'ReadTagV','ADbuf',0,FFRnpts);
+            if invoke(RP3,'GetTagVal','BufFlag') == 1
+                FFRdata = invoke(RP3,'ReadTagV','ADbuf',0,FFRnpts);
                 maxFFRobs = max(abs(FFRdata)); %Artifact rejection KHZZ 2011 Nov 4
                 set(FIG.ax.line3,'xdata',0.5,'ydata',maxFFRobs);
                 drawnow;
@@ -122,18 +122,21 @@ for attenIND= 1
                     % sure if this is happening anymore. Plus we have
                     % been saving all reps (including the first two reps)
                     weight = 1/ceil(currStim/2);
-                    if mod(currStim,2)
-                        % Important: Before 7/22/19, all FFR data saved
-                        % had POS and NEG polarity switched in the
-                        % average
-                        FFRdataAvg_PO_plot{attenIND} = FFRdataAvg_PO_plot{attenIND}*(1 - weight) + weight*FFRdata;
-                    else
-                        FFRdataAvg_NP_plot{attenIND} = FFRdataAvg_NP_plot{attenIND}*(1 - weight) + weight*FFRdata;
+                    if currStim>0
+                        if mod(currStim,2)
+                            % Important: Before 7/22/19, all FFR data saved
+                            % had POS and NEG polarity switched in the
+                            % average
+                            FFRdataAvg_PO_plot{attenIND} = FFRdataAvg_PO_plot{attenIND}*(1 - weight) + weight*FFRdata;
+                        else
+                            FFRdataAvg_NP_plot{attenIND} = FFRdataAvg_NP_plot{attenIND}*(1 - weight) + weight*FFRdata;
+                        end
                     end
-                    % end
                     
                     if currStim
                         FFRdataReps{currStim}=FFRdata; %added DA 7/23/13
+%                         fprintf('rejections %1.0f:: ORGval = %1.0f :: currStim= %1.0f :: MaxVal=%1.2f :: nSamps= %d\n', ...
+%                             rejections, invoke(RP1,'GetTagVal','ORG') ,currStim, maxFFRobs, bNoSampleObtained);
                     end
                     
                 elseif maxFFRobs > critVal
@@ -141,20 +144,20 @@ for attenIND= 1
                     rejections=rejections+1;
                 end %End for artifact rejection KH 2011 June 08
                 
-                invoke(RP1,'SoftTrg',1);
-                %% Debugging
-                fprintf('rejections %1.0f:: ORGval = %1.0f :: currStim= %1.0f :: MaxVal=%1.2f :: nSamps= %d\n', ...
-                    rejections, invoke(RP1,'GetTagVal','ORG') ,currStim, maxFFRobs, bNoSampleObtained);
-                
+                invoke(RP3,'SoftTrg',2);
             end
+            
         end
-        
-        if currStim
+        %% Debugging
+%         fprintf('rejections %1.0f:: ORGval = %1.0f :: currStim= %1.0f :: MaxVal=%1.2f :: nSamps= %d\n', ...
+%             rejections, invoke(RP1,'GetTagVal','ORG') ,currStim, maxFFRobs, bNoSampleObtained);
+%         
+        if currStim>0
             if mod(currStim,2)
-                %             set(FIG.ax.line,'xdata',[0:(1/Stimuli.RPsamprate_Hz):
-                %                 FFR_SNRenv_Gating.FFRlength_ms/1000],
-                %                'ydata',FFRdataAvg_NP{attenIND}*Display.PlotFactor); drawnow;
-            else
+%                 set(FIG.ax.line,'xdata',[0:(1/Stimuli.RPsamprate_Hz):
+%                     FFR_SNRenv_Gating.FFRlength_ms/1000],
+%                 'ydata',FFRdataAvg_NP{attenIND}*Display.PlotFactor); drawnow;
+            else  % every other curstim, plot SUM (ENV_FFR)
                 set(FIG.ax.line,'xdata',0:(1/Stimuli.RPsamprate_Hz):FFR_SNRenv_Gating.FFRlength_ms/1000, ...
                     'ydata',(FFRdataAvg_PO_plot{attenIND}+FFRdataAvg_NP_plot{attenIND})*Display.PlotFactor/2);
                 drawnow;
@@ -190,7 +193,7 @@ if (bAbort == 0)
     
     %    disp(sprintf(ButtonName))
     if ~strcmp(ButtonName,'No')
-        FFR_set_attns(-120,-120,Stimuli.channel,Stimuli.KHosc,RP1,RP2);
+        FFR_set_attns(-120,-120,Stimuli.channel,Stimuli.KHosc,RP1,RP3);
         PAset([120;120;120;120]);
         set(FIG.statText.status, 'String', 'STATUS: saving data...');
         NelData= make_FFR_Se_text_file(misc, Stimuli, PROG, NelData, comment, ...
@@ -213,7 +216,7 @@ end
 
 %% Reset to "free running..." mode:
 set(FIG.statText.status, 'String', ['STATUS (' interface_type '): free running...']);
-FFR_set_attns(Stimuli.atten_dB,-120,Stimuli.channel,Stimuli.KHosc,RP1,RP2);
+FFR_set_attns(Stimuli.atten_dB,-120,Stimuli.channel,Stimuli.KHosc,RP1,RP3);
 set(FIG.push.run_levels,'string','Run levels...');
 set(FIG.push.run_levels,'Userdata','');
 set(FIG.push.forget_now,'string','Forget NOW');
