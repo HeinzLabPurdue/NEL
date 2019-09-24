@@ -109,7 +109,7 @@ elseif strcmp(command_str,'calibrate')
         
         % Get SPL calibration data if requested.
         if Stimuli.cal
-            [error] = gtsplc;
+            [error] = Gtsplc;
         end
         % *** Main Data Collection Loop ***
         set(FIG.ax2.ProgMess,'String','Starting data collection...');
