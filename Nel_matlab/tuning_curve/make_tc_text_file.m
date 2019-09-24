@@ -1,4 +1,4 @@
-global data_dir NelData
+global data_dir NelData VOLTS
 
 fname = current_data_file('tc');
 

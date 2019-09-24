@@ -60,29 +60,29 @@ White      =[255     255      255    ]/255;
 %%%%%%%%%%%%%%%%%%%%
 %%% Nargin Check %%%
 %%%%%%%%%%%%%%%%%%%%
-if nargin == 1 & nargout == 0,
-  if strcmp(Prompt,'InputDlgResizeCB'),
+if nargin == 1 && nargout == 0
+  if strcmp(Prompt,'InputDlgResizeCB')
     LocalResizeFcn(gcbf)
     return
   end
 end
 
-error(nargchk(1,6,nargin));
-error(nargoutchk(1,1,nargout));
+narginchk(1,6);
+nargoutchk(1,1);
 
-if nargin==1,
+if nargin==1
   Title=' ';
 end
 
 if nargin<=2, NumLines=1;end
 
-if ~iscell(Prompt),
+if ~iscell(Prompt)
    Prompt={Prompt};
 end
 
-NumQuest=prod(size(Prompt));    
+NumQuest=numel(Prompt);    
 
-if nargin<=3, 
+if nargin<=3
   DefAns=cell(NumQuest,1);
   for lp=1:NumQuest, DefAns{lp}=''; end
 end
@@ -105,12 +105,12 @@ if (isstruct(Resize))
    WindowStyle=Resize.WindowStyle;
    Resize=Resize.Resize;
 end
-if strcmp(Resize,'on'),
+if strcmp(Resize,'on')
   WindowStyle='normal';
 end
 
 % Backwards Compatibility
-if isstr(NumLines),
+if isstr(NumLines)
   warning(['Please see the INPUTDLG help for correct input syntax.' 10 ...
            '         OKCallback no longer supported.' ]);
   NumLines=1;

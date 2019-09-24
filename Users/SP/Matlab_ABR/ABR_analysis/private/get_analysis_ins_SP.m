@@ -1,4 +1,5 @@
 %ABR Analysis Instruction Block
+global CalibFileNum
 
 abr_Stimuli = struct(...
     'cal_pic','1', ...
@@ -11,3 +12,13 @@ abr_Stimuli = struct(...
     'ClickToUpdateABR', 'ClickToUpdate', ...
     'dir','MH-2015_10_28-Q226_TTS_followup2wk_ABR_DP_DPIO', ...
     'abr_pic_all','20-27');  % these plots will be shown----------------------------------------------------------------------------------------------
+
+if ~isempty(CalibFileNum)
+    if isnumeric(CalibFileNum)
+        abr_Stimuli.cal_pic= num2str(CalibFileNum);
+    elseif isstring(CalibFileNum)
+        abr_Stimuli.cal_pic= CalibFileNum;
+    elseif iscell(CalibFileNum)
+        abr_Stimuli.cal_pic= CalibFileNum{1};
+    end
+end

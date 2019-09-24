@@ -28,9 +28,9 @@ if ~AutoLevel_params.ReRunFlag
     %Stimuli.MaxdBSPLCalib is TDT max atten
 %     AutoLevel_params.attenMask=[round((Stimuli.MaxdBSPLCalib-AutoLevel_params.maxdBSPLtoRUN)/AutoLevel_params.stepdB): ...
 %             min(120,ceil((Stimuli.atten_dB+AutoLevel_params.dB_below_thresh)/AutoLevel_params.stepdB))];
-    dBs2RUN=[AutoLevel_params.stepdB*floor(max(Stimuli.MaxdBSPLCalib-Stimuli.atten_dB-...
+    dBs2RUN=AutoLevel_params.stepdB*floor(max(Stimuli.MaxdBSPLCalib-Stimuli.atten_dB-...
             AutoLevel_params.dB_below_thresh,Stimuli.MaxdBSPLCalib-120)/AutoLevel_params.stepdB)...
-            :AutoLevel_params.stepdB:min(Stimuli.MaxdBSPLCalib,AutoLevel_params.maxdBSPLtoRUN)];
+            :AutoLevel_params.stepdB:min(Stimuli.MaxdBSPLCalib,AutoLevel_params.maxdBSPLtoRUN);
     if dBs2RUN(1)<Stimuli.MaxdBSPLCalib-120 % Case: When the floor10 of -20 is not possible
         dBs2RUN(1)=Stimuli.MaxdBSPLCalib-120;
     end
@@ -108,10 +108,10 @@ for zfrequency = frequencies %New outer loop, KH 10Jan2012
             % Get first of paired samples:
             bNoSampleObtained = 1;
             while(bNoSampleObtained)
-                if(invoke(RP2,'GetTagVal','BufFlag') == 1)
-                    if(invoke(RP1,'GetTagVal','ampPolarity') > 0 | (Stimuli.fixedPhase == 1)) 
+                if(invoke(RP3,'GetTagVal','BufFlag') == 1)
+                    if(invoke(RP1,'GetTagVal','ampPolarity') > 0 || (Stimuli.fixedPhase == 1)) 
                              % check for stim polarity, if necessary
-                        CAPdata1 = invoke(RP2,'ReadTagV','ADbuf',0,CAPnpts);
+                        CAPdata1 = invoke(RP3,'ReadTagV','ADbuf',0,CAPnpts);
                         CAPobs1=max(abs(CAPdata1(1:end-2)-mean(CAPdata1(1:end-2)))); %KH Jun2011
                         % ^^  Added SP because DC shift in abr probably affects the whole signal except the last point
                         if CAPobs1 <= critVal %Artifact rejection KH 2011 June 08
@@ -126,16 +126,16 @@ for zfrequency = frequencies %New outer loop, KH 10Jan2012
                             rejections(freqIND,attenIND)=rejections(freqIND,attenIND)+1;
                         end                          %End for artifact rejection KH 2011 June 08
                     end
-                    invoke(RP2,'SoftTrg',2);
+                    invoke(RP3,'SoftTrg',2);
                 end
             end
             % Get second of paired samples:
             bNoSampleObtained = 1;
             while(bNoSampleObtained)
-                if(invoke(RP2,'GetTagVal','BufFlag') == 1)
-                    if(invoke(RP1,'GetTagVal','ampPolarity') < 0 | (Stimuli.fixedPhase == 1)) 
+                if(invoke(RP3,'GetTagVal','BufFlag') == 1)
+                    if(invoke(RP1,'GetTagVal','ampPolarity') < 0 || (Stimuli.fixedPhase == 1)) 
                              % check for stim polarity, if necessary
-                        CAPdata2 = invoke(RP2,'ReadTagV','ADbuf',0,CAPnpts);
+                        CAPdata2 = invoke(RP3,'ReadTagV','ADbuf',0,CAPnpts);
                         CAPobs2=max(abs(CAPdata2(1:end-2)-mean(CAPdata2(1:end-2))));
                         if CAPobs2 <= critVal %Artifact rejection KH 2011 June 08
                             bNoSampleObtained = 0;
@@ -148,12 +148,12 @@ for zfrequency = frequencies %New outer loop, KH 10Jan2012
                             rejections(freqIND,attenIND)=rejections(freqIND,attenIND)+1;
                         end
                     end
-                    invoke(RP2,'SoftTrg',2);
+                    invoke(RP3,'SoftTrg',2);
                 end
             end
             if currPair
                 set(FIG.ax.line,'xdata',(1:CAPnpts)/Stimuli.RPsamprate_Hz, ...
-                    'ydata',(CAPdataAvg{freqIND,attenIND}-debugAmp*mean(CAPdataAvg{freqIND,attenIND}))/(2*currPair)*Display.PlotFactor); 
+                    'ydata',(CAPdataAvg{freqIND,attenIND}-mean(CAPdataAvg{freqIND,attenIND}))/(2*currPair)*Display.PlotFactor); 
                 set(FIG.ax.line2(1),'ydata',max([CAPobs1 CAPobs2])); %KH 2011 June 08
                 drawnow;
             end
@@ -163,7 +163,7 @@ for zfrequency = frequencies %New outer loop, KH 10Jan2012
         end
         CAPdataAvg{freqIND,attenIND} = CAPdataAvg{freqIND,attenIND} / (2*AutoLevel_params.nPairs);
         set(FIG.ax.line,'xdata',(1:CAPnpts)/Stimuli.RPsamprate_Hz, ...
-            'ydata',(CAPdataAvg{freqIND,attenIND}-debugAmp*mean(CAPdataAvg{freqIND,attenIND}))*Display.PlotFactor); drawnow;
+            'ydata',(CAPdataAvg{freqIND,attenIND}-mean(CAPdataAvg{freqIND,attenIND}))*Display.PlotFactor); drawnow;
     end
     if (bAbort == 1)
         break;
@@ -183,10 +183,10 @@ if (bAbort == 0)
         'Save Prompt', ...
         'Yes','No','Comment','Yes');
     
-    switch ButtonName,
-    case 'Yes',
+    switch ButtonName
+    case 'Yes'
         comment='No comment.';
-    case 'No',
+    case 'No'
         SaveFlag=0;
     case 'Comment'
         comment=add_comment_line;	%add a comment line before saving data file

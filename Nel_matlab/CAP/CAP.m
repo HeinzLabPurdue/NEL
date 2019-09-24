@@ -3,9 +3,10 @@ function h_fig = CAP(command_str)
 % ge debug ABR 26Apr2004: replace "CAP" with more generalized nomenclature, throughout entire system.
 
 global PROG FIG Stimuli CAP_Gating root_dir prog_dir NelData devices_names_vector Display
-global data_dir RunThroughABRFlag
+global data_dir RunThroughABRFlag interface_type
 
-h_fig = findobj('Tag','CAP_Main_Fig');    %% Finds handle for TC-Figure
+% h_fig = findobj('Tag','CAP_Main_Fig'); % SP on 22Sep19: Moved to after
+% FIG is defined
 
 if nargin < 1
     prog_dir = [root_dir 'CAP\'];
@@ -26,6 +27,11 @@ if nargin < 1
     FIG   = struct('handle',[],'edit',[],'push',push,'radio',radio,'checkbox',checkbox,'statText', statText, 'fsldr',fsldr,'asldr',asldr,'NewStim',0,'ax',ax);
     %    FIG   = struct('handle',[],'edit',[],'push',push,'radio',radio,'fsldr',fsldr,'asldr',asldr,'NewStim',0,'ax',ax,'popup',popup, 'statText', statText);  % modified by GE 17Jan2003.
     
+    h_fig = findobj('Tag','CAP_Main_Fig');    %% Finds handle for TC-Figure
+    if length(h_fig)>2
+        h_fig= h_fig(1);
+    end
+    
     CAP_ins;
     
     if ~RunThroughABRFlag
@@ -34,8 +40,35 @@ if nargin < 1
         colordef none;
         whitebg('w');
         
-        CAP_loop_plot;
-        CAP_loop;
+        if ~strcmp(interface_type, 'FFR')
+            CAP_loop_plot;
+            CAP('clickYes'); % Start invCalib = true or false based on default clickYes value
+            CAP_loop;
+        elseif strcmp(interface_type,'FFR')
+            %             interface_type=questdlg('Which
+            %             FFR:','','FFR','SFR','SFR-mask','SFR'); %SP 30Jun2016
+            %-->
+            %SP 14Nov2018
+            % commented SFR-mask, using that button space for
+            % EFR_harm_complex = EFR_HrmCpx
+            interface_type=questdlg('Which FFR:','','FFR','SFR','SFR_pink','SFR');
+            %<--
+            if ishandle(h_fig)
+                delete(h_fig);
+            end
+            
+            if strcmp(interface_type, 'FFR')
+                h_fig = FFR();
+            elseif strcmp(interface_type, 'SFR')
+                h_fig = FFR_SNRenv();
+            elseif strcmp(interface_type, 'SFR-mask')
+                h_fig = SFR_pink_mask_SNRenv;
+            elseif strcmp(interface_type, 'SFR_pink')
+                h_fig = SFR_pink_mask_tdt;
+            elseif strcmp(interface_type, 'EFR_HrmCpx')
+                h_fig = EFR_Harm_Cmplx;
+            end
+        end
     else
         cd([NelData.General.RootDir 'Users\SP\SP_nel_gui']);
         CAP;
@@ -284,10 +317,15 @@ elseif strcmp(command_str,'audiogram') %KH 10Jan2012
 elseif strcmp(command_str,'clickYes') %KH 10Jan2012
     Stimuli.clickYes = get(FIG.radio.clickYes,'value');
     FIG.NewStim = 16;
+    if Stimuli.clickYes
+        run_invCalib(true); % Initialize with allpass RP2_3
+    else
+        run_invCalib(false); % Initialize with allpass RP2_3
+    end
     
     
-    
-elseif strcmp(command_str,'close');
+elseif strcmp(command_str,'close')
+    run_invCalib(false); % Initialize with allpass RP2_3
     set(FIG.push.close,'Userdata',1);
 end
 

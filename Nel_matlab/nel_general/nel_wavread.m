@@ -23,10 +23,10 @@ else
       else
          dest_fname = [NelData.File_Manager.dirname 'Signals\' ];
       end
-      [path name ext] = fileparts(fname);
+      [~, name, ext] = fileparts(fname);
       %if (exist(dest_fname,'file') ~= 1) % LQ 12/15/03 this will always xcopy since dest_fname is not file
       if (~exist([dest_fname name ext],'file')) 
-         [rcdos status] = dos(['xcopy ' fname ' ' dest_fname ' /Y /Q']);
+         [~, ~] = dos(['xcopy ' fname ' ' dest_fname ' /Y /Q']);
       end
    end
 end

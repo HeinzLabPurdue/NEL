@@ -156,16 +156,19 @@ if nargin < 1
     text(.2,.19,'Template right (ms):','fontsize',10,'color','k','horizontalalignment','left','VerticalAlignment','middle');
     text(.2,.09,'N of templates:','fontsize',10,'color','k','horizontalalignment','left','VerticalAlignment','middle');
     
-%     text(.2,.05,'Thresh:','fontsize',10,'color','k','horizontalalignment','left','VerticalAlignment','middle');
-        
+    %     text(.2,.05,'Thresh:','fontsize',10,'color','k','horizontalalignment','left','VerticalAlignment','middle');
     
-    abr_FIG.parm_txt(1)  = text(.8,.65,num2str(abr_Stimuli.cal_pic),   'fontsize',10,'color','b','horizontalalignment','right',...
-        'buttondownfcn','abr_analysis_SP(''stimulus'',1);');
-    
-    %%% SP
-    abr_FIG.parm_txt(8)  = text(.8,.58,num2str(abr_Stimuli.abr_pic_all),   'fontsize',10,'color','b','horizontalalignment','right',...
-        'buttondownfcn','abr_analysis_SP(''stimulus'',8);');
-    abr_FIG.parm_txt(2)  = text(.8,.52,num2str(abr_Stimuli.abr_pic),   'fontsize',10,'color','b','horizontalalignment','right',...
+    if isstring(abr_Stimuli.cal_pic)
+        abr_FIG.parm_txt(1)  = text(.8,.65,num2str(abr_Stimuli.cal_pic),   'fontsize',10,'color','b','horizontalalignment','right',...
+            'buttondownfcn','abr_analysis_SP(''stimulus'',1);');
+    else 
+        abr_FIG.parm_txt(1)  = text(.8,.65,abr_Stimuli.cal_pic,   'fontsize',10,'color','b','horizontalalignment','right',...
+            'buttondownfcn','abr_analysis_SP(''stimulus'',1);');
+    end
+        %%% SP
+        abr_FIG.parm_txt(8)  = text(.8,.58,num2str(abr_Stimuli.abr_pic_all),   'fontsize',10,'color','b','horizontalalignment','right',...
+            'buttondownfcn','abr_analysis_SP(''stimulus'',8);');
+        abr_FIG.parm_txt(2)  = text(.8,.52,num2str(abr_Stimuli.abr_pic),   'fontsize',10,'color','b','horizontalalignment','right',...
         'buttondownfcn','abr_analysis_SP(''stimulus'',2);');
     %     abr_FIG.parm_txt(9)  = text(.8,.46,num2str(abr_Stimuli.ClickToUpdateABR),   'fontsize',10,'color','b','horizontalalignment','right',...
     %         'buttondownfcn','abr_analysis_SP(''stimulus'',9);');

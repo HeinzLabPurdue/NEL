@@ -59,9 +59,9 @@ if (exist('stimulus_vals','var') == 1)
     count=0;
     for i=1:5
         count=count+1;
-        Llist{count}=[signals_dir '\KH\BBNlong\BBN' num2str(i) '_P'];
+        Llist{count}=[signals_dir '\KH\BBNlong\BBN' num2str(i) '_P.wav'];
         count=count+1;
-        Llist{count}=[signals_dir '\KH\BBNlong\BBN' num2str(i) '_N'];
+        Llist{count}=[signals_dir '\KH\BBNlong\BBN' num2str(i) '_N.wav'];
     end
     Rlist=[];
     %    if (isempty(stimulus_vals.Inloop.CalibPicNum))

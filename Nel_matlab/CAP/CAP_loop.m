@@ -13,35 +13,43 @@ else
     end
 end
 
+%% For stimulus 
 RP1=actxcontrol('RPco.x',[0 0 1 1]);
 invoke(RP1,'ConnectRP2','USB',1);
 invoke(RP1,'ClearCOF');
 invoke(RP1,'LoadCOF',[prog_dir '\object\CAP_left.rcx']);
 
-% if get(FIG.radio.tone,'value')
 invoke(RP1,'SetTagVal','freq',Stimuli.freq_hz);
 invoke(RP1,'SetTagVal','tone',1);
 invoke(RP1,'SetTagVal','FixedPhase',Stimuli.fixedPhase);
 invoke(RP1,'SetTagVal','toneAmp',toneAmp); %KH 06Jan2012
 invoke(RP1,'SetTagVal','clickAmp',clickAmp); %KH 06Jan2012
 
-% elseif get(FIG.radio.noise,'value')
-%     invoke(RP1,'SetTagVal','tone',0);
-% elseif get(FIG.radio.khite,'value')
-%     invoke(RP1,'SetTagVal','tone',2);
-% end
-
 invoke(RP1,'SetTagVal','StmOn',CAP_Gating.duration_ms);
 invoke(RP1,'SetTagVal','StmOff',CAP_Gating.period_ms-CAP_Gating.duration_ms);
 invoke(RP1,'SetTagVal','RiseFall',CAP_Gating.rftime_ms);
 invoke(RP1,'Run');
 
+%% For bit select (RP2#3 is not connected to Mix/Sel). So have to use RP2#2. May use RP2#1? 
 RP2=actxcontrol('RPco.x',[0 0 1 1]);
 invoke(RP2,'ConnectRP2','USB',2);
-invoke(RP2,'ClearCOF');
-invoke(RP2,'LoadCOF',[prog_dir '\object\CAP_right.rco']);
-invoke(RP2,'SetTagVal','ADdur', CAP_Gating.CAPlength_ms);
+invoke(RP2,'LoadCOF',[prog_dir '\object\CAP_BitSet.rcx']); 
 invoke(RP2,'Run');
+
+%% For ADC (data in)
+RP3=actxcontrol('RPco.x',[0 0 1 1]);
+invoke(RP3,'ConnectRP2','USB',3);
+invoke(RP3,'ClearCOF');
+if strcmpi(interface_type, 'CAP')
+    invoke(RP3,'LoadCOF',[prog_dir '\object\CAP_ADC.rcx']); 
+    % Only difference: Input Channel number
+    % For CAP: AD chan #1
+else % ABR
+    invoke(RP3,'LoadCOF',[prog_dir '\object\ABR_right.rcx']);
+    % For ABR: AD chan #2
+end
+invoke(RP3,'SetTagVal','ADdur', CAP_Gating.CAPlength_ms);
+invoke(RP3,'Run');
 
 CAP_set_attns(Stimuli.atten_dB,Stimuli.channel,Stimuli.KHosc,RP1,RP2);  %% debug deal with later Khite
 CAPnpts=ceil(CAP_Gating.CAPlength_ms/1000*Stimuli.RPsamprate_Hz);
@@ -53,7 +61,7 @@ end
 firstSTIM=1;
 veryfirstSTIM=1;  % The very first CAPdata when program starts is all zeros, so skip this, debug later MH 18Nov2003 
 
-while ~length(get(FIG.push.close,'Userdata')),
+while isempty(get(FIG.push.close,'Userdata'))
    if (ishandle(FIG.ax.axis))
       delete(FIG.ax.axis);
    end
@@ -90,8 +98,8 @@ while ~length(get(FIG.push.close,'Userdata')),
    invoke(RP1,'SoftTrg',1);
    %    tspan = CAP_Gating.period_ms/1000;
    while(1)  % loop until "close" request
-      if(invoke(RP2,'GetTagVal','BufFlag') == 1)
-         CAPdata = invoke(RP2,'ReadTagV','ADbuf',0,CAPnpts);
+      if(invoke(RP3,'GetTagVal','BufFlag') == 1)
+         CAPdata = invoke(RP3,'ReadTagV','ADbuf',0,CAPnpts);
          %           CAPdata = ones(size(CAPdata)); % ge debug
          
          CAPobs=max(abs(CAPdata)); %KH 08Jun2011
@@ -109,7 +117,7 @@ while ~length(get(FIG.push.close,'Userdata')),
                CAPdataAvg_freerun = CAPdata;
                firstSTIM=0;
             end
-            set(FIG.ax.line,'xdata',[0:(1/Stimuli.RPsamprate_Hz):CAP_Gating.CAPlength_ms/1000], ...
+            set(FIG.ax.line,'xdata',0:(1/Stimuli.RPsamprate_Hz):CAP_Gating.CAPlength_ms/1000, ...
                'ydata',CAPdataAvg_freerun*Display.PlotFactor);
            
             set(FIG.ax.line2(1),'ydata',CAPobs); %KH 10Jan2012
@@ -118,10 +126,10 @@ while ~length(get(FIG.push.close,'Userdata')),
          else
             veryfirstSTIM=0;
          end
-         invoke(RP2,'SoftTrg',2);
+         invoke(RP3,'SoftTrg',2);
       end
       
-      if get(FIG.push.close,'Userdata'),
+      if get(FIG.push.close,'Userdata')
          break;
       elseif FIG.NewStim
          switch FIG.NewStim
@@ -138,7 +146,7 @@ while ~length(get(FIG.push.close,'Userdata')),
          case 4
             invoke(RP1,'SetTagVal','StmOn',CAP_Gating.duration_ms);
             invoke(RP1,'SetTagVal','StmOff',CAP_Gating.period_ms-CAP_Gating.duration_ms);
-            invoke(RP2,'SetTagVal','ADdur',CAP_Gating.CAPlength_ms);
+            invoke(RP3,'SetTagVal','ADdur',CAP_Gating.CAPlength_ms);
             CAPnpts=ceil((CAP_Gating.CAPlength_ms/1000)*Stimuli.RPsamprate_Hz);
             firstSTIM = 1;
             FIG.NewStim = 0;
@@ -217,6 +225,7 @@ rc = PAset([120;120;120;120]); % added by GE/MH, 17Jan2003.  To force all attens
 
 invoke(RP1,'Halt');
 invoke(RP2,'Halt');
+invoke(RP3,'Halt');
 
 delete(FIG.handle);
 clear FIG;

@@ -26,7 +26,7 @@ else
    track = NelData.File_Manager.track.No;
    unit  = NelData.File_Manager.unit.No;
    name = sprintf('%sp%04d_u%d_%02d',NelData.File_Manager.dirname,pic,track,unit);
-   if (~isempty(short_description) & ~all(isspace(short_description)))
+   if (~isempty(short_description) && ~all(isspace(short_description)))
       name = [name '_' short_description];
    end
 end

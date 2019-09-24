@@ -13,7 +13,6 @@ if strcmp(interface_type,'ABR')
     interface_type=questdlg('Which ABR:','','ABR','ABR New','ABR New'); %SP 30Jun2016
 end
 
-
 switch interface_type
    
 	case 'CAP'
@@ -122,5 +121,4 @@ switch interface_type
 end
 
 Stimuli.RPsamprate_Hz=12207.03125;  % Hard coded for now, eventually get from RP
-              
 % MH/GE 11/03/03: eventually add a param for AD channel

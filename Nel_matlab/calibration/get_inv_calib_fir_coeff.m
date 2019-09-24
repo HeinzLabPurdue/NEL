@@ -19,7 +19,7 @@ cdd;
 fName_calib=getFileName(calibPicNum);
 fName_calib= strrep(fName_calib, '_raw', '');
 
-data= loadPic(calibPicNum);
+data= loadpic(calibPicNum);
 data=data.CalibData;
 
 freq_kHz=data(:,1);

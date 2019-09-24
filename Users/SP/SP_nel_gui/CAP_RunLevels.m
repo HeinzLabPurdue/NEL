@@ -62,9 +62,9 @@ for zfrequency = frequencies %New outer loop, KH 10Jan2012
             % Get first of paired samples:
             bNoSampleObtained = 1;
             while(bNoSampleObtained)
-                if(invoke(RP2,'GetTagVal','BufFlag') == 1)
-                    if(invoke(RP1,'GetTagVal','ampPolarity') > 0 | (Stimuli.fixedPhase == 1)) % check for stim polarity, if necessary
-                        CAPdata1 = invoke(RP2,'ReadTagV','ADbuf',0,CAPnpts);
+                if(invoke(RP3,'GetTagVal','BufFlag') == 1)
+                    if(invoke(RP1,'GetTagVal','ampPolarity') > 0 || (Stimuli.fixedPhase == 1)) % check for stim polarity, if necessary
+                        CAPdata1 = invoke(RP3,'ReadTagV','ADbuf',0,CAPnpts);
                         CAPobs1=max(abs(CAPdata1(1:end-2)-mean(CAPdata1(1:end-2)))); %KH Jun2011
                         if CAPobs1 <= critVal %Artifact rejection KH 2011 June 08
                             bNoSampleObtained = 0;
@@ -78,33 +78,32 @@ for zfrequency = frequencies %New outer loop, KH 10Jan2012
                             rejections(freqIND,attenIND)=rejections(freqIND,attenIND)+1;
                         end                          %End for artifact rejection KH 2011 June 08
                     end
-                    invoke(RP2,'SoftTrg',2);
+                    invoke(RP3,'SoftTrg',2);
                 end
             end
             % Get second of paired samples:
             bNoSampleObtained = 1;
             while(bNoSampleObtained)
-                if(invoke(RP2,'GetTagVal','BufFlag') == 1)
-                    if(invoke(RP1,'GetTagVal','ampPolarity') < 0 | (Stimuli.fixedPhase == 1)) % check for stim polarity, if necessary
-                        CAPdata2 = invoke(RP2,'ReadTagV','ADbuf',0,CAPnpts);
+                if(invoke(RP3,'GetTagVal','BufFlag') == 1)
+                    if(invoke(RP1,'GetTagVal','ampPolarity') < 0 || (Stimuli.fixedPhase == 1)) % check for stim polarity, if necessary
+                        CAPdata2 = invoke(RP3,'ReadTagV','ADbuf',0,CAPnpts);
                         CAPobs2=max(abs(CAPdata2(1:end-2)-mean(CAPdata2(1:end-2)))); %KH Jun2011
                         if CAPobs2 <= critVal %Artifact rejection KH 2011 June 08
                             bNoSampleObtained = 0;
                             if currPair
                                 CAPdataReps{freqIND,attenIND}(2*currPair,:) = CAPdata2;
-                                CAPdataAvg{freqIND,attenIND} = CAPdataAvg{freqIND,attenIND}...
-                                    + CAPdataReps{freqIND,attenIND}(2*currPair,:);
+                                CAPdataAvg{freqIND,attenIND} = CAPdataAvg{freqIND,attenIND} + CAPdataReps{freqIND,attenIND}(2*currPair,:);
                             end
                         else
                             rejections(freqIND,attenIND)=rejections(freqIND,attenIND)+1;
                         end
                     end
-                    invoke(RP2,'SoftTrg',2);
+                    invoke(RP3,'SoftTrg',2);
                 end
             end
             if currPair
                 set(FIG.ax.line,'xdata',(1:CAPnpts)/Stimuli.RPsamprate_Hz, ...
-                    'ydata',(CAPdataAvg{freqIND,attenIND}-debugAmp*mean(CAPdataAvg{freqIND,attenIND}))/(2*currPair)*Display.PlotFactor);
+                    'ydata',(CAPdataAvg{freqIND,attenIND}-mean(CAPdataAvg{freqIND,attenIND}))/(2*currPair)*Display.PlotFactor);
                 set(FIG.ax.line2(1),'ydata',max([CAPobs1 CAPobs2])); %KH 2011 June 08
                 drawnow;
             end
@@ -114,7 +113,7 @@ for zfrequency = frequencies %New outer loop, KH 10Jan2012
         end
         CAPdataAvg{freqIND,attenIND} = CAPdataAvg{freqIND,attenIND} / (2*RunLevels_params.nPairs);
         set(FIG.ax.line,'xdata',(1:CAPnpts)/Stimuli.RPsamprate_Hz, ...
-            'ydata',(CAPdataAvg{freqIND,attenIND}-debugAmp*mean(CAPdataAvg{freqIND,attenIND}))*Display.PlotFactor); drawnow;
+            'ydata',(CAPdataAvg{freqIND,attenIND}-mean(CAPdataAvg{freqIND,attenIND}))*Display.PlotFactor); drawnow;
     end
 end
 
@@ -131,8 +130,8 @@ if (bAbort == 0)
         'Save Prompt', ...
         'Yes','No','Comment','Yes');
     
-    switch ButtonName,
-        case 'Yes',
+    switch ButtonName
+        case 'Yes'
             comment='No comment.';
         case 'No'
             SaveFlag=0;

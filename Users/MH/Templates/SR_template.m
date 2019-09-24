@@ -1,11 +1,11 @@
-function [tmplt,DAL,stimulus_vals,units,errstr] = PST_template(fieldname,stimulus_vals,units)
+function [tmplt,DAL,stimulus_vals,units,errstr] = SR_template(fieldname,stimulus_vals,units)
 %
 % Modified by M.Heinz 12Nov2003, from nel_rate_level_template.m
 
 % Adapted from "nel_pst_template.m" by GE, 29Mar2002.
 
 used_devices.Tone       = 'RP1.1';
-tmplt = template_definition(fieldname);
+tmplt = template_definition;
 if (exist('stimulus_vals','var') == 1)
 %   Inloop.Name                               = 'DALinloop_general_TN_delay';  % modified by GE (07Jan2003)  %Removed MH(12Nov2003)
    Inloop.Name                               = 'DALinloop_general_TN';
@@ -62,8 +62,7 @@ if (isequal(fieldname,'Inloop'))
 end
 
 %----------------------------------------------------------------------------------------
-function tmplt = template_definition(fieldname)
-persistent prev_unit_bf prev_unit_thresh
+function tmplt = template_definition
 %%%%%%%%%%%%%%%%%%%%
 %% Inloop Section 
 %%%%%%%%%%%%%%%%%%%%

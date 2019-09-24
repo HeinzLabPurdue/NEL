@@ -20,6 +20,7 @@ else
     end
 end
 
+%% For stimulus 
 RP1=actxcontrol('RPco.x',[0 0 1 1]);
 invoke(RP1,'ConnectRP2','USB',1);
 invoke(RP1,'ClearCOF');
@@ -43,12 +44,19 @@ invoke(RP1,'SetTagVal','StmOff',CAP_Gating.period_ms-CAP_Gating.duration_ms);
 invoke(RP1,'SetTagVal','RiseFall',CAP_Gating.rftime_ms);
 invoke(RP1,'Run');
 
+%% For bit select (RP2#3 is not connected to Mix/Sel). So have to use RP2#2. May use RP2#1? 
 RP2=actxcontrol('RPco.x',[0 0 1 1]);
 invoke(RP2,'ConnectRP2','USB',2);
-invoke(RP2,'ClearCOF');
-invoke(RP2,'LoadCOF',[prog_dir '\object\CAP_right.rco']);
-invoke(RP2,'SetTagVal','ADdur', CAP_Gating.CAPlength_ms);
+invoke(RP2,'LoadCOF',[prog_dir '\object\CAP_BitSet.rcx']); 
 invoke(RP2,'Run');
+
+%% For ADC (data in)
+RP3=actxcontrol('RPco.x',[0 0 1 1]);
+invoke(RP3,'ConnectRP2','USB',3);
+invoke(RP3,'ClearCOF');
+invoke(RP3,'LoadCOF',[prog_dir '\object\ABR_right.rcx']);
+invoke(RP3,'SetTagVal','ADdur', CAP_Gating.CAPlength_ms);
+invoke(RP3,'Run');
 
 CAP_set_attns(Stimuli.atten_dB,Stimuli.channel,Stimuli.KHosc,RP1,RP2);  %% debug deal with later Khite
 CAPnpts=floor(CAP_Gating.CAPlength_ms/1000*Stimuli.RPsamprate_Hz); % SP: Changed from ceil to floor on 21Aug19: one extra point was collected in ABR serial buffer
@@ -106,8 +114,12 @@ while isempty(get(FIG.push.close,'Userdata'))
     %    tspan = CAP_Gating.period_ms/1000;
     bAbort = 0;
     while(1)  % loop until "close" request
-        if(invoke(RP2,'GetTagVal','BufFlag') == 1)
-            CAPdata = invoke(RP2,'ReadTagV','ADbuf',0,CAPnpts);
+        %%
+        % ---------------------------------------------------------------------------------------------------------------------------------------
+        % Start: Main body. excluding interrupt for FIG.push.close or FIG.NewStim
+        % ---------------------------------------------------------------------------------------------------------------------------------------
+        if(invoke(RP3,'GetTagVal','BufFlag') == 1)
+            CAPdata = invoke(RP3,'ReadTagV','ADbuf',0,CAPnpts);
             %           CAPdata = ones(size(CAPdata)); % ge debug
             
             CAPobs=max(abs(CAPdata(1:end-2)-debugAmp*mean(CAPdata(1:end-2)))); %KH 08Jun2011 
@@ -138,10 +150,14 @@ while isempty(get(FIG.push.close,'Userdata'))
             else
                 veryfirstSTIM=0;
             end
-            invoke(RP2,'SoftTrg',2);
+            invoke(RP3,'SoftTrg',2);
         end
+        % ---------------------------------------------------------------------------------------------------------------------------------------
+        % END: Main body. Excluding interrupt for FIG.push.close or FIG.NewStim
+        % ---------------------------------------------------------------------------------------------------------------------------------------
         
-        if get(FIG.push.close,'Userdata'),
+        %% Interruts during freerun 
+        if get(FIG.push.close,'Userdata')
             break;
         elseif FIG.NewStim
             switch FIG.NewStim
@@ -158,8 +174,7 @@ while isempty(get(FIG.push.close,'Userdata'))
             case 4
                 invoke(RP1,'SetTagVal','StmOn',CAP_Gating.duration_ms);
                 invoke(RP1,'SetTagVal','StmOff',CAP_Gating.period_ms-CAP_Gating.duration_ms);
-                invoke(RP2,'SetTagVal','ADdur',CAP_Gating.CAPlength_ms);
-%                 CAPnpts=ceil((CAP_Gating.CAPlength_ms/1000)*Stimuli.RPsamprate_Hz);
+                invoke(RP3,'SetTagVal','ADdur',CAP_Gating.CAPlength_ms);
                 CAPnpts=floor((CAP_Gating.CAPlength_ms/1000)*Stimuli.RPsamprate_Hz);
                 firstSTIM = 1;
                 FIG.NewStim = 0;
@@ -257,16 +272,16 @@ while isempty(get(FIG.push.close,'Userdata'))
                         [xx,lastdBindex]=min(abs(dBSPLlist-lastdBSPL));
                         picstoSEND=picNUMlist(1:lastdBindex);  % list of PICS to send to Ken's code to avoid usinig too high an SPL for template
                         
-                        CalibPIC=1;
+                        CalibPIC=CalibFileNum;
                         dataDIR=NelData.File_Manager.dirname;
                         
                         if DEBUG_FLAG
-                            picstoSEND=[6:12];
-                            dBSPLlist=[0:10:80];
-                            picNUMlist=[6:14];
+                            picstoSEND=6:12;
+                            dBSPLlist=0:10:80;
+                            picNUMlist=6:14;
                         end
                         
-                        AutoLevel_params.AutoThresh1=main_abr_bb(dataDIR,CalibPIC,picstoSEND)
+                        AutoLevel_params.AutoThresh1=main_abr_bb(dataDIR,CalibPIC,picstoSEND);
                         
                         if isnan(AutoLevel_params.AutoThresh1)
                             AutoLevel_params.AutoThresh1=25;
@@ -357,8 +372,8 @@ while isempty(get(FIG.push.close,'Userdata'))
                     ButtonName=questdlg('Are you satisfied?', ...
                         'Close Prompt', ...
                         'Yes','No','Yes');
-                    switch ButtonName,
-                    case 'Yes',
+                    switch ButtonName
+                    case 'Yes'
                         global data;
                         AutoLevel_params.AutoThresh2=data.threshold;
                         Stimuli.atten_dB = 120;
@@ -399,6 +414,7 @@ rc = PAset([120;120;120;120]); % added by GE/MH, 17Jan2003.  To force all attens
 
 invoke(RP1,'Halt');
 invoke(RP2,'Halt');
+invoke(RP3,'Halt');
 
 delete(FIG.handle);
 clear FIG;
