@@ -182,6 +182,7 @@ elseif strcmp(command_str,'slide_atten')
     Stimuli.atten_dB = floor(-get(FIG.asldr.slider,'value'));
     set(FIG.asldr.val,'string',num2str(-Stimuli.atten_dB));
     %     set_RP_tagvals(RP1, RP2, FFR_SNRenv_Gating, Stimuli);
+    FFR_set_attns(Stimuli.atten_dB,-120,Stimuli.channel,Stimuli.KHosc,RP1,RP2); 
     
     % LQ 01/31/05
 elseif strcmp(command_str, 'slide_atten_text')
@@ -198,6 +199,7 @@ elseif strcmp(command_str, 'slide_atten_text')
         Stimuli.atten_dB = -new_atten;
         set(FIG.asldr.slider, 'value', new_atten);
     end
+    FFR_set_attns(Stimuli.atten_dB,-120,Stimuli.channel,Stimuli.KHosc,RP1,RP2); 
     %     set_RP_tagvals(RP1, RP2, FFR_SNRenv_Gating, Stimuli);
     
 elseif strcmp(command_str,'memReps')
@@ -284,8 +286,7 @@ elseif strcmp(command_str,'YLim')
     set(FIG.edit.yscale,'string', num2str(Display.YLim_atAD));
     
 elseif strcmp(command_str,'invCalib')
-    Stimuli.invCalib= get(FIG.radio.invCalib,'value');
-    Stimuli.coefNum_invCalib= run_invCalib(Stimuli.invCalib);
+    [~, Stimuli.calibPicNum]= run_invCalib(get(FIG.radio.invCalib,'value'));
     
 elseif strcmp(command_str,'close')
     run_invCalib(false); % Initialize with allpass RP2_3
