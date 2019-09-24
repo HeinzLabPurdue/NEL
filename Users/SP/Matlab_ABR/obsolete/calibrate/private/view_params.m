@@ -14,17 +14,17 @@ if nargin < 1
     axes('Position',[0 0 1 1]);
     axis('off');
     
-    text(.445,.70,'Low Frequency:','fontsize',12,'color','k','horizontalalignment','right','VerticalAlignment','middle','EraseMode','none');
-    text(.445,.65,'High Frequency:','fontsize',12,'color','k','horizontalalignment','right','VerticalAlignment','middle','EraseMode','none');
-    text(.445,.60,'Reference Frequency:','fontsize',12,'color','k','horizontalalignment','right','VerticalAlignment','middle','EraseMode','none');
-    text(.445,.55,'Attenuation:','fontsize',12,'color','k','horizontalalignment','right','VerticalAlignment','middle','EraseMode','none');
-    text(.445,.50,'Microphone:','fontsize',12,'color','k','horizontalalignment','right','VerticalAlignment','middle','EraseMode','none');
+    text(.445,.70,'Low Frequency:','fontsize',12,'color','k','horizontalalignment','right','VerticalAlignment','middle');
+    text(.445,.65,'High Frequency:','fontsize',12,'color','k','horizontalalignment','right','VerticalAlignment','middle');
+    text(.445,.60,'Reference Frequency:','fontsize',12,'color','k','horizontalalignment','right','VerticalAlignment','middle');
+    text(.445,.55,'Attenuation:','fontsize',12,'color','k','horizontalalignment','right','VerticalAlignment','middle');
+    text(.445,.50,'Microphone:','fontsize',12,'color','k','horizontalalignment','right','VerticalAlignment','middle');
     
-    View.parm_txt(1)  = text(.6,.70,num2str(Stimuli.frqlo),   'fontsize',12,'color',[.1 .1 .6],'horizontalalignment','right','VerticalAlignment','middle','EraseMode','normal','buttondownfcn','view_params(''Stimuli'',1);');
-    View.parm_txt(2)  = text(.6,.65,num2str(Stimuli.frqhi),   'fontsize',12,'color',[.1 .1 .6],'horizontalalignment','right','VerticalAlignment','middle','EraseMode','normal','buttondownfcn','view_params(''Stimuli'',2);');
-    View.parm_txt(3)  = text(.6,.60,num2str(Stimuli.frqcal),  'fontsize',12,'color',[.1 .1 .6],'horizontalalignment','right','VerticalAlignment','middle','EraseMode','normal','buttondownfcn','view_params(''Stimuli'',3);');
-    View.parm_txt(4)  = text(.6,.55,num2str(Stimuli.attencal),'fontsize',12,'color',[.1 .1 .6],'horizontalalignment','right','VerticalAlignment','middle','EraseMode','normal','buttondownfcn','view_params(''Stimuli'',4);');
-    View.parm_txt(5)  = text(.6,.50,Stimuli.nmic,             'fontsize',12,'color',[.1 .1 .6],'horizontalalignment','right','VerticalAlignment','middle','EraseMode','normal','buttondownfcn','view_params(''Stimuli'',5);');
+    View.parm_txt(1)  = text(.6,.70,num2str(Stimuli.frqlo),   'fontsize',12,'color',[.1 .1 .6],'horizontalalignment','right','VerticalAlignment','middle','buttondownfcn','view_params(''Stimuli'',1);');
+    View.parm_txt(2)  = text(.6,.65,num2str(Stimuli.frqhi),   'fontsize',12,'color',[.1 .1 .6],'horizontalalignment','right','VerticalAlignment','middle','buttondownfcn','view_params(''Stimuli'',2);');
+    View.parm_txt(3)  = text(.6,.60,num2str(Stimuli.frqcal),  'fontsize',12,'color',[.1 .1 .6],'horizontalalignment','right','VerticalAlignment','middle','buttondownfcn','view_params(''Stimuli'',3);');
+    View.parm_txt(4)  = text(.6,.55,num2str(Stimuli.attencal),'fontsize',12,'color',[.1 .1 .6],'horizontalalignment','right','VerticalAlignment','middle','buttondownfcn','view_params(''Stimuli'',4);');
+    View.parm_txt(5)  = text(.6,.50,Stimuli.nmic,             'fontsize',12,'color',[.1 .1 .6],'horizontalalignment','right','VerticalAlignment','middle','buttondownfcn','view_params(''Stimuli'',5);');
     
     
     View.push.default = uicontrol(fighandle,'callback','view_params(''defs'',0);','style','pushbutton','Units','normalized','position',[.1 .85 .3 .075],'string','Defaults');

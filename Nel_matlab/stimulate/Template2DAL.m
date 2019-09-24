@@ -32,5 +32,8 @@ catch
     DAL.Gating = [];
     DAL.Mix = [];
     vars = [];
+    tmplt= [];
+    units= [];
+    errstr= '';
     return;
 end

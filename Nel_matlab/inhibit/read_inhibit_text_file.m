@@ -8,7 +8,7 @@ if findstr(file_prog,'TCrp2'),
    set(h_push_start,'Userdata',file_data);
    h_ax1 = axes('position',[.2 .4 .6 .5]);
    h_line1 = plot(file_data(:,1),file_data(:,2),'-');
-   set(h_line1,'Color',[1 1 1],'LineWidth',2,'EraseMode','none');
+   set(h_line1,'Color',[1 1 1],'LineWidth',2);
    axis([file_frqlo file_frqhi file_attlo-5 file_atthi+5]);
    if ~file_fstlin,
       set(h_ax1,'XScale','log');

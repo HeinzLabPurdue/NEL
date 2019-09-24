@@ -1,4 +1,4 @@
-function [error] = Calspl(iseq)
+function [error] = calspl(iseq)
 % Modified for TDT system at Purdue
 % July 20, 2006
 % M. Heinz/J. Swaminathan
