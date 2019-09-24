@@ -1,3 +1,5 @@
 ExpData/**
-NelUsersProfiles/MH.mat
-NelUsersProfiles/Nel_Workspace.mat
+Nel_matlab/FFR_NEL1dave/**
+Nel_matlab/FFR_NEL2satya/**
+**/*.wav
+Nel_matlab/calibrationOLD/**
