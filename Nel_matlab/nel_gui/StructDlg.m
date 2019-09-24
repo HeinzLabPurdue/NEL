@@ -1,4 +1,4 @@
-function [P,units] = structdlg(struct_def,title,dflt,visible,present_val,fig_pos)
+function [P,units] = StructDlg(struct_def,title,dflt,visible,present_val,fig_pos)
 % structdlg - dialog box for filling in structure fields.
 %     P = structdlg(struct_def, 'title' dflt)
 %     struct_def is a structure whose fields will be displayed and assigned to the returned P structure.
