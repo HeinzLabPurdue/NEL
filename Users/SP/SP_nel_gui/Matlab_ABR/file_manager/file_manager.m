@@ -20,16 +20,16 @@ if nargin < 1
     h_ax = axes('Position',[0 0 1 1]);	%set up axes equal in size to the jpeg
     axis('off');
     
-    text(.25,.125,'Name Experiment','fontsize',12,'color',[.6 .1 .1],'horizontalalignment','center','VerticalAlignment','bottom','EraseMode','back');
+    text(.25,.125,'Name Experiment','fontsize',12,'color',[.6 .1 .1],'horizontalalignment','center','VerticalAlignment','bottom');
     
-    text(.2,.68,'Owner','fontsize',12,'fontweight','bold','color','k','horizontalalignment','left','VerticalAlignment','bottom','EraseMode','back');
-    text(.4,.68,'Date','fontsize',12,'fontweight','bold','color','k','horizontalalignment','center','VerticalAlignment','bottom','EraseMode','back');
-    text(.6,.68,'Files','fontsize',12,'fontweight','bold','fontweight','bold','color','k','horizontalalignment','right','VerticalAlignment','bottom','EraseMode','back');
-    text(.8,.68,'Last Unit','fontsize',12,'fontweight','bold','fontweight','bold','color','k','horizontalalignment','right','VerticalAlignment','bottom','EraseMode','back');
-    FIG.txt.owners   = text(.2,.658,struct2cell(EXPS.owners),'fontsize',12,'color','k','horizontalalignment','left','VerticalAlignment','top','EraseMode','back');
-    FIG.txt.dates    = text(.4,.658,struct2cell(EXPS.dates),'fontsize',12,'color','k','horizontalalignment','center','VerticalAlignment','top','EraseMode','back');
-    FIG.txt.files    = text(.6,.658,struct2cell(EXPS.files),'fontsize',12,'color','k','horizontalalignment','right','VerticalAlignment','top','EraseMode','back');
-    FIG.txt.lastunit = text(.8,.658,struct2cell(EXPS.lastunit),'fontsize',12,'color','k','horizontalalignment','right','VerticalAlignment','top','EraseMode','back');
+    text(.2,.68,'Owner','fontsize',12,'fontweight','bold','color','k','horizontalalignment','left','VerticalAlignment','bottom');
+    text(.4,.68,'Date','fontsize',12,'fontweight','bold','color','k','horizontalalignment','center','VerticalAlignment','bottom');
+    text(.6,.68,'Files','fontsize',12,'fontweight','bold','fontweight','bold','color','k','horizontalalignment','right','VerticalAlignment','bottom');
+    text(.8,.68,'Last Unit','fontsize',12,'fontweight','bold','fontweight','bold','color','k','horizontalalignment','right','VerticalAlignment','bottom');
+    FIG.txt.owners   = text(.2,.658,struct2cell(EXPS.owners),'fontsize',12,'color','k','horizontalalignment','left','VerticalAlignment','top');
+    FIG.txt.dates    = text(.4,.658,struct2cell(EXPS.dates),'fontsize',12,'color','k','horizontalalignment','center','VerticalAlignment','top');
+    FIG.txt.files    = text(.6,.658,struct2cell(EXPS.files),'fontsize',12,'color','k','horizontalalignment','right','VerticalAlignment','top');
+    FIG.txt.lastunit = text(.8,.658,struct2cell(EXPS.lastunit),'fontsize',12,'color','k','horizontalalignment','right','VerticalAlignment','top');
     
     %the following menus change behavioral parameters held in global PARAMS
     FIG.push.name    = uicontrol(FIG.handle,'callback','file_manager(''name'');','style','pushbutton','Units','normalized','position',[.025 .85 .15 .075],'string','New Exp');

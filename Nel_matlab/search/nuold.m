@@ -69,7 +69,7 @@ end
 
 while ~length(get(h_push_stop,'Userdata')),
    h_line1 = plot(-5,-5,'*');
-   set(h_line1,'MarkerSize',2,'Color','g','EraseMode','none');
+   set(h_line1,'MarkerSize',2,'Color','g');
    
    msdl(1,1);
    
