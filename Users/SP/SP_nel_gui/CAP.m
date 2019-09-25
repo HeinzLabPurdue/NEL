@@ -349,7 +349,7 @@ elseif strcmp(command_str,'load_calib') %SP 24Jan2016
     Stimuli.MaxdBSPLCalib=CalibInterp(Stimuli.freq_hz/1000,CalibData);
     %     Stimuli.MaxdBSPLCalib=max_dBSPL;
     % max_dBSPL=Stimuli.MaxdBSPLCalib+(Stimuli.freq_hz)/1000; %testing It should be max_dBSPL-Stimuli.MaxdBSPLCalib (dB SPL, which whould be the max value)
-    Stimuli.cur_freq_calib_dbshift=Stimuli.MaxdBSPLCalib-90;
+%     Stimuli.cur_freq_calib_dbshift=Stimuli.MaxdBSPLCalib-90;
 %     if (Stimuli.cur_freq_calib_dbshift<0)
 %         Stimuli.CalibBelow90=1;
 %     else

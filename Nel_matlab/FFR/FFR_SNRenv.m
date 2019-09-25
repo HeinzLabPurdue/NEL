@@ -34,8 +34,8 @@ if nargin < 1
     if ~(double(invoke(RP1,'GetTagVal', 'Stage')) == 2)
         FFR_set_attns(-120,-120,Stimuli.channel,Stimuli.KHosc,RP1,RP2); %% Check with MH
     end
-    FFR_SNRenv('invCalib'); % Initialize RP2_4 with InvFilter
     FFR_SNRenv('update_stim', 'spl');
+    FFR_SNRenv('invCalib'); % Initialize RP2_4 with InvFilter
     ffr_snrenv_loop2; % Working
     
 elseif strcmp(command_str,'update_stim')
@@ -203,6 +203,7 @@ elseif strcmp(command_str,'slide_atten')
     set(FIG.asldr.val,'string',num2str(-Stimuli.atten_dB));
     %     set_RP_tagvals(RP1, RP2, FFR_SNRenv_Gating, Stimuli);
     FFR_set_attns(Stimuli.atten_dB,-120,Stimuli.channel,Stimuli.KHosc,RP1,RP2); 
+    set(FIG.asldr.SPL,'string',sprintf('%.1f dB SPL',Stimuli.calib_dBSPLout-abs(get(FIG.asldr.slider,'val'))));
     
     % LQ 01/31/05
 elseif strcmp(command_str, 'slide_atten_text')
@@ -221,6 +222,7 @@ elseif strcmp(command_str, 'slide_atten_text')
     end
     FFR_set_attns(Stimuli.atten_dB,-120,Stimuli.channel,Stimuli.KHosc,RP1,RP2); 
     %     set_RP_tagvals(RP1, RP2, FFR_SNRenv_Gating, Stimuli);
+    set(FIG.asldr.SPL,'string',sprintf('%.1f dB SPL',Stimuli.calib_dBSPLout-abs(get(FIG.asldr.slider,'val'))));
     
 elseif strcmp(command_str,'memReps')
     FIG.NewStim = 3;
@@ -307,6 +309,14 @@ elseif strcmp(command_str,'YLim')
     
 elseif strcmp(command_str,'invCalib')
     [~, Stimuli.calibPicNum]= run_invCalib(get(FIG.radio.invCalib,'value'));
+    [sig, fs] =audioread([Stimuli.UPDdir Stimuli.filename]);
+    curDir= pwd;
+    cdd; 
+    xx= loadpic(Stimuli.calibPicNum);
+    cd(curDir);
+    calibdata= xx.CalibData;
+    Stimuli.calib_dBSPLout= get_SPL_from_calib(sig, fs, calibdata, false);
+    set(FIG.asldr.SPL,'string',sprintf('%.1f dB SPL',Stimuli.calib_dBSPLout-abs(str2double(get(FIG.asldr.val, 'string')))));
     
 elseif strcmp(command_str,'close')
     run_invCalib(false); % Initialize with allpass RP2_3

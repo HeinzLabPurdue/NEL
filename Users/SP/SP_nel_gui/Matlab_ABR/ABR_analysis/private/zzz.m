@@ -1,5 +1,8 @@
 function zzz
 
+warn_state= warning('query');
+warning off;
+
 global abr_Stimuli abr_data_dir...
 	num dt line_width abr freq attn spl w upper_y_bound lower_y_bound padvoltage y_shift date...
 	data noise freq_level han animal abr_time thresh_mag ABRmag
@@ -54,7 +57,7 @@ date1=x.General.date; date=[date1(1:2) date1(4:6) date1(8:11)];
 dt=500/x.Stimuli.RPsamprate_Hz; %sampling period after oversampling
 
 %sort abrs in order of increasing attenuation
-[toss, order]=sort(-attn);
+[~, order]=sort(-attn);
 abr2=abr(:,order); 
 attn=attn(:,order);
 freqs=freqs(:,order);
@@ -99,9 +102,9 @@ txcor=NaN*ones(length(abr)*2-1,abr_Stimuli.num_templates);
 delay=NaN*ones(1,abr_Stimuli.num_templates);
 for i=1:abr_Stimuli.num_templates
 	txcor(:,i)=xcorr(abr(:,i),abr(:,1));
-	[toss, delay1(1,i)]=max(txcor(:,i));
+	[~, delay1(1,i)]=max(txcor(:,i));
 	delay(1,i)=(delay1(1,i)-delay1(1,1))*dt;
-	template1(:,1)=abr(bin_of_time(abr_Stimuli.start_template+delay(1,i)):bin_of_time(abr_Stimuli.end_template+delay(1,i)),i);
+	template1(:,1)=abr(round(bin_of_time(abr_Stimuli.start_template+delay(1,i))):round(bin_of_time(abr_Stimuli.end_template+delay(1,i)),i));
 end;
 template=mean(template1,2);
 
@@ -138,7 +141,7 @@ bin_of_max=NaN*ones(1,num);
 [data.z.score(1,1),bin_of_max(1,1)]=max(abr_xx2(:,1));
 for i = 2:num
 	add_attn=attn(1,i-1)-attn(1,i); exp_bin=bin_of_max(1,i-1) + bin_of_time(add_attn/40) - 1;
-    [data.z.score(1,i),delay]=max(abr_xx2(exp_bin-bin_of_time(1):exp_bin+bin_of_time(1),i));
+    [data.z.score(1,i),delay]=max(abr_xx2(round(exp_bin-bin_of_time(1)):round(exp_bin+bin_of_time(1),i)));
 	bin_of_max(1,i)=exp_bin-bin_of_time(1)+delay-1;
 end;
 delay_of_max=time_of_bin(bin_of_max);
@@ -203,15 +206,15 @@ thresh_mag = mean(ABRmag(:,3)) + 2*std(ABRmag(:,3));
 ABRmag(1:num,4) = thresh_mag;
 ABRmag = sortrows(ABRmag,1);
 yes_thresh = 0;
-for index = 1:num-1,
-   if (ABRmag(index,2) <= thresh_mag) & (ABRmag(index+1,2) >= thresh_mag), %find points that bracket 50% hit rate
+for index = 1:num-1
+   if (ABRmag(index,2) <= thresh_mag) && (ABRmag(index+1,2) >= thresh_mag) %find points that bracket 50% hit rate
       pts = index;
       yes_thresh = 1;
    end
 end
 
 %calculate threshold
-if yes_thresh,
+if yes_thresh
    hi_loc  = ABRmag(pts,  1);
    lo_loc  = ABRmag(pts+1,1);
    hi_resp = ABRmag(pts,  2);
@@ -236,5 +239,4 @@ if freqs ~= freq_mean
 	msgbox('Multiple stimulus frequencies selected!')
 end;
 
-
-
+warning(warn_state.state);

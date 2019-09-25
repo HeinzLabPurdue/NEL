@@ -363,7 +363,6 @@ while isempty(get(FIG.push.close,'Userdata'))
                         set(FIG.asldr.val,'string',num2str(-Stimuli.atten_dB));
                         set(FIG.asldr.SPL,'string',sprintf('%.1f dB SPL',Stimuli.MaxdBSPLCalib-Stimuli.atten_dB));
                         set(FIG.asldr.slider, 'value', -Stimuli.atten_dB);
-                        set(FIG.asldr.SPL,'string',sprintf('%.1f dB SPL',Stimuli.MaxdBSPLCalib-Stimuli.atten_dB));
                         
                         ButtonName=questdlg('Are you satisfied?', ...
                             'Close Prompt', ...

@@ -8,6 +8,8 @@ global abr_Stimuli ...
 num=length(pic);
 
 clear global 'reff'
+warn_state= warning('query');
+warning off;
 
 data.threshold=NaN; 
 data.z.intercept=NaN; 
@@ -108,7 +110,7 @@ for i=1:abr_Stimuli.num_templates
 	txcor(:,i)=xcorr(abr(:,i),abr(:,1));
 	[~, delay1(1,i)]=max(txcor(:,i));
 	delay(1,i)=(delay1(1,i)-delay1(1,1))*dt;
-	template1(:,1)=abr(bin_of_time(abr_Stimuli.start_template+delay(1,i)):bin_of_time(abr_Stimuli.end_template+delay(1,i)),i);
+	template1(:,1)=abr(round(bin_of_time(abr_Stimuli.start_template+delay(1,i))):round(bin_of_time(abr_Stimuli.end_template+delay(1,i))),i);
 end;
 template=mean(template1,2);
 
@@ -147,7 +149,7 @@ bin_of_max=NaN*ones(1,num);
 [data.z.score(1,1),bin_of_max(1,1)]=max(abr_xx2(:,1));
 for i = 2:num
 	add_attn=attn(1,i-1)-attn(1,i); exp_bin=bin_of_max(1,i-1) + bin_of_time(add_attn/40) - 1;
-    [data.z.score(1,i),delay]=max(abr_xx2(exp_bin-bin_of_time(1):exp_bin+bin_of_time(1),i));
+    [data.z.score(1,i),delay]=max(abr_xx2(round(exp_bin-bin_of_time(1)):round(exp_bin+bin_of_time(1),i)));
 	bin_of_max(1,i)=exp_bin-bin_of_time(1)+delay-1;
 end;
 delay_of_max=time_of_bin(bin_of_max);
@@ -198,13 +200,14 @@ for i=1:num
 end;
 
 
-
 for i=1:num
-	data.amp(1,i)=max(abr(bin_of_time(abr_Stimuli.start_template):bin_of_time(abr_Stimuli.end_template),i))...
-			     -min(abr(bin_of_time(abr_Stimuli.start_template):bin_of_time(abr_Stimuli.end_template),i));
-	data.amp_null(1,i)=max(abr(end-round(bin_of_time(abr_Stimuli.end_template-abr_Stimuli.start_template)):end,i))...
-			     -min(abr(end-round(bin_of_time(abr_Stimuli.end_template-abr_Stimuli.start_template)):end,i));
-end;
+	data.amp(1,i)=max(abr(round(bin_of_time(abr_Stimuli.start_template)):round(bin_of_time(abr_Stimuli.end_template),i)))...
+			     -min(abr(round(bin_of_time(abr_Stimuli.start_template)):round(bin_of_time(abr_Stimuli.end_template),i)));
+	data.amp_null(1,i)=max(abr(size(abr,1)-round(bin_of_time(abr_Stimuli.end_template-abr_Stimuli.start_template)):end,i))...
+			     -min(abr(size(abr,1)-round(bin_of_time(abr_Stimuli.end_template-abr_Stimuli.start_template)):end,i));
+end
+
+warning(warn_state.state);
 
 
 ABRmag(1:num,1)=spl'; 
