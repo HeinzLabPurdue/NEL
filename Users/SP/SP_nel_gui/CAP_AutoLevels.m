@@ -7,7 +7,7 @@
 
 % Setup panel for acquire/write mode:
 
-AutoLevel_params.ManThresh_dBSPL=Stimuli.MaxdBSPLCalib-Stimuli.atten_dB+Stimuli.cur_freq_calib_dbshift;
+AutoLevel_params.ManThresh_dBSPL= Stimuli.MaxdBSPLCalib-Stimuli.atten_dB;
 SaveFlag=1;
 
 if runAudiogram==1 %KH 10Jan2012

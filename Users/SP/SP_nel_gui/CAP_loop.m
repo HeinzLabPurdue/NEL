@@ -20,7 +20,7 @@ else
     end
 end
 
-%% For stimulus 
+%% For stimulus
 RP1=actxcontrol('RPco.x',[0 0 1 1]);
 invoke(RP1,'ConnectRP2','USB',1);
 invoke(RP1,'ClearCOF');
@@ -44,10 +44,10 @@ invoke(RP1,'SetTagVal','StmOff',CAP_Gating.period_ms-CAP_Gating.duration_ms);
 invoke(RP1,'SetTagVal','RiseFall',CAP_Gating.rftime_ms);
 invoke(RP1,'Run');
 
-%% For bit select (RP2#3 is not connected to Mix/Sel). So have to use RP2#2. May use RP2#1? 
+%% For bit select (RP2#3 is not connected to Mix/Sel). So have to use RP2#2. May use RP2#1?
 RP2=actxcontrol('RPco.x',[0 0 1 1]);
 invoke(RP2,'ConnectRP2','USB',2);
-invoke(RP2,'LoadCOF',[prog_dir '\object\CAP_BitSet.rcx']); 
+invoke(RP2,'LoadCOF',[prog_dir '\object\CAP_BitSet.rcx']);
 invoke(RP2,'Run');
 
 %% For ADC (data in)
@@ -66,7 +66,7 @@ else
     CAP_memFact=0;
 end
 firstSTIM=1;
-veryfirstSTIM=1;  % The very first CAPdata when program starts is all zeros, so skip this, debug later MH 18Nov2003 
+veryfirstSTIM=1;  % The very first CAPdata when program starts is all zeros, so skip this, debug later MH 18Nov2003
 
 while isempty(get(FIG.push.close,'Userdata'))
     if (ishandle(FIG.ax.axis))
@@ -96,7 +96,7 @@ while isempty(get(FIG.push.close,'Userdata'))
     %New axes for showing maximum of each input waveform - KH 2011 Jun 08
     FIG.ax.axis2 = axes('position',[.925 .34 .025 .62]);
     FIG.ax.line2 = plot(0.5,0,'r*',[0 1],[Stimuli.threshV Stimuli.threshV],':r');
-    xlim([0 1]); ylim([0 10]);  
+    xlim([0 1]); ylim([0 10]);
     set(FIG.ax.axis2,'XTickMode','auto');
     set(FIG.ax.axis2,'YTickMode','auto');
     ylabel('Max AD Voltage (1 rep)','fontsize',12,'FontWeight','Bold');
@@ -105,7 +105,7 @@ while isempty(get(FIG.push.close,'Userdata'))
     debugging= 1; % For free-run. runLevel and autolevel: DC shift correction for plotting
     if debugging
         debugAmp= 0;
-    else 
+    else
         debugAmp= 1;
     end
     
@@ -122,7 +122,7 @@ while isempty(get(FIG.push.close,'Userdata'))
             CAPdata = invoke(RP3,'ReadTagV','ADbuf',0,CAPnpts);
             %           CAPdata = ones(size(CAPdata)); % ge debug
             
-            CAPobs=max(abs(CAPdata(1:end-2)-debugAmp*mean(CAPdata(1:end-2)))); %KH 08Jun2011 
+            CAPobs=max(abs(CAPdata(1:end-2)-debugAmp*mean(CAPdata(1:end-2)))); %KH 08Jun2011
             % ^^ added SP (because there is a dc shift probably affects the whole signal except the last point)
             
             if ~veryfirstSTIM  % MH 18Nov2003 Skip very first, all zeros
@@ -139,8 +139,8 @@ while isempty(get(FIG.push.close,'Userdata'))
                     CAPdataAvg_freerun = CAPdata;
                     firstSTIM=0;
                 end
-%                 set(FIG.ax.line,'xdata',[0:(1/Stimuli.RPsamprate_Hz):CAP_Gating.CAPlength_ms/1000], ...
-%                     'ydata',CAPdataAvg_freerun*Display.PlotFactor);
+                %                 set(FIG.ax.line,'xdata',[0:(1/Stimuli.RPsamprate_Hz):CAP_Gating.CAPlength_ms/1000], ...
+                %                     'ydata',CAPdataAvg_freerun*Display.PlotFactor);
                 set(FIG.ax.line,'xdata',(1:length(CAPdataAvg_freerun))/Stimuli.RPsamprate_Hz, ...
                     'ydata',CAPdataAvg_freerun*Display.PlotFactor);
                 
@@ -156,252 +156,247 @@ while isempty(get(FIG.push.close,'Userdata'))
         % END: Main body. Excluding interrupt for FIG.push.close or FIG.NewStim
         % ---------------------------------------------------------------------------------------------------------------------------------------
         
-        %% Interruts during freerun 
+        %% Interruts during freerun
         if get(FIG.push.close,'Userdata')
             break;
         elseif FIG.NewStim
             switch FIG.NewStim
                 
-            case 1
-                invoke(RP1,'SetTagVal','freq',Stimuli.freq_hz);
-                invoke(RP1,'SetTagVal','tone',1);
-                CAP_set_attns(Stimuli.atten_dB,Stimuli.channel,Stimuli.KHosc,RP1,RP2);
-            case 2
-                invoke(RP1,'SetTagVal','tone',0);
-                CAP_set_attns(Stimuli.atten_dB,Stimuli.channel,Stimuli.KHosc,RP1,RP2);
-            case 3
-                CAP_set_attns(Stimuli.atten_dB,Stimuli.channel,Stimuli.KHosc,RP1,RP2);
-            case 4
-                invoke(RP1,'SetTagVal','StmOn',CAP_Gating.duration_ms);
-                invoke(RP1,'SetTagVal','StmOff',CAP_Gating.period_ms-CAP_Gating.duration_ms);
-                invoke(RP3,'SetTagVal','ADdur',CAP_Gating.CAPlength_ms);
-                CAPnpts=floor((CAP_Gating.CAPlength_ms/1000)*Stimuli.RPsamprate_Hz);
-                firstSTIM = 1;
-                FIG.NewStim = 0;
-                break
-            case 5
-                CAP_set_attns(Stimuli.atten_dB,Stimuli.channel,Stimuli.KHosc,RP1,RP2);
-            case 6
-                invoke(RP1,'SetTagVal','freq',Stimuli.freq_hz);
-            case 7
-                CAP_set_attns(Stimuli.atten_dB,Stimuli.channel,Stimuli.KHosc,RP1,RP2);
-            case 8
-                invoke(RP1,'SetTagVal','FixedPhase',Stimuli.fixedPhase);
-            case 9
-                if Stimuli.CAPmem_reps>0
-                    CAP_memFact=exp(-1/Stimuli.CAPmem_reps);
-                else
-                    CAP_memFact=0;
-                end
-            case 10 % Stimulate and acquire CAP curves at levels based on AttenMask around the current freq/atten combo.
-                
-                runAudiogram=0; %KH 10Jan2012
-                
-                CAP_RunLevels;
-                veryfirstSTIM=1;
-                
-                if AutoLevel_params.dB5Flag
-                    FIG.NewStim = 17;
-                    break;
-                end
-                
-            case 11 % Make "free-run" forget previous averages.
-                firstSTIM = 1;          
-            case 12 % Change Voltage Display         
-                if strcmp(Display.Voltage,'atELEC')
-                    set(FIG.ax.ylabel,'String','Voltage at Electrode (V)')
-                    Display.PlotFactor=1/Display.Gain;
-                    Display.YLim=Display.YLim_atAD/Display.Gain;
-                else
-                    set(FIG.ax.ylabel,'String','Voltage at AD (V)')
-                    Display.PlotFactor=1;
-                    Display.YLim=Display.YLim_atAD;
-                end
-                set(FIG.ax.axis,'Ylim',[-Display.YLim Display.YLim])
-                
-            case 13 %KH 08Jun2011
-                set(FIG.ax.line2(2),'ydata',[Stimuli.threshV Stimuli.threshV]);
-                drawnow;
-                
-            case 15 % Runs through Stimuli.audiogramFreqs at levels specified, KH 10Jan2012
-                runAudiogram=1;
-                CAP_RunLevels;
-                veryfirstSTIM=1;
-                
-            case 16 % KH 10Jan2012, switch between click and tone
-                if Stimuli.clickYes==1
-                    clickAmp=5; toneAmp=0;
-                    CAP_Gating.duration_ms=Stimuli.clickLength_ms;
-                else
-                    clickAmp=0; toneAmp=5;
-                    if get(FIG.radio.fast, 'value') == 1
-                        CAP_Gating.duration_ms=Stimuli.fast.duration_ms;
+                case 1
+                    invoke(RP1,'SetTagVal','freq',Stimuli.freq_hz);
+                    invoke(RP1,'SetTagVal','tone',1);
+                    CAP_set_attns(Stimuli.atten_dB,Stimuli.channel,Stimuli.KHosc,RP1,RP2);
+                case 2
+                    invoke(RP1,'SetTagVal','tone',0);
+                    CAP_set_attns(Stimuli.atten_dB,Stimuli.channel,Stimuli.KHosc,RP1,RP2);
+                case 3
+                    CAP_set_attns(Stimuli.atten_dB,Stimuli.channel,Stimuli.KHosc,RP1,RP2);
+                case 4
+                    invoke(RP1,'SetTagVal','StmOn',CAP_Gating.duration_ms);
+                    invoke(RP1,'SetTagVal','StmOff',CAP_Gating.period_ms-CAP_Gating.duration_ms);
+                    invoke(RP3,'SetTagVal','ADdur',CAP_Gating.CAPlength_ms);
+                    CAPnpts=floor((CAP_Gating.CAPlength_ms/1000)*Stimuli.RPsamprate_Hz);
+                    firstSTIM = 1;
+                    FIG.NewStim = 0;
+                    break
+                case 5
+                    CAP_set_attns(Stimuli.atten_dB,Stimuli.channel,Stimuli.KHosc,RP1,RP2);
+                case 6
+                    invoke(RP1,'SetTagVal','freq',Stimuli.freq_hz);
+                case 7
+                    CAP_set_attns(Stimuli.atten_dB,Stimuli.channel,Stimuli.KHosc,RP1,RP2);
+                case 8
+                    invoke(RP1,'SetTagVal','FixedPhase',Stimuli.fixedPhase);
+                case 9
+                    if Stimuli.CAPmem_reps>0
+                        CAP_memFact=exp(-1/Stimuli.CAPmem_reps);
                     else
-                        CAP_Gating.duration_ms=Stimuli.slow.duration_ms;
+                        CAP_memFact=0;
                     end
-                end
-                invoke(RP1,'SetTagVal','toneAmp',toneAmp); 
-                invoke(RP1,'SetTagVal','clickAmp',clickAmp); 
-                invoke(RP1,'SetTagVal','StmOn',CAP_Gating.duration_ms);
-                invoke(RP1,'SetTagVal','StmOff',CAP_Gating.period_ms-CAP_Gating.duration_ms);
-                
-            case 17 % SP 24Jan2016, Automatic Levels Run
-                if ~AutoLevel_params.dB5Flag
-                    runAudiogram=0; %KH 10Jan2012  % Don't know why it should be here
-                    CAP_AutoLevels;
+                case 10 % Stimulate and acquire CAP curves at levels based on AttenMask around the current freq/atten combo.
+                    
+                    runAudiogram=0; %KH 10Jan2012
+                    
+                    CAP_RunLevels;
                     veryfirstSTIM=1;
                     
-                    if (bAbort == 1)
-                        FIG.NewStim = 0;
-                        break;
-                    end
-                    
-                    if (SaveFlag == 0)
-                        FIG.NewStim = 0;
-                        rc = PAset([120;120;120;120]); 
-                        break;
-                    end
-                    
-                    if ~AutoLevel_params.ReRunFlag  % <1> Case when runs for the first time afrer MANthresh-20:MANthresh+50
-                        % calculates autoThresh silently, runs the 5 dB step around autoThresh
-                        %% Change to min(90,thresh+50) <to-do SP>
-                        picNUMlist=NelData.File_Manager.picture-fliplr((1:AutoLevel_params.numAttens_1)-1);
-                        dBSPLlist=fliplr(AutoLevel_params.maxdBSPLtoRUN -((1:AutoLevel_params.numAttens_1)-1)*AutoLevel_params.stepdB);
-                        lastdBSPL=60; %AutoLevel_params.ManThresh_dBSPL+AutoLevel_params.dBaboveTHRman_for_autoTHRcorr;
-                        % Added SP (Sep 10, 2018) % May have to change depending on PTS/ NH
-                        [xx,lastdBindex]=min(abs(dBSPLlist-lastdBSPL));
-                        picstoSEND=picNUMlist(1:lastdBindex);  % list of PICS to send to Ken's code to avoid usinig too high an SPL for template
-                        
-                        CalibPIC=CalibFileNum;
-                        dataDIR=NelData.File_Manager.dirname;
-                        
-                        if DEBUG_FLAG
-                            picstoSEND=6:12;
-                            dBSPLlist=0:10:80;
-                            picNUMlist=6:14;
-                        end
-                        
-                        AutoLevel_params.AutoThresh1=main_abr_bb(dataDIR,CalibPIC,picstoSEND);
-                        
-                        if isnan(AutoLevel_params.AutoThresh1)
-                            AutoLevel_params.AutoThresh1=25;
-                            disp('You must be debuggin, else something is wrong!');
-                            ding;
-                        elseif AutoLevel_params.AutoThresh1<0
-                            AutoLevel_params.AutoThresh1=25;
-                            disp('You must be debuggin, else something is wrong!');
-                            ding;
-                        elseif AutoLevel_params.AutoThresh1>80
-                            AutoLevel_params.AutoThresh1=25;
-                            disp('You must be debuggin, else something is wrong!');
-                            ding;
-                        end
-                        
-                        Stimuli.atten_dB= Stimuli.MaxdBSPLCalib-(5+10*floor(AutoLevel_params.AutoThresh1/10));
-                        
-                        FIG.NewStim = 10;
-                        AutoLevel_params.dB5Flag=1;
-                        break;
-                        % It goes to run_level and runs the 5dB step
-                    else % <3> To run the user defined levels 
+                    if AutoLevel_params.dB5Flag
                         FIG.NewStim = 17;
-                        AutoLevel_params.dB5Flag=1;
-                        break;
-                    end
-                else 
-                    AutoLevel_params.dB5Flag=0;
-                    
-                    if (SaveFlag == 0)
-                        FIG.NewStim = 0;
-                        AutoLevel_params.dB5Flag=0;
-                        rc = PAset([120;120;120;120]); 
                         break;
                     end
                     
-                    if AutoLevel_params.ReRunFlag % After rerun
-                        if ~DEBUG_FLAG %If NOT debugging
-                            AutoLevel_params.ReRunFlag=0;
-                            picstoSEND_deBUG=[picstoSEND_deBUG, (35)];
-                            global FLAG_RERUN_FOR_ABR_ANALYSIS
-                            FLAG_RERUN_FOR_ABR_ANALYSIS=1;
+                case 11 % Make "free-run" forget previous averages.
+                    firstSTIM = 1;
+                case 12 % Change Voltage Display
+                    if strcmp(Display.Voltage,'atELEC')
+                        set(FIG.ax.ylabel,'String','Voltage at Electrode (V)')
+                        Display.PlotFactor=1/Display.Gain;
+                        Display.YLim=Display.YLim_atAD/Display.Gain;
+                    else
+                        set(FIG.ax.ylabel,'String','Voltage at AD (V)')
+                        Display.PlotFactor=1;
+                        Display.YLim=Display.YLim_atAD;
+                    end
+                    set(FIG.ax.axis,'Ylim',[-Display.YLim Display.YLim])
+                    
+                case 13 %KH 08Jun2011
+                    set(FIG.ax.line2(2),'ydata',[Stimuli.threshV Stimuli.threshV]);
+                    drawnow;
+                    
+                case 15 % Runs through Stimuli.audiogramFreqs at levels specified, KH 10Jan2012
+                    runAudiogram=1;
+                    CAP_RunLevels;
+                    veryfirstSTIM=1;
+                    
+                case 16 % KH 10Jan2012, switch between click and tone
+                    if Stimuli.clickYes==1
+                        clickAmp=5; toneAmp=0;
+                        CAP_Gating.duration_ms=Stimuli.clickLength_ms;
+                    else
+                        clickAmp=0; toneAmp=5;
+                        if get(FIG.radio.fast, 'value') == 1
+                            CAP_Gating.duration_ms=Stimuli.fast.duration_ms;
+                        else
+                            CAP_Gating.duration_ms=Stimuli.slow.duration_ms;
+                        end
+                    end
+                    invoke(RP1,'SetTagVal','toneAmp',toneAmp);
+                    invoke(RP1,'SetTagVal','clickAmp',clickAmp);
+                    invoke(RP1,'SetTagVal','StmOn',CAP_Gating.duration_ms);
+                    invoke(RP1,'SetTagVal','StmOff',CAP_Gating.period_ms-CAP_Gating.duration_ms);
+                    
+                case 17 % SP 24Jan2016, Automatic Levels Run
+                    if ~AutoLevel_params.dB5Flag
+                        runAudiogram=0; %KH 10Jan2012  % Don't know why it should be here
+                        CAP_AutoLevels;
+                        veryfirstSTIM=1;
+                        
+                        if (bAbort == 1)
+                            FIG.NewStim = 0;
+                            break;
+                        end
+                        
+                        if (SaveFlag == 0)
+                            FIG.NewStim = 0;
+                            rc = PAset([120;120;120;120]);
+                            break;
+                        end
+                        
+                        if ~AutoLevel_params.ReRunFlag  % <1> Case when runs for the first time afrer MANthresh-20:MANthresh+50
+                            % calculates autoThresh silently, runs the 5 dB step around autoThresh
+                            %% Change to min(90,thresh+50) <to-do SP>
+                            picNUMlist=NelData.File_Manager.picture-fliplr((1:AutoLevel_params.numAttens_1)-1);
+                            dBSPLlist=fliplr(AutoLevel_params.maxdBSPLtoRUN -((1:AutoLevel_params.numAttens_1)-1)*AutoLevel_params.stepdB);
+                            lastdBSPL=60; %AutoLevel_params.ManThresh_dBSPL+AutoLevel_params.dBaboveTHRman_for_autoTHRcorr;
+                            % Added SP (Sep 10, 2018) % May have to change depending on PTS/ NH
+                            [xx,lastdBindex]=min(abs(dBSPLlist-lastdBSPL));
+                            picstoSEND=picNUMlist(1:lastdBindex);  % list of PICS to send to Ken's code to avoid usinig too high an SPL for template
                             
-                            picNUMlist=[picNUMlist NelData.File_Manager.picture-fliplr((1:AutoLevel_params.numAttens_1)-1)];
-                            dBSPLlist=[dBSPLlist rerunSPLs];
-                            lastdBSPL=AutoLevel_params.AutoThresh1+AutoLevel_params.dBaboveTHRman_for_autoTHRcorr;  
-                            %% CHANGE MANthre
-                            %                         [xx,lastdBindex]=min(abs(dBSPLlist-lastdBSPL));
-                            %                         picstoSEND=[picstoSEND picNUMlist(1:lastdBindex)];  % list of PICS to send to Ken's code to avoid usinig too high an SPL for template
-                            picstoSEND=picNUMlist;%(dBSPLlist<lastdBSPL);
-                            %% on;y send less 65 - non monotonic
-                        else 
-                            picstoSEND=[picstoSEND 15];
-                            picNUMlist=picstoSEND;
-                            dBSPLlist=[dBSPLlist(1:length(picNUMlist)-1) 35];
+                            CalibPIC=CalibFileNum;
+                            dataDIR=NelData.File_Manager.dirname;
+                            
+                            if DEBUG_FLAG
+                                picstoSEND=6:12;
+                                dBSPLlist=0:10:80;
+                                picNUMlist=6:14;
+                            end
+                            
+                            AutoLevel_params.AutoThresh1=main_abr_bb(dataDIR,CalibPIC,picstoSEND);
+                            
+                            if isnan(AutoLevel_params.AutoThresh1)
+                                AutoLevel_params.AutoThresh1=25;
+                                disp('You must be debuggin, else something is wrong!');
+                                ding;
+                            elseif AutoLevel_params.AutoThresh1<0
+                                AutoLevel_params.AutoThresh1=25;
+                                disp('You must be debuggin, else something is wrong!');
+                                ding;
+                            elseif AutoLevel_params.AutoThresh1>80
+                                AutoLevel_params.AutoThresh1=25;
+                                disp('You must be debuggin, else something is wrong!');
+                                ding;
+                            end
+                            
+                            Stimuli.atten_dB= Stimuli.MaxdBSPLCalib-(5+10*floor(AutoLevel_params.AutoThresh1/10));
+                            
+                            FIG.NewStim = 10;
+                            AutoLevel_params.dB5Flag=1;
+                            break;
+                            % It goes to run_level and runs the 5dB step
+                        else % <3> To run the user defined levels
+                            FIG.NewStim = 17;
+                            AutoLevel_params.dB5Flag=1;
+                            break;
                         end
-                    else % <2> After 5dB step is run
-                        if ~DEBUG_FLAG %If NOT debugging
-                            picstoSEND=[picstoSEND,NelData.File_Manager.picture]; %% Check
-                            picNUMlist=[picNUMlist,NelData.File_Manager.picture]; %% Should be uncommented
-                            dBSPLlist=[dBSPLlist,(Stimuli.MaxdBSPLCalib-Stimuli.atten_dB+Stimuli.cur_freq_calib_dbshift)];
-%                             picNUMlist=picstoSEND;
-%                             dBSPLlist=dBSPLlist([1:length(picNUMlist)-1 end]); %% ChangeSP:: should change to plot figures in RED and BLACK
-                        else %If debugging
-                            picstoSEND=[picstoSEND 15];
-                            picNUMlist=picstoSEND;
-                            dBSPLlist=[dBSPLlist(1:length(picNUMlist)-1) 35];
+                    else
+                        AutoLevel_params.dB5Flag=0;
+                        
+                        if (SaveFlag == 0)
+                            FIG.NewStim = 0;
+                            AutoLevel_params.dB5Flag=0;
+                            rc = PAset([120;120;120;120]);
+                            break;
                         end
-                    end
-                    
-                    global FLAG_ABR_ENTER_SP
-                    FLAG_ABR_ENTER_SP=1;        
-                                       
-                    cur_dir=pwd;
-                    abr_analysis_dir=fileparts(cur_dir);
-                    cd(abr_analysis_dir);
-                    abr_setup_SP; 
-                    abr_analysis_SP('process');
-                    FLAG_ABR_ENTER_SP=0;
-                    
-                    rc = PAset([120;120;120;120]); % added by GE/MH, 17Jan2003.  To force all attens to 120
-                    Stimuli.atten_dB = 120;
-                    set(FIG.asldr.val,'string',num2str(-Stimuli.atten_dB));
-                    set(FIG.asldr.SPL,'string',sprintf('%.1f dB SPL',Stimuli.MaxdBSPLCalib-Stimuli.atten_dB));
-                    set(FIG.asldr.slider, 'value', -Stimuli.atten_dB);
-                    set(FIG.asldr.SPL,'string',sprintf('%.1f dB SPL',Stimuli.MaxdBSPLCalib-Stimuli.atten_dB));
-                    
-                    ButtonName=questdlg('Are you satisfied?', ...
-                        'Close Prompt', ...
-                        'Yes','No','Yes');
-                    switch ButtonName
-                    case 'Yes'
-                        global data;
-                        AutoLevel_params.AutoThresh2=data.threshold;
+                        
+                        if AutoLevel_params.ReRunFlag % After rerun
+                            if ~DEBUG_FLAG %If NOT debugging
+                                AutoLevel_params.ReRunFlag=0;
+                                picstoSEND_deBUG=[picstoSEND_deBUG, (35)];
+                                global FLAG_RERUN_FOR_ABR_ANALYSIS
+                                FLAG_RERUN_FOR_ABR_ANALYSIS=1;
+                                
+                                picNUMlist=[picNUMlist NelData.File_Manager.picture-fliplr((1:AutoLevel_params.numAttens_1)-1)];
+                                dBSPLlist=[dBSPLlist rerunSPLs];
+                                lastdBSPL=AutoLevel_params.AutoThresh1+AutoLevel_params.dBaboveTHRman_for_autoTHRcorr;
+                                %% CHANGE MANthre
+                                %                         [xx,lastdBindex]=min(abs(dBSPLlist-lastdBSPL));
+                                %                         picstoSEND=[picstoSEND picNUMlist(1:lastdBindex)];  % list of PICS to send to Ken's code to avoid usinig too high an SPL for template
+                                picstoSEND=picNUMlist;%(dBSPLlist<lastdBSPL);
+                                %% on;y send less 65 - non monotonic
+                            else
+                                picstoSEND=[picstoSEND 15];
+                                picNUMlist=picstoSEND;
+                                dBSPLlist=[dBSPLlist(1:length(picNUMlist)-1) 35];
+                            end
+                        else % <2> After 5dB step is run
+                            
+                            picstoSEND=[picstoSEND,NelData.File_Manager.picture]; % Check
+                            picNUMlist=[picNUMlist,NelData.File_Manager.picture];
+                            %                         dBSPLlist=[dBSPLlist,(Stimuli.MaxdBSPLCalib-Stimuli.atten_dB+Stimuli.cur_freq_calib_dbshift)];
+                            %                         Commented SP on 9/25/19
+                            dBSPLlist=[dBSPLlist,(Stimuli.MaxdBSPLCalib-Stimuli.atten_dB)];
+                            
+                        end
+                        
+                        global FLAG_ABR_ENTER_SP
+                        FLAG_ABR_ENTER_SP=1;
+                        
+                        cur_dir=pwd;
+                        abr_analysis_dir=fileparts(cur_dir);
+                        cd(abr_analysis_dir);
+                        abr_setup_SP;
+                        abr_analysis_SP('process');
+                        FLAG_ABR_ENTER_SP=0;
+                        
+                        rc = PAset([120;120;120;120]); % added by GE/MH, 17Jan2003.  To force all attens to 120
                         Stimuli.atten_dB = 120;
                         set(FIG.asldr.val,'string',num2str(-Stimuli.atten_dB));
                         set(FIG.asldr.SPL,'string',sprintf('%.1f dB SPL',Stimuli.MaxdBSPLCalib-Stimuli.atten_dB));
                         set(FIG.asldr.slider, 'value', -Stimuli.atten_dB);
                         set(FIG.asldr.SPL,'string',sprintf('%.1f dB SPL',Stimuli.MaxdBSPLCalib-Stimuli.atten_dB));
-                    case 'No'
-                        global rerunSPLs;
-                        rerunSPLs=[];
-                        h_checkbox=abr_checkbox;
-                        uiwait(h_checkbox);
                         
-                        [picstoSEND,picNUMlist,dBSPLlist]=update_pic_num_list_ABR(picstoSEND,picNUMlist,dBSPLlist,rerunSPLs);
-                        
-                        AutoLevel_params.ReRun_dBSPL=sort(rerunSPLs);
-                        
-                        FIG.NewStim = 17;
+                        ButtonName=questdlg('Are you satisfied?', ...
+                            'Close Prompt', ...
+                            'Yes','No','Yes');
+                        switch ButtonName
+                            case 'Yes'
+                                global data;
+                                AutoLevel_params.AutoThresh2=data.threshold;
+                                Stimuli.atten_dB = 120;
+                                set(FIG.asldr.val,'string',num2str(-Stimuli.atten_dB));
+                                set(FIG.asldr.SPL,'string',sprintf('%.1f dB SPL',Stimuli.MaxdBSPLCalib-Stimuli.atten_dB));
+                                set(FIG.asldr.slider, 'value', -Stimuli.atten_dB);
+                                set(FIG.asldr.SPL,'string',sprintf('%.1f dB SPL',Stimuli.MaxdBSPLCalib-Stimuli.atten_dB));
+                            case 'No'
+                                global rerunSPLs;
+                                rerunSPLs=[];
+                                h_checkbox=abr_checkbox;
+                                uiwait(h_checkbox);
+                                
+                                [picstoSEND,picNUMlist,dBSPLlist]=update_pic_num_list_ABR(picstoSEND,picNUMlist,dBSPLlist,rerunSPLs);
+                                
+                                AutoLevel_params.ReRun_dBSPL=sort(rerunSPLs);
+                                
+                                FIG.NewStim = 17;
+                                delete(2); % Delete the ABR analysis plot
+                                cd (cur_dir);
+                                AutoLevel_params.ReRunFlag=1;
+                                break;
+                                
+                        end
                         delete(2); % Delete the ABR analysis plot
                         cd (cur_dir);
-                        AutoLevel_params.ReRunFlag=1;
-                        break;
-                        
                     end
-                    delete(2); % Delete the ABR analysis plot
-                    cd (cur_dir);
-                    
-                end
             end
             FIG.NewStim = 0;
         end

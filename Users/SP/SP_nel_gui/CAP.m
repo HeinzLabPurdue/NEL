@@ -48,8 +48,7 @@ if nargin < 1
     CAP_loop_plot;
     CAP('load_calib'); %SP: load calib-picNum once to populate calibdata
     CAP('clickYes'); % Start invCalib = true or false based on default clickYes value
-    
-    Stimuli.MaxdBSPLCalib=90+Stimuli.cur_freq_calib_dbshift;
+%     Stimuli.MaxdBSPLCalib=90+Stimuli.cur_freq_calib_dbshift;
     
     CAP_loop;
     
@@ -347,16 +346,16 @@ elseif strcmp(command_str,'load_calib') %SP 24Jan2016
         CalibData(:,2)=trifilt(CalibData(:,2)',5)';
         rdd
     end
-    max_dBSPL=CalibInterp(Stimuli.freq_hz/1000,CalibData);
+    Stimuli.MaxdBSPLCalib=CalibInterp(Stimuli.freq_hz/1000,CalibData);
     %     Stimuli.MaxdBSPLCalib=max_dBSPL;
     % max_dBSPL=Stimuli.MaxdBSPLCalib+(Stimuli.freq_hz)/1000; %testing It should be max_dBSPL-Stimuli.MaxdBSPLCalib (dB SPL, which whould be the max value)
-    Stimuli.cur_freq_calib_dbshift=max_dBSPL-90;
-    if (Stimuli.cur_freq_calib_dbshift<0)
-        Stimuli.CalibBelow90=1;
-    else
-        Stimuli.CalibBelow90=0;
-    end
-    Stimuli.MaxdBSPLCalib=90+Stimuli.cur_freq_calib_dbshift;
+    Stimuli.cur_freq_calib_dbshift=Stimuli.MaxdBSPLCalib-90;
+%     if (Stimuli.cur_freq_calib_dbshift<0)
+%         Stimuli.CalibBelow90=1;
+%     else
+%         Stimuli.CalibBelow90=0;
+%     end
+%     Stimuli.MaxdBSPLCalib=max_dBSPL;
     set(FIG.asldr.SPL,'string',sprintf('%.1f dB SPL',Stimuli.MaxdBSPLCalib-Stimuli.atten_dB));
     
     
