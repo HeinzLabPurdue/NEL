@@ -39,6 +39,7 @@ if nargin < 1
     ffr_snrenv_loop2; % Working
     
 elseif strcmp(command_str,'update_stim')
+    update_gating_flag= false;
     switch eventdata
         case 'spl'
             FIG.NewStim = 2;
@@ -75,6 +76,7 @@ elseif strcmp(command_str,'update_stim')
                 FIG.popup.stims = uicontrol(FIG.handle,'callback', 'FFR_SNRenv(''update_stim'',0);','style', ...
                     'popup','Units' ,'normalized', 'Userdata',Stimuli.filename,'position',[.4 .175 .425 .04], ...
                     'string',({fName.SNRenv_stimlist.name}),'fontsize',12);
+                update_gating_flag= true;
             end
             
         case 'noise_type' % not functional -- remove??
@@ -121,6 +123,24 @@ elseif strcmp(command_str,'update_stim')
     xpr=resample(xp,round(Stimuli.RPsamprate_Hz), fsp);
     audiowrite([Stimuli.UPDdir Stimuli.filename], xpr, round(Stimuli.RPsamprate_Hz));
     copyfile([Stimuli.UPDdir Stimuli.filename],Stimuli.STIMfile,'f');
+    
+    if update_gating_flag % right now, this will update only for dir based, later for all stims
+        Stimuli.fast.duration_ms= round(length(xp)/fsp*1e3);
+        Stimuli.fast.XendPlot_ms= Stimuli.fast.duration_ms+300;
+        Stimuli.fast.FFRlength_ms= Stimuli.fast.duration_ms+300;
+
+        Stimuli.slow.duration_ms= round(length(xp)/fsp*1e3);
+        Stimuli.slow.XendPlot_ms= Stimuli.fast.duration_ms+300;
+        Stimuli.slow.FFRlength_ms= Stimuli.fast.duration_ms+300;
+
+        if get(FIG.radio.fast, 'value') % Fast
+            Stimuli.fast.period_ms= Stimuli.fast.duration_ms+500;
+            FFR_SNRenv('fast');
+        elseif get(FIG.radio.slow, 'value') == 1 % Slow
+            Stimuli.slow.period_ms= Stimuli.fast.duration_ms+1000;
+            FFR_SNRenv('slow');
+        end
+    end
     
 elseif strcmp(command_str,'fast')
     if get(FIG.radio.fast, 'value') == 1
