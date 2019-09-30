@@ -1,12 +1,6 @@
 %global root_dir NelData
 
 global DEBUG_FLAG
-DEBUG_FLAG=0;
-if DEBUG_FLAG
-    disp('Debug Mode ON!!! Go to CAP_loop Line Num 3 to set it off! ');
-    ding;  ding;  ding;
-end
-
 
 if Stimuli.clickYes==1  %KH 06Jan2012
     clickAmp=5; toneAmp=0;
@@ -44,17 +38,27 @@ invoke(RP1,'SetTagVal','StmOff',CAP_Gating.period_ms-CAP_Gating.duration_ms);
 invoke(RP1,'SetTagVal','RiseFall',CAP_Gating.rftime_ms);
 invoke(RP1,'Run');
 
-%% For bit select (RP2#3 is not connected to Mix/Sel). So have to use RP2#2. May use RP2#1?
-RP2=actxcontrol('RPco.x',[0 0 1 1]);
-invoke(RP2,'ConnectRP2','USB',2);
-invoke(RP2,'LoadCOF',[prog_dir '\object\CAP_BitSet.rcx']);
-invoke(RP2,'Run');
 
-%% For ADC (data in)
-RP3=actxcontrol('RPco.x',[0 0 1 1]);
-invoke(RP3,'ConnectRP2','USB',3);
-invoke(RP3,'ClearCOF');
-invoke(RP3,'LoadCOF',[prog_dir '\object\ABR_right.rcx']);
+if NelData.General.RP2_3and4
+    %% For bit select (RP2#3 is not connected to Mix/Sel). So have to use RP2#2. May use RP2#1?
+    RP2=actxcontrol('RPco.x',[0 0 1 1]);
+    invoke(RP2,'ConnectRP2','USB',2);
+    invoke(RP2,'LoadCOF',[prog_dir '\object\CAP_BitSet.rcx']);
+    invoke(RP2,'Run');
+    
+    %% For ADC (data in)
+    RP3=actxcontrol('RPco.x',[0 0 1 1]);
+    invoke(RP3,'ConnectRP2','USB',3);
+    invoke(RP3,'ClearCOF');
+    invoke(RP3,'LoadCOF',[prog_dir '\object\ABR_right.rcx']);
+else
+    RP2=actxcontrol('RPco.x',[0 0 1 1]);
+    invoke(RP2,'ConnectRP2','USB',2);
+    
+    RP3= RP2;
+    invoke(RP3,'ClearCOF');
+    invoke(RP3,'LoadCOF',[prog_dir '\object\CAP_right.rcx']);
+end
 invoke(RP3,'SetTagVal','ADdur', CAP_Gating.CAPlength_ms);
 invoke(RP3,'Run');
 
@@ -104,9 +108,9 @@ while isempty(get(FIG.push.close,'Userdata'))
     
     debugging= 1; % For free-run. runLevel and autolevel: DC shift correction for plotting
     if debugging
-        debugAmp= 0;
+        demean_flag= 0;
     else
-        debugAmp= 1;
+        demean_flag= 1;
     end
     
     
@@ -122,7 +126,7 @@ while isempty(get(FIG.push.close,'Userdata'))
             CAPdata = invoke(RP3,'ReadTagV','ADbuf',0,CAPnpts);
             %           CAPdata = ones(size(CAPdata)); % ge debug
             
-            CAPobs=max(abs(CAPdata(1:end-2)-debugAmp*mean(CAPdata(1:end-2)))); %KH 08Jun2011
+            CAPobs=max(abs(CAPdata(1:end-2)-demean_flag*mean(CAPdata(1:end-2)))); %KH 08Jun2011
             % ^^ added SP (because there is a dc shift probably affects the whole signal except the last point)
             
             if ~veryfirstSTIM  % MH 18Nov2003 Skip very first, all zeros
@@ -132,7 +136,7 @@ while isempty(get(FIG.push.close,'Userdata'))
                     if CAPobs <= Stimuli.threshV  %KH 2011 June 08 - artifact rejection
                         CAPdataAvg_freerun = CAP_memFact * CAPdataAvg_freerun ...
                             + (1 - CAP_memFact)*CAPdata;
-                        CAPdataAvg_freerun=CAPdataAvg_freerun-debugAmp*mean(CAPdataAvg_freerun); %added demean SP Aug 21 2018
+                        CAPdataAvg_freerun=CAPdataAvg_freerun-demean_flag*mean(CAPdataAvg_freerun); %added demean SP Aug 21 2018
                     end
                     
                 else
@@ -144,7 +148,7 @@ while isempty(get(FIG.push.close,'Userdata'))
                 set(FIG.ax.line,'xdata',(1:length(CAPdataAvg_freerun))/Stimuli.RPsamprate_Hz, ...
                     'ydata',CAPdataAvg_freerun*Display.PlotFactor);
                 
-                set(FIG.ax.line2(1),'ydata',CAPobs-debugAmp*mean(CAPobs)); %KH 10Jan2012 % added demean SP (Aug 21 2018)
+                set(FIG.ax.line2(1),'ydata',CAPobs-demean_flag*mean(CAPobs)); %KH 10Jan2012 % added demean SP (Aug 21 2018)
                 
                 drawnow;
             else

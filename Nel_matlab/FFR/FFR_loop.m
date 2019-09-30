@@ -5,21 +5,31 @@ invoke(RP1,'ClearCOF');
 
 invoke(RP1,'LoadCOF',[prog_dir '\object\FFR_wav_polIN.rcx']);
 
-%% For bit-select
-RP2=actxcontrol('RPco.x',[0 0 1 1]);
-invoke(RP2,'ConnectRP2','USB',2);
-invoke(RP2,'ClearCOF');
-invoke(RP2,'LoadCOF',[prog_dir '\object\FFR_BitSet.rcx']);
-invoke(RP2,'Run');
+if NelData.General.RP2_3and4
+    %% For bit-select
+    RP2=actxcontrol('RPco.x',[0 0 1 1]);
+    invoke(RP2,'ConnectRP2','USB',2);
+    invoke(RP2,'ClearCOF');
+    invoke(RP2,'LoadCOF',[prog_dir '\object\FFR_BitSet.rcx']);
+    invoke(RP2,'Run');
+    
+    %% For ADC (data in)
+    RP3=actxcontrol('RPco.x',[0 0 1 1]);
+    invoke(RP3,'ConnectRP2','USB',3);
+    invoke(RP3,'ClearCOF');
+    % invoke(RP2,'LoadCOF',[prog_dir '\object\FFR_right.rco']); % MH/KH Dec 8 2011
+    invoke(RP3,'LoadCOF',[prog_dir '\object\FFR_ADC.rcx']);
+    invoke(RP3,'SetTagVal','ADdur', FFR_Gating.FFRlength_ms);
+    invoke(RP3,'Run');
+else
+    RP2=actxcontrol('RPco.x',[0 0 1 1]);
+    invoke(RP2,'ConnectRP2','USB',2);
+    invoke(RP2,'ClearCOF');
+    invoke(RP2,'LoadCOF',[prog_dir '\object\FFR_right2.rcx']);
+    invoke(RP2,'Run');
+    RP3= RP2;
+end
 
-%% For ADC (data in)
-RP3=actxcontrol('RPco.x',[0 0 1 1]);
-invoke(RP3,'ConnectRP2','USB',3);
-invoke(RP3,'ClearCOF');
-% invoke(RP2,'LoadCOF',[prog_dir '\object\FFR_right.rco']); % MH/KH Dec 8 2011
-invoke(RP3,'LoadCOF',[prog_dir '\object\FFR_ADC.rcx']);
-invoke(RP3,'SetTagVal','ADdur', FFR_Gating.FFRlength_ms);
-invoke(RP3,'Run');
 
 FFR_set_attns(Stimuli.atten_dB,(Stimuli.noiseLevel*(1-Stimuli.noNoise)...
     +(Stimuli.noNoise)*(Stimuli.atten_dB-120)),Stimuli.channel,Stimuli.KHosc,RP1,RP2); %% debug deal with later Khite

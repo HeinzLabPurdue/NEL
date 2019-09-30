@@ -134,9 +134,9 @@ elseif strcmp(command_str,'calibrate')
         % Read amplitude of response
         if ~error && isempty(get(FIG.push.stop,'userdata'))
             converge = 0;
-            tic;
-            [error,converge, ADdata_V_raw] = TDTdaq;
-            temp_calib_time=toc;
+%             tic;
+            [error,converge, ~] = TDTdaq;
+%             temp_calib_time=toc;
         end
         % Correct for probe microphone calibration IF a calibration file was
         % loaded
@@ -149,8 +149,8 @@ elseif strcmp(command_str,'calibrate')
             
             % Track number of completed data points.
             FREQS.ndpnts = FREQS.ndpnts + 1;
-            raw_data{FREQS.ndpnts}= ADdata_V_raw;
-            calib_time(FREQS.ndpnts)= temp_calib_time;
+%             raw_data{FREQS.ndpnts}= ADdata_V_raw;
+%             calib_time(FREQS.ndpnts)= temp_calib_time;
             
             % Save data in buffer arrays.
             DDATA(FREQS.ndpnts,1) = FREQS.freq;  % current frequency in kHz
@@ -219,9 +219,9 @@ elseif strcmp(command_str,'calibrate')
     invoke(COMM.handle.RP2_2,'Halt');
     
     if ~isempty(instrfind)
-        fprintf(COMM.handle.SR530,'%s\n','G24') %sensitivity 500 mV
-        fprintf(COMM.handle.SR530,'%s\n','I2')  %activate panel inputs
-        fclose(COMM.handle.SR530)
+        fprintf(COMM.handle.SR530,'%s\n','G24'); %sensitivity 500 mV
+        fprintf(COMM.handle.SR530,'%s\n','I2');  %activate panel inputs
+        fclose(COMM.handle.SR530);
         delete(COMM.handle.SR530)
         clear COMM.handle.SR530
     end

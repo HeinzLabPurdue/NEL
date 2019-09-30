@@ -1,11 +1,11 @@
 function [error] = make_tone()
 
-global object_dir COMM FIG Stimuli newCalib coefFileNum
+global object_dir COMM FIG Stimuli newCalib coefFileNum NelData
 
 error = 0;
 
 %%
-useInvFIR= 1;
+useInvFIR= NelData.General.RP2_3and4; % run Inv calib if RP2:3 and 4 exist
 if useInvFIR
     cdd;
     all_Calib_files= dir('p*calib*');
@@ -20,8 +20,10 @@ if useInvFIR
         end
     end
     rdd;
-    doInvCalib= ~newCalib;
+    doInvCalib= ~newCalib; % if not new (means old => coef-file exists), then run inverse calibration
     coefFileNum= run_invCalib(doInvCalib);
+else 
+    newCalib= true;
 end
 
 %%

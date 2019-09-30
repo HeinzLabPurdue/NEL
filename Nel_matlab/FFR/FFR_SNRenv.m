@@ -2,7 +2,7 @@ function h_fig = FFR_SNRenv(command_str,eventdata)
 
 % ge debug ABR 26Apr2004: replace "FFR" with more generalized nomenclature, throughout entire system.
 
-global RP PROG FIG Stimuli FFR_Gating root_dir prog_dir Display NelData
+global RP PROG FIG Stimuli FFR_Gating root_dir prog_dir Display NelData 
 %Stimuli.OLDDir
 % global fc fm pol dur
 prog_dir = [root_dir 'FFR\'];
@@ -308,7 +308,15 @@ elseif strcmp(command_str,'YLim')
     set(FIG.edit.yscale,'string', num2str(Display.YLim_atAD));
     
 elseif strcmp(command_str,'invCalib')
-    [~, Stimuli.calibPicNum]= run_invCalib(get(FIG.radio.invCalib,'value'));
+    if NelData.General.RP2_3and4
+        [~, Stimuli.calibPicNum]= run_invCalib(get(FIG.radio.invCalib,'value'));
+    elseif isnan(Stimuli.calibPicNum)
+        cdd;
+        allCalibFiles= dir('*calib*raw*');
+        Stimuli.calibPicNum= getPicNum(allCalibFiles(end).name);
+        Stimuli.calibPicNum= str2double(inputdlg('Enter Calibration File Number','Load Calib File', 1,{num2str(Stimuli.calibPicNum)}));
+        rdd;
+    end
     [sig, fs] =audioread([Stimuli.UPDdir Stimuli.filename]);
     curDir= pwd;
     cdd; 
@@ -319,7 +327,9 @@ elseif strcmp(command_str,'invCalib')
     set(FIG.asldr.SPL,'string',sprintf('%.1f dB SPL',Stimuli.calib_dBSPLout-abs(str2double(get(FIG.asldr.val, 'string')))));
     
 elseif strcmp(command_str,'close')
-    run_invCalib(false); % Initialize with allpass RP2_3
+    if NelData.General.RP2_3and4
+        run_invCalib(false); % Initialize with allpass RP2_3
+    end
     set(FIG.push.close,'Userdata',1);
     cd([NelData.General.RootDir 'Nel_matlab\nel_general']);
 end

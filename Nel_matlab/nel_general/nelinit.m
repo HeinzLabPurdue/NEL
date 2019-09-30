@@ -60,5 +60,20 @@ NelData.UnSaved = [];
 NelData.General.WindowsUserName = char(java.lang.System.getProperty('user.name'));
 NelData.General.WindowsHostName = char(java.net.InetAddress.getLocalHost.getHostName);
 NelData.General.RootDir= [fileparts(fileparts(pwd)) filesep];
+%% check how many RP2s
+figure(314);
+RPtemp= actxcontrol('RPco.x',[0 0 1 1]);
+e1=invoke(RPtemp,'Connect', 4, 1);
+e2=invoke(RPtemp,'Connect', 4, 2);
+e3=invoke(RPtemp,'Connect', 4, 3);
+e4=invoke(RPtemp,'Connect', 4, 4);
+if (e1&&e2) && (e3&&e4) % All RP2s connected
+    NelData.General.RP2_3and4= true; % RP2- 3 and 4 exist
+elseif (e1&&e2) && ~(e3||e4) % RP2s (1 and 2) connected, 3 and 4 do not exist 
+    NelData.General.RP2_3and4= false; % RP2- 3 and 4 do not exist
+else % Why is this happening
+    NelData.General.RP2_3and4= nan; % Error
+end
+close(314);
 
 nel;

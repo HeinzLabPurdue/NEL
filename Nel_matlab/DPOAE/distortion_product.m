@@ -75,7 +75,9 @@ if ~strcmp(command_str,'initialize')		%you're returning via callback, retrieve f
     h_text6b = handles(22);
     
     dpoaedata= get(h_push_start,'Userdata');
-    run_invCalib(false); % DPOAEs play 2 tones: easier to use raw-calib file with an allpass system; % SP on 22Sep19
+    if NelData.General.RP2_3and4
+        run_invCalib(false); % DPOAEs play 2 tones: easier to use raw-calib file with an allpass system; % SP on 22Sep19
+    end
     % This means: need to use the last raw calib file
 end
 
@@ -210,6 +212,8 @@ elseif strcmp(command_str,'saveNquit')
     set(h_push_stop,'Userdata','saveNquit');
     
 elseif strcmp(command_str,'close')
-    run_invCalib(false); 
+    if NelData.General.RP2_3and4
+        run_invCalib(false);
+    end
     close('Distortion Product Otoacoustic Emissions');
 end
