@@ -5,11 +5,11 @@ nmic = '168';
 DataFile = 'calib_p121.m';
 
 PAco1=actxcontrol('PA5.x',[0 0 1 1]);
-invoke(PAco1,'Connect',4,1);
+invoke(PAco1, 'ConnectPA5', NelData.General.TDTcommMode, 1);
 invoke(PAco1,'SetAtten',0);
 
 RPco1=actxcontrol('RPco.x',[0 0 1 1]);
-invoke(RPco1,'Connect',4,1);
+invoke(RPco1, 'ConnectPA5', NelData.General.TDTcommMode, 1);
 invoke(RPco1,'LoadCof','C:\matlab_user\srcal_232\object\tone_DAC.rco');
 invoke(RPco1,'Run');
 invoke(RPco1,'SoftTrg',1);
@@ -26,7 +26,7 @@ zcross = find(tone(j-1)<=0 & tone(j)>=0);
 
 npers = 0;
 magSum = 0;
-for k = 2:length(zcross);
+for k = 2:length(zcross)
     wave=tone(zcross(k-1):zcross(k));
     magSum = magSum + max(wave)-min(wave);
     npers = npers + 1;
@@ -35,7 +35,7 @@ end
 v16k = magSum/npers*0.3535;
 
 RPco1=actxcontrol('RPco.x',[0 0 1 1]);
-invoke(RPco1,'Connect',4,1);
+invoke(RPco1, 'ConnectPA5', NelData.General.TDTcommMode, 1);
 invoke(RPco1,'LoadCof','C:\matlab_user\srcal_232\object\noise_DAC.rco');
 invoke(RPco1,'Run');
 invoke(RPco1,'SoftTrg',1);
@@ -58,15 +58,15 @@ freq  = f(FrqRange)/1000;
 data_file = strcat('mic',nmic,'.m');
 command_line = sprintf('%s%s%c','[mic]=',strrep(lower(data_file),'.m',''),';');
 eval(command_line);
-FrqLoc = max(find(mic.CalData(:,1) <= frqcal));
+FrqLoc = find(mic.CalData(:,1) <= frqcal, 1, 'last' );
 dbSPL16k = 20 * log10(v16k) - mic.dBV;
-CalLoc = min(find(freq >=frqcal));
+CalLoc = find(freq >=frqcal, 1 );
 mag16k = dbSPL(CalLoc);
 
 cal = dbSPL16k - mag16k;
 
 for index = 1:length(freq)
-    FrqLoc = max(find(mic.CalData(:,1) <= freq(index)));
+    FrqLoc = find(mic.CalData(:,1) <= freq(index), 1, 'last' );
     dbSPL(index) = dbSPL(index) + mic.CalData(FrqLoc,2) + cal;
 end
 semilogx(freq,dbSPL,'b');

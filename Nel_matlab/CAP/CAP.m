@@ -317,15 +317,18 @@ elseif strcmp(command_str,'audiogram') %KH 10Jan2012
 elseif strcmp(command_str,'clickYes') %KH 10Jan2012
     Stimuli.clickYes = get(FIG.radio.clickYes,'value');
     FIG.NewStim = 16;
-    if Stimuli.clickYes
-        run_invCalib(true); % Initialize with allpass RP2_3
-    else
-        run_invCalib(false); % Initialize with allpass RP2_3
+    if NelData.General.RP2_3and4
+        if Stimuli.clickYes
+            run_invCalib(true); % Initialize with allpass RP2_3
+        else
+            run_invCalib(false); % Initialize with allpass RP2_3
+        end
     end
     
-    
 elseif strcmp(command_str,'close')
-    run_invCalib(false); % Initialize with allpass RP2_3
+    if NelData.General.RP2_3and4
+        run_invCalib(false); % Initialize with allpass RP2_3
+    end
     set(FIG.push.close,'Userdata',1);
 end
 

@@ -6,11 +6,11 @@
 function [coefFileNum, calibPicNum]= run_invCalib(doInvCalib)
 
 %% Connecting to RP2_4
-global COMM root_dir
+global COMM root_dir NelData
 object_dir = [root_dir 'calibration\object'];
 
 COMM.handle.RP2_4= actxcontrol('RPco.x',[0 0 5 5]);
-status3 = invoke(COMM.handle.RP2_4,'Connect',4, 4);
+status3 = invoke(COMM.handle.RP2_4,'ConnectRP2', NelData.General.TDTcommMode, 4);
 invoke(COMM.handle.RP2_4,'LoadCof',[object_dir '\calib_invFIR_right.rcx']);
 
 %% Define appropriate b for invCalib or allPass

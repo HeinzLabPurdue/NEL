@@ -16,7 +16,7 @@ end
 
 %% For stimulus
 RP1=actxcontrol('RPco.x',[0 0 1 1]);
-invoke(RP1,'ConnectRP2','USB',1);
+invoke(RP1,'ConnectRP2',NelData.General.TDTcommMode,1);
 invoke(RP1,'ClearCOF');
 invoke(RP1,'LoadCOF',[prog_dir '\object\CAP_left.rcx']);
 
@@ -42,18 +42,18 @@ invoke(RP1,'Run');
 if NelData.General.RP2_3and4
     %% For bit select (RP2#3 is not connected to Mix/Sel). So have to use RP2#2. May use RP2#1?
     RP2=actxcontrol('RPco.x',[0 0 1 1]);
-    invoke(RP2,'ConnectRP2','USB',2);
+    invoke(RP2,'ConnectRP2',NelData.General.TDTcommMode,2);
     invoke(RP2,'LoadCOF',[prog_dir '\object\CAP_BitSet.rcx']);
     invoke(RP2,'Run');
     
     %% For ADC (data in)
     RP3=actxcontrol('RPco.x',[0 0 1 1]);
-    invoke(RP3,'ConnectRP2','USB',3);
+    invoke(RP3,'ConnectRP2',NelData.General.TDTcommMode,3);
     invoke(RP3,'ClearCOF');
     invoke(RP3,'LoadCOF',[prog_dir '\object\ABR_right.rcx']);
 else
     RP2=actxcontrol('RPco.x',[0 0 1 1]);
-    invoke(RP2,'ConnectRP2','USB',2);
+    invoke(RP2,'ConnectRP2',NelData.General.TDTcommMode,2);
     
     RP3= RP2;
     invoke(RP3,'ClearCOF');
@@ -106,12 +106,7 @@ while isempty(get(FIG.push.close,'Userdata'))
     ylabel('Max AD Voltage (1 rep)','fontsize',12,'FontWeight','Bold');
     box on;
     
-    debugging= 1; % For free-run. runLevel and autolevel: DC shift correction for plotting
-    if debugging
-        demean_flag= 0;
-    else
-        demean_flag= 1;
-    end
+    demean_flag= 0; % set 0 to not demean
     
     
     invoke(RP1,'SoftTrg',1);
@@ -160,7 +155,7 @@ while isempty(get(FIG.push.close,'Userdata'))
         % END: Main body. Excluding interrupt for FIG.push.close or FIG.NewStim
         % ---------------------------------------------------------------------------------------------------------------------------------------
         
-        %% Interruts during freerun
+        %% Interrupts during freerun
         if get(FIG.push.close,'Userdata')
             break;
         elseif FIG.NewStim
@@ -262,7 +257,7 @@ while isempty(get(FIG.push.close,'Userdata'))
                         
                         if (SaveFlag == 0)
                             FIG.NewStim = 0;
-                            rc = PAset([120;120;120;120]);
+                            PAset([120;120;120;120]);
                             break;
                         end
                         
@@ -326,7 +321,7 @@ while isempty(get(FIG.push.close,'Userdata'))
                             if ~DEBUG_FLAG %If NOT debugging
                                 AutoLevel_params.ReRunFlag=0;
                                 picstoSEND_deBUG=[picstoSEND_deBUG, (35)];
-                                global FLAG_RERUN_FOR_ABR_ANALYSIS
+                                global FLAG_RERUN_FOR_ABR_ANALYSIS % Need to remove these global-vars 
                                 FLAG_RERUN_FOR_ABR_ANALYSIS=1;
                                 
                                 picNUMlist=[picNUMlist NelData.File_Manager.picture-fliplr((1:AutoLevel_params.numAttens_1)-1)];

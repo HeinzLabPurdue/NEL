@@ -22,7 +22,7 @@ if NelData.General.RP2_3and4
     invoke(RP3,'Run');
 else
     RP2=actxcontrol('RPco.x',[0 0 1 1]);
-    invoke(RP2,'ConnectRP2','USB',2);
+    invoke(RP2,'ConnectRP2',NelData.General.TDTcommMode,2);
     invoke(RP2,'ClearCOF');
     invoke(RP2,'LoadCOF',[prog_dir '\object\FFR_right2.rcx']);
     invoke(RP2,'SetTagVal','ADdur', FFR_Gating.FFRlength_ms);

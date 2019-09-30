@@ -1,6 +1,6 @@
 %% For stimulus
 RP1=actxcontrol('RPco.x',[0 0 1 1]);
-invoke(RP1,'ConnectRP2','USB',1);
+invoke(RP1,'ConnectRP2',NelData.General.TDTcommMode,1);
 invoke(RP1,'ClearCOF');
 
 invoke(RP1,'LoadCOF',[prog_dir '\object\FFR_wav_polIN.rcx']);
@@ -8,14 +8,14 @@ invoke(RP1,'LoadCOF',[prog_dir '\object\FFR_wav_polIN.rcx']);
 if NelData.General.RP2_3and4
     %% For bit-select
     RP2=actxcontrol('RPco.x',[0 0 1 1]);
-    invoke(RP2,'ConnectRP2','USB',2);
+    invoke(RP2,'ConnectRP2',NelData.General.TDTcommMode,2);
     invoke(RP2,'ClearCOF');
     invoke(RP2,'LoadCOF',[prog_dir '\object\FFR_BitSet.rcx']);
     invoke(RP2,'Run');
     
     %% For ADC (data in)
     RP3=actxcontrol('RPco.x',[0 0 1 1]);
-    invoke(RP3,'ConnectRP2','USB',3);
+    invoke(RP3,'ConnectRP2',NelData.General.TDTcommMode,3);
     invoke(RP3,'ClearCOF');
     % invoke(RP2,'LoadCOF',[prog_dir '\object\FFR_right.rco']); % MH/KH Dec 8 2011
     invoke(RP3,'LoadCOF',[prog_dir '\object\FFR_ADC.rcx']);
@@ -23,7 +23,7 @@ if NelData.General.RP2_3and4
     invoke(RP3,'Run');
 else
     RP2=actxcontrol('RPco.x',[0 0 1 1]);
-    invoke(RP2,'ConnectRP2','USB',2);
+    invoke(RP2,'ConnectRP2',NelData.General.TDTcommMode,2);
     invoke(RP2,'ClearCOF');
     invoke(RP2,'LoadCOF',[prog_dir '\object\FFR_right2.rcx']);
     invoke(RP2,'Run');

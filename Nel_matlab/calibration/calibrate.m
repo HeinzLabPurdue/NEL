@@ -134,9 +134,9 @@ elseif strcmp(command_str,'calibrate')
         % Read amplitude of response
         if ~error && isempty(get(FIG.push.stop,'userdata'))
             converge = 0;
-%             tic;
+            %             tic;
             [error,converge, ~] = TDTdaq;
-%             temp_calib_time=toc;
+            %             temp_calib_time=toc;
         end
         % Correct for probe microphone calibration IF a calibration file was
         % loaded
@@ -149,8 +149,8 @@ elseif strcmp(command_str,'calibrate')
             
             % Track number of completed data points.
             FREQS.ndpnts = FREQS.ndpnts + 1;
-%             raw_data{FREQS.ndpnts}= ADdata_V_raw;
-%             calib_time(FREQS.ndpnts)= temp_calib_time;
+            %             raw_data{FREQS.ndpnts}= ADdata_V_raw;
+            %             calib_time(FREQS.ndpnts)= temp_calib_time;
             
             % Save data in buffer arrays.
             DDATA(FREQS.ndpnts,1) = FREQS.freq;  % current frequency in kHz
@@ -247,7 +247,7 @@ elseif strcmp(command_str,'calibrate')
         
         NelData=make_calib_text_file(fname, NelData, Stimuli, comment, PROG, DDATA, SRdata);
         %update_params;
-%         filename = current_data_file('calib'); %strcat(FILEPREFIX,num2str(FNUM),'.m');
+        %         filename = current_data_file('calib'); %strcat(FILEPREFIX,num2str(FNUM),'.m');
         uiresume; % Allow Nel's main window to update the Title
         if newCalib
             [~, temp_picName] = fileparts(fname);
@@ -295,6 +295,8 @@ elseif strcmp(command_str,'recall')
     drawnow;
     
 elseif strcmp(command_str,'close')
-    coefFileNum= run_invCalib(false);
+    if NelData.General.RP2_3and4
+        coefFileNum= run_invCalib(false);
+    end
     delete(FIG.handle);
 end

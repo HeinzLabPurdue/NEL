@@ -6,12 +6,12 @@ volts = 0;
 
 PAco1=actxcontrol('PA5.x',[0 0 1 1]);
 for dev = 1:2
-    invoke(PAco1,'ConnectPA5','GB',dev);
+    invoke(PAco1,'ConnectPA5',NelData.General.TDTcommMode,dev);
     invoke(PAco1,'SetAtten',120.0);
 end
 
 RPco1=actxcontrol('RPco.x',[0 0 1 1]);
-invoke(RPco1,'ConnectRP2','GB',1);
+invoke(RPco1,'ConnectRP2',NelData.General.TDTcommMode,1);
 if Stimuli.freq_hz,
     invoke(RPco1,'LoadCof',fullfile(prog_dir,'object','set_tone.rco'));
     invoke(RPco1,'SetTagVal','freq',Stimuli.freq_hz);
@@ -23,7 +23,7 @@ end
 invoke(RPco1,'SetTagVal','chan',Stimuli.chan);
 invoke(RPco1,'Run');
 
-invoke(PAco1,'ConnectPA5','GB',Stimuli.chan);
+invoke(PAco1,'ConnectPA5',NelData.General.TDTcommMode,Stimuli.chan);
 invoke(PAco1,'SetAtten',Stimuli.atten);
 
 tic;
@@ -50,13 +50,13 @@ while ~length(get(FIG.push.edit,'Userdata')),
                 invoke(RPco1,'SetTagVal','HiCutOff',Stimuli.high);
             end
             invoke(RPco1,'SetTagVal','chan',Stimuli.chan);
-            invoke(PAco1,'ConnectPA5','GB',Stimuli.chan);
+            invoke(PAco1,'ConnectPA5',NelData.General.TDTcommMode,Stimuli.chan);
             invoke(PAco1,'SetAtten',Stimuli.atten);
-            invoke(PAco1,'ConnectPA5','GB',mod(Stimuli.chan,2)+1);
+            invoke(PAco1,'ConnectPA5',NelData.General.TDTcommMode,mod(Stimuli.chan,2)+1);
             invoke(PAco1,'SetAtten',120.0);
             invoke(RPco1,'Run');
         case 2
-            invoke(PAco1,'ConnectPA5','GB',Stimuli.chan);
+            invoke(PAco1,'ConnectPA5',NelData.General.TDTcommMode,Stimuli.chan);
             invoke(PAco1,'SetAtten',Stimuli.atten);
         case 3
             num_freqs = 0;
@@ -97,7 +97,7 @@ end
 invoke(RPco1,'Halt');
 
 for dev = 1:2
-    invoke(PAco1,'ConnectPA5','GB',dev);
+    invoke(PAco1,'ConnectPA5',NelData.General.TDTcommMode,dev);
     invoke(PAco1,'SetAtten',120.0);
 end
 

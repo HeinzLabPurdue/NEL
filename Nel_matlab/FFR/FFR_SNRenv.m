@@ -9,11 +9,11 @@ prog_dir = [root_dir 'FFR\'];
 
 if strcmp(NelData.General.WindowsHostName, '1353lyl303501d') % means NEL1
     RP1=actxcontrol('RPco.x',[0 0 1 1]);
-    invoke(RP1,'ConnectRP2','USB',1);
+    invoke(RP1,'ConnectRP2',NelData.General.TDTcommMode,1);
     RP2=actxcontrol('RPco.x',[0 0 1 1]);
-    invoke(RP2,'ConnectRP2','USB',2);
+    invoke(RP2,'ConnectRP2',NelData.General.TDTcommMode,2);
     RP3=actxcontrol('RPco.x',[0 0 1 1]);
-    invoke(RP3,'ConnectRP2','USB',3);
+    invoke(RP3,'ConnectRP2',NelData.General.TDTcommMode,3);
 else % means NEL2??
     RP1= RP.activeX;        %MW10062016  use global control object rather than reinitialize
     RP2 = RP1;      %MW10062016  only one device with RX8

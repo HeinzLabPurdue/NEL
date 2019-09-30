@@ -6,18 +6,18 @@ set(FIG.ax2.ProgMess,'String','Measuring amplitude of reference tone...');
 drawnow;
 
 PAco1=actxcontrol('PA5.x',[0 0 1 1]);
-invoke(PAco1,'ConnectPA5','GB',1);
+invoke(PAco1,'ConnectPA5',NelData.General.TDTcommMode,1);
 invoke(PAco1,'SetAtten',Stimuli.attencal);
 
 RPco1=actxcontrol('RPco.x',[0 0 1 1]);
-invoke(RPco1,'ConnectRP2','GB',1);
+invoke(RPco1,'ConnectRP2',NelData.General.TDTcommMode,1);
 invoke(RPco1,'LoadCof',fullfile(root_dir,'calibrate','object','tone_DAC.rco'));
 invoke(RPco1,'Run');
 invoke(RPco1,'SoftTrg',1);
 
 tic;
 while toc < 2
-    if length(get(FIG.push.stop,'Userdata'))
+    if ~isempty(get(FIG.push.stop,'Userdata'))
         invoke(RPco1,'Halt');
         invoke(PAco1,'SetAtten',120);
         set(FIG.ax2.ProgMess,'String','Aborting QuickCal...');
@@ -40,7 +40,7 @@ zcross = find(tone(j-1)<=0 & tone(j)>=0);
 
 npers = 0;
 magSum = 0;
-for k = 2:length(zcross);
+for k = 2:length(zcross)
     wave=tone(zcross(k-1):zcross(k));
     magSum = magSum + max(wave)-min(wave);
     npers = npers + 1;
@@ -52,14 +52,14 @@ set(FIG.ax2.ProgMess,'String','Measuring speaker transfer function...');
 drawnow;
 
 RPco1=actxcontrol('RPco.x',[0 0 1 1]);
-invoke(RPco1,'ConnectRP2','GB',1);
+invoke(RPco1,'ConnectRP2',NelData.General.TDTcommMode,1);
 invoke(RPco1,'LoadCof',fullfile(root_dir,'calibrate','object','noise_DAC.rco'));
 invoke(RPco1,'Run');
 invoke(RPco1,'SoftTrg',1);
 
 tic;
 while toc < 5
-    if length(get(FIG.push.stop,'Userdata'))
+    if ~isempty(get(FIG.push.stop,'Userdata'))
         invoke(RPco1,'Halt');
         invoke(PAco1,'SetAtten',120);
         set(FIG.ax2.ProgMess,'String','Aborting QuickCal...');
@@ -90,15 +90,15 @@ drawnow;
 data_file = strcat('mic',Stimuli.nmic,'.m');
 command_line = sprintf('%s%s%c','[mic]=',strrep(lower(data_file),'.m',''),';');
 eval(command_line);
-FrqLoc = max(find(mic.CalData(:,1) <= Stimuli.frqcal));
+% FrqLoc = find(mic.CalData(:,1) <= Stimuli.frqcal, 1, 'last' );
 dbSPL16k = 20 * log10(v16k) - mic.dBV;
-CalLoc = min(find(freq >=Stimuli.frqcal));
+CalLoc = find(freq >=Stimuli.frqcal, 1 );
 mag16k = dbSPL(CalLoc);
 
 cal = dbSPL16k - mag16k;
 
 for index = 1:length(freq)
-    FrqLoc = max(find(mic.CalData(:,1) <= freq(index)));
+    FrqLoc = find(mic.CalData(:,1) <= freq(index), 1, 'last' );
     dbSPL(index) = dbSPL(index) + mic.CalData(FrqLoc,2) + cal;
 end
 

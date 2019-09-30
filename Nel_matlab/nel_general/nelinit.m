@@ -60,20 +60,35 @@ NelData.UnSaved = [];
 NelData.General.WindowsUserName = char(java.lang.System.getProperty('user.name'));
 NelData.General.WindowsHostName = char(java.net.InetAddress.getLocalHost.getHostName);
 NelData.General.RootDir= [fileparts(fileparts(pwd)) filesep];
-%% check how many RP2s
+
+
+%% Initialize NelData.General.**flags** to check
+% if RP2 or RX8
+% if USB or GB: assuming same connection mode for both RP2s and PA5s
+% if 2 or 4 RP2s
 figure(314);
 RPtemp= actxcontrol('RPco.x',[0 0 1 1]);
-e1=invoke(RPtemp,'Connect', 4, 1);
-e2=invoke(RPtemp,'Connect', 4, 2);
-e3=invoke(RPtemp,'Connect', 4, 3);
-e4=invoke(RPtemp,'Connect', 4, 4);
-if (e1&&e2) && (e3&&e4) % All RP2s connected
+yesUSB= invoke(RPtemp,'ConnectRP2', 'USB', 1);
+yesGB= invoke(RPtemp,'ConnectRP2', 'GB', 1);
+if yesUSB && ~yesGB
+    NelData.General.TDTcommMode= 'USB';
+elseif yesGB && ~yesUSB
+    NelData.General.TDTcommMode= 'GB';
+end
+
+% Assuming RP2s only: will be different for RX8
+% Check how many RP2s
+yesRP1=invoke(RPtemp,'ConnectRP2', NelData.General.TDTcommMode, 1);
+yesRP2=invoke(RPtemp,'ConnectRP2', NelData.General.TDTcommMode, 2);
+yesRP3=invoke(RPtemp,'ConnectRP2', NelData.General.TDTcommMode, 3);
+yesRP4=invoke(RPtemp,'ConnectRP2', NelData.General.TDTcommMode, 4);
+if (yesRP1&&yesRP2) && (yesRP3&&yesRP4) % All RP2s connected
     NelData.General.RP2_3and4= true; % RP2- 3 and 4 exist
-elseif (e1&&e2) && ~(e3||e4) % RP2s (1 and 2) connected, 3 and 4 do not exist 
+elseif (yesRP1&&yesRP2) && ~(yesRP3||yesRP4) % RP2s (1 and 2) connected, 3 and 4 do not exist
     NelData.General.RP2_3and4= false; % RP2- 3 and 4 do not exist
 else % Why is this happening
     NelData.General.RP2_3and4= nan; % Error
 end
 close(314);
-
+%%
 nel;

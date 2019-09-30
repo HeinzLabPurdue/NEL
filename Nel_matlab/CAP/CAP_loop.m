@@ -15,7 +15,7 @@ end
 
 %% For stimulus 
 RP1=actxcontrol('RPco.x',[0 0 1 1]);
-invoke(RP1,'ConnectRP2','USB',1);
+invoke(RP1,'ConnectRP2',NelData.General.TDTcommMode,1);
 invoke(RP1,'ClearCOF');
 invoke(RP1,'LoadCOF',[prog_dir '\object\CAP_left.rcx']);
 
@@ -30,26 +30,37 @@ invoke(RP1,'SetTagVal','StmOff',CAP_Gating.period_ms-CAP_Gating.duration_ms);
 invoke(RP1,'SetTagVal','RiseFall',CAP_Gating.rftime_ms);
 invoke(RP1,'Run');
 
-%% For bit select (RP2#3 is not connected to Mix/Sel). So have to use RP2#2. May use RP2#1? 
-RP2=actxcontrol('RPco.x',[0 0 1 1]);
-invoke(RP2,'ConnectRP2','USB',2);
-invoke(RP2,'LoadCOF',[prog_dir '\object\CAP_BitSet.rcx']); 
-invoke(RP2,'Run');
-
-%% For ADC (data in)
-RP3=actxcontrol('RPco.x',[0 0 1 1]);
-invoke(RP3,'ConnectRP2','USB',3);
-invoke(RP3,'ClearCOF');
-if strcmpi(interface_type, 'CAP')
-    invoke(RP3,'LoadCOF',[prog_dir '\object\CAP_ADC.rcx']); 
-    % Only difference: Input Channel number
-    % For CAP: AD chan #1
-else % ABR
-    invoke(RP3,'LoadCOF',[prog_dir '\object\ABR_right.rcx']);
-    % For ABR: AD chan #2
+if NelData.General.RP2_3and4
+    %% For bit select (RP2#3 is not connected to Mix/Sel). So have to use RP2#2. May use RP2#1?
+    RP2=actxcontrol('RPco.x',[0 0 1 1]);
+    invoke(RP2,'ConnectRP2',NelData.General.TDTcommMode,2);
+    invoke(RP2,'ClearCOF');
+    invoke(RP2,'LoadCOF',[prog_dir '\object\CAP_BitSet.rcx']);
+    invoke(RP2,'Run');
+    
+    %% For ADC (data in)
+    RP3=actxcontrol('RPco.x',[0 0 1 1]);
+    invoke(RP3,'ConnectRP2',NelData.General.TDTcommMode,3);
+    invoke(RP3,'ClearCOF');
+    if strcmpi(interface_type, 'CAP')
+        invoke(RP3,'LoadCOF',[prog_dir '\object\CAP_ADC.rcx']);
+        % Only difference: Input Channel number
+        % For CAP: AD chan #1
+    else % ABR
+        invoke(RP3,'LoadCOF',[prog_dir '\object\ABR_right.rcx']);
+        % For ABR: AD chan #2
+    end
+    invoke(RP3,'SetTagVal','ADdur', CAP_Gating.CAPlength_ms);
+    invoke(RP3,'Run');
+else
+    RP2=actxcontrol('RPco.x',[0 0 1 1]);
+    invoke(RP2,'ConnectRP2',NelData.General.TDTcommMode,2);
+    invoke(RP2,'ClearCOF');
+    RP3= RP2;
+    invoke(RP3,'LoadCOF',[prog_dir '\object\CAP_right.rcx']);
+    invoke(RP3,'SetTagVal','ADdur', CAP_Gating.CAPlength_ms);
+    invoke(RP3,'Run');
 end
-invoke(RP3,'SetTagVal','ADdur', CAP_Gating.CAPlength_ms);
-invoke(RP3,'Run');
 
 CAP_set_attns(Stimuli.atten_dB,Stimuli.channel,Stimuli.KHosc,RP1,RP2);  %% debug deal with later Khite
 CAPnpts=ceil(CAP_Gating.CAPlength_ms/1000*Stimuli.RPsamprate_Hz);
