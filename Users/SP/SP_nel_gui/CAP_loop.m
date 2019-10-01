@@ -22,7 +22,6 @@ invoke(RP1,'LoadCOF',[prog_dir '\object\CAP_left.rcx']);
 
 % if get(FIG.radio.tone,'value')
 invoke(RP1,'SetTagVal','freq',Stimuli.freq_hz);
-invoke(RP1,'SetTagVal','tone',1);
 invoke(RP1,'SetTagVal','FixedPhase',Stimuli.fixedPhase);
 invoke(RP1,'SetTagVal','toneAmp',toneAmp); %KH 06Jan2012
 invoke(RP1,'SetTagVal','clickAmp',clickAmp); %KH 06Jan2012
