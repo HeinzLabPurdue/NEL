@@ -1,6 +1,6 @@
 %TDT Calib Instruction Block
 
-
+function Stimuli= get_calib_ins()
 
 Stimuli= struct('frqlo', .05, ...
     'frqhi', 20.000, ...

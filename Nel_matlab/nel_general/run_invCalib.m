@@ -30,11 +30,21 @@ if doInvCalib==1
     end
     [coefFileNum, max_ind] = max(all_Coefs_picNums); % Output#1
     allINVcalFiles= dir(['p*calib*' num2str(coefFileNum) '*']);
-    all_invCal_picNums= cell2mat(cellfun(@(x) sscanf(x, 'p%04f_calib*'), {allINVcalFiles.name}', 'UniformOutput', false));
-    calibPicNum= max(all_invCal_picNums); % Output#2
     
-    temp = load(all_Coefs_Files(max_ind).name);
-    b= temp.b(:)';
+    if ~isempty(allINVcalFiles) % There's both rawCalib and invCalib
+        all_invCal_picNums= cell2mat(cellfun(@(x) sscanf(x, 'p%04f_calib*'), {allINVcalFiles.name}', 'UniformOutput', false));
+        calibPicNum= max(all_invCal_picNums); % Output#2
+        
+        temp = load(all_Coefs_Files(max_ind).name);
+        b= temp.b(:)';
+        doINVcheck= true;
+    else % There's rawCalib but no invCalib
+        % Output #1-2
+        doINVcheck= false;
+        coefFileNum= nan;
+        calibPicNum= max(all_calib_picNums);
+        b= [1 zeros(1, 255)];
+    end
 elseif doInvCalib==0
     % Output #1-2
     coefFileNum= nan;
@@ -60,7 +70,11 @@ cd(curDir);
 e1= COMM.handle.RP2_4.WriteTagV('FIR_Coefs', 0, b);
 if e1 && status3
     if doInvCalib
-        fprintf('invFIR Coefs loaded successfully (%s) \n', datestr(datetime));
+        if doINVcheck
+            fprintf('invFIR Coefs loaded successfully (%s) \n', datestr(datetime));
+        else 
+            fprintf('Running allpass as no invCalib. allpass Coefs loaded successfully (%s) \n', datestr(datetime));
+        end
     else
         fprintf('Allpass Coefs loaded successfully (%s) \n', datestr(datetime));
     end
