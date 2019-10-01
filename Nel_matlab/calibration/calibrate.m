@@ -121,11 +121,12 @@ elseif strcmp(command_str,'calibrate')
     %%%%%%%%%%%%%%%%%%%%%%%%%%
     
     %% Main data collection Loop
+    all_times= [];
     while ~error && isempty(get(FIG.push.stop,'userdata'))
-        %Set up TDT system for next stimulus:
+        tic;%Set up TDT system for next stimulus:
         [error] = setlab;
         FREQS.isinit = 0;
-        
+        all_times(FREQS.ndpnts+1, 1)= toc; tic; %#ok<*AGROW>
         %       %Set proper gain in lock-in (max gain without overload)
         %       if ~error & ~length(get(FIG.push.stop,'userdata'))
         %          [error] = srgain;
@@ -133,9 +134,8 @@ elseif strcmp(command_str,'calibrate')
         
         % Read amplitude of response
         if ~error && isempty(get(FIG.push.stop,'userdata'))
-            %             tic;
             [error,converge, ~] = TDTdaq;
-            %             temp_calib_time=toc;
+            all_times(FREQS.ndpnts+1, 2)=toc; tic; 
         end
         % Correct for probe microphone calibration IF a calibration file was
         % loaded
@@ -159,6 +159,7 @@ elseif strcmp(command_str,'calibrate')
             DDATA(FREQS.ndpnts,3) = COMM.SRdata.rph / pi;								  % is phase re pi radians
             DDATA(FREQS.ndpnts,4) = COMM.SRdata.sem;                                     % error of COMM.SRdata.rmag sample
             if FREQS.ndpnts == 1, iseq = 1; end
+            all_times(FREQS.ndpnts+1, 3)=toc; tic;
             if Stimuli.cal
                 [error] = calspl(iseq);
                 if ~isempty(COMM.SRdata.dbspl)
@@ -205,6 +206,7 @@ elseif strcmp(command_str,'calibrate')
             set(FIG.ax2.ProgMess,'String','Program stopped...');
             set(FIG.push.close,'Userdata',DDATA);
         end
+        all_times(FREQS.ndpnts+1, 4)=toc; 
     end
     % end data collection
   
