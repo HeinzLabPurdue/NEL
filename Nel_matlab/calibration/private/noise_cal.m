@@ -4,10 +4,12 @@ frqcal = 16;
 nmic = '168';
 DataFile = 'calib_p121.m';
 
-PAco1=actxcontrol('PA5.x',[0 0 1 1]);
-invoke(PAco1, 'ConnectPA5', NelData.General.TDTcommMode, 1);
+% PAco1=actxcontrol('PA5.x',[0 0 1 1]);
+% invoke(PAco1, 'ConnectPA5', NelData.General.TDTcommMode, 1);
+PAco1= connect_tdt('PA5', 1);
 invoke(PAco1,'SetAtten',0);
 
+% Why RPco1 is called using 'ConnectPA5'?? SP on 10/1/19
 RPco1=actxcontrol('RPco.x',[0 0 1 1]);
 invoke(RPco1, 'ConnectPA5', NelData.General.TDTcommMode, 1);
 invoke(RPco1,'LoadCof','C:\matlab_user\srcal_232\object\tone_DAC.rco');
