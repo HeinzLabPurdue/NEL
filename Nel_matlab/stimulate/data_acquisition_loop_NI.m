@@ -100,6 +100,11 @@ if (isfield(NelData.General,'Pulse'))
     end
 end
 
+% SP/MH: Oct2 2019 turn on FIR inverse Calib filtering
+disp('HERE START'); 
+% ding
+[~,block_info.invCALIBpic]=run_invCalib(true);
+
 %% Attens and SwitchBox code
 stim_info.attens_devices = stim_info.attens_devices .* DAL.Mix;
 if (~isstruct(stim_info))
@@ -567,6 +572,11 @@ SBset([],[]);
 if (rc ~= 1)
     nelerror('''STM'': Error(s) detected within stimulus presentation loop');
 end
+
+% SP/MH: Oct2 2019 turn off FIR inverse Calib filtering
+disp('HERE END'); 
+% ding
+run_invCalib(false);
 
 % MH:11Nov2004  This is a bit of a hack, but is needed to generalize the use of nstim in showing Number of Spikes / Condition
 global nstim

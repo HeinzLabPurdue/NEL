@@ -21,7 +21,8 @@ if useInvFIR
     end
     rdd;
     doInvCalib= ~newCalib; % if not new (means old => coef-file exists), then run inverse calibration
-    coefFileNum= run_invCalib(doInvCalib);
+    forceCalib= true;
+    coefFileNum= run_invCalib(doInvCalib, forceCalib);
 else
     newCalib= true;
 end

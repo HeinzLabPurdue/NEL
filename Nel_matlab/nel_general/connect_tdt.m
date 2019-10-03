@@ -18,6 +18,7 @@ for devNum= 1:numel(deviceNumbers)
             else
                 TDTout=actxcontrol('RPco.x', [0 0 1 1]);
                 status= TDTout.ConnectRP2(NelData.General.TDTcommMode, deviceNumbers);
+                RP(devNum).activeX= TDTout;
             end
         case {'PA', 'PA5'}
             if deviceNumbers <= numel(PA)
@@ -26,6 +27,7 @@ for devNum= 1:numel(deviceNumbers)
             else
                 TDTout=actxcontrol('PA5.x', [0 0 1 1]);
                 status= TDTout.ConnectPA5(NelData.General.TDTcommMode, deviceNumbers);
+                PA(devNum).activeX= TDTout;
             end
     end
     varargout{2*devNum-1}= TDTout;

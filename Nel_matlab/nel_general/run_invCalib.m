@@ -2,8 +2,14 @@
 % if doInvCalib= 0, all pass
 % if doInvCalib= 1, inverse calib based on last coef* file
 % if doInvCalib= -1, query allpass or invFIR
+% forceDO: should be set to 1 for only when running invCalib after rawCalib
 
-function [coefFileNum, calibPicNum]= run_invCalib(doInvCalib)
+
+function [coefFileNum, calibPicNum]= run_invCalib(doInvCalib, forceDO)
+
+if ~exist('forceDO', 'var')
+    forceDO= false;
+end
 
 %% Connecting to RP2_4
 global COMM root_dir NelData
@@ -31,7 +37,7 @@ if doInvCalib==1
     [coefFileNum, max_ind] = max(all_Coefs_picNums); % Output#1
     allINVcalFiles= dir(['p*calib*' num2str(coefFileNum) '*']);
     
-    if ~isempty(allINVcalFiles) % There's both rawCalib and invCalib
+    if ~isempty(allINVcalFiles)|| forceDO % There's both rawCalib and invCalib
         all_invCal_picNums= cell2mat(cellfun(@(x) sscanf(x, 'p%04f_calib*'), {allINVcalFiles.name}', 'UniformOutput', false));
         calibPicNum= max(all_invCal_picNums); % Output#2
         
@@ -74,6 +80,8 @@ if e1 && status3
             fprintf('invFIR Coefs loaded successfully (%s) \n', datestr(datetime));
         else 
             fprintf('Running allpass as no invCalib. allpass Coefs loaded successfully (%s) \n', datestr(datetime));
+            warn_handle= warndlg('Running allpass as no invCalib', 'Run invCalib?');
+            uiwait(warn_handle);
         end
     else
         fprintf('Allpass Coefs loaded successfully (%s) \n', datestr(datetime));
