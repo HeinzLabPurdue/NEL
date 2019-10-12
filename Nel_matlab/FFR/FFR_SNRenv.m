@@ -2,18 +2,25 @@ function h_fig = FFR_SNRenv(command_str,eventdata)
 
 % ge debug ABR 26Apr2004: replace "FFR" with more generalized nomenclature, throughout entire system.
 
-global RP PROG FIG Stimuli FFR_Gating root_dir prog_dir Display NelData 
+global RP PROG FIG Stimuli FFR_Gating root_dir prog_dir Display NelData
 %Stimuli.OLDDir
 % global fc fm pol dur
 prog_dir = [root_dir 'FFR\'];
 
 if strcmp(NelData.General.WindowsHostName, '1353lyl303501d') % means NEL1
-    RP1=actxcontrol('RPco.x',[0 0 1 1]);
-    invoke(RP1,'ConnectRP2',NelData.General.TDTcommMode,1);
-    RP2=actxcontrol('RPco.x',[0 0 1 1]);
-    invoke(RP2,'ConnectRP2',NelData.General.TDTcommMode,2);
-    RP3=actxcontrol('RPco.x',[0 0 1 1]);
-    invoke(RP3,'ConnectRP2',NelData.General.TDTcommMode,3);
+    %     RP1=actxcontrol('RPco.x',[0 0 1 1]);
+    %     invoke(RP1,'ConnectRP2',NelData.General.TDTcommMode,1);
+    RP1= connect_tdt('RP2', 1);
+    %     RP2=actxcontrol('RPco.x',[0 0 1 1]);
+    %     invoke(RP2,'ConnectRP2',NelData.General.TDTcommMode,2);
+    RP2= connect_tdt('RP2', 2);
+    %     RP3=actxcontrol('RPco.x',[0 0 1 1]);
+    %     invoke(RP3,'ConnectRP2',NelData.General.TDTcommMode,3);
+    if NelData.General.RP2_3and4
+        RP3= connect_tdt('RP2', 3);  %#ok<*NASGU>
+    else 
+        RP3= RP2; 
+    end
 else % means NEL2??
     RP1= RP.activeX;        %MW10062016  use global control object rather than reinitialize
     RP2 = RP1;      %MW10062016  only one device with RX8
@@ -130,8 +137,8 @@ elseif strcmp(command_str,'update_stim')
         Stimuli.fast.FFRlength_ms= Stimuli.fast.duration_ms+300;
 
         Stimuli.slow.duration_ms= round(length(xp)/fsp*1e3);
-        Stimuli.slow.XendPlot_ms= Stimuli.fast.duration_ms+300;
-        Stimuli.slow.FFRlength_ms= Stimuli.fast.duration_ms+300;
+        Stimuli.slow.XendPlot_ms= Stimuli.fast.duration_ms+200;
+        Stimuli.slow.FFRlength_ms= Stimuli.fast.duration_ms+200;
 
         if get(FIG.radio.fast, 'value') % Fast
             Stimuli.fast.period_ms= Stimuli.fast.duration_ms+500;
