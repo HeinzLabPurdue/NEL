@@ -10,13 +10,13 @@ global devices_names_vector COMM
 rc = 1;
 
 kh_flag = 0;
-if ((kh_flag==2) & ~isempty(strmatch('KH-oscillator', devices_names_vector,'exact')))
+if ((kh_flag==2) && ~isempty(strmatch('KH-oscillator', devices_names_vector,'exact')))
    devices = nel_devices_vector('kh');
 else
    devices = nel_devices_vector('1.1');
 end
 
-attens_devices = repmat(NaN,length(devices),2);
+attens_devices = NaN(length(devices),2);
 if (bitget(ear,1)) % Left
    attens_devices(:,2) = devices;
 end

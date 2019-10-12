@@ -2,7 +2,7 @@
 %North Chamber Version 1.0
 
 frqlo   = 0.200;			%low frequency (in kHz) bounds for data
-frqhi   = 7.000;			%high frequency (in kHz) bounds for data
+frqhi   =11.000;			%high frequency (in kHz) bounds for data
 fstlin  =     0;			% # of linear frequency steps (set = 0 for log steps)
 fstoct  =    -9;			% # of log freq. steps (per oct. OR per 10-dB BW for Qspaced) (= 0 for lin steps; NEGATIVE for Qspaced)
 attlo   =    20;			%low atten (in dB atten) for auto tracking

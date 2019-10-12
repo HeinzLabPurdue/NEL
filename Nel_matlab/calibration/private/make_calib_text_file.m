@@ -38,8 +38,6 @@ x.Line    = [];
 
 DDATA = DDATA(1:find(DDATA(:,1)<=0, 1)-1,:);
 x.CalibData = DDATA;
-% x.RawData= cell2mat(raw_data(cellfun(@(x) ~isempty(x), raw_data)));
-% x.calib_time= calib_time;
 x.User = [];
 
 x.Hardware.mic        = Stimuli.nmic;

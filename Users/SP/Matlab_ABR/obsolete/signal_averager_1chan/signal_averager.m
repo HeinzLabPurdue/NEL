@@ -91,13 +91,13 @@ elseif strcmp(command_str,'average')
     set(FIG.ax1.line1,'XData',AVdata(:,1),'YData',AVdata(:,4));
     
     PAco1=actxcontrol('PA5.x',[0 0 1 1]);
-    invoke(PAco1,'Connect',4,1);
+    invoke(PAco1,'ConnectPA5',NelData.General.TDTcommMode,1);
     invoke(PAco1,'SetAtten',Stimuli.db_atten);
-    invoke(PAco1,'Connect',4,2);
+    invoke(PAco1,'ConnectPA5',NelData.General.TDTcommMode,2);
     invoke(PAco1,'SetAtten',120.0);
     
     RPco1=actxcontrol('RPco.x',[0 0 1 1]);
-    invoke(RPco1,'Connect',4,1);
+    invoke(RPco1,'ConnectRP',NelData.General.TDTcommMode,1);
     if Stimuli.freq_hz
         invoke(RPco1,'LoadCof',fullfile(root_dir,'signal_averager','object','ComboTones.rco'));
         invoke(RPco1,'SetTagVal','freq',Stimuli.freq_hz);

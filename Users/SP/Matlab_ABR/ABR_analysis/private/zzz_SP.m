@@ -8,6 +8,8 @@ global abr_Stimuli ...
 num=length(pic);
 
 clear global 'reff'
+warn_state= warning('query');
+warning off;
 
 data.threshold=NaN; 
 data.z.intercept=NaN; 
@@ -42,25 +44,25 @@ if exist(hhh.name,'file')
 		abr(:,i)=x.AD_Data.AD_Avg_V(1:end-1)'-mean(x.AD_Data.AD_Avg_V(1:end-1)); % removes DC offset
 	end
 else
-	for i=1:num
-		fname=dir(sprintf('p%04d*',pic(i)));
-		filename=fname.name(1:end-2);
-		eval(['x=' filename ';'])
-		freqs(1,i)=x.Stimuli.freq_hz;
-		attn(1,i)=-x.Stimuli.atten_dB;
+    for i=1:num
+        fname=dir(sprintf('p%04d*',pic(i)));
+        filename=fname.name(1:end-2);
+        eval(['x=' filename ';'])
+        freqs(1,i)=x.Stimuli.freq_hz;
+        attn(1,i)=-x.Stimuli.atten_dB;
         if iscell(x.AD_Data.AD_Avg_V)
-		    abr(:,i)=(x.AD_Data.AD_Avg_V{1}(1:end-1)-mean(x.AD_Data.AD_Avg_V{1}(1:end-1)))'; % removes DC offset
+            abr(:,i)=(x.AD_Data.AD_Avg_V{1}(1:end-1)-mean(x.AD_Data.AD_Avg_V{1}(1:end-1)))'; % removes DC offset
         else
             abr(:,i)=x.AD_Data.AD_Avg_V(1:end-1)'-mean(x.AD_Data.AD_Avg_V(1:end-1)); % removes DC offset
         end
         
-     end
+    end
 end
 date1=x.General.date; date=[date1(1:2) date1(4:6) date1(8:11)];
 dt=500/x.Stimuli.RPsamprate_Hz; %sampling period after oversampling
 
 %% sort abrs in order of increasing attenuation
-[toss, order]=sort(-attn);
+[~, order]=sort(-attn);
 abr2=abr(:,order); 
 attn=attn(:,order);
 freqs=freqs(:,order);
@@ -103,11 +105,12 @@ norm_low_bound=(lower_y_bound+padvoltage)/(total_volts+total_padvolts);
 %% Template waveform
 txcor=NaN*ones(length(abr)*2-1,abr_Stimuli.num_templates); 
 delay=NaN*ones(1,abr_Stimuli.num_templates);
+delay1= nan(1, abr_Stimuli.num_templates);
 for i=1:abr_Stimuli.num_templates
 	txcor(:,i)=xcorr(abr(:,i),abr(:,1));
-	[toss, delay1(1,i)]=max(txcor(:,i));
+	[~, delay1(1,i)]=max(txcor(:,i));
 	delay(1,i)=(delay1(1,i)-delay1(1,1))*dt;
-	template1(:,1)=abr(bin_of_time(abr_Stimuli.start_template+delay(1,i)):bin_of_time(abr_Stimuli.end_template+delay(1,i)),i);
+	template1(:,1)=abr(round(bin_of_time(abr_Stimuli.start_template+delay(1,i))):round(bin_of_time(abr_Stimuli.end_template+delay(1,i))),i);
 end;
 template=mean(template1,2);
 
@@ -117,7 +120,7 @@ null_xx2=null_xx(length(noise):length(noise)*2-length(template),1);
 peaks=[]; 
 count=0;
 for i=2:length(null_xx2)-1
-   if (null_xx2(i,1)>0) & (null_xx2(i,1)>null_xx2(i-1,1)) & (null_xx2(i,1)>null_xx2(i+1,1))
+   if (null_xx2(i,1)>0) && (null_xx2(i,1)>null_xx2(i-1,1)) && (null_xx2(i,1)>null_xx2(i+1,1))
       count=count+1;
       peaks(count,1)=null_xx2(i,1);
    end;
@@ -146,7 +149,7 @@ bin_of_max=NaN*ones(1,num);
 [data.z.score(1,1),bin_of_max(1,1)]=max(abr_xx2(:,1));
 for i = 2:num
 	add_attn=attn(1,i-1)-attn(1,i); exp_bin=bin_of_max(1,i-1) + bin_of_time(add_attn/40) - 1;
-    [data.z.score(1,i),delay]=max(abr_xx2(exp_bin-bin_of_time(1):exp_bin+bin_of_time(1),i));
+    [data.z.score(1,i),delay]=max(abr_xx2(round(exp_bin-bin_of_time(1)):round(exp_bin+bin_of_time(1),i)));
 	bin_of_max(1,i)=exp_bin-bin_of_time(1)+delay-1;
 end;
 delay_of_max=time_of_bin(bin_of_max);
@@ -173,10 +176,10 @@ data.threshold=(3-b(1,1))/b(2,1);
 
 axis(han.abr_panel,[abr_Stimuli.start abr_Stimuli.end 0 total_volts+total_padvolts]);
 axis(han.peak_panel,[abr_Stimuli.start abr_Stimuli.end 0 total_volts+total_padvolts])
-set(han.abr_panel,'NextPlot','Add','XTick',[abr_Stimuli.start:1:abr_Stimuli.end],...
-	'XGrid','on','YGrid','on','YTick',[0:0.5:total_volts+total_padvolts],'YTickLabel',[])
+set(han.abr_panel,'NextPlot','Add','XTick',abr_Stimuli.start:1:abr_Stimuli.end,...
+	'XGrid','on','YGrid','on','YTick',0:0.5:total_volts+total_padvolts,'YTickLabel',[])
 set(han.peak_panel,'XTick',[abr_Stimuli.start:1:abr_Stimuli.end],...
-	'XGrid','on','YGrid','on','YTick',[0:0.5:total_volts+total_padvolts],'YTickLabel',[])
+	'XGrid','on','YGrid','on','YTick',0:0.5:total_volts+total_padvolts,'YTickLabel',[])
 
 
 %xcor_panel
@@ -197,13 +200,14 @@ for i=1:num
 end;
 
 
-
 for i=1:num
-	data.amp(1,i)=max(abr(bin_of_time(abr_Stimuli.start_template):bin_of_time(abr_Stimuli.end_template),i))...
-			     -min(abr(bin_of_time(abr_Stimuli.start_template):bin_of_time(abr_Stimuli.end_template),i));
-	data.amp_null(1,i)=max(abr(end-bin_of_time(abr_Stimuli.end_template-abr_Stimuli.start_template):end,i))...
-			     -min(abr(end-bin_of_time(abr_Stimuli.end_template-abr_Stimuli.start_template):end,i));
-end;
+	data.amp(1,i)=max(abr(round(bin_of_time(abr_Stimuli.start_template)):round(bin_of_time(abr_Stimuli.end_template),i)))...
+			     -min(abr(round(bin_of_time(abr_Stimuli.start_template)):round(bin_of_time(abr_Stimuli.end_template),i)));
+	data.amp_null(1,i)=max(abr(size(abr,1)-round(bin_of_time(abr_Stimuli.end_template-abr_Stimuli.start_template)):end,i))...
+			     -min(abr(size(abr,1)-round(bin_of_time(abr_Stimuli.end_template-abr_Stimuli.start_template)):end,i));
+end
+
+warning(warn_state.state);
 
 
 ABRmag(1:num,1)=spl'; 
@@ -213,15 +217,15 @@ thresh_mag = mean(ABRmag(:,3)) + 2*std(ABRmag(:,3));
 ABRmag(1:num,4) = thresh_mag;
 ABRmag = sortrows(ABRmag,1);
 yes_thresh = 0;
-for index = 1:num-1,
-   if (ABRmag(index,2) <= thresh_mag) & (ABRmag(index+1,2) >= thresh_mag), %find points that bracket 50% hit rate
+for index = 1:num-1
+   if (ABRmag(index,2) <= thresh_mag) && (ABRmag(index+1,2) >= thresh_mag) %find points that bracket 50% hit rate
       pts = index;
       yes_thresh = 1;
    end
 end
 
 %calculate threshold
-if yes_thresh,
+if yes_thresh
    hi_loc  = ABRmag(pts,  1);
    lo_loc  = ABRmag(pts+1,1);
    hi_resp = ABRmag(pts,  2);

@@ -5,7 +5,7 @@ function rc = PAset(attn)
 
 global PA
 
-if ((length(attn) > 1) & (length(PA) ~= length(attn)))
+if ((length(attn) > 1) && (length(PA) ~= length(attn)))
    nelerror('PAset: incompatable number of PA devices and attenuations');
    rc = -1;
    return;

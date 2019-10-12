@@ -58,7 +58,7 @@ function [error] = calspl(iseq)
 % 	      = 1 if ddata(:,1). can't be found in calibration array.  In this case,
 %		       should not use the current point.
 
-global FIG DDATA CDATA FREQS COMM SRdata
+global FIG DDATA CDATA FREQS COMM 
 
 % Program looks for frequency freq(j) in calibration array CDATA(:,1), starting
 % at CDATA(iseq,1).  If freq(j) doesn't match to within tolerance slop, i.e.
@@ -94,7 +94,7 @@ isntrp = 0;
 if thfreq < 0.01 || thfreq > 100.0, out_of_range = 1; end
 
 if ~out_of_range
-   while round(thfreq*1000)/1000 < round(CDATA(iseq,1)*1000)/1000
+    while round(thfreq*1000)/1000 < round(CDATA(iseq,1)*1000)/1000
       if iseq <= 1, out_of_range = 1; break; end
       iseq = iseq - 1;
    end

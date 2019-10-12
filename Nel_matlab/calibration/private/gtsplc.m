@@ -1,5 +1,5 @@
-function [error] = gtsplc
-global Stimuli FIG CDATA FREQS SRdata
+function [err] = gtsplc
+global Stimuli  CDATA FREQS SRdata
 
 % Subroutine to get acoustic calibration file necessary to correct
 % for microphone/probe tube characteristics.  This version will work
@@ -8,7 +8,7 @@ global Stimuli FIG CDATA FREQS SRdata
 % Calibration data stored in CDATA as ordered quadlets:
 %    CDATA(:,1) - freq
 %    CDATA(:,2) - dBSPL
-%    CDATA(:,3) - RMS voltage 
+%    CDATA(:,3) - RMS voltage
 %    CDATA(:,4) - phase
 % where RMS voltage is the output of the probe tube, microphone, and preamp
 % ensemble at the given frequency (kHz) and dB SPL.  To correct a dB voltage
@@ -40,7 +40,7 @@ global Stimuli FIG CDATA FREQS SRdata
 %	          - 1 if calib file can't be opened, set nmic to 0
 
 % Define data arrays
-error = 0;
+err= 0;
 % Open calibration file
 data_file = strcat('mic',Stimuli.nmic,'.m');
 

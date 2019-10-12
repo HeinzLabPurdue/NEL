@@ -64,9 +64,7 @@ if (exist('stimulus_vals','var') == 1)
         Inloop.params.attens=0;
     end
     stimulus_vals.Inloop.Computed_Attenuation_dB          = Inloop.params.attens;
-    
-    
-    
+
     DAL.funcName = 'data_acquisition_loop_NI'; % added by GE 30oct2003.
     DAL.Inloop = Inloop;
     DAL.Gating = stimulus_vals.Gating;

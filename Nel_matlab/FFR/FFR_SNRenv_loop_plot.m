@@ -50,6 +50,7 @@ FIG.asldr.slider = uicontrol(FIG.handle,'callback','FFR_SNRenv(''slide_atten'');
 FIG.asldr.min    = uicontrol(FIG.handle,'style','text','string',num2str(get(FIG.asldr.slider,'min')),'backgroundcolor',gray_dark,'Units','normalized','position',[.33 .04 .05 .03],'fontsize',10);
 FIG.asldr.max    = uicontrol(FIG.handle,'style','text','string',num2str(get(FIG.asldr.slider,'max')),'backgroundcolor',gray_dark,'Units','normalized','position',[.825 .04 .05 .03],'fontsize',10,'horizontalalignment','right');
 FIG.asldr.val    = uicontrol(FIG.handle,'style','edit','Units','normalized','Userdata',Stimuli.atten_dB,'position',[.5825 .075 .06 .04],'string',num2str(-Stimuli.atten_dB),'fontsize',12,'callback', 'FFR_SNRenv(''slide_atten_text'');');
+FIG.asldr.SPL    = uicontrol(FIG.handle,'style','text','string',sprintf('%.1f dB SPL',0), 'backgroundcolor',[1 1 1],'Units','normalized','position',[.92 .06 .075 .03],'fontsize',10,'horizontalalignment','left');
 
 
 %% LQ 01/31/05 add callback
@@ -77,7 +78,6 @@ FIG.statText.voltDisplay = uicontrol(FIG.handle, 'style', 'text','Units','normal
 FIG.radio.atAD    = uicontrol(FIG.handle,'callback','FFR_SNRenv(''atAD'');', 'style','radio','Enable','on','Units','normalized','position',[.135 .07 .13 .03],'string','at AD;  YLim (AD): ', 'fontsize',12,'BackgroundColor','w','value',strcmp(Display.Voltage,'atAD'));
 FIG.radio.atELEC  = uicontrol(FIG.handle,'callback','FFR_SNRenv(''atELEC'');','style','radio','Enable','on','Units','normalized','position',[.135 .04 .12 .03],'string','at Electrode','fontsize',12,'BackgroundColor','w','value',~strcmp(Display.Voltage,'atAD'));
 FIG.edit.yscale     = uicontrol(FIG.handle,'callback','FFR_SNRenv(''YLim'');','style','edit','Units','normalized','position',[.265 .07 .05 .04],'string',Display.YLim_atAD,'fontsize',12);
-
 
 % FIG.statText.spike_channel =  uicontrol(FIG.handle, 'callback', '', 'style', 'text','Units','normalized', 'position', [.1 .49 .13 .03], 'string', 'spike channel:','fontsize',12,'BackgroundColor','w');   % added by GE 17Jan2003.
 % FIG.popup.spike_channel = uicontrol(FIG.handle, 'callback', 'FFR_SNRenv(''spike_channel'');', 'style', 'popup', 'Enable', 'on','Units','normalized', 'position', [.22 .5 .035 .03], 'string', '1|2|3|4|5|6','fontsize',12,'BackgroundColor','w','value',1);   % added by GE 17Jan2003.

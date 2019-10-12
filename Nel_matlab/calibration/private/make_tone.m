@@ -1,11 +1,11 @@
 function [error] = make_tone()
 
-global object_dir COMM FIG Stimuli newCalib coefFileNum
+global object_dir COMM FIG Stimuli newCalib coefFileNum NelData
 
 error = 0;
 
 %%
-useInvFIR= 1;
+useInvFIR= NelData.General.RP2_3and4; % run Inv calib if RP2:3 and 4 exist
 if useInvFIR
     cdd;
     all_Calib_files= dir('p*calib*');
@@ -20,45 +20,41 @@ if useInvFIR
         end
     end
     rdd;
-    doInvCalib= ~newCalib;
-    coefFileNum= run_invCalib(doInvCalib);
+    doInvCalib= ~newCalib; % if not new (means old => coef-file exists), then run inverse calibration
+    forceCalib= true;
+    coefFileNum= run_invCalib(doInvCalib, forceCalib);
+else
+    newCalib= true;
 end
 
 %%
 if Stimuli.ear == 1 %left ear
     %%
-    COMM.handle.RP2_1 = actxcontrol('RPco.x',[0 0 5 5]);
-    status1 = invoke(COMM.handle.RP2_1,'Connect',4,1);
+    %     COMM.handle.RP2_1 = actxcontrol('RPco.x',[0 0 5 5]);
+    %     status1 = invoke(COMM.handle.RP2_1, 'ConnectRP2', NelData.General.TDTcommMode, 1);
+    [COMM.handle.RP2_1, status1]=connect_tdt('RP2', 1);
     invoke(COMM.handle.RP2_1,'LoadCof',[object_dir '\make_tone_left.rco']);
     invoke(COMM.handle.RP2_1,'SetTagVal','Select',160);
     invoke(COMM.handle.RP2_1,'Run');
     
-    COMM.handle.RP2_2 = actxcontrol('RPco.x',[0 0 5 5]);
-    status2 = invoke(COMM.handle.RP2_2,'Connect',4, 2);
+    %     COMM.handle.RP2_2 = actxcontrol('RPco.x',[0 0 5 5]);
+    %     status2 = invoke(COMM.handle.RP2_2, 'ConnectRP2', NelData.General.TDTcommMode, 2);
+    [COMM.handle.RP2_2, status2 ]=connect_tdt('RP2', 2);
     invoke(COMM.handle.RP2_2,'LoadCof',[object_dir '\make_tone_right_PU.rco']);
     invoke(COMM.handle.RP2_2,'SetTagVal','Select', 56);
     invoke(COMM.handle.RP2_2,'Run');
 else
-    %    COMM.handle.RP2_1 = actxcontrol('RPco.x',[0 0 5 5]);
-    %    status1 = invoke(COMM.handle.RP2_1,'Connect',4,2);
-    %    invoke(COMM.handle.RP2_1,'LoadCof',[object_dir '\make_tone_left.rco']);
-    %    invoke(COMM.handle.RP2_1,'SetTagVal','Select',160);
-    %    invoke(COMM.handle.RP2_1,'Run');
-    %
-    %    COMM.handle.RP2_2 = actxcontrol('RPco.x',[0 0 5 5]);
-    %    status2 = invoke(COMM.handle.RP2_2,'Connect',4,1);
-    %    invoke(COMM.handle.RP2_2,'LoadCof',[object_dir '\make_tone_right_PU.rco']);
-    %    invoke(COMM.handle.RP2_2,'SetTagVal','Select',4);
-    %    invoke(COMM.handle.RP2_2,'Run');
     
-    COMM.handle.RP2_1 = actxcontrol('RPco.x',[0 0 5 5]);
-    status1 = invoke(COMM.handle.RP2_1,'Connect',4,1);
+    %     COMM.handle.RP2_1 = actxcontrol('RPco.x',[0 0 5 5]);
+    %     status1 = invoke(COMM.handle.RP2_1, 'ConnectRP2', NelData.General.TDTcommMode, 1);
+    [COMM.handle.RP2_1, status1]=connect_tdt('RP2', 1);
     invoke(COMM.handle.RP2_1,'LoadCof',[object_dir '\make_tone_left.rco']);
     invoke(COMM.handle.RP2_1,'SetTagVal','Select',56);
     invoke(COMM.handle.RP2_1,'Run');
     
-    COMM.handle.RP2_2 = actxcontrol('RPco.x',[0 0 5 5]);
-    status2 = invoke(COMM.handle.RP2_2,'Connect',4,2);
+    %     COMM.handle.RP2_2 = actxcontrol('RPco.x',[0 0 5 5]);
+    %     status2 = invoke(COMM.handle.RP2_2, 'ConnectRP2', NelData.General.TDTcommMode, 2);
+    [COMM.handle.RP2_2, status2]=connect_tdt('RP2', 2);
     invoke(COMM.handle.RP2_2,'LoadCof',[object_dir '\make_tone_right_PU.rco']);
     invoke(COMM.handle.RP2_2,'SetTagVal','Select',64);
     invoke(COMM.handle.RP2_2,'Run');

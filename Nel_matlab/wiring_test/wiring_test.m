@@ -3,7 +3,7 @@ function varargout = wiring_test(command)
 % the selecter and mixer is correct. Nel users can use this program
 % to make sure the system wiring is working correctly before doing
 % experiment. 
-
+global NelData
 if ~nargin
   handles.fig = figure('NumberTitle','off','Name','Wiring Test For Nel', ...
 		       'Units','normalized','position',[.25 .2 .5 ...
@@ -55,7 +55,7 @@ if ~nargin
 
    % TDT setup
    handles.RP2_1 = actxcontrol('RPco.x',[0 0 1 1],handles.fig);
-   if (invoke(handles.RP2_1,'ConnectRP2','USB',1) == 0)
+   if (invoke(handles.RP2_1,'ConnectRP2',NelData.General.RP2_3and4,1) == 0)
      msgbox('can''t connect to RP2_1');
    end
    invoke(handles.RP2_1,'ClearCOF');
@@ -64,7 +64,7 @@ if ~nargin
    loadwav(handles.RP2_1,'1',which('RP2_1Out1.wav'));   
    loadwav(handles.RP2_1,'2',which('RP2_1Out2.wav'));   
    handles.RP2_2 = actxcontrol('RPco.x',[0 0 1 2],handles.fig);
-   if (invoke(handles.RP2_2,'ConnectRP2','USB',2) == 0)
+   if (invoke(handles.RP2_2,'ConnectRP2',NelData.General.TDTcommMode,2) == 0)
      msgbox('can''t connect to RP2_2');
    end
    invoke(handles.RP2_2,'ClearCOF');
@@ -74,7 +74,7 @@ if ~nargin
    loadwav(handles.RP2_2,'2',which('RP2_2Out2.wav'));   
    for i = 1:4
      handles.PA(i).h = actxcontrol('PA5.x',[0 0 1 1],handles.fig);
-     if (invoke(handles.PA(i).h,'ConnectPA5','USB',i) == 0)
+     if (invoke(handles.PA(i).h,'ConnectPA5',NelData.General.TDTcommMode,i) == 0)
        msgbox(['Failed to connect to PA #' int2str(i)]);       
      end
      invoke(handles.PA(i).h, 'SetAtten', 0); 

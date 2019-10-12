@@ -2,18 +2,18 @@ function h_fig = FFR_SNRenv(command_str,eventdata)
 
 % ge debug ABR 26Apr2004: replace "FFR" with more generalized nomenclature, throughout entire system.
 
-global RP PROG FIG Stimuli FFR_Gating root_dir prog_dir Display NelData
+global RP PROG FIG Stimuli FFR_Gating root_dir prog_dir Display NelData 
 %Stimuli.OLDDir
 % global fc fm pol dur
 prog_dir = [root_dir 'FFR\'];
 
 if strcmp(NelData.General.WindowsHostName, '1353lyl303501d') % means NEL1
     RP1=actxcontrol('RPco.x',[0 0 1 1]);
-    invoke(RP1,'ConnectRP2','USB',1);
+    invoke(RP1,'ConnectRP2',NelData.General.TDTcommMode,1);
     RP2=actxcontrol('RPco.x',[0 0 1 1]);
-    invoke(RP2,'ConnectRP2','USB',2);
+    invoke(RP2,'ConnectRP2',NelData.General.TDTcommMode,2);
     RP3=actxcontrol('RPco.x',[0 0 1 1]);
-    invoke(RP3,'ConnectRP2','USB',3);
+    invoke(RP3,'ConnectRP2',NelData.General.TDTcommMode,3);
 else % means NEL2??
     RP1= RP.activeX;        %MW10062016  use global control object rather than reinitialize
     RP2 = RP1;      %MW10062016  only one device with RX8
@@ -34,11 +34,12 @@ if nargin < 1
     if ~(double(invoke(RP1,'GetTagVal', 'Stage')) == 2)
         FFR_set_attns(-120,-120,Stimuli.channel,Stimuli.KHosc,RP1,RP2); %% Check with MH
     end
-    FFR_SNRenv('invCalib'); % Initialize RP2_4 with InvFilter
     FFR_SNRenv('update_stim', 'spl');
+    FFR_SNRenv('invCalib'); % Initialize RP2_4 with InvFilter
     ffr_snrenv_loop2; % Working
     
 elseif strcmp(command_str,'update_stim')
+    update_gating_flag= false;
     switch eventdata
         case 'spl'
             FIG.NewStim = 2;
@@ -75,6 +76,7 @@ elseif strcmp(command_str,'update_stim')
                 FIG.popup.stims = uicontrol(FIG.handle,'callback', 'FFR_SNRenv(''update_stim'',0);','style', ...
                     'popup','Units' ,'normalized', 'Userdata',Stimuli.filename,'position',[.4 .175 .425 .04], ...
                     'string',({fName.SNRenv_stimlist.name}),'fontsize',12);
+                update_gating_flag= true;
             end
             
         case 'noise_type' % not functional -- remove??
@@ -121,6 +123,24 @@ elseif strcmp(command_str,'update_stim')
     xpr=resample(xp,round(Stimuli.RPsamprate_Hz), fsp);
     audiowrite([Stimuli.UPDdir Stimuli.filename], xpr, round(Stimuli.RPsamprate_Hz));
     copyfile([Stimuli.UPDdir Stimuli.filename],Stimuli.STIMfile,'f');
+    
+    if update_gating_flag % right now, this will update only for dir based, later for all stims
+        Stimuli.fast.duration_ms= round(length(xp)/fsp*1e3);
+        Stimuli.fast.XendPlot_ms= Stimuli.fast.duration_ms+300;
+        Stimuli.fast.FFRlength_ms= Stimuli.fast.duration_ms+300;
+
+        Stimuli.slow.duration_ms= round(length(xp)/fsp*1e3);
+        Stimuli.slow.XendPlot_ms= Stimuli.fast.duration_ms+300;
+        Stimuli.slow.FFRlength_ms= Stimuli.fast.duration_ms+300;
+
+        if get(FIG.radio.fast, 'value') % Fast
+            Stimuli.fast.period_ms= Stimuli.fast.duration_ms+500;
+            FFR_SNRenv('fast');
+        elseif get(FIG.radio.slow, 'value') == 1 % Slow
+            Stimuli.slow.period_ms= Stimuli.fast.duration_ms+1000;
+            FFR_SNRenv('slow');
+        end
+    end
     
 elseif strcmp(command_str,'fast')
     if get(FIG.radio.fast, 'value') == 1
@@ -183,6 +203,7 @@ elseif strcmp(command_str,'slide_atten')
     set(FIG.asldr.val,'string',num2str(-Stimuli.atten_dB));
     %     set_RP_tagvals(RP1, RP2, FFR_SNRenv_Gating, Stimuli);
     FFR_set_attns(Stimuli.atten_dB,-120,Stimuli.channel,Stimuli.KHosc,RP1,RP2); 
+    set(FIG.asldr.SPL,'string',sprintf('%.1f dB SPL',Stimuli.calib_dBSPLout-abs(get(FIG.asldr.slider,'val'))));
     
     % LQ 01/31/05
 elseif strcmp(command_str, 'slide_atten_text')
@@ -201,6 +222,7 @@ elseif strcmp(command_str, 'slide_atten_text')
     end
     FFR_set_attns(Stimuli.atten_dB,-120,Stimuli.channel,Stimuli.KHosc,RP1,RP2); 
     %     set_RP_tagvals(RP1, RP2, FFR_SNRenv_Gating, Stimuli);
+    set(FIG.asldr.SPL,'string',sprintf('%.1f dB SPL',Stimuli.calib_dBSPLout-abs(get(FIG.asldr.slider,'val'))));
     
 elseif strcmp(command_str,'memReps')
     FIG.NewStim = 3;
@@ -286,10 +308,28 @@ elseif strcmp(command_str,'YLim')
     set(FIG.edit.yscale,'string', num2str(Display.YLim_atAD));
     
 elseif strcmp(command_str,'invCalib')
-    [~, Stimuli.calibPicNum]= run_invCalib(get(FIG.radio.invCalib,'value'));
+    if NelData.General.RP2_3and4
+        [~, Stimuli.calibPicNum]= run_invCalib(get(FIG.radio.invCalib,'value'));
+    elseif isnan(Stimuli.calibPicNum)
+        cdd;
+        allCalibFiles= dir('*calib*raw*');
+        Stimuli.calibPicNum= getPicNum(allCalibFiles(end).name);
+        Stimuli.calibPicNum= str2double(inputdlg('Enter Calibration File Number','Load Calib File', 1,{num2str(Stimuli.calibPicNum)}));
+        rdd;
+    end
+    [sig, fs] =audioread([Stimuli.UPDdir Stimuli.filename]);
+    curDir= pwd;
+    cdd; 
+    xx= loadpic(Stimuli.calibPicNum);
+    cd(curDir);
+    calibdata= xx.CalibData;
+    Stimuli.calib_dBSPLout= get_SPL_from_calib(sig, fs, calibdata, false);
+    set(FIG.asldr.SPL,'string',sprintf('%.1f dB SPL',Stimuli.calib_dBSPLout-abs(str2double(get(FIG.asldr.val, 'string')))));
     
 elseif strcmp(command_str,'close')
-    run_invCalib(false); % Initialize with allpass RP2_3
+    if NelData.General.RP2_3and4
+        run_invCalib(false); % Initialize with allpass RP2_3
+    end
     set(FIG.push.close,'Userdata',1);
     cd([NelData.General.RootDir 'Nel_matlab\nel_general']);
 end

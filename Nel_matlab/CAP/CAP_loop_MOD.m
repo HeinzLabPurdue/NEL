@@ -1,7 +1,7 @@
 %global root_dir NelData
 
 RP1=actxcontrol('RPco.x',[0 0 1 1]);
-invoke(RP1,'ConnectRP2','USB',2);
+invoke(RP1,'ConnectRP2',NelData.General.TDTcommMode,2);
 invoke(RP1,'ClearCOF');
 invoke(RP1,'LoadCOF',[prog_dir '\object\CAP_left.rco']);
 
@@ -21,7 +21,7 @@ invoke(RP1,'SetTagVal','RiseFall',CAP_Gating.rftime_ms);
 invoke(RP1,'Run');
 
 RP2=actxcontrol('RPco.x',[0 0 1 1]);
-invoke(RP2,'ConnectRP2','USB',1);
+invoke(RP2,'ConnectRP2',NelData.General.TDTcommMode,1);
 invoke(RP2,'ClearCOF');
 invoke(RP2,'LoadCOF',[prog_dir '\object\CAP_right.rco']);
 invoke(RP2,'SetTagVal','ADdur', CAP_Gating.CAPlength_ms);
@@ -37,7 +37,7 @@ end
 firstSTIM=1;
 veryfirstSTIM=1;  % The very first CAPdata when program starts is all zeros, so skip this, debug later MH 18Nov2003 
 
-while ~length(get(FIG.push.close,'Userdata')),
+while isempty(get(FIG.push.close,'Userdata'))
    if (ishandle(FIG.ax.axis))
       delete(FIG.ax.axis);
    end
@@ -79,7 +79,7 @@ while ~length(get(FIG.push.close,'Userdata')),
                CAPdataAvg_freerun = CAPdata;
                firstSTIM=0;
             end
-            set(FIG.ax.line,'xdata',[0:(1/Stimuli.RPsamprate_Hz):CAP_Gating.CAPlength_ms/1000], ...
+            set(FIG.ax.line,'xdata',0:(1/Stimuli.RPsamprate_Hz):CAP_Gating.CAPlength_ms/1000, ...
                'ydata',CAPdataAvg_freerun*Display.PlotFactor);
             drawnow;
          else
@@ -88,7 +88,7 @@ while ~length(get(FIG.push.close,'Userdata')),
          invoke(RP2,'SoftTrg',2);
       end
       
-      if get(FIG.push.close,'Userdata'),
+      if get(FIG.push.close,'Userdata')
          break;
       elseif FIG.NewStim
          switch FIG.NewStim

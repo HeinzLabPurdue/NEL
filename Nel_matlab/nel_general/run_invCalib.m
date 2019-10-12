@@ -2,15 +2,21 @@
 % if doInvCalib= 0, all pass
 % if doInvCalib= 1, inverse calib based on last coef* file
 % if doInvCalib= -1, query allpass or invFIR
+% forceDO: should be set to 1 for only when running invCalib after rawCalib
 
-function [coefFileNum, calibPicNum]= run_invCalib(doInvCalib)
+
+function [coefFileNum, calibPicNum]= run_invCalib(doInvCalib, forceDO)
+
+if ~exist('forceDO', 'var')
+    forceDO= false;
+end
 
 %% Connecting to RP2_4
-global COMM root_dir
+global COMM root_dir NelData
 object_dir = [root_dir 'calibration\object'];
 
 COMM.handle.RP2_4= actxcontrol('RPco.x',[0 0 5 5]);
-status3 = invoke(COMM.handle.RP2_4,'Connect',4, 4);
+status3 = invoke(COMM.handle.RP2_4,'ConnectRP2', NelData.General.TDTcommMode, 4);
 invoke(COMM.handle.RP2_4,'LoadCof',[object_dir '\calib_invFIR_right.rcx']);
 
 %% Define appropriate b for invCalib or allPass
@@ -30,11 +36,21 @@ if doInvCalib==1
     end
     [coefFileNum, max_ind] = max(all_Coefs_picNums); % Output#1
     allINVcalFiles= dir(['p*calib*' num2str(coefFileNum) '*']);
-    all_invCal_picNums= cell2mat(cellfun(@(x) sscanf(x, 'p%04f_calib*'), {allINVcalFiles.name}', 'UniformOutput', false));
-    calibPicNum= max(all_invCal_picNums); % Output#2
     
-    temp = load(all_Coefs_Files(max_ind).name);
-    b= temp.b(:)';
+    if ~isempty(allINVcalFiles)|| forceDO % There's both rawCalib and invCalib
+        all_invCal_picNums= cell2mat(cellfun(@(x) sscanf(x, 'p%04f_calib*'), {allINVcalFiles.name}', 'UniformOutput', false));
+        calibPicNum= max(all_invCal_picNums); % Output#2
+        
+        temp = load(all_Coefs_Files(max_ind).name);
+        b= temp.b(:)';
+        doINVcheck= true;
+    else % There's rawCalib but no invCalib
+        % Output #1-2
+        doINVcheck= false;
+        coefFileNum= nan;
+        calibPicNum= max(all_calib_picNums);
+        b= [1 zeros(1, 255)];
+    end
 elseif doInvCalib==0
     % Output #1-2
     coefFileNum= nan;
@@ -60,7 +76,13 @@ cd(curDir);
 e1= COMM.handle.RP2_4.WriteTagV('FIR_Coefs', 0, b);
 if e1 && status3
     if doInvCalib
-        fprintf('invFIR Coefs loaded successfully (%s) \n', datestr(datetime));
+        if doINVcheck
+            fprintf('invFIR Coefs loaded successfully (%s) \n', datestr(datetime));
+        else 
+            fprintf('Running allpass as no invCalib. allpass Coefs loaded successfully (%s) \n', datestr(datetime));
+            warn_handle= warndlg('Running allpass as no invCalib', 'Run invCalib?');
+            uiwait(warn_handle);
+        end
     else
         fprintf('Allpass Coefs loaded successfully (%s) \n', datestr(datetime));
     end

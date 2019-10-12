@@ -9,17 +9,26 @@ end
 invoke(RP1,'ClearCOF');
 invoke(RP1,'LoadCOF',[prog_dir '\object\FFR_wav_polIN_sp.rcx']);
 
-%% For bit-select
-invoke(RP2,'ClearCOF');
-invoke(RP2,'LoadCOF',[prog_dir '\object\FFR_BitSet.rcx']);
-invoke(RP2,'Run');
-
-%% For ADC (data in)
-invoke(RP3,'ClearCOF');
-invoke(RP3,'LoadCOF',[prog_dir '\object\FFR_ADC.rcx']);
-invoke(RP3,'SetTagVal','ADdur', FFR_Gating.FFRlength_ms);
-invoke(RP3,'Run');
-
+if NelData.General.RP2_3and4
+    %% For bit-select
+    invoke(RP2,'ClearCOF');
+    invoke(RP2,'LoadCOF',[prog_dir '\object\FFR_BitSet.rcx']);
+    invoke(RP2,'Run');
+    
+    %% For ADC (data in)
+    invoke(RP3,'ClearCOF');
+    invoke(RP3,'LoadCOF',[prog_dir '\object\FFR_ADC.rcx']);
+    invoke(RP3,'SetTagVal','ADdur', FFR_Gating.FFRlength_ms);
+    invoke(RP3,'Run');
+else
+    RP2=actxcontrol('RPco.x',[0 0 1 1]);
+    invoke(RP2,'ConnectRP2',NelData.General.TDTcommMode,2);
+    invoke(RP2,'ClearCOF');
+    invoke(RP2,'LoadCOF',[prog_dir '\object\FFR_right2.rcx']);
+    invoke(RP2,'SetTagVal','ADdur', FFR_Gating.FFRlength_ms);
+    invoke(RP2,'Run');
+    RP3= RP2;
+end
 % Avoiding using set_RP_tagvals: somehow set_RP_tagvals doesn't let FFR
 % loops run as expected. 
 % set_RP_tagvals(RP1, RP2, FFR_Gating, Stimuli);
