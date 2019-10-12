@@ -17,7 +17,7 @@ function [Thresh_dBSPL_ret,BF_kHz_ret,Q10_ret] = plotTCs(CALIBpic,PIClist,PLOTye
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 if ~exist('PIClist')
-   PIClist = findpics('tc');
+   PIClist = findPics('tc');
 end
 
 if ~exist('PLOTyes')

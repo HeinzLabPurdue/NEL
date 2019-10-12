@@ -1,4 +1,4 @@
-function [tmplt,DAL,stimulus_vals,units,errstr] = EHINvN_reBFi_template(fieldname,stimulus_vals,units)
+function [tmplt,DAL,stimulus_vals,units,errstr] = syncCAP_reBFi_template(fieldname,stimulus_vals,units)
 % MH 13Apr2005 added background noise, varying noise level for a fixed signal level
 %
 % MH 24Mar2005: for R03 project
@@ -64,7 +64,7 @@ if (exist('stimulus_vals','var') == 1)
    PolarityFact=(strcmp(stimulus_vals.Inloop.InvertPolarity,'yes')-.5)*-2;  % For inverting waveform if necessary
    % Get filename and FormFreqs: mode 3 returns empty stim,Fs,dBreTONE
    [Xstim,XFs,filename,XdBreTONE,BASELINE_FormFreqs_Hz]= ...
-      synth_BASELINE_eh(BASELINE_TargetFreq_Hz,BASELINE_F0_Hz,BASELINE_Feature,Fix2Harms,3);
+      synth_BASELINE_schwa(BASELINE_TargetFreq_Hz,BASELINE_F0_Hz,BASELINE_Feature,Fix2Harms,3);
    %%% MH: 11Nov2004 Check here for problems with stimulus design (e.g., formants at 0 freq, or equal to other formants 
    if length(unique(BASELINE_FormFreqs_Hz))~=length(BASELINE_FormFreqs_Hz)|sum(BASELINE_FormFreqs_Hz==0)
       BADstim=1;
@@ -373,7 +373,7 @@ if (exist('stimulus_vals','var') == 1)
    DAL.Inloop = Inloop;
    DAL.Gating = stimulus_vals.Gating;
    DAL.Mix         = mix_params2devs(stimulus_vals.Mix,used_devices); % GE debug: see 'used_devices.File' line at beginning of function
-   DAL.short_description   = 'EHvNrBFi';
+   DAL.short_description   = 'syncCAP';
    
 %    DAL.endLinePlotParams                  = nel_plot_pst_params(DAL.Gating.Period/1000, DAL.Gating.Duration/1000);  % GE 04Nov2003.
 
