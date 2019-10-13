@@ -141,7 +141,7 @@ elseif strcmp(command_str,'update_stim')
         Stimuli.slow.FFRlength_ms= Stimuli.fast.duration_ms+200;
 
         if get(FIG.radio.fast, 'value') % Fast
-            Stimuli.fast.period_ms= Stimuli.fast.duration_ms+500;
+            Stimuli.fast.period_ms= Stimuli.fast.duration_ms+501;
             FFR_SNRenv('fast');
         elseif get(FIG.radio.slow, 'value') == 1 % Slow
             Stimuli.slow.period_ms= Stimuli.fast.duration_ms+1000;

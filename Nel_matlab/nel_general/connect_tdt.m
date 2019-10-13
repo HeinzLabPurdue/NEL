@@ -7,29 +7,30 @@ function varargout= connect_tdt(TDTmoduleName, deviceNumbers)
 
 global PA RP NelData 
 
-varargout= cell(1, numel(deviceNumbers));
+varargout= cell(1, 2*numel(deviceNumbers));
 
-for devNum= 1:numel(deviceNumbers)
+for devIter= 1:numel(deviceNumbers)
+    devNum= deviceNumbers(devIter);
     switch TDTmoduleName
         case {'RP', 'RP2'}
-            if deviceNumbers <= numel(RP)
-                TDTout= RP(deviceNumbers).activeX;
+            if devNum <= numel(RP)
+                TDTout= RP(devNum).activeX;
                 status= true;
             else
                 TDTout=actxcontrol('RPco.x', [0 0 1 1]);
-                status= TDTout.ConnectRP2(NelData.General.TDTcommMode, deviceNumbers);
+                status= TDTout.ConnectRP2(NelData.General.TDTcommMode, devNum);
                 RP(devNum).activeX= TDTout;
             end
         case {'PA', 'PA5'}
-            if deviceNumbers <= numel(PA)
-                TDTout= PA(deviceNumbers).activeX;
+            if devNum <= numel(PA)
+                TDTout= PA(devNum).activeX;
                 status= true;
             else
                 TDTout=actxcontrol('PA5.x', [0 0 1 1]);
-                status= TDTout.ConnectPA5(NelData.General.TDTcommMode, deviceNumbers);
+                status= TDTout.ConnectPA5(NelData.General.TDTcommMode, devNum);
                 PA(devNum).activeX= TDTout;
             end
     end
-    varargout{2*devNum-1}= TDTout;
-    varargout{2*devNum}= status;
+    varargout{2*devIter-1}= TDTout;
+    varargout{2*devIter}= status;
 end
