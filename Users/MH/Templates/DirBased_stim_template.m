@@ -1,4 +1,4 @@
-function [tmplt,DAL,stimulus_vals,units,errstr] = syncCAP_reBFi_template(fieldname,stimulus_vals,units)
+function [tmplt,DAL,stimulus_vals,units,errstr] = DirBased_stim_template(fieldname,stimulus_vals,units)
 %  Written by GE, adapted from 'nel_rot_wavefile_template' written by AF (11/26/01).
 %   For implementation NI 6052e board, rather than TDT analog outputs.
 %  Modification dates: 06oct2003.
@@ -28,7 +28,7 @@ if (exist('stimulus_vals','var') == 1)
         %         prev_maxlen = 0;
     end
     
-    Inloop.Name                         = 'DALinloop_NI_wavfiles_fast';   % added by GE 26Jul2002
+    Inloop.Name                         = 'DALinloop_NI_wavfiles';   % added by GE 26Jul2002
     Inloop.params.list                  = Llist;
     Inloop.params.Rlist                 = [];
     
@@ -73,11 +73,11 @@ if (exist('stimulus_vals','var') == 1)
     end
     stimulus_vals.Inloop.Computed_Attenuation_dB          = Inloop.params.attens;
 
-    DAL.funcName = 'data_acquisition_loop_NI_fast'; % added by GE 30oct2003.
+    DAL.funcName = 'data_acquisition_loop_NI'; % added by GE 30oct2003.
     DAL.Inloop = Inloop;
     DAL.Gating = stimulus_vals.Gating;
     DAL.Mix         = mix_params2devs(stimulus_vals.Mix,used_devices);
-    DAL.short_description   = 'SynCap'; % added by GE 26Jul2002
+    DAL.short_description   = 'DirBased'; % added by GE 26Jul2002
     DAL.description = build_description(DAL,stimulus_vals);
     errstr = check_DAL_params(DAL,fieldname);
 end
@@ -123,17 +123,10 @@ if contains(curDataDir, {'NH', 'setup'})
 else
     spl2use= 80;
 end
-OutFolder= [NelData.File_Manager.dirname 'Signals' filesep 'SynCap' filesep sprintf('T%.0f_U%.0f', NelData.File_Manager.track.No, NelData.File_Manager.unit.No) filesep];
+
+OutFolder= 'C:\NEL1_2\Users\MH\DirBasedStimuli\';
 if ~isdir(OutFolder) % means files have not been created for this track/unit
-    mkdir(OutFolder);
-end
-wavFiles= dir([OutFolder '*.wav']);
-if isempty(wavFiles)
-    CodesDir= 'C:\NEL1_2\Users\MH\SynchronyCapture\';
-    % here call Klatt functions to create these files.
-    addpath(CodesDir);
-    create_vowel_A_reBF(OutFolder, NelData.File_Manager.unit.BF*1e3);
-    rmpath(CodesDir);
+    error('What''s the point if no directory? Create directory and add wav-files at 100k sampling rate. Need to add this sampling frequency check somewhere.');
 end
 
 cdd;
@@ -148,14 +141,14 @@ rdd;
 IO_def.Inloop.List_Folder             = {OutFolder};
 IO_def.Inloop.CalibPicNum  =  {calib_picNum   ''       [0 6000]};
 IO_def.Inloop.Level  =  {spl2use 'dB SPL'       [-50    150]   0  0};
-IO_def.Inloop.Repetitions            = { 25                        ''      [1    Inf]      };
+IO_def.Inloop.Repetitions            = { 15                        ''      [1    Inf]      };
 IO_def.Inloop.UpdateRate        = { 100000                  'Hz'      [1    NI6052UsableRate_Hz(Inf)]      };
 
 %%%%%%%%%%%%%%%%%%%%
 %% Gating Section
 %%%%%%%%%%%%%%%%%%%%
-IO_def.Gating.Duration             = {188       'ms'    [20 4000]};
-IO_def.Gating.Period               = {300    'ms'   [50 5000]};
+IO_def.Gating.Duration             = {1300       'ms'    [20 4000]};
+IO_def.Gating.Period               = {1800    'ms'   [50 5000]};
 IO_def.Gating.Rise_fall_time       = {'default_rise_time(this.Duration)' 'ms'   [0  1000]};
 
 %%%%%%%%%%%%%%%%%%%%
@@ -164,7 +157,7 @@ IO_def.Gating.Rise_fall_time       = {'default_rise_time(this.Duration)' 'ms'   
 IO_def.Mix.Llist        =  {'Left|Both|{Right}'};
 % IO_def.Mix.Rlist        =  {'Left|Both|{Right}'};
 
-tmplt.tag               = 'SynCap';
+tmplt.tag               = 'DirBased';
 tmplt.IO_def = IO_def;
 
 %% SP: Updating default vars here because every unit has a different IO_def.Inloop.List_Folder
