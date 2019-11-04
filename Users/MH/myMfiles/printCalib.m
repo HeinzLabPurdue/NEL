@@ -20,7 +20,7 @@ end
 xlabel('Freq (kHz)')
 ylabel('dB SPL')
 grid
-xlim([.200 20])
+xlim([.050 20])
 ylim([75 120])
 set(gca,'XTickLabels',[1 10])
 legend(legendTEXT)

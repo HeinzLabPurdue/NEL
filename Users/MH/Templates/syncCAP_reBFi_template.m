@@ -148,14 +148,14 @@ rdd;
 IO_def.Inloop.List_Folder             = {OutFolder};
 IO_def.Inloop.CalibPicNum  =  {calib_picNum   ''       [0 6000]};
 IO_def.Inloop.Level  =  {spl2use 'dB SPL'       [-50    150]   0  0};
-IO_def.Inloop.Repetitions            = { 25                        ''      [1    Inf]      };
+IO_def.Inloop.Repetitions            = { 15                        ''      [1    Inf]      };
 IO_def.Inloop.UpdateRate        = { 100000                  'Hz'      [1    NI6052UsableRate_Hz(Inf)]      };
 
 %%%%%%%%%%%%%%%%%%%%
 %% Gating Section
 %%%%%%%%%%%%%%%%%%%%
 IO_def.Gating.Duration             = {188       'ms'    [20 4000]};
-IO_def.Gating.Period               = {300    'ms'   [50 5000]};
+IO_def.Gating.Period               = {350    'ms'   [50 5000]};
 IO_def.Gating.Rise_fall_time       = {'default_rise_time(this.Duration)' 'ms'   [0  1000]};
 
 %%%%%%%%%%%%%%%%%%%%

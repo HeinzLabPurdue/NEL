@@ -95,7 +95,9 @@ for ind=1:numTCs
          ylabel('dB SPL'); xlabel('Frequency (kHz)');
          axis([xmin xmax ymin ymax]);
          set(gca,'YTick',[0 20 40 60 80 100])
-         set(gca,'XTick',[.1 1 10],'XTickLabel',[.1 1 10])
+         XTick_vals= [.1 .2 .5 1 2 5 10];
+         XTick_labs= cellfun(@(x) num2str(x), num2cell(XTick_vals), 'UniformOutput', false);
+         set(gca,'XTick',XTick_vals,'XTickLabel',XTick_labs)
          title(sprintf('Unit: %d.%d; (Cal: P%d)',TRACK,UNIT,CALIBpic))
          if geomean(TCdata{ind}(:,1)) < 1
             Xtext=.55;

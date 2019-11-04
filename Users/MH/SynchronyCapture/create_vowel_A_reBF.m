@@ -20,7 +20,7 @@ end
 
 
 if ~exist('featureList_stat', 'var')
-    if BF_Hz>500
+    if BF_Hz>600
         featureList_stat= {'RAW', 'F2', 'F2T2', 'T2', 'F3'};
     else
         featureList_stat= {'RAW', 'F1', 'F1T1', 'T1', 'F3'};
@@ -55,7 +55,7 @@ target_dBSPL= 75;
 
 %% stationary params
 base_duration_ms= 188;
-fsKlatt= 40e3; % not sure if Klatt-Synth will work with 100e3. So create with 40e3, upsample and save. 
+fsKlatt= 40e3; % not sure if Klatt-Synth will work with 100e3. So create with 40e3, upsample and save.
 fsWav= 100e3;
 stationary_base_params.fsOrg= fsKlatt;
 stationary_base_params.f0= [100 100];
@@ -77,7 +77,7 @@ stationary_base_params.b3= [170 170];
 stationary_base_params.sw= [0 0]; % Cascade mode: produces more natural vowels
 
 
-for stat_feat_var= 1:length(featureList_stat) 
+for stat_feat_var= 1:length(featureList_stat)
     stationary_params= stationary_base_params;
     switch featureList_stat{stat_feat_var}
         case 'RAW'
@@ -114,16 +114,17 @@ for stat_feat_var= 1:length(featureList_stat)
     sig_stat= gen_rescale(sig_stat, target_dBSPL);
     fName_pos= sprintf('%svowelA_stat_BF%.0f_%s_pos.wav', outDataDir, BF_Hz, featureList_stat{stat_feat_var});
     fName_neg= sprintf('%svowelA_stat_BF%.0f_%s_neg.wav', outDataDir, BF_Hz, featureList_stat{stat_feat_var});
-    if max(abs(sig_stat))>1
+    
+    % Finally save both +ve and -ve polarity at Fs = 100e3
+    sig_stat= gen_resample(sig_stat, stationary_base_params.fsOrg, fsWav);
+    audiowrite(fName_pos, sig_stat, fsWav);
+    audiowrite(fName_neg, -sig_stat, fsWav);
+    
+    if max(abs(sig_stat))>.99
         sig_stat= sig_stat/max(abs(sig_stat))*.99;
         warning('Couldn''t acheive desired intensity by %.1f dB SPL for file %s\n', target_dBSPL-calc_dbspl(sig_stat), fName_pos);
         beep;
     end
-    
-    % Finally save both +ve and -ve polarity at Fs = 100e3 
-    sig_stat= gen_resample(sig_stat, stationary_base_params.fsOrg, fsWav);
-    audiowrite(fName_pos, sig_stat, fsWav);
-    audiowrite(fName_neg, -sig_stat, fsWav);
     
     if doPlot
         plot_before_after_rs(sig_stat_temp, sig_stat, stationary_params.fsOrg, BF_Hz, featureList_stat{stat_feat_var});
@@ -180,13 +181,14 @@ for kin_feat_var= 1:length(featureList_kin)
     
     fName_pos= sprintf('%svowelA_kin_BF%.0f_%s_pos.wav', outDataDir, BF_Hz, featureList_kin{kin_feat_var});
     fName_neg= sprintf('%svowelA_kin_BF%.0f_%s_neg.wav', outDataDir, BF_Hz, featureList_kin{kin_feat_var});
-    if max(abs(sig_kin))>1
+    % Finally save both +ve and -ve polarity at Fs = 100e3
+    sig_kin= gen_resample(sig_kin, kinematic_base_params.fsOrg, fsWav);
+    if max(abs(sig_kin))>.99
         sig_kin= sig_kin/max(abs(sig_kin))*.99;
         warning('Couldn''t acheive desired intensity by %.1f dB SPL for file %s\n', target_dBSPL-calc_dbspl(sig_kin), fName_pos);
         beep;
     end
-    % Finally save both +ve and -ve polarity at Fs = 100e3 
-    sig_kin= gen_resample(sig_kin, kinematic_base_params.fsOrg, fsWav);
+    
     audiowrite(fName_pos, sig_kin, fsWav);
     audiowrite(fName_neg, -sig_kin, fsWav);
     if doPlot
