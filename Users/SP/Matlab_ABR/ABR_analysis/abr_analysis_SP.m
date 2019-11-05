@@ -3,7 +3,7 @@ function abr_analysis_SP(command_str,parm_num)
 %This function computes an ABR threshold based on series of AVERAGER files.
 
 global NelData abr_FIG abr_Stimuli abr_root_dir abr_data_dir num num_all dt line_width abr freq ...
-    attn spl upper_y_bound lower_y_bound y_shift animal date freq_level data han
+    attn spl upper_y_bound lower_y_bound y_shift animal date freq_level data han noise
 host = lower(getenv('hostname'));
 
 User_Dir=pwd;
@@ -12,7 +12,6 @@ abr_root_dir = [User_Dir filesep 'Matlab_ABR' filesep 'ABR_analysis'];
 abr_data_dir = [fileparts(fileparts(User_Dir)) filesep 'ExpData'];
 % abr_data_dir=[];
 
-get_noise
 
 if ~isempty(abr_Stimuli) 
     temp_dir_name=abr_Stimuli.dir;
@@ -23,6 +22,9 @@ if ~isempty(abr_Stimuli)
     end
     cd(ExpDir);
 end
+
+% get_noise
+noise= concat_noise(ExpDir); 
 
 if nargin < 1
     

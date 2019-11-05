@@ -270,7 +270,7 @@ while isempty(get(FIG.push.close,'Userdata'))
                             [xx,lastdBindex]=min(abs(dBSPLlist-lastdBSPL));
                             picstoSEND=picNUMlist(1:lastdBindex);  % list of PICS to send to Ken's code to avoid usinig too high an SPL for template
                             
-                            CalibPIC=CalibFileNum;
+                            CalibPIC= Stimuli.calibPicNum;
                             dataDIR=NelData.File_Manager.dirname;
                             
                             if DEBUG_FLAG
@@ -350,7 +350,7 @@ while isempty(get(FIG.push.close,'Userdata'))
                         FLAG_ABR_ENTER_SP=1;
                         
                         cur_dir=pwd;
-                        abr_analysis_dir=fileparts(cur_dir);
+                        abr_analysis_dir= [NelData.General.RootDir 'Users\SP\'];
                         cd(abr_analysis_dir);
                         abr_setup_SP;
                         abr_analysis_SP('process');

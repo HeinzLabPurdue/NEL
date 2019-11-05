@@ -149,7 +149,7 @@ bin_of_max=NaN*ones(1,num);
 [data.z.score(1,1),bin_of_max(1,1)]=max(abr_xx2(:,1));
 for i = 2:num
 	add_attn=attn(1,i-1)-attn(1,i); exp_bin=bin_of_max(1,i-1) + bin_of_time(add_attn/40) - 1;
-    [data.z.score(1,i),delay]=max(abr_xx2(round(exp_bin-bin_of_time(1)):round(exp_bin+bin_of_time(1),i)));
+    [data.z.score(1,i),delay]=max(abr_xx2(round(exp_bin-bin_of_time(1)):round(exp_bin+bin_of_time(1)), i));
 	bin_of_max(1,i)=exp_bin-bin_of_time(1)+delay-1;
 end;
 delay_of_max=time_of_bin(bin_of_max);

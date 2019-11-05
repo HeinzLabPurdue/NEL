@@ -1,6 +1,6 @@
 function thresh_to_return=abr_analysis_blackbox(dataDIR,CalibPIC,PIClist)
 
-global abr_Stimuli abr_root_dir abr_data_dir  data han %num dt line_width abr freq attn spl upper_y_bound lower_y_bound y_shift %animal
+global abr_Stimuli abr_root_dir abr_data_dir noise data han %num dt line_width abr freq attn spl upper_y_bound lower_y_bound y_shift %animal
 
 User_Dir=pwd;
 
@@ -8,7 +8,8 @@ abr_root_dir = [User_Dir filesep 'Matlab_ABR' filesep 'ABR_analysis'];
 abr_data_dir = [fileparts(fileparts(User_Dir)) filesep 'ExpData'];
 
 
-get_noise
+% get_noise % Commented SP on 5nov19
+noise= concat_noise(dataDIR); 
 
 abr_Stimuli.dir =dataDIR;%get_directory; %PASS
 han.abr_panel=0;
