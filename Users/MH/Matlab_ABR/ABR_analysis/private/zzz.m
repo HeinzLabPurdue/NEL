@@ -59,9 +59,12 @@ freq_mean=mean(freqs); freq=round(freqs(1,1)/500)*500; %round to nearest 500 Hz
 abr_time=(0:dt:time_of_bin(length(abr)));
 
 %Determine SPL of stimuli
-CalibFile  = sprintf('p%04d_calib', str2num(abr_Stimuli.cal_pic));
-command_line = sprintf('%s%s%c','[xcal]=',CalibFile,';');
-eval(command_line);
+CalibFile= dir(sprintf('p%04d_calib*', str2num(abr_Stimuli.cal_pic)));
+CalibFile= CalibFile.name;
+run(CalibFile);
+xcal= ans;
+% command_line = sprintf('%s%s%c','[xcal]=',CalibFile,';');
+% eval(command_line);
 freq_loc = find(xcal.CalibData(:,1)>=(freq_mean/1000));
 freq_level = xcal.CalibData(freq_loc(1),2);
 spl=freq_level+attn;

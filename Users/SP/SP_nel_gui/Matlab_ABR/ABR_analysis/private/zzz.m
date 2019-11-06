@@ -1,7 +1,6 @@
 function zzz
 
-warn_state= warning('query');
-warning off;
+warning off; % SP: pm Nov 5, 2019: forgot why turned off warning. 
 
 global abr_Stimuli abr_data_dir...
 	num dt line_width abr freq attn spl w upper_y_bound lower_y_bound padvoltage y_shift date...
@@ -240,4 +239,4 @@ if freqs ~= freq_mean
 	msgbox('Multiple stimulus frequencies selected!')
 end;
 
-warning(warn_state.state);
+warning on;

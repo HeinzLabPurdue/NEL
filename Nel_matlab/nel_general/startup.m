@@ -40,7 +40,7 @@ addpath([root_dir  'NELanalysis_Mfiles']);
 % host = host(~isspace(host));
 
 %% FOR FASTER DEBUGGING, skip all questions
-SKIPintro=0;
+SKIPintro=1;
 
 if SKIPintro
     ButtonName='Real_TDT';
