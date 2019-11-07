@@ -130,6 +130,7 @@ elseif strcmp(command_str,'update_stim')
     xpr=resample(xp,round(Stimuli.RPsamprate_Hz), fsp);
     audiowrite([Stimuli.UPDdir Stimuli.filename], xpr, round(Stimuli.RPsamprate_Hz));
     copyfile([Stimuli.UPDdir Stimuli.filename],Stimuli.STIMfile,'f');
+    FFR_SNRenv('invCalib'); % Initialize RP2_4 with InvFilter
     
     if update_gating_flag % right now, this will update only for dir based, later for all stims
         Stimuli.fast.duration_ms= round(length(xp)/fsp*1e3);

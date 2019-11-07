@@ -66,7 +66,7 @@ for attenIND= 1
     
     FFRattens{attenIND}=attenLevel;
     
-    set(FIG.statText.status, 'String', sprintf('STATUS: averaging at -%d dB...', attenLevel));
+    set(FIG.statText.status, 'String', sprintf('STATUS: averaging at -%.1f dB...', attenLevel));
     
     FFRdataAvg_PO_plot{attenIND} = zeros(1, FFRnpts);
     FFRdataAvg_NP_plot{attenIND} = zeros(1, FFRnpts);
@@ -84,7 +84,7 @@ for attenIND= 1
     for currStim = 0:2*RunLevels_params.nPairs
         
         if currStim
-            set(FIG.statText.status, 'String', sprintf('STATUS: averaging at -%ddB (%d %d)...', ...
+            set(FIG.statText.status, 'String', sprintf('STATUS: averaging at -%.1f dB (%d/%d)...', ...
                 attenLevel, currStim, rejections)); % KHZZ 2011 Nov 4
         end
         
@@ -135,8 +135,8 @@ for attenIND= 1
                     
                     if currStim
                         FFRdataReps{currStim}=FFRdata; %added DA 7/23/13
-%                         fprintf('rejections %1.0f:: ORGval = %1.0f :: currStim= %1.0f :: MaxVal=%1.2f :: nSamps= %d\n', ...
-%                             rejections, invoke(RP1,'GetTagVal','ORG') ,currStim, maxFFRobs, bNoSampleObtained);
+                        %                         fprintf('rejections %1.0f:: ORGval = %1.0f :: currStim= %1.0f :: MaxVal=%1.2f :: nSamps= %d\n', ...
+                        %                             rejections, invoke(RP1,'GetTagVal','ORG') ,currStim, maxFFRobs, bNoSampleObtained);
                     end
                     
                 elseif maxFFRobs > critVal
@@ -149,14 +149,14 @@ for attenIND= 1
             
         end
         %% Debugging
-%         fprintf('rejections %1.0f:: ORGval = %1.0f :: currStim= %1.0f :: MaxVal=%1.2f :: nSamps= %d\n', ...
-%             rejections, invoke(RP1,'GetTagVal','ORG') ,currStim, maxFFRobs, bNoSampleObtained);
-%         
+        %         fprintf('rejections %1.0f:: ORGval = %1.0f :: currStim= %1.0f :: MaxVal=%1.2f :: nSamps= %d\n', ...
+        %             rejections, invoke(RP1,'GetTagVal','ORG') ,currStim, maxFFRobs, bNoSampleObtained);
+        %
         if currStim>0
             if mod(currStim,2)
-%                 set(FIG.ax.line,'xdata',[0:(1/Stimuli.RPsamprate_Hz):
-%                     FFR_SNRenv_Gating.FFRlength_ms/1000],
-%                 'ydata',FFRdataAvg_NP{attenIND}*Display.PlotFactor); drawnow;
+                %                 set(FIG.ax.line,'xdata',[0:(1/Stimuli.RPsamprate_Hz):
+                %                     FFR_SNRenv_Gating.FFRlength_ms/1000],
+                %                 'ydata',FFRdataAvg_NP{attenIND}*Display.PlotFactor); drawnow;
             else  % every other curstim, plot SUM (ENV_FFR)
                 set(FIG.ax.line,'xdata',0:(1/Stimuli.RPsamprate_Hz):FFR_SNRenv_Gating.FFRlength_ms/1000, ...
                     'ydata',(FFRdataAvg_PO_plot{attenIND}+FFRdataAvg_NP_plot{attenIND})*Display.PlotFactor/2);

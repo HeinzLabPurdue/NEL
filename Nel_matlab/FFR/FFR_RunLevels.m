@@ -60,7 +60,7 @@ for attenLevel = Stimuli.atten_dB + RunLevels_params.stepdB*RunLevels_params.att
    % 28Apr2004 M.Heinz: Setup to skip 1st pulse pair, which is sometimes from previous level condition
    for currStim = 0:2*RunLevels_params.nPairs
       if currStim
-         set(FIG.statText.status, 'String', sprintf('STATUS: averaging at -%ddB (%d %d)...',... %KHZZ 2011 Nov 4
+         set(FIG.statText.status, 'String', sprintf('STATUS: averaging at -%.1f dB (%d/%d)...',... %KHZZ 2011 Nov 4
             attenLevel, currStim, rejections));
          %set(FIG.statText.status, 'String', sprintf('STATUS: averaging at -%ddB (%d)...', attenLevel, currStim));
       end
