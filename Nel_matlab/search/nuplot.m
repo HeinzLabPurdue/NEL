@@ -1,7 +1,7 @@
 global devices_names_vector
 UNIT = sprintf('%1d.%02d', NelData.File_Manager.track.No, NelData.File_Manager.unit.No);
 
-FIG.radio.invCalib= uicontrol(FIG.handle,'callback','search(''invCalib'');','style','radio','Enable','on','Units','normalized','position',[.125 .455 .08 .03],'string','invCalib','fontsize',12,'BackgroundColor','w','value',0); 
+FIG.radio.invCalib= uicontrol(FIG.handle,'callback','search(''invCalib'');','style','radio','Enable','on','Units','normalized','position',[.125 .455 .08 .03],'string','invCalib','fontsize',12,'BackgroundColor','w','value',1); 
 FIG.radio.noise  = uicontrol(FIG.handle,'callback','search(''noise'');','style','radio','Enable','on','Units','normalized','position',[.125 .425 .08 .03],'string','Noise','fontsize',12,'BackgroundColor','w','value',1);
 FIG.radio.tone   = uicontrol(FIG.handle,'callback','search(''tone'');','style','radio','Enable','on','Units','normalized','position',[.125 .395 .08 .03],'string','Tone','fontsize',12,'BackgroundColor','w');
 FIG.radio.khite  = uicontrol(FIG.handle,'callback','search(''khite'');','style','radio','Enable','on','Units','normalized','position',[.125 .365 .08 .03],'string','KH Osc','fontsize',12,'BackgroundColor','w');
