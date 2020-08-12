@@ -1,4 +1,4 @@
-function user_profile_load(user_name);
+function user_profile_load(user_name)
 %
 
 % AF 10/30/01

@@ -21,13 +21,13 @@ if NelData.General.RP2_3and4
     invoke(RP3,'SetTagVal','ADdur', FFR_Gating.FFRlength_ms);
     invoke(RP3,'Run');
 else
-    RP2=actxcontrol('RPco.x',[0 0 1 1]);
-    invoke(RP2,'ConnectRP2',NelData.General.TDTcommMode,2);
+%     RP2=actxcontrol('RPco.x',[0 0 1 1]);
+%     invoke(RP2,'ConnectRP2',NelData.General.TDTcommMode,2);
     invoke(RP2,'ClearCOF');
     invoke(RP2,'LoadCOF',[prog_dir '\object\FFR_right2.rcx']);
     invoke(RP2,'SetTagVal','ADdur', FFR_Gating.FFRlength_ms);
     invoke(RP2,'Run');
-    RP3= RP2;
+%     RP3= RP2;
 end
 % Avoiding using set_RP_tagvals: somehow set_RP_tagvals doesn't let FFR
 % loops run as expected. 
@@ -198,10 +198,14 @@ while isempty(get(FIG.push.close,'Userdata'))
                     break
                     
                 case 2 % case: updated wav-file
+%                     RP1= connect_tdt('RP2', 1);
                     invoke(RP1,'Halt');
+                    %% SP: Is it necessary to clear COF? 
                     invoke(RP1,'ClearCOF');
                     invoke(RP1,'LoadCOF',[prog_dir '\object\FFR_wav_polIN_sp.rcx']);
                     % set_RP_tagvals(RP1, RP2, FFR_Gating, Stimuli);
+                    
+                    %%
                     invoke(RP1, 'SetTagVal', 'StmOn', FFR_Gating.duration_ms);
                     invoke(RP1, 'SetTagVal', 'StmOff', FFR_Gating.period_ms-FFR_Gating.duration_ms);
                     invoke(RP1, 'SetTagVal', 'RiseFall', FFR_Gating.rftime_ms);
@@ -218,6 +222,16 @@ while isempty(get(FIG.push.close,'Userdata'))
                         FFR_memFact=0;
                     end
                     
+                    % Because a new wav-file, stimulus duration may be
+                    % different. Need to
+                    
+                    %% SP on 12Oct19: Different wav-file means ADdur maybe different
+                    % For ADC (data in)
+                    invoke(RP3,'Halt');
+                    invoke(RP3,'SetTagVal','ADdur', FFR_Gating.FFRlength_ms);
+                    invoke(RP3,'Run');
+                    
+                    %%
                     pair1 = 1;
                     pair2 = 1;
                     firstSTIM=or(pair1,pair2);

@@ -1,11 +1,14 @@
-function [x,errorMSG]=loadpic(picNum)
+function [x,errorMSG]=loadpic(picNum, prefix)
 % function x=loadpic(picIND)
 % Created: M. Heinz 18Mar2004
 % Modified from GE version, 29Jul2004
 %
 % Loads picture based on picture number
 
-picSearchString = sprintf('*p%04d*.m', picNum);
+if ~exist('prefix', 'var')
+    prefix= 'p';
+end
+picSearchString = sprintf('%s%04d*.m', prefix, picNum);
 picMFile = dir(picSearchString);
 errorMSG = '';
 if isempty(picMFile)

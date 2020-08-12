@@ -1,5 +1,6 @@
 function abr_setup
 
+global NelData
 % host = lower(getenv('hostname'));
 % switch (host)
 % case {'south-chamber'}

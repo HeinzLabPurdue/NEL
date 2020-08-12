@@ -67,6 +67,7 @@ NelData.General.RootDir= [fileparts(fileparts(pwd)) filesep];
 % if USB or GB: assuming same connection mode for both RP2s and PA5s
 % if 2 or 4 RP2s
 figure(314);
+text(0, .5,  'connecting to TDT', 'FontSize', 20);
 RPtemp= actxcontrol('RPco.x',[0 0 1 1]);
 yesUSB= invoke(RPtemp,'ConnectRP2', 'USB', 1);
 yesGB= invoke(RPtemp,'ConnectRP2', 'GB', 1);

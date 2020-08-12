@@ -101,7 +101,7 @@ if (isfield(NelData.General,'Pulse'))
 end
 
 % SP/MH: Oct2 2019 turn on FIR inverse Calib filtering
-disp('HERE START'); 
+% disp('HERE START'); 
 % ding
 [~,block_info.invCALIBpic]=run_invCalib(true);
 
@@ -574,7 +574,7 @@ if (rc ~= 1)
 end
 
 % SP/MH: Oct2 2019 turn off FIR inverse Calib filtering
-disp('HERE END'); 
+% disp('HERE END'); 
 % ding
 run_invCalib(false);
 

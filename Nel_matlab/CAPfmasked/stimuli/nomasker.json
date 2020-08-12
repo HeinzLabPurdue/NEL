@@ -1,0 +1,14 @@
+{
+    "type":"noise-bands", 
+    "comment":"created with noiseBandMaskerDesigner", 
+    "n_bands":0, 
+    "name":"nomasker", 
+    "bands":[], 
+    "wavefiles":{
+        "fs":48828, 
+        "duration_s":3, 
+        "filter_order":64, 
+        "filter_order_mult":2, 
+        "filename":"nomasker_48828_128_3.wav"
+    }
+}

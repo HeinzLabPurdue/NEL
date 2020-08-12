@@ -1,4 +1,4 @@
-function varargout = DALinloop_NI_SCCi_wavfiles(varargin)
+function varargout = DALinloop_NI_SCCi2_wavfiles(varargin)
 % Adapted by MH 10Nov2004 from 'DALinloop_NI_SCC_wavefiles'
 %   adds the ability to interleave conditions (with different updateRates, later want to add attens)
 %
@@ -138,10 +138,10 @@ if (common.index == 1)  % first picture
          counter = 1;
          for ii = 1:specific.repetitions
             for jj = 1:nstim
-               [dummypath fname] = fileparts(static_bi.list{jj});
+               [dummypath, fname] = fileparts(static_bi.list{jj});
                var_labels{counter} = fname; 
                if (~isempty(static_bi.Rlist))
-                  [dummypath fname] = fileparts(static_bi.Rlist{jj});
+                  [dummypath, fname] = fileparts(static_bi.Rlist{jj});
                   var_labels{counter} = [var_labels{counter} ' + ' fname]; 
                end
                if (ii > 1)

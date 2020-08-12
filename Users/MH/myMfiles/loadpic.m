@@ -1,5 +1,8 @@
-function x = loadpic(picNum)     % Load picture
-picSearchString = sprintf('p%04d*.m', picNum);
+function x = loadpic(picNum, preFix)     % Load picture
+if ~exist('preFix', 'var')
+    preFix= 'p';
+end
+picSearchString = sprintf('%s%04d*.m', preFix, picNum);
 picMFile = dir(picSearchString);
 if (~isempty(picMFile))
    eval( strcat('x = ',picMFile.name(1:length(picMFile.name)-2),';') );

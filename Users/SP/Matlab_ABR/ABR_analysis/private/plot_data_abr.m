@@ -64,11 +64,11 @@ freq_mean=mean(freqs);
 abr_time=(0:dt:time_of_bin(length(abr)));
 
 %% Determine SPL of stimuli
-CalibFile  = sprintf('p%04d_calib',str2num(abr_Stimuli.cal_pic));
-if ~exist(CalibFile, 'file')
-    CalibFile  = sprintf('p%04d_calib_raw',str2num(abr_Stimuli.cal_pic));
-end
-command_line = sprintf('%s%s%c','[xcal]=',CalibFile,';');
+CalibFile  = dir(sprintf('p%04d_calib*',str2num(abr_Stimuli.cal_pic)));
+% if ~exist(CalibFile, 'file')
+%     CalibFile  = sprintf('p%04d_calib_raw',str2num(abr_Stimuli.cal_pic));
+% end
+command_line = sprintf('%s%s%c','[xcal]=',CalibFile.name(1:end-2),';');
 eval(command_line);
 freq_loc = find(xcal.CalibData(:,1)>=(freq_mean/1000));
 freq_level = xcal.CalibData(freq_loc(1),2);

@@ -3,7 +3,7 @@ function h_fig = CAP(command_str)
 % ge debug ABR 26Apr2004: replace "CAP" with more generalized nomenclature, throughout entire system.
 
 global PROG FIG Stimuli CAP_Gating root_dir prog_dir NelData devices_names_vector Display
-global data_dir picstoSEND_deBUG picstoSEND dBSPLlist picNUMlist FLAG_RERUN_FOR_ABR_ANALYSIS CalibFileNum CalibFileRefresh
+global data_dir picstoSEND_deBUG picstoSEND dBSPLlist picNUMlist FLAG_RERUN_FOR_ABR_ANALYSIS CalibFileNum  CalibFileRefresh
 FLAG_RERUN_FOR_ABR_ANALYSIS=0;
 
 
@@ -12,7 +12,6 @@ FLAG_RERUN_FOR_ABR_ANALYSIS=0;
 if nargin < 1
     prog_dir = [root_dir 'CAP\'];
     
-    CalibFileRefresh=0;
     
     PROG = struct('name','CAP(v1.ge_mh.1).m');  % modified by GE 26Apr2004.
     
@@ -46,7 +45,7 @@ if nargin < 1
     whitebg('w');
     
     CAP_loop_plot;
-    CAP('load_calib'); %SP: load calib-picNum once to populate calibdata
+    CAP('invCalib'); %SP: load calib-picNum once to populate calibdata
     CAP('clickYes'); % Start invCalib = true or false based on default clickYes value
     %     Stimuli.MaxdBSPLCalib=90+Stimuli.cur_freq_calib_dbshift;
     
@@ -138,7 +137,7 @@ elseif strcmp(command_str,'slide_freq')
     FIG.NewStim = 6;
     Stimuli.freq_hz = floor(get(FIG.fsldr.slider,'value')*Stimuli.fmult);
     set(FIG.fsldr.val,'string',num2str(Stimuli.freq_hz));
-    CAP('load_calib');
+    CAP('invCalib');
     
     % LQ 01/31/05
 elseif strcmp(command_str,'slide_freq_text')
@@ -151,7 +150,7 @@ elseif strcmp(command_str,'slide_freq_text')
         Stimuli.freq_hz = new_freq;
         set(FIG.fsldr.slider, 'value', Stimuli.freq_hz/Stimuli.fmult);
     end
-    CAP('load_calib');
+    CAP('invCalib');
     
 elseif strcmp(command_str,'mult_1x')
     Stimuli.fmult = 1;
@@ -161,7 +160,7 @@ elseif strcmp(command_str,'mult_1x')
     FIG.NewStim = 6;
     Stimuli.freq_hz = floor(get(FIG.fsldr.slider,'value')*Stimuli.fmult);
     set(FIG.fsldr.val,'string',num2str(Stimuli.freq_hz));
-    CAP('load_calib');
+    CAP('invCalib');
     
     
 elseif strcmp(command_str,'mult_10x')
@@ -172,7 +171,7 @@ elseif strcmp(command_str,'mult_10x')
     FIG.NewStim = 6;
     Stimuli.freq_hz = floor(get(FIG.fsldr.slider,'value')*Stimuli.fmult);
     set(FIG.fsldr.val,'string',num2str(Stimuli.freq_hz));
-    CAP('load_calib');
+    CAP('invCalib');
     
 elseif strcmp(command_str,'mult_100x')
     Stimuli.fmult = 100;
@@ -182,7 +181,7 @@ elseif strcmp(command_str,'mult_100x')
     FIG.NewStim = 6;
     Stimuli.freq_hz = floor(get(FIG.fsldr.slider,'value')*Stimuli.fmult);
     set(FIG.fsldr.val,'string',num2str(Stimuli.freq_hz));
-    CAP('load_calib');
+    CAP('invCalib');
     
 elseif strcmp(command_str,'slide_atten')
     FIG.NewStim = 7;
@@ -199,7 +198,7 @@ elseif strcmp(command_str, 'slide_atten_text')
         set(FIG.asldr.val,'string', new_atten);
     end
     new_atten = str2num(new_atten);
-    if new_atten < get(FIG.asldr.slider,'min') | new_atten > get(FIG.asldr.slider,'max')
+    if new_atten < get(FIG.asldr.slider,'min') || new_atten > get(FIG.asldr.slider,'max')
         set( FIG.asldr.val, 'string', num2str(-Stimuli.atten_dB));
     else
         Stimuli.atten_dB = -new_atten;
@@ -304,13 +303,14 @@ elseif strcmp(command_str,'audiogram') %KH 10Jan2012
 elseif strcmp(command_str,'clickYes') %KH 10Jan2012
     Stimuli.clickYes = get(FIG.radio.clickYes,'value');
     FIG.NewStim = 16;
-    if NelData.General.RP2_3and4
-        if Stimuli.clickYes
-            run_invCalib(true); % Initialize with allpass RP2_3
-        else
-            run_invCalib(false); % Initialize with allpass RP2_3
-        end
-    end
+    %     Comment on Nov/5/19: added "invCalib" radio button.
+    % % %     if NelData.General.RP2_3and4
+    % % %         if Stimuli.clickYes
+    % % %             run_invCalib(true); % Initialize with allpass RP2_3
+    % % %         else
+    % % %             run_invCalib(false); % Initialize with allpass RP2_3
+    % % %         end
+    % % %     end
     
 elseif strcmp(command_str,'Automate_Levels') %SP 24Jan2016
     
@@ -327,38 +327,31 @@ elseif strcmp(command_str,'Automate_Levels') %SP 24Jan2016
     end
     
     
-elseif strcmp(command_str,'load_calib') %SP 24Jan2016
+elseif strcmp(command_str,'invCalib') %SP 24Jan2016
     %%% Needs to be called whenever the frequency is changed!!!
     %% ?SP? Should the whole thing be called everytime the frequency is changed or should it be saved?
     
     %%% Account for Calibration to set Level in dB SPL
     
-    if ~exist('CalibData', 'var')
-        cdd
-        allFiles= dir('*calib*raw*');
-        lastCalibFileName= allFiles(end).name;
-        lastCalibFileNum= getPicNum(lastCalibFileName);
-        
-        if ~CalibFileRefresh % Runs only during ABR initialization
-            CalibFileNum= str2double(inputdlg('Enter Calibration File Number','Load Calib File', 1,{num2str(lastCalibFileNum)}));
-            CalibFileRefresh=1;
-        end
-        x=loadpic(CalibFileNum);
-        CalibData=x.CalibData(:,1:2);
-        CalibData(:,2)=trifilt(CalibData(:,2)',5)';
-        rdd
+    %     if ~exist('CalibData', 'var')
+    if NelData.General.RP2_3and4
+        [~, Stimuli.calibPicNum]= run_invCalib(get(FIG.radio.invCalib,'value'));
+    elseif isnan(Stimuli.calibPicNum)
+        cdd;
+        allCalibFiles= dir('*calib*raw*');
+        Stimuli.calibPicNum= getPicNum(allCalibFiles(end).name);
+        Stimuli.calibPicNum= str2double(inputdlg('Enter Calibration File Number','Load Calib File', 1,{num2str(Stimuli.calibPicNum)}));
+        rdd;
     end
-    Stimuli.MaxdBSPLCalib=CalibInterp(Stimuli.freq_hz/1000,CalibData);
-    %     Stimuli.MaxdBSPLCalib=max_dBSPL;
-    % max_dBSPL=Stimuli.MaxdBSPLCalib+(Stimuli.freq_hz)/1000; %testing It should be max_dBSPL-Stimuli.MaxdBSPLCalib (dB SPL, which whould be the max value)
-    %     Stimuli.cur_freq_calib_dbshift=Stimuli.MaxdBSPLCalib-90;
-    %     if (Stimuli.cur_freq_calib_dbshift<0)
-    %         Stimuli.CalibBelow90=1;
-    %     else
-    %         Stimuli.CalibBelow90=0;
-    %     end
-    %     Stimuli.MaxdBSPLCalib=max_dBSPL;
-    set(FIG.asldr.SPL,'string',sprintf('%.1f dB SPL',Stimuli.MaxdBSPLCalib-Stimuli.atten_dB));
+
+    cdd;
+    x=loadpic(Stimuli.calibPicNum);
+    CalibData=x.CalibData(:,1:2);
+    CalibData(:,2)=trifilt(CalibData(:,2)',5)';
+    rdd;
+
+    Stimuli.MaxdBSPLCalib=CalibInterp(Stimuli.freq_hz/1000, CalibData);
+    set(FIG.asldr.SPL, 'string', sprintf('%.1f dB SPL', Stimuli.MaxdBSPLCalib-Stimuli.atten_dB));
     
     
     
@@ -366,6 +359,7 @@ elseif strcmp(command_str,'close')
     if NelData.General.RP2_3and4
         run_invCalib(false); % Initialize with allpass RP2_3
     end
+    rmpath('C:\NEL1_2\Users\SP\SP_nel_gui\')
     set(FIG.push.close,'Userdata',1);
     cd([NelData.General.RootDir 'Nel_matlab\nel_general']);
 end

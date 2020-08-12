@@ -1,0 +1,17 @@
+{
+    "type":"noise-bands", 
+    "n_bands":1, 
+    "name":"stim_ex2", 
+    "bands":{
+        "amplitude":0.1, 
+        "fc_low":200, 
+        "fc_high":8000
+    }, 
+    "wavefiles":{
+        "fs":48828, 
+        "duration_s":3, 
+        "filter_order":64, 
+        "filter_order_mult":2, 
+        "filename":"stim_ex2_48828_128_3.wav"
+    }
+}

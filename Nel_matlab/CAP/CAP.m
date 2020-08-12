@@ -34,7 +34,13 @@ if nargin < 1
     
     CAP_ins;
     
-    if ~RunThroughABRFlag
+    if strcmp(interface_type, 'CAP (fMask)')
+        fMaskCodesDir= 'C:\NEL1_2\Nel_matlab\CAPfmasked';
+        cd(fMaskCodesDir);
+        h_fig= fmaskedCAP();
+        cd(root_dir);
+        
+    elseif ~RunThroughABRFlag
         FIG.handle = figure('NumberTitle','off','Name','CAP Interface','Units','normalized','position',[0.045  0.013  0.9502  0.7474],'Visible','off','MenuBar','none','Tag','CAP_Main_Fig');
         set(FIG.handle,'CloseRequestFcn','CAP(''close'');')
         colordef none;
