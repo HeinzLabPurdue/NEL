@@ -18,8 +18,10 @@ if strcmp(NelData.General.WindowsHostName, '1353lyl303501d') % means NEL1
     %     invoke(RP3,'ConnectRP2',NelData.General.TDTcommMode,3);
     if NelData.General.RP2_3and4 && (~NelData.General.RX8)
         RP3= connect_tdt('RP2', 3);  %#ok<*NASGU>
-    else 
+    elseif (~NelData.General.RP2_3and4) && (~NelData.General.RX8)
         RP3= RP2; 
+    elseif NelData.General.RX8
+        RP3= connect_tdt('RX8', 1);
     end
 else % means NEL2??
     RP1= RP.activeX;        %MW10062016  use global control object rather than reinitialize
@@ -335,8 +337,9 @@ elseif strcmp(command_str,'invCalib')
     set(FIG.asldr.SPL,'string',sprintf('%.1f dB SPL',Stimuli.calib_dBSPLout-abs(str2double(get(FIG.asldr.val, 'string')))));
     
 elseif strcmp(command_str,'close')
-    if NelData.General.RP2_3and4 && (~NelData.General.RX8)
-        run_invCalib(false); % Initialize with allpass RP2_3
+    if NelData.General.RP2_3and4 || NelData.General.RX8
+        forceDO= true;
+        run_invCalib(false, forceDO); % Initialize with allpass RP2_3
     end
     set(FIG.push.close,'Userdata',1);
     cd([NelData.General.RootDir 'Nel_matlab\nel_general']);

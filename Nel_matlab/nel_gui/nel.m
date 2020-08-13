@@ -1212,9 +1212,10 @@ end
 external_run_checkout(handles);
 
 function varargout = Menu_Tools_calibrateOLD_Callback(h, eventdata, handles, varargin)
+global NelData
 external_run_checkin(handles);
 currDIR=pwd;
-cd('C:\NEL1_2\Nel_matlab\calibrationOLD') 
+cd([NelData.General.RootDir 'Nel_matlab\calibrationOLD']) 
 h_calib = calibrate;
 while (ishandle(h_calib))
     uiwait(h_calib);

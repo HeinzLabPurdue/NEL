@@ -47,7 +47,7 @@ switch interface_type
            'fmult',    10, ...
            'CAPmem_reps',  30, ...
            'threshV', 2, ... %for artifact rejection KH 2012 Jan 05
-           'clickYes', 1, ... % added by KH 06Jan2012
+           'clickYes', 0, ... % added by KH 06Jan2012
            'clickLength_ms', 0.04, ... %KH 10Jan2012
            ... %not cleaned up yet
            'ear', 'both' ...  % set in CAP.m

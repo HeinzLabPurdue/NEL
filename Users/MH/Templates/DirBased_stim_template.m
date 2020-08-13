@@ -124,7 +124,7 @@ else
     spl2use= 80;
 end
 
-OutFolder= 'C:\NEL1_2\Users\MH\DirBasedStimuli\';
+OutFolder= [NelData.General.RootDir 'Users\MH\DirBasedStimuli\'];
 if ~isdir(OutFolder) % means files have not been created for this track/unit
     error('What''s the point if no directory? Create directory and add wav-files at 100k sampling rate. Need to add this sampling frequency check somewhere.');
 end

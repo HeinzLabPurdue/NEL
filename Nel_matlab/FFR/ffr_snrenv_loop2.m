@@ -6,11 +6,12 @@ end
 
 %% For stimulus
 % RP*={1,2,3} are already defined (in FFR_SNRenv)
+
+if NelData.General.RP2_3and4 && (~NelData.General.RX8) % NEL1 with RP2 #3 & #4
 invoke(RP1,'ClearCOF');
 invoke(RP1,'LoadCOF',[prog_dir '\object\FFR_wav_polIN_sp.rcx']);
 
-if NelData.General.RP2_3and4 && (~NelData.General.RX8)
-    %% For bit-select
+%% For bit-select
     invoke(RP2,'ClearCOF');
     invoke(RP2,'LoadCOF',[prog_dir '\object\FFR_BitSet.rcx']);
     invoke(RP2,'Run');
@@ -20,7 +21,10 @@ if NelData.General.RP2_3and4 && (~NelData.General.RX8)
     invoke(RP3,'LoadCOF',[prog_dir '\object\FFR_ADC.rcx']);
     invoke(RP3,'SetTagVal','ADdur', FFR_Gating.FFRlength_ms);
     invoke(RP3,'Run');
-else
+elseif (~NelData.General.RP2_3and4) && (~NelData.General.RX8) % NEL1 without (RP2 #3 & #4), and not NEL2 because no RX8
+invoke(RP1,'ClearCOF');
+invoke(RP1,'LoadCOF',[prog_dir '\object\FFR_wav_polIN_sp.rcx']);
+
 %     RP2=actxcontrol('RPco.x',[0 0 1 1]);
 %     invoke(RP2,'ConnectRP2',NelData.General.TDTcommMode,2);
     invoke(RP2,'ClearCOF');
@@ -28,6 +32,30 @@ else
     invoke(RP2,'SetTagVal','ADdur', FFR_Gating.FFRlength_ms);
     invoke(RP2,'Run');
 %     RP3= RP2;
+
+elseif NelData.General.RX8  %NEL2 with RX8
+invoke(RP1,'ClearCOF');
+invoke(RP1,'LoadCOF',[prog_dir '\object\FFR_wav_polIN_sp.rcx']);
+
+%% For bit-select
+    %     RP2=actxcontrol('RPco.x',[0 0 1 1]);
+    %     invoke(RP2,'ConnectRP2',NelData.General.TDTcommMode,2);
+    invoke(RP2,'ClearCOF');
+    invoke(RP2,'LoadCOF',[prog_dir '\object\FFR_BitSet.rcx']);
+    invoke(RP2,'Run');
+    
+    %% For ADC (data in)
+    %     RP3=actxcontrol('RPco.x',[0 0 1 1]);
+    %     invoke(RP3,'ConnectRP2',NelData.General.TDTcommMode,3);
+    [~, ~, b_invCalib_coef]= run_invCalib(-2);
+    
+    invoke(RP3,'ClearCOF');
+    % invoke(RP2,'LoadCOF',[prog_dir '\object\FFR_right.rco']); % MH/KH Dec 8 2011
+    invoke(RP3,'LoadCOF',[prog_dir '\object\FFR_RX8_ADC_invCalib.rcx']);
+    e_invCalib_status= RP3.WriteTagV('FIR_Coefs', 0, b_invCalib_coef);
+    invoke(RP3,'SetTagVal','ADdur', FFR_Gating.FFRlength_ms);
+    invoke(RP3,'Run');
+    
 end
 % Avoiding using set_RP_tagvals: somehow set_RP_tagvals doesn't let FFR
 % loops run as expected. 
