@@ -3,34 +3,56 @@
 % ---- (1)activeX if already connected
 % ---- (2)connects and then returns activeX if not connected
 % TDTmoduleName= {'RP2', 'PA5'}
-function varargout= connect_tdt(TDTmoduleName, deviceNumbers)
+function varargout= connect_tdt(TDTmoduleName, deviceNumbers, initFlag)
 
-global PA RP NelData 
+if ~exist('initFlag', 'var')
+    initFlag= false;
+end
+
+global RX PA RP NelData
 
 varargout= cell(1, 2*numel(deviceNumbers));
 
 for devIter= 1:numel(deviceNumbers)
+    TDTout= '';
+    status= false;
+    
     devNum= deviceNumbers(devIter);
     switch TDTmoduleName
         case {'RP', 'RP2'}
-            if devNum <= numel(RP)
+            if devNum <= numel(RP) && (~initFlag)
                 TDTout= RP(devNum).activeX;
                 status= true;
-            else
+            elseif initFlag
                 TDTout=actxcontrol('RPco.x', [0 0 1 1]);
                 status= TDTout.ConnectRP2(NelData.General.TDTcommMode, devNum);
-                RP(devNum).activeX= TDTout;
+                
+                if status
+                    RP(devNum).activeX= TDTout;
+                end
             end
         case {'PA', 'PA5'}
-            if devNum <= numel(PA)
+            if devNum <= numel(PA) && (~initFlag)
                 TDTout= PA(devNum).activeX;
                 status= true;
-            else
+            elseif initFlag
                 TDTout=actxcontrol('PA5.x', [0 0 1 1]);
                 status= TDTout.ConnectPA5(NelData.General.TDTcommMode, devNum);
-                PA(devNum).activeX= TDTout;
+                
+                if status
+                    PA(devNum).activeX= TDTout;
+                end
+            end
+        case {'RX', 'RX8'}
+            if devNum <= numel(RX) && (~initFlag)
+                TDTout= RX(devNum).activeX;
+                status= true;
+            elseif initFlag
+                TDTout=actxcontrol('RPco.x', [0 0 1 1]);
+                status= TDTout.ConnectRX8(NelData.General.TDTcommMode, devNum);
+                RX(devNum).activeX= TDTout;
             end
     end
     varargout{2*devIter-1}= TDTout;
-    varargout{2*devIter}= status;
+    varargout{2*devIter}= status == 1;
 end

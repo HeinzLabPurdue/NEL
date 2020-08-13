@@ -16,7 +16,7 @@ if strcmp(NelData.General.WindowsHostName, '1353lyl303501d') % means NEL1
     RP2= connect_tdt('RP2', 2);
     %     RP3=actxcontrol('RPco.x',[0 0 1 1]);
     %     invoke(RP3,'ConnectRP2',NelData.General.TDTcommMode,3);
-    if NelData.General.RP2_3and4
+    if NelData.General.RP2_3and4 && (~NelData.General.RX8)
         RP3= connect_tdt('RP2', 3);  %#ok<*NASGU>
     else 
         RP3= RP2; 
@@ -316,7 +316,7 @@ elseif strcmp(command_str,'YLim')
     set(FIG.edit.yscale,'string', num2str(Display.YLim_atAD));
     
 elseif strcmp(command_str,'invCalib')
-    if NelData.General.RP2_3and4
+    if NelData.General.RP2_3and4 && (~NelData.General.RX8)
         [~, Stimuli.calibPicNum]= run_invCalib(get(FIG.radio.invCalib,'value'));
     elseif isnan(Stimuli.calibPicNum)
         cdd;
@@ -335,7 +335,7 @@ elseif strcmp(command_str,'invCalib')
     set(FIG.asldr.SPL,'string',sprintf('%.1f dB SPL',Stimuli.calib_dBSPLout-abs(str2double(get(FIG.asldr.val, 'string')))));
     
 elseif strcmp(command_str,'close')
-    if NelData.General.RP2_3and4
+    if NelData.General.RP2_3and4 && (~NelData.General.RX8)
         run_invCalib(false); % Initialize with allpass RP2_3
     end
     set(FIG.push.close,'Userdata',1);

@@ -5,7 +5,7 @@ invoke(RP1,'ClearCOF');
 
 invoke(RP1,'LoadCOF',[prog_dir '\object\FFR_wav_polIN.rcx']);
 
-if NelData.General.RP2_3and4
+if NelData.General.RP2_3and4 && (~NelData.General.RX8)
     %% For bit-select
     RP2=actxcontrol('RPco.x',[0 0 1 1]);
     invoke(RP2,'ConnectRP2',NelData.General.TDTcommMode,2);

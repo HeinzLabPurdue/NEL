@@ -12,12 +12,22 @@ if ~exist('forceDO', 'var')
 end
 
 %% Connecting to RP2_4
-global COMM root_dir NelData
+global COMM root_dir
 object_dir = [root_dir 'calibration\object'];
 
-COMM.handle.RP2_4= actxcontrol('RPco.x',[0 0 5 5]);
-status3 = invoke(COMM.handle.RP2_4,'ConnectRP2', NelData.General.TDTcommMode, 4);
-invoke(COMM.handle.RP2_4,'LoadCof',[object_dir '\calib_invFIR_right.rcx']);
+[COMM.handle.RP2_4, status_rp2]= connect_tdt('RP2', 4);
+[COMM.handle.RX8, status_rx8]= connect_tdt('RX8', 1);
+
+if status_rp2 && status_rp2
+    error('How are RP2#4 and RX8 both in the circuit?');
+end
+
+if status_rp2
+    invoke(COMM.handle.RP2_4,'LoadCof',[object_dir '\calib_invFIR_right.rcx']);
+elseif status_rx8 && forceDO % Most call for run_invCalib are from NEL1. For NEL2 (with RX8), only needed for calibrate and dpoae.
+    invoke(COMM.handle.RX8,'LoadCof',[object_dir '\calib_invFIR_right_RX8.rcx']);
+end
+
 
 %% Define appropriate b for invCalib or allPass
 curDir= pwd;
@@ -73,14 +83,22 @@ end
 cd(curDir);
 
 %% Run the circuit
-e1= COMM.handle.RP2_4.WriteTagV('FIR_Coefs', 0, b);
-if e1 && status3
+if status_rp2
+    e1= COMM.handle.RP2_4.WriteTagV('FIR_Coefs', 0, b);
+    invoke(COMM.handle.RP2_4,'Run');
+elseif (status_rx8 && forceDO)
+    e1= COMM.handle.RX8.WriteTagV('FIR_Coefs', 0, b);
+    invoke(COMM.handle.RX8,'Run');
+else 
+    e1= false;
+end
+if e1 
     if doInvCalib
         if doINVcheck
             fprintf('invFIR Coefs loaded successfully (%s) \n', datestr(datetime));
-        else 
+        else
             fprintf('Running allpass as no invCalib. allpass Coefs loaded successfully (%s) \n', datestr(datetime));
-            warn_handle= warndlg('Running allpass as no invCalib', 'Run invCalib?');
+            warn_handle= warndlg('Running allpass as no invCalib', 'Run invCalib maybe?');
             uiwait(warn_handle);
         end
     else
@@ -89,4 +107,4 @@ if e1 && status3
 else
     fprintf('Could not connect to RP2 or load FIR_Coefs (%s) \n', datestr(datetime));
 end
-invoke(COMM.handle.RP2_4,'Run');
+

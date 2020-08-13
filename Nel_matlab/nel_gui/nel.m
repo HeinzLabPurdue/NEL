@@ -31,12 +31,14 @@ if nargin == 0  % LAUNCH GUI
     Refresh_Template_List(handles); % TODO: include the user templates (NelData.User_block_templates)
     Set_Menu_Accelerators(handles);
     Set_Global_Handles_Lists(handles);
-    tdtinit(fig);
+%     tdtinit(fig); % SP on Aug 12, 2020
     if (isempty(NelData.UnSaved))
         set(handles.Menu_Save_pic,'Enable','off');
     end
     set(handles.Menu_Open,'Enable','off'); % Untill this option is implemented
     set(fig,'Visible','on');
+    set(NelData.General.main_handle,'handlevisib','on'); % SP added on Aug 12, 2020
+    tdtinit();
     
     if nargout > 0
         varargout{1} = fig;

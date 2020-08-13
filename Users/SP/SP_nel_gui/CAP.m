@@ -334,7 +334,7 @@ elseif strcmp(command_str,'invCalib') %SP 24Jan2016
     %%% Account for Calibration to set Level in dB SPL
     
     %     if ~exist('CalibData', 'var')
-    if NelData.General.RP2_3and4
+    if NelData.General.RP2_3and4 && (~NelData.General.RX8)
         [~, Stimuli.calibPicNum]= run_invCalib(get(FIG.radio.invCalib,'value'));
     elseif isnan(Stimuli.calibPicNum)
         cdd;
@@ -356,7 +356,7 @@ elseif strcmp(command_str,'invCalib') %SP 24Jan2016
     
     
 elseif strcmp(command_str,'close')
-    if NelData.General.RP2_3and4
+    if NelData.General.RP2_3and4 && (~NelData.General.RX8)
         run_invCalib(false); % Initialize with allpass RP2_3
     end
     rmpath('C:\NEL1_2\Users\SP\SP_nel_gui\')

@@ -30,7 +30,7 @@ invoke(RP1,'SetTagVal','StmOff',CAP_Gating.period_ms-CAP_Gating.duration_ms);
 invoke(RP1,'SetTagVal','RiseFall',CAP_Gating.rftime_ms);
 invoke(RP1,'Run');
 
-if NelData.General.RP2_3and4
+if NelData.General.RP2_3and4 && (~NelData.General.RX8)
     %% For bit select (RP2#3 is not connected to Mix/Sel). So have to use RP2#2. May use RP2#1?
     RP2=actxcontrol('RPco.x',[0 0 1 1]);
     invoke(RP2,'ConnectRP2',NelData.General.TDTcommMode,2);
