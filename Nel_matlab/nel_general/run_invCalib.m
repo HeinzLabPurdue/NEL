@@ -2,10 +2,11 @@
 % if doInvCalib= 0, all pass
 % if doInvCalib= 1, inverse calib based on last coef* file
 % if doInvCalib= -1, query allpass or invFIR
+% if doInvCalib= -2, return b required from invFIR
 % forceDO: should be set to 1 for only when running invCalib after rawCalib
 
 
-function [coefFileNum, calibPicNum]= run_invCalib(doInvCalib, forceDO)
+function [coefFileNum, calibPicNum, b]= run_invCalib(doInvCalib, forceDO)
 
 if ~exist('forceDO', 'var')
     forceDO= false;
@@ -72,6 +73,7 @@ elseif doInvCalib==-1
     coefFileNum= nan;
     calibPicNum= nan;
     coef_stored= COMM.handle.RP2_4.ReadTagV('FIR_Coefs', 0, 256);
+    b= coef_stored;
     if max(abs((coef_stored-[1 zeros(1, 255)])))<1e-6 % if within quantization error, then equal
         fprintf('Using Allpass Coefs (%s) \n', datestr(datetime));
     else
@@ -79,6 +81,27 @@ elseif doInvCalib==-1
     end
     cd(curDir);
     return;
+elseif doInvCalib== -2 % return
+    all_Coefs_Files= dir('coef*');
+    all_Coefs_picNums= cell2mat(cellfun(@(x) sscanf(x, 'coef_%04f_calib*'), {all_Coefs_Files.name}', 'UniformOutput', false));
+    
+    % Check if last calib file is the same as last coef file
+    if max(all_calib_picNums)~=max(all_Coefs_picNums)
+        %         warning('Last Calib file does not match last coef-file. Rerunning invCalib?');
+        warning('All raw-files should have corresponding coef files?? Something wrong???');
+    end
+    [coefFileNum, max_ind] = max(all_Coefs_picNums); % Output#1
+    allINVcalFiles= dir(['p*calib*' num2str(coefFileNum) '*']);
+    
+    if ~isempty(allINVcalFiles) % There's both rawCalib and invCalib
+        all_invCal_picNums= cell2mat(cellfun(@(x) sscanf(x, 'p%04f_calib*'), {allINVcalFiles.name}', 'UniformOutput', false));
+        calibPicNum= max(all_invCal_picNums); % Output#2
+        
+        temp = load(all_Coefs_Files(max_ind).name);
+        b= temp.b(:)';
+    else
+        b= nan;
+    end
 end
 cd(curDir);
 

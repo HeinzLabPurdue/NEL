@@ -357,9 +357,12 @@ elseif strcmp(command_str,'invCalib') %SP 24Jan2016
     
 elseif strcmp(command_str,'close')
     if NelData.General.RP2_3and4 && (~NelData.General.RX8)
-        run_invCalib(false); % Initialize with allpass RP2_3
+        forceDO= true;
+        run_invCalib(false, forceDO); % Initialize with allpass RP2_3
     end
-    rmpath('C:\NEL1_2\Users\SP\SP_nel_gui\')
+    if any(strcmpi([NelData.General.RootDir 'Users\SP\SP_nel_gui\'], regexp(path, pathsep, 'split')))
+        rmpath([NelData.General.RootDir 'Users\SP\SP_nel_gui\'])
+    end
     set(FIG.push.close,'Userdata',1);
     cd([NelData.General.RootDir 'Nel_matlab\nel_general']);
 end
