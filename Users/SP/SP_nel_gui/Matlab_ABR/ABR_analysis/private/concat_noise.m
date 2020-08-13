@@ -16,7 +16,7 @@ noiseEnd= 6.2e-3;
 %%
 for freq_var=1:length(AllFreq)
     allfiles=dir([DataDir filesep 'a*' num2str(AllFreq(freq_var)) '*']);
-    search_string='a%d_*';
+    search_string='a';
     if isempty(allfiles)
         allfiles=dir([DataDir filesep 'p*' num2str(AllFreq(freq_var)) '*']);
         search_string(1)='p';
@@ -24,11 +24,11 @@ for freq_var=1:length(AllFreq)
     
     %%
     for file_var=1:length(allfiles)
-        picNum=sscanf(allfiles(file_var).name,search_string);
+        picNum=sscanf(allfiles(file_var).name, [search_string '%d_*']);
         
         %%
         cd(DataDir);
-        xx=loadpic(picNum, 'a');
+        xx=loadpic(picNum, search_string);
         cd(CurDir);
         if iscell(xx.AD_Data.AD_Avg_V)
             xx.AD_Data.AD_Avg_V=xx.AD_Data.AD_Avg_V{1};

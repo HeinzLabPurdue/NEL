@@ -360,8 +360,12 @@ elseif strcmp(command_str,'close')
         forceDO= true;
         run_invCalib(false, forceDO); % Initialize with allpass RP2_3
     end
-    if any(strcmpi([NelData.General.RootDir 'Users\SP\SP_nel_gui\'], regexp(path, pathsep, 'split')))
-        rmpath([NelData.General.RootDir 'Users\SP\SP_nel_gui\'])
+    curPath= regexp(path, pathsep, 'split');
+    del_path_ind= find(contains(curPath, {'SP_nel_gui', 'SP\Matlab_ABR'}));
+    if any(del_path_ind)
+        for pathVar=1:length(del_path_ind)
+            rmpath(curPath{del_path_ind(pathVar)})
+        end
     end
     set(FIG.push.close,'Userdata',1);
     cd([NelData.General.RootDir 'Nel_matlab\nel_general']);

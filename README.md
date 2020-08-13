@@ -8,7 +8,8 @@ To-Do list:
 (4) rename RP1,2,3,4 in CAP codes to something tdt_stim_module, tdt_bitset_module, tdt_dac_module for better readability. Because RP3 can be RX8. Can becomes difficult to understand code flow and reasons behind such hack for someone new without knowing NEL history.
 (5) Bit selection parts from CAP_left.rcx can be moved to to CAP_bitset.rcx (or we probably don't need) CAP_bitset.rcx, just move everything into CAP_left.rcx and rename it to CAP_stimGen_bitSet.rcx 
 (6) All .rco files should be renamed to .rcx files 
-
+(7) Remove nel.m from SP_NEL_GUI folder. It causes a lot of problem.
+(8) ABR blackbox and ABR NEL GUI under SP_NEL_GUI use different codes. Try to keep the outer scripts separate, but the private scripts the same (lile concat_noise)
 
 NEL1 code
 

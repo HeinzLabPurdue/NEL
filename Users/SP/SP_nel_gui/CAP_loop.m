@@ -1,7 +1,5 @@
 %global root_dir NelData
 
-global DEBUG_FLAG
-
 if Stimuli.clickYes==1  %KH 06Jan2012
     clickAmp=5; toneAmp=0;
     CAP_Gating.duration_ms=Stimuli.clickLength_ms;
@@ -53,6 +51,7 @@ if NelData.General.RP2_3and4 && (~NelData.General.RX8) % NEL1 with RP2 #3 & #4
     RP3= connect_tdt('RP2', 3);
     invoke(RP3,'ClearCOF');
     invoke(RP3,'LoadCOF',[prog_dir '\object\ABR_right.rcx']);
+
 elseif ~(NelData.General.RP2_3and4) && (~NelData.General.RX8) % NEL1 without (RP2 #3 & #4), and not NEL2 because no RX8
     %     RP2=actxcontrol('RPco.x',[0 0 1 1]);
     %     invoke(RP2,'ConnectRP2',NelData.General.TDTcommMode,2);
@@ -61,6 +60,7 @@ elseif ~(NelData.General.RP2_3and4) && (~NelData.General.RX8) % NEL1 without (RP
     RP3= RP2;
     invoke(RP3,'ClearCOF');
     invoke(RP3,'LoadCOF',[prog_dir '\object\CAP_right.rcx']);
+
 elseif NelData.General.RX8  %NEL2 with RX8
     %     RP2=actxcontrol('RPco.x',[0 0 1 1]);
     %     invoke(RP2,'ConnectRP2',NelData.General.TDTcommMode,2);
@@ -77,6 +77,7 @@ elseif NelData.General.RX8  %NEL2 with RX8
 else 
     nelerror('Cannot figure out whether NEL1 or NEL2')
 end
+
 invoke(RP3,'SetTagVal','ADdur', CAP_Gating.CAPlength_ms);
 invoke(RP3,'Run');
 
