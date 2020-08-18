@@ -7,7 +7,7 @@ else
 end
 
 % [pathstr name ext versn]=fileparts(fname);
-[pathstr name ext]=fileparts(fname);
+[pathstr, name, ext]=fileparts(fname);
 aux_fname = fullfile(pathstr,['a' name(2:end)]);
 % aux_fname = fullfile(pathstr,['p' name(2:end)]);
 x.General.program_name  = PROG.name;
@@ -27,3 +27,4 @@ x.Stimuli.CAP_Gating = CAP_Gating;
 x.Line.freq_Hz = Stimuli.freq_hz;
 
 x.AD_Data.Gain=Display.Gain;
+x.AD_Data.SampleRate= Stimuli.RPsamprate_Hz/RunLevels_params.decimateFact;

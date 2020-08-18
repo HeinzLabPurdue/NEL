@@ -10,6 +10,7 @@ To-Do list:
 (6) All .rco files should be renamed to .rcx files 
 (7) Remove nel.m from SP_NEL_GUI folder. It causes a lot of problem.
 (8) ABR blackbox and ABR NEL GUI under SP_NEL_GUI use different codes. Try to keep the outer scripts separate, but the private scripts the same (lile concat_noise)
+(9) ABR codes do not work for the fixed phase option 
 
 NEL1 code
 

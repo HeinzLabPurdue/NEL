@@ -66,6 +66,7 @@ elseif NelData.General.RX8  %NEL2 with RX8
     %     RP2=actxcontrol('RPco.x',[0 0 1 1]);
     %     invoke(RP2,'ConnectRP2',NelData.General.TDTcommMode,2);
     RP2= connect_tdt('RP2', 2);
+    invoke(RP2,'ClearCOF');
     invoke(RP2,'LoadCOF',[prog_dir '\object\CAP_BitSet.rcx']);
     invoke(RP2,'Run');
     
@@ -87,6 +88,8 @@ end
 
 invoke(RP3,'SetTagVal','ADdur', CAP_Gating.CAPlength_ms);
 invoke(RP3,'Run');
+
+Stimuli.RPsamprate_Hz= RP3.GetSFreq; % 12207.03125;  % Hard coded for now, eventually get from RP
 
 CAP_set_attns(Stimuli.atten_dB,Stimuli.channel,Stimuli.KHosc,RP1,RP2);  %% debug deal with later Khite
 CAPnpts=ceil(CAP_Gating.CAPlength_ms/1000*Stimuli.RPsamprate_Hz);
@@ -134,10 +137,10 @@ while isempty(get(FIG.push.close,'Userdata'))
     
     invoke(RP1,'SoftTrg',1);
     %    tspan = CAP_Gating.period_ms/1000;
-    
     while(1)  % loop until "close" request
         % disp ('in loop')
-        if(invoke(RP3,'GetTagVal','BufFlag') == 1)
+        %         pause(.01)    
+        if (invoke(RP3,'GetTagVal','BufFlag') == 1)
             CAPdata = invoke(RP3,'ReadTagV','ADbuf',0, CAPnpts);
             %           CAPdata = ones(size(CAPdata)); % ge debug
             
@@ -249,8 +252,8 @@ while isempty(get(FIG.push.close,'Userdata'))
                     invoke(RP1,'SetTagVal','clickAmp',clickAmp);
                     invoke(RP1,'SetTagVal','StmOn',CAP_Gating.duration_ms);
                     invoke(RP1,'SetTagVal','StmOff',CAP_Gating.period_ms-CAP_Gating.duration_ms);
-                    
             end
+            
             FIG.NewStim = 0;
         end
     end

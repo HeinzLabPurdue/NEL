@@ -70,7 +70,7 @@ elseif NelData.General.RX8  %NEL2 with RX8
     
     RP3= connect_tdt('RX8', 1);
     invoke(RP3,'ClearCOF');
-    invoke(RP3,'LoadCOF',[prog_dir '\object\CAP_RX8_ADC_invCalib.rcx']);
+    invoke(RP3,'LoadCOF',[prog_dir '\object\ABR_RX8_ADC_invCalib.rcx']);
     %     [~, ~, b_invCalib_coef]= run_invCalib(-2);
     b_invCalib_coef= [1 zeros(1, 255)];
     e_invCalib_status= RP3.WriteTagV('FIR_Coefs', 0, b_invCalib_coef);
@@ -80,6 +80,7 @@ end
 
 invoke(RP3,'SetTagVal','ADdur', CAP_Gating.CAPlength_ms);
 invoke(RP3,'Run');
+Stimuli.RPsamprate_Hz= RP3.GetSFreq; % 12207.03125;  % Hard coded for now, eventually get from RP
 
 CAP_set_attns(Stimuli.atten_dB,Stimuli.channel,Stimuli.KHosc,RP1,RP2);  %% debug deal with later Khite
 CAPnpts=floor(CAP_Gating.CAPlength_ms/1000*Stimuli.RPsamprate_Hz); % SP: Changed from ceil to floor on 21Aug19: one extra point was collected in ABR serial buffer
