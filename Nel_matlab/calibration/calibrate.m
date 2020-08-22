@@ -294,9 +294,8 @@ elseif strcmp(command_str,'recall')
     drawnow;
     
 elseif strcmp(command_str,'close')
-    if NelData.General.RP2_3and4 && (~NelData.General.RX8)
-        forceCalib= true;
-        coefFileNum= run_invCalib(false, forceCalib);
+    if NelData.General.RP2_3and4 || NelData.General.RX8
+        coefFileNum= run_invCalib(false);
     end
     delete(FIG.handle);
 end

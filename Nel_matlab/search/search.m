@@ -147,7 +147,7 @@ elseif strcmp(command_str,'spike_channel')
     
     
 elseif strcmp(command_str,'invCalib')
-    if NelData.General.RP2_3and4 && (~NelData.General.RX8)
+    if NelData.General.RP2_3and4 || NelData.General.RX8
         [~, Stimuli.calibPicNum]= run_invCalib(get(FIG.radio.invCalib,'value'));
     elseif isnan(Stimuli.calibPicNum)
         cdd;
@@ -158,7 +158,7 @@ elseif strcmp(command_str,'invCalib')
     end
     
 elseif strcmp(command_str,'close')
-    if NelData.General.RP2_3and4 && (~NelData.General.RX8)
+    if NelData.General.RP2_3and4 || NelData.General.RX8
         run_invCalib(false); % Initialize with allpass RP2_3
     end
     set(FIG.push.close,'Userdata',1);

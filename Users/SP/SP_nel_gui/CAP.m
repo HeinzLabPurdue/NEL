@@ -357,8 +357,7 @@ elseif strcmp(command_str,'invCalib') %SP 24Jan2016
     
 elseif strcmp(command_str,'close')
     if NelData.General.RP2_3and4 && (~NelData.General.RX8)
-        forceDO= true;
-        run_invCalib(false, forceDO); % Initialize with allpass RP2_3
+        run_invCalib(false); % Initialize with allpass RP2_3
     end
     curPath= regexp(path, pathsep, 'split');
     del_path_ind= find(contains(curPath, {'SP_nel_gui', 'SP\Matlab_ABR'}));

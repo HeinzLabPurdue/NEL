@@ -20,8 +20,7 @@ if (NelData.General.RP2_3and4 || NelData.General.RX8)
     end
     rdd;
     doInvCalib= ~newCalib; % if not new (means old => coef-file exists), then run inverse calibration
-    forceCalib= true;
-    coefFileNum= run_invCalib(doInvCalib, forceCalib);
+    coefFileNum= run_invCalib(doInvCalib);
 else
     newCalib= true;
 end

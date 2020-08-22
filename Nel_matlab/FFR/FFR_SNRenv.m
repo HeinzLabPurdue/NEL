@@ -337,9 +337,8 @@ elseif strcmp(command_str,'invCalib')
     set(FIG.asldr.SPL,'string',sprintf('%.1f dB SPL',Stimuli.calib_dBSPLout-abs(str2double(get(FIG.asldr.val, 'string')))));
     
 elseif strcmp(command_str,'close')
-    if NelData.General.RP2_3and4 || NelData.General.RX8
-        forceDO= true;
-        run_invCalib(false, forceDO); % Initialize with allpass RP2_3
+    if NelData.General.RP2_3and4 && (~NelData.General.RX8)
+        run_invCalib(false); % Initialize with allpass RP2_3
     end
     set(FIG.push.close,'Userdata',1);
     cd([NelData.General.RootDir 'Nel_matlab\nel_general']);

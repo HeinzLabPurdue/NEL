@@ -3,16 +3,11 @@
 % if doInvCalib= 1, inverse calib based on last coef* file
 % if doInvCalib= -1, query allpass or invFIR
 % if doInvCalib= -2, return b required from invFIR
-% forceDO: should be set to 1 for only when running invCalib after rawCalib
 
 
-function [coefFileNum, calibPicNum, b]= run_invCalib(doInvCalib, forceDO)
+function [coefFileNum, calibPicNum, b]= run_invCalib(doInvCalib)
 
-if ~exist('forceDO', 'var')
-    forceDO= false;
-end
-
-%% Connecting to RP2_4
+%% Connecting to TDT modules
 global COMM root_dir
 object_dir = [root_dir 'calibration\object'];
 
@@ -25,7 +20,7 @@ end
 
 if status_rp2
     invoke(COMM.handle.RP2_4,'LoadCof',[object_dir '\calib_invFIR_right.rcx']);
-elseif status_rx8 && forceDO % Most call for run_invCalib are from NEL1. For NEL2 (with RX8), only needed for calibrate and dpoae.
+elseif status_rx8 % Most call for run_invCalib are from NEL1. For NEL2 (with RX8), only needed for calibrate and dpoae.
     invoke(COMM.handle.RX8,'LoadCof',[object_dir '\calib_invFIR_right_RX8.rcx']);
 end
 
@@ -46,9 +41,9 @@ if doInvCalib==1
         warning('All raw-files should have corresponding coef files?? Something wrong???');
     end
     [coefFileNum, max_ind] = max(all_Coefs_picNums); % Output#1
-    allINVcalFiles= dir(['p*calib*' num2str(coefFileNum) '*']);
+    allINVcalFiles= dir(['p*' num2str(coefFileNum) '*calib*']);
     
-    if ~isempty(allINVcalFiles)|| forceDO % There's both rawCalib and invCalib
+    if ~isempty(allINVcalFiles) % There's both rawCalib and invCalib
         all_invCal_picNums= cell2mat(cellfun(@(x) sscanf(x, 'p%04f_calib*'), {allINVcalFiles.name}', 'UniformOutput', false));
         calibPicNum= max(all_invCal_picNums); % Output#2
         
@@ -109,13 +104,13 @@ cd(curDir);
 if status_rp2
     e1= COMM.handle.RP2_4.WriteTagV('FIR_Coefs', 0, b);
     invoke(COMM.handle.RP2_4,'Run');
-elseif (status_rx8 && forceDO)
+elseif status_rx8
     e1= COMM.handle.RX8.WriteTagV('FIR_Coefs', 0, b);
     invoke(COMM.handle.RX8,'Run');
 else 
     e1= false;
 end
-if e1 
+if e1
     if doInvCalib
         if doINVcheck
             fprintf('invFIR Coefs loaded successfully (%s) \n', datestr(datetime));
@@ -127,7 +122,7 @@ if e1
     else
         fprintf('Allpass Coefs loaded successfully (%s) \n', datestr(datetime));
     end
-else
+elseif (~e1) && (doInvCalib ~= -2)
     fprintf('Could not connect to RP2 or load FIR_Coefs (%s) \n', datestr(datetime));
 end
 

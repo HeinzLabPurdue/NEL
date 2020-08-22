@@ -333,8 +333,7 @@ elseif strcmp(command_str,'clickYes') %KH 10Jan2012
     
 elseif strcmp(command_str,'close')
     if NelData.General.RP2_3and4 && (~NelData.General.RX8)
-        forceDO= true;
-        run_invCalib(false, forceDO); % Initialize with allpass RP2_3
+        run_invCalib(false); % Initialize with allpass RP2_3
     end
     set(FIG.push.close,'Userdata',1);
 end

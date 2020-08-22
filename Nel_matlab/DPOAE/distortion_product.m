@@ -76,8 +76,7 @@ if ~strcmp(command_str,'initialize')		%you're returning via callback, retrieve f
     
     dpoaedata= get(h_push_start,'Userdata');
     if NelData.General.RP2_3and4 || NelData.General.RX8 % if NEL1 || NEL2
-        forceDO= true;
-        run_invCalib(false, forceDO); % DPOAEs play 2 tones: easier to use raw-calib file with an allpass system; % SP on 22Sep19
+        run_invCalib(false); % DPOAEs play 2 tones: easier to use raw-calib file with an allpass system; % SP on 22Sep19
     end
     % This means: need to use the last raw calib file
 end
@@ -214,8 +213,7 @@ elseif strcmp(command_str,'saveNquit')
     
 elseif strcmp(command_str,'close')
     if NelData.General.RP2_3and4 || NelData.General.RX8
-        forceDO= true;
-        run_invCalib(false, forceDO);
+        run_invCalib(false);
     end
     close('Distortion Product Otoacoustic Emissions');
 end
