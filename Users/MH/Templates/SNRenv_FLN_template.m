@@ -184,6 +184,10 @@ else
     spl2use= 65;
 end
 
+cdd;
+calibFiles= dir('*calib*'); % assumes last invCalib file
+calib_picNum= getPicNum(calibFiles(end).name);
+rdd;
 
 %% Inloop Section 
 %%%%%%%%%%%%%%%%%%%%
@@ -193,7 +197,7 @@ IO_def.Inloop.List_File             = {sprintf('%sLists\\MH\\SNRenv\\SNRenv_14st
 % IO_def.Inloop.List_File             = {sprintf('%sLists\\MH\\SNRenv\\SNRenv_22stim_FLN.m', signals_dir)  };
 % IO_def.Inloop.List_File             = { {['uigetfile(''' signals_dir 'Lists\MH\SNRenv\*.m'')']} };
 % IO_def.Inloop.Attenuation           = {'max(0,current_unit_thresh-50)'  'dB'    [0    120]      };
-IO_def.Inloop.CalibPicNum  =  {1   ''       [0 6000]};
+IO_def.Inloop.CalibPicNum  =  {calib_picNum   ''       [0 6000]};
 IO_def.Inloop.Level  =  {spl2use 'dB SPL'       [-50    150]   0  0}; 
 IO_def.Inloop.Repetitions            = { 25                        ''      [1    Inf]      };
 IO_def.Inloop.UpdateRate        = { 100000                  'Hz'      [1    NI6052UsableRate_Hz(Inf)]      };
