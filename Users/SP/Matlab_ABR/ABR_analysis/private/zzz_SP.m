@@ -73,11 +73,9 @@ freq_mean=mean(freqs); freq=round(freqs(1,1)/500)*500; %round to nearest 500 Hz
 abr_time=(0:dt:time_of_bin(length(abr)));
 
 %% Determine SPL of stimuli
-CalibFile  = sprintf('p%04d_calib', str2double(abr_Stimuli.cal_pic));
-if ~exist(CalibFile, 'file')
-    CalibFile  = sprintf('p%04d_calib_raw', str2double(abr_Stimuli.cal_pic));
-end
-command_line = sprintf('%s%s%c','[xcal]=',CalibFile,';');
+CalibFile  = dir(sprintf('p%04d_calib*', str2double(abr_Stimuli.cal_pic)));
+
+command_line = sprintf('%s%s%c','[xcal]=',CalibFile.name(1:end-2),';');
 eval(command_line);
 freq_loc = find(xcal.CalibData(:,1)>=(freq_mean/1000));
 freq_level = xcal.CalibData(freq_loc(1),2);
@@ -149,7 +147,7 @@ bin_of_max=NaN*ones(1,num);
 [data.z.score(1,1),bin_of_max(1,1)]=max(abr_xx2(:,1));
 for i = 2:num
 	add_attn=attn(1,i-1)-attn(1,i); exp_bin=bin_of_max(1,i-1) + bin_of_time(add_attn/40) - 1;
-    [data.z.score(1,i),delay]=max(abr_xx2(round(exp_bin-bin_of_time(1)):round(exp_bin+bin_of_time(1),i)));
+    [data.z.score(1,i),delay]=max(abr_xx2(round(exp_bin-bin_of_time(1)):round(exp_bin+bin_of_time(1)), i));
 	bin_of_max(1,i)=exp_bin-bin_of_time(1)+delay-1;
 end;
 delay_of_max=time_of_bin(bin_of_max);

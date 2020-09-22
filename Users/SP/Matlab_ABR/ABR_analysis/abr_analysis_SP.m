@@ -3,7 +3,7 @@ function abr_analysis_SP(command_str,parm_num)
 %This function computes an ABR threshold based on series of AVERAGER files.
 
 global NelData abr_FIG abr_Stimuli abr_root_dir abr_data_dir num num_all dt line_width abr freq ...
-    attn spl upper_y_bound lower_y_bound y_shift animal date freq_level data han
+    attn spl upper_y_bound lower_y_bound y_shift animal date freq_level data han noise 
 host = lower(getenv('hostname'));
 
 User_Dir=pwd;
@@ -12,7 +12,6 @@ abr_root_dir = [User_Dir filesep 'Matlab_ABR' filesep 'ABR_analysis'];
 abr_data_dir = [fileparts(fileparts(User_Dir)) filesep 'ExpData'];
 % abr_data_dir=[];
 
-get_noise
 
 if ~isempty(abr_Stimuli) 
     temp_dir_name=abr_Stimuli.dir;
@@ -23,6 +22,9 @@ if ~isempty(abr_Stimuli)
     end
     cd(ExpDir);
 end
+
+% get_noise
+noise= concat_noise(ExpDir); 
 
 if nargin < 1
     
@@ -35,7 +37,7 @@ if nargin < 1
     abrs  = cell2struct(cell(1,10),{'abr1','abr2','abr3','abr4','abr5','abr6','abr7','abr8','abr9','abr10'},2);
     abr_FIG = struct('handle',[],'push',push,'ax1',ax1,'ax2',ax2,'abrs',abrs,'parm_text',[],'dir_text',[]);
     
-    get_analysis_ins_SP; %script creates struct Stimuli
+    abr_Stimuli= get_analysis_ins_SP(abr_Stimuli); %script creates struct Stimuli
     global FLAG_ABR_ENTER_SP picstoSEND_deBUG picNUMlist picstoSEND FLAG_RERUN FLAG_RERUN_FOR_ABR_ANALYSIS
     
     if ~isempty(FLAG_RERUN_FOR_ABR_ANALYSIS) & FLAG_RERUN_FOR_ABR_ANALYSIS

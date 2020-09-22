@@ -270,15 +270,9 @@ while isempty(get(FIG.push.close,'Userdata'))
                             [xx,lastdBindex]=min(abs(dBSPLlist-lastdBSPL));
                             picstoSEND=picNUMlist(1:lastdBindex);  % list of PICS to send to Ken's code to avoid usinig too high an SPL for template
                             
-                            CalibPIC=CalibFileNum;
+                            CalibPIC= Stimuli.calibPicNum;
                             dataDIR=NelData.File_Manager.dirname;
-                            
-                            if DEBUG_FLAG
-                                picstoSEND=6:12;
-                                dBSPLlist=0:10:80;
-                                picNUMlist=6:14;
-                            end
-                            
+                                                        
                             AutoLevel_params.AutoThresh1=main_abr_bb(dataDIR,CalibPIC,picstoSEND);
                             
                             if isnan(AutoLevel_params.AutoThresh1)
@@ -317,25 +311,19 @@ while isempty(get(FIG.push.close,'Userdata'))
                         end
                         
                         if AutoLevel_params.ReRunFlag % After rerun
-                            if ~DEBUG_FLAG %If NOT debugging
-                                AutoLevel_params.ReRunFlag=0;
-                                picstoSEND_deBUG=[picstoSEND_deBUG, (35)];
-                                global FLAG_RERUN_FOR_ABR_ANALYSIS % Need to remove these global-vars 
-                                FLAG_RERUN_FOR_ABR_ANALYSIS=1;
-                                
-                                picNUMlist=[picNUMlist NelData.File_Manager.picture-fliplr((1:AutoLevel_params.numAttens_1)-1)];
-                                dBSPLlist=[dBSPLlist rerunSPLs];
-                                lastdBSPL=AutoLevel_params.AutoThresh1+AutoLevel_params.dBaboveTHRman_for_autoTHRcorr;
-                                %% CHANGE MANthre
-                                %                         [xx,lastdBindex]=min(abs(dBSPLlist-lastdBSPL));
-                                %                         picstoSEND=[picstoSEND picNUMlist(1:lastdBindex)];  % list of PICS to send to Ken's code to avoid usinig too high an SPL for template
-                                picstoSEND=picNUMlist;%(dBSPLlist<lastdBSPL);
-                                %% on;y send less 65 - non monotonic
-                            else
-                                picstoSEND=[picstoSEND 15];
-                                picNUMlist=picstoSEND;
-                                dBSPLlist=[dBSPLlist(1:length(picNUMlist)-1) 35];
-                            end
+                            AutoLevel_params.ReRunFlag=0;
+                            global FLAG_RERUN_FOR_ABR_ANALYSIS % Need to remove these global-vars
+                            FLAG_RERUN_FOR_ABR_ANALYSIS=1;
+                            
+                            picNUMlist=[picNUMlist NelData.File_Manager.picture-fliplr((1:AutoLevel_params.numAttens_1)-1)];
+                            dBSPLlist=[dBSPLlist rerunSPLs];
+                            lastdBSPL=AutoLevel_params.AutoThresh1+AutoLevel_params.dBaboveTHRman_for_autoTHRcorr;
+                            %% CHANGE MANthre
+                            %                         [xx,lastdBindex]=min(abs(dBSPLlist-lastdBSPL));
+                            %                         picstoSEND=[picstoSEND picNUMlist(1:lastdBindex)];  % list of PICS to send to Ken's code to avoid usinig too high an SPL for template
+                            picstoSEND=picNUMlist;%(dBSPLlist<lastdBSPL);
+                            %% on;y send less 65 - non monotonic
+                            
                         else % <2> After 5dB step is run
                             
                             picstoSEND=[picstoSEND,NelData.File_Manager.picture]; % Check
@@ -350,7 +338,7 @@ while isempty(get(FIG.push.close,'Userdata'))
                         FLAG_ABR_ENTER_SP=1;
                         
                         cur_dir=pwd;
-                        abr_analysis_dir=fileparts(cur_dir);
+                        abr_analysis_dir= [NelData.General.RootDir 'Users\SP\'];
                         cd(abr_analysis_dir);
                         abr_setup_SP;
                         abr_analysis_SP('process');

@@ -42,13 +42,13 @@ if NelData.General.RP2_3and4
     RP3=actxcontrol('RPco.x',[0 0 1 1]);
     invoke(RP3,'ConnectRP2',NelData.General.TDTcommMode,3);
     invoke(RP3,'ClearCOF');
-    if strcmpi(interface_type, 'CAP')
+    if contains(interface_type, {'CAP', 'ECochG'})
         invoke(RP3,'LoadCOF',[prog_dir '\object\CAP_ADC.rcx']);
         % Only difference: Input Channel number
-        % For CAP: AD chan #1
+        % For CAP: AD chan #2
     else % ABR
         invoke(RP3,'LoadCOF',[prog_dir '\object\ABR_right.rcx']);
-        % For ABR: AD chan #2
+        % For ABR: AD chan #1
     end
     invoke(RP3,'SetTagVal','ADdur', CAP_Gating.CAPlength_ms);
     invoke(RP3,'Run');
@@ -109,7 +109,8 @@ while isempty(get(FIG.push.close,'Userdata'))
    invoke(RP1,'SoftTrg',1);
    %    tspan = CAP_Gating.period_ms/1000;
    while(1)  % loop until "close" request
-      if(invoke(RP3,'GetTagVal','BufFlag') == 1)
+% disp ('in loop')
+       if(invoke(RP3,'GetTagVal','BufFlag') == 1)
          CAPdata = invoke(RP3,'ReadTagV','ADbuf',0,CAPnpts);
          %           CAPdata = ones(size(CAPdata)); % ge debug
          

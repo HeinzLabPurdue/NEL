@@ -186,7 +186,11 @@ else
 end
 if contains(curDataDir, {'NH', 'setup'})
     spl2use= 65;
-else
+elseif contains(curDataDir, {'PTS', 'HI'})
+    spl2use= 80;
+elseif contains(curDataDir, {'CA'})
+    spl2use= 75;
+else 
     spl2use= 80;
 end
 

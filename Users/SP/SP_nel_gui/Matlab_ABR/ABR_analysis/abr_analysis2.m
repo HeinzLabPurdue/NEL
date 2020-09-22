@@ -112,7 +112,7 @@ elseif strcmp(command_str,'stimulus')
             set(abr_FIG.parm_txt(parm_num),'string',upper(new_value));
             switch parm_num
                 case 1,
-                   abr_Stimuli.cal_pic = new_value;              
+                    abr_Stimuli.cal_pic = new_value;
                 case 2,
                    abr_Stimuli.abr_pic = new_value;
 %                    abr_analysis('process');  % added by GE 14Apr2004

@@ -3,11 +3,10 @@
 % FIG.radio.noise  = uicontrol(FIG.handle,'callback','CAP(''noise'');','style','radio','Enable','on','Units','normalized','position',[.125 .425 .08 .03],'string','Noise','fontsize',12,'BackgroundColor','w','value',1);
 % FIG.radio.tone   = uicontrol(FIG.handle,'callback','CAP(''tone'');','style','radio','Enable','on','Units','normalized','position',[.125 .395 .08 .03],'string','Tone','fontsize',12,'BackgroundColor','w','value',1);
 % FIG.radio.khite  = uicontrol(FIG.handle,'callback','CAP(''khite'');','style','radio','Enable','on','Units','normalized','position',[.125 .365 .08 .03],'string','KH Osc','fontsize',12,'BackgroundColor','w');
-FIG.radio.fast   = uicontrol(FIG.handle,'callback','CAP(''fast'');','style','radio','Enable','on','Units','normalized','position',[.125 .315 .08 .03],'string','Fast','fontsize',12,'BackgroundColor','w','value',1);
-FIG.radio.slow   = uicontrol(FIG.handle,'callback','CAP(''slow'');','style','radio','Enable','on','Units','normalized','position',[.125 .285 .08 .03],'string','Slow','fontsize',12,'BackgroundColor','w');
-FIG.checkbox.fixedPhase = uicontrol(FIG.handle, 'callback', 'CAP(''fixedPhase'');','style','checkbox','Enable','on','Units','normalized','position',[.125 .365 .09 .03],'string','fixedPhase','fontsize',12,'BackgroundColor','w','value',Stimuli.fixedPhase);
-
-
+FIG.checkbox.fixedPhase = uicontrol(FIG.handle, 'callback', 'CAP(''fixedPhase'');','style','checkbox','Enable','on','Units','normalized','position',[.125 .375 .09 .03],'string','fixedPhase','fontsize',12,'BackgroundColor','w','value',Stimuli.fixedPhase);
+FIG.radio.invCalib      = uicontrol(FIG.handle,'callback','CAP(''invCalib'');','style','radio','Enable','on','Units','normalized','position',[.125 .345 .08 .03],'string','invCalib','fontsize',12,'BackgroundColor','w','value',1);
+FIG.radio.fast   = uicontrol(FIG.handle,'callback','CAP(''fast'');','style','radio','Enable','on','Units','normalized','position',[.125 .305 .08 .03],'string','Fast','fontsize',12,'BackgroundColor','w','value',1);
+FIG.radio.slow   = uicontrol(FIG.handle,'callback','CAP(''slow'');','style','radio','Enable','on','Units','normalized','position',[.125 .275 .08 .03],'string','Slow','fontsize',12,'BackgroundColor','w');
 
 
 FIG.fsldr.slider = uicontrol(FIG.handle,'callback','CAP(''slide_freq'');','style','slider','SliderStep',[0.001 0.01],'Enable','on','min',100,'max',1000,'Units','normalized','position',[.35 .175 .525 .04],'Value',Stimuli.freq_hz/Stimuli.fmult);

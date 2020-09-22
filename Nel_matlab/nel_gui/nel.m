@@ -100,7 +100,7 @@ while ((isempty(user) | isempty(user{1})))
     if SKIPintro
         user = {'MH'};
     else
-        user = inputdlg({'User Name:'},title,1,{NelData.General.User},180);
+        user = inputdlg({'User Name:'},title,1,{NelData.General.User}, 180);
     end
     if (isempty(user))
         Nel_Main_CloseRequestFcn(handles.Nel_Main, [], handles,{});

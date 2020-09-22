@@ -337,7 +337,9 @@ Data.Offset = DefOffset;
 set(InputFig ,'Visible','on','UserData',Data);
 % This drawnow is a hack to work around a bug
 drawnow
-set(findall(InputFig),'Units','normalized','HandleVisibility','callback');
+all_handles_temp= findall(InputFig);
+all_handles_temp_notAnotPan= all_handles_temp([1:4 6 8]);
+set(all_handles_temp_notAnotPan,'Units','normalized','HandleVisibility','callback');
 set(InputFig,'Units','points')
 try
     uiwait(InputFig);
