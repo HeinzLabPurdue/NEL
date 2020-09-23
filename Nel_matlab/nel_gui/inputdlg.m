@@ -337,9 +337,17 @@ Data.Offset = DefOffset;
 set(InputFig ,'Visible','on','UserData',Data);
 % This drawnow is a hack to work around a bug
 drawnow
+
+% --------------------
+% before R2020a
+% set(findall(InputFig),'Units','normalized','HandleVisibility','callback');
+
+% now (after R2020a)
 all_handles_temp= findall(InputFig);
 all_handles_temp_notAnotPan= all_handles_temp([1:4 6 8]);
 set(all_handles_temp_notAnotPan,'Units','normalized','HandleVisibility','callback');
+% --------------------
+
 set(InputFig,'Units','points')
 try
     uiwait(InputFig);

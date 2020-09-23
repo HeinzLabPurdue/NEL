@@ -77,7 +77,12 @@ if (exist('stimulus_vals','var') == 1)
     calib_picNum= getPicNum(calibFiles(end).name);
     
     [filteredSPL, ~]=CalibFilter_outSPL(audio_fName, calib_picNum, plotYes, verbose);
-    Inloop.params.attens= round((filteredSPL - (stimulus_vals.Inloop.Low_dBSPL : stimulus_vals.Inloop.dBstep: stimulus_vals.Inloop.High_dBSPL)));
+    tempAtten= round((filteredSPL - (stimulus_vals.Inloop.Low_dBSPL : stimulus_vals.Inloop.dBstep: stimulus_vals.Inloop.High_dBSPL)));
+    if min(tempAtten)<0
+        warning('Max dB SPL = %.1f. Cannot go up to 80 dB SPL\n', filteredSPL);
+        tempAtten= tempAtten(tempAtten>=0);
+    end
+    Inloop.params.attens= tempAtten;
     Inloop.params.attens= Inloop.params.attens(randsample(numel(Inloop.params.attens), numel(Inloop.params.attens)));
 
     rdd;
@@ -159,7 +164,7 @@ rdd;
 %%%%%%%%%%%%%%%%%%%%
 IO_def.Inloop.File           = { fName '' [] 1 };
 IO_def.Inloop.CalibPicNum    =  {calib_picNum   ''       [0 6000]};
-IO_def.Inloop.Low_dBSPL      = { 5             'dB'    [0    120]      };
+IO_def.Inloop.Low_dBSPL      = { 0             'dB'    [0    120]      };
 IO_def.Inloop.High_dBSPL     = { 75           'dB'    [0    120]      };
 IO_def.Inloop.dBstep         = { 1           'dB'    [1    120]      };
 IO_def.Inloop.Repetitions    =  {1   ''       [1 600]};
