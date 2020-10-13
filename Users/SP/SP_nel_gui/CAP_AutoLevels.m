@@ -4,6 +4,8 @@
 % Script for Taking CAP data (Run Levels), called at "case 10" within CAP_loop
 %
 
+%SP_nel_gui version
+
 
 % Setup panel for acquire/write mode:
 

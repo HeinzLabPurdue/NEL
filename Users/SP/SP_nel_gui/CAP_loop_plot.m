@@ -1,3 +1,6 @@
+%SP_nel_gui version
+
+
 % UNIT = sprintf('%1d.%02d', NelData.File_Manager.track.No, NelData.File_Manager.unit.No);
 
 % FIG.radio.noise  = uicontrol(FIG.handle,'callback','CAP(''noise'');','style','radio','Enable','on','Units','normalized','position',[.125 .425 .08 .03],'string','Noise','fontsize',12,'BackgroundColor','w','value',1);

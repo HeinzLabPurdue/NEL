@@ -1,5 +1,7 @@
 function h_fig = CAP(command_str)
 
+%SP_nel_gui version
+
 % ge debug ABR 26Apr2004: replace "CAP" with more generalized nomenclature, throughout entire system.
 
 global PROG FIG Stimuli CAP_Gating root_dir prog_dir NelData devices_names_vector Display

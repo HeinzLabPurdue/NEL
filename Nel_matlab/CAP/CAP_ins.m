@@ -1,5 +1,7 @@
 %CAP Instruction Block
 
+%\NEL\Nel_matlab\nel_general version
+
 % interface_type = 'CAP'; % ge debug ABR
 % interface_type = 'ABR';
 global RunThroughABRFlag

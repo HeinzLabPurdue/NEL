@@ -1,4 +1,5 @@
 %global root_dir NelData
+%SP_nel_gui version
 
 if Stimuli.clickYes==1  %KH 06Jan2012
     clickAmp=5; toneAmp=0;
