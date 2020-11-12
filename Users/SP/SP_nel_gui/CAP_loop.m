@@ -1,6 +1,8 @@
 %global root_dir NelData
 %SP_nel_gui version
 
+global start_trigger savedata_dir trigger_counter
+
 if Stimuli.clickYes==1  %KH 06Jan2012
     clickAmp=5; toneAmp=0;
     CAP_Gating.duration_ms=Stimuli.clickLength_ms;
@@ -80,11 +82,15 @@ else
 end
 
 invoke(RP3,'SetTagVal','ADdur', CAP_Gating.CAPlength_ms);
-invoke(RP3,'SetTagVal','StartTrig', 4);
 invoke(RP3,'Run');
 Stimuli.RPsamprate_Hz= RP3.GetSFreq; % 12207.03125;  % Hard coded for now, eventually get from RP
 
-
+%HG ADDED 11/9/20
+if start_trigger == 0
+    invoke(RP3,'SetTagVal','StartTrig', 1);
+elseif start_trigger == 1
+    invoke(RP3,'SetTagVal','StartTrig', 4);
+end
 
 CAP_set_attns(Stimuli.atten_dB,Stimuli.channel,Stimuli.KHosc,RP1,RP2);  %% debug deal with later Khite
 CAPnpts=floor(CAP_Gating.CAPlength_ms/1000*Stimuli.RPsamprate_Hz); % SP: Changed from ceil to floor on 21Aug19: one extra point was collected in ABR serial buffer
@@ -93,6 +99,8 @@ if Stimuli.CAPmem_reps>0
 else
     CAP_memFact=0;
 end
+
+
 firstSTIM=1;
 veryfirstSTIM=1;  % The very first CAPdata when program starts is all zeros, so skip this, debug later MH 18Nov2003
 
@@ -406,6 +414,35 @@ while isempty(get(FIG.push.close,'Userdata'))
                         end
                         delete(2); % Delete the ABR analysis plot
                         cd (cur_dir);
+                    end
+                case 18 % HG - 11/10/20 - start trigger button
+                    if start_trigger == 0 %button pressed, start trigger
+                        start_trigger = 1;
+                        trigger_counter = trigger_counter + 1;
+                        FIG.push.close   = uicontrol(FIG.handle,'callback','CAP(''start_trigger'');','style','pushbutton','Units','normalized',...
+                            'position',[.06 .6 .09 .09],'string','Stop Trigger','fontsize',12,'fontangle','normal','fontweight','normal');
+                        invoke(RP3,'SetTagVal','StartTrig', 4); %start sending trigger
+                        %Grab current level and frequency, save into
+                        %triggers.txt
+                        current_atten = Stimuli.atten_dB;
+                        current_freq = Stimuli.freq_hz;
+                        current_click = Stimuli.clickYes; %1/0
+                        current_trigger = trigger_counter;
+                        %Initialize text file
+                        currentspot = pwd;
+                        cd(savedata_dir);
+                        fid = fopen('triggers.txt','at+');
+                        fprintf(fid,'%d,%d,%.2f,%d\r\n',current_trigger,current_freq,current_atten,current_click);
+                        fclose(fid);
+                        cd(currentspot);
+                        
+                    elseif start_trigger == 1 %button pressed, stop trigger
+                        start_trigger = 0;
+                        FIG.push.close   = uicontrol(FIG.handle,'callback','CAP(''start_trigger'');','style','pushbutton','Units','normalized',...
+                            'position',[.06 .6 .09 .09],'string','Start Trigger','fontsize',12,'fontangle','normal','fontweight','normal');
+                        invoke(RP3,'SetTagVal','StartTrig', 1); %stop sending trigger
+                            set(FIG.push.run_levels,'Enable','on');
+                            set(FIG.push.Automate_Levels,'Enable','on');
                     end
             end
             FIG.NewStim = 0;

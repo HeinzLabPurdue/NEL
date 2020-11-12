@@ -1,5 +1,6 @@
 %SP_nel_gui version
 
+global start_trigger
 
 % UNIT = sprintf('%1d.%02d', NelData.File_Manager.track.No, NelData.File_Manager.unit.No);
 
@@ -52,6 +53,17 @@ if strcmp(interface_type,'ABR')
         'position',[.18 .6 .09 .09],'string','Close','fontsize',12,'fontangle','normal','fontweight','normal');
 %     FIG.push.load_calib   = uicontrol(FIG.handle,'callback','CAP(''load_calib'');','style','pushbutton','Units','normalized',...
 %         'position',[.06 .6 .09 .09],'string','load_calib','fontsize',12,'fontangle','normal','fontweight','normal');
+
+    %HG ADDED 11/9/20
+    if start_trigger == 0
+                FIG.push.close   = uicontrol(FIG.handle,'callback','CAP(''start_trigger'');','style','pushbutton','Units','normalized',...
+        'position',[.06 .6 .09 .09],'string','Start Trigger','fontsize',12,'fontangle','normal','fontweight','normal'); 
+    elseif start_trigger == 1
+        FIG.push.close   = uicontrol(FIG.handle,'callback','CAP(''start_trigger'');','style','pushbutton','Units','normalized',...
+            'position',[.06 .6 .09 .09],'string','Stop Trigger','fontsize',12,'fontangle','normal','fontweight','normal');
+    end
+    %GLOBAL - initialize
+    %start_trigger = 0;
 
     FIG.asldr.SPL    = uicontrol(FIG.handle,'style','text','string',sprintf('%.1f dB SPL',120+get(FIG.asldr.slider,'val')),...
         'backgroundcolor',[1 1 1],'Units','normalized','position',[.9 .06 .1 .03],'fontsize',10,'horizontalalignment','right');

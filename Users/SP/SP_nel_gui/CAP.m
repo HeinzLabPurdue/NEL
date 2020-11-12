@@ -6,6 +6,9 @@ function h_fig = CAP(command_str)
 
 global PROG FIG Stimuli CAP_Gating root_dir prog_dir NelData devices_names_vector Display
 global data_dir picstoSEND_deBUG picstoSEND dBSPLlist picNUMlist FLAG_RERUN_FOR_ABR_ANALYSIS CalibFileNum  CalibFileRefresh
+
+global start_trigger savedata_dir trigger_counter
+
 FLAG_RERUN_FOR_ABR_ANALYSIS=0;
 
 
@@ -14,11 +17,33 @@ FLAG_RERUN_FOR_ABR_ANALYSIS=0;
 if nargin < 1
     prog_dir = [root_dir 'CAP\'];
     
+    %HG ADDED 11/9/20
+    start_trigger = 0;
+    savedata_dir = NelData.File_Manager.dirname;
+    
+    %Check if results.txt exists
+    %If it exists, add 1 to last trigger_num -> starting trigger_num
+    currentspot = pwd;
+    cd(savedata_dir);
+    if isfile('triggers.txt')
+        %fid = fopen('triggers.txt','r'); %open file for reading
+        %formatSpec = '%d';
+        %A = fscanf(fid,formatSpec);
+        %fclose(fid);
+        m=table2array(readtable('triggers.txt'));
+        trigger_counter = m(end,1);
+    else
+       trigger_counter = 0;
+    end
+    cd(currentspot);
     
     PROG = struct('name','CAP(v1.ge_mh.1).m');  % modified by GE 26Apr2004.
     
     %     push  = cell2struct(cell(1,4),{'close','x1','x10','x100'},2);
-    push  = cell2struct(cell(1,6),{'run_levels','close','x1','x10','x100', 'forget_now'},2);
+%    push  = cell2struct(cell(1,6),{'run_levels','close','x1','x10','x100', 'forget_now'},2);
+    push  = cell2struct(cell(1,7),{'run_levels','close','x1','x10','x100', 'forget_now','start_trigger'},2);
+
+
     %     radio = cell2struct(cell(1,8),{'noise','tone','khite','fast','slow','left','right','both'},2);
     % ge debug ABR 26Apr2004: need to add buttons to select between tone/noise/click
     radio = cell2struct(cell(1,5),{'fast','slow','left','right','both'},2);
@@ -141,6 +166,12 @@ elseif strcmp(command_str,'slide_freq')
     set(FIG.fsldr.val,'string',num2str(Stimuli.freq_hz));
     CAP('invCalib');
     
+%HG ADDED 11/9/20
+elseif strcmp(command_str,'start_trigger')
+    FIG.NewStim = 18;
+    set(FIG.push.run_levels,'Enable','off');
+    set(FIG.push.Automate_Levels,'Enable','off');
+    
     % LQ 01/31/05
 elseif strcmp(command_str,'slide_freq_text')
     FIG.NewStim = 6;
@@ -246,6 +277,7 @@ elseif strcmp(command_str,'run_levels')
     else
         set(FIG.push.close,'Enable','off');
         set(FIG.push.forget_now,'Enable','off');
+        set(FIG.push.start_trigger,'Enable','off');
     end
     
 elseif strcmp(command_str,'forget_now')
@@ -326,6 +358,7 @@ elseif strcmp(command_str,'Automate_Levels') %SP 24Jan2016
     else
         set(FIG.push.close,'Enable','off');
         set(FIG.push.forget_now,'Enable','off');
+        set(FIG.push.start_trigger,'Enable','off');
     end
     
     

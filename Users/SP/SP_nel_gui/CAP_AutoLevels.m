@@ -1,3 +1,5 @@
+global savedata_dir trigger_counter Stimuli
+
 % File: CAP_RunLevels
 % M. Heinz 18Nov2003
 %
@@ -13,7 +15,7 @@ AutoLevel_params.ManThresh_dBSPL= Stimuli.MaxdBSPLCalib-Stimuli.atten_dB;
 SaveFlag=1;
 
 if runAudiogram==1 %KH 10Jan2012
-    frequencies=AutoLevel_params.audiogramFreqs;
+    frequencies=AutoLevel_params.audiogramFreqs;s
 else
     frequencies=Stimuli.freq_hz;
 end
@@ -92,7 +94,24 @@ for zfrequency = frequencies %New outer loop, KH 10Jan2012
         CAP_set_attns(attenLevel,Stimuli.channel,Stimuli.KHosc,RP1,RP2);
         set(FIG.asldr.val, 'string', sprintf('- %.1f',attenLevel));
         set(FIG.asldr.SPL,'string',sprintf('%.1f dBSPL',Stimuli.MaxdBSPLCalib-attenLevel));
+        invoke(RP3,'SetTagVal','StartTrig', 4); %start sending trigger 
         
+        trigger_counter = trigger_counter + 1;
+        invoke(RP3,'SetTagVal','StartTrig', 1); %stop sending trigger
+        %pause(5);
+        %Grab current level and frequency, save into
+        %triggers.txt
+        current_atten = attenLevel;
+        current_freq = Stimuli.freq_hz;
+        current_click = Stimuli.clickYes; %1/0
+        current_trigger = trigger_counter;
+        %Initialize text file
+        currentspot = pwd;
+        cd(savedata_dir);
+        fid = fopen('triggers.txt','at+');
+        fprintf(fid,'%d,%d,%.2f,%d\r\n',current_trigger,current_freq,current_atten,current_click);
+        fclose(fid);
+        cd(currentspot);
         
         CAPdataAvg{freqIND,attenIND} = zeros(1, CAPnpts);
         CAPdataReps{freqIND,attenIND} = zeros(2*AutoLevel_params.nPairs,CAPnpts);
@@ -103,6 +122,7 @@ for zfrequency = frequencies %New outer loop, KH 10Jan2012
                     zfrequency, attenLevel, currPair, rejections(freqIND,attenIND)));
             end
             if (strcmp(get(FIG.push.Automate_Levels, 'Userdata'), 'abort'))
+                invoke(RP3,'SetTagVal','StartTrig', 1); %stop sending trigger
                 rc = PAset([120;120;120;120]);
                 bAbort = 1;
                 break;
@@ -166,6 +186,8 @@ for zfrequency = frequencies %New outer loop, KH 10Jan2012
         CAPdataAvg{freqIND,attenIND} = CAPdataAvg{freqIND,attenIND} / (2*AutoLevel_params.nPairs);
         set(FIG.ax.line,'xdata',(1:CAPnpts)/Stimuli.RPsamprate_Hz, ...
             'ydata',(CAPdataAvg{freqIND,attenIND}-mean(CAPdataAvg{freqIND,attenIND}))*Display.PlotFactor); drawnow;
+        
+        invoke(RP3,'SetTagVal','StartTrig', 1); %stop sending trigger
     end
     if (bAbort == 1)
         break;

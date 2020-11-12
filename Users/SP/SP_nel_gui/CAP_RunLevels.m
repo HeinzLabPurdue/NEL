@@ -1,9 +1,10 @@
+global savedata_dir trigger_counter Stimuli 
+
 % File: CAP_RunLevels
 % M. Heinz 18Nov2003
 %
 % Script for Taking CAP data (Run Levels), called at "case 10" within CAP_loop
 %
-
 
 % Setup panel for acquire/write mode:
 SaveFlag=1;
@@ -45,7 +46,22 @@ for zfrequency = frequencies %New outer loop, KH 10Jan2012
         
         set(FIG.asldr.val, 'string', ['-' num2str(attenLevel)]);
         set(FIG.asldr.SPL,'string',sprintf('%.1f dBSPL',Stimuli.MaxdBSPLCalib-attenLevel));
+        invoke(RP3,'SetTagVal','StartTrig', 4); %start sending trigger
         
+        trigger_counter = trigger_counter + 1;
+        %Grab current level and frequency, save into
+        %triggers.txt
+        current_atten = Stimuli.atten_dB;
+        current_freq = Stimuli.freq_hz;
+        current_click = Stimuli.clickYes; %1/0
+        current_trigger = trigger_counter;
+        %Initialize text file
+        currentspot = pwd;
+        cd(savedata_dir);
+        fid = fopen('triggers.txt','at+');
+        fprintf(fid,'%d,%d,%.2f,%d\r\n',current_trigger,current_freq,current_atten,current_click);
+        fclose(fid);
+        cd(currentspot);
         
         CAPdataAvg{freqIND,attenIND} = zeros(1, CAPnpts);
         CAPdataReps{freqIND,attenIND} = zeros(2*RunLevels_params.nPairs,CAPnpts);
@@ -113,16 +129,18 @@ for zfrequency = frequencies %New outer loop, KH 10Jan2012
         end
         CAPdataAvg{freqIND,attenIND} = CAPdataAvg{freqIND,attenIND} / (2*RunLevels_params.nPairs);
         set(FIG.ax.line,'xdata',(1:CAPnpts)/Stimuli.RPsamprate_Hz, ...
-            'ydata',(CAPdataAvg{freqIND,attenIND}-mean(CAPdataAvg{freqIND,attenIND}))*Display.PlotFactor); drawnow;
+            'ydata',(CAPdataAvg{freqIND,attenIND}-mean(CAPdataAvg{freqIND,attenIND}))*Display.PlotFactor); drawnow;     
     end
 end
+
+%stop sending trigger
+invoke(RP3,'SetTagVal','StartTrig', 1); %stop sending trigger
 
 rc = PAset([120;120;120;120]); % added by GE/MH, 17Jan2003.  To force all attens to 120
 set(FIG.asldr.val,'string',num2str(-120));
 set(FIG.asldr.SPL,'string',sprintf('%.1f dB SPL',Stimuli.MaxdBSPLCalib-120));
 set(FIG.asldr.slider, 'value', -120);
 set(FIG.asldr.SPL,'string',sprintf('%.1f dB SPL',Stimuli.MaxdBSPLCalib-120));
-
 
 if (bAbort == 0)
     beep;
