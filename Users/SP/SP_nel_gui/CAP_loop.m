@@ -90,6 +90,7 @@ if start_trigger == 0
     invoke(RP3,'SetTagVal','StartTrig', 1);
 elseif start_trigger == 1
     invoke(RP3,'SetTagVal','StartTrig', 4);
+    invoke(RP3,'SetTagVal','TrigCounter', trigger_counter);
 end
 
 CAP_set_attns(Stimuli.atten_dB,Stimuli.channel,Stimuli.KHosc,RP1,RP2);  %% debug deal with later Khite
@@ -419,9 +420,12 @@ while isempty(get(FIG.push.close,'Userdata'))
                     if start_trigger == 0 %button pressed, start trigger
                         start_trigger = 1;
                         trigger_counter = trigger_counter + 1;
+                        fprintf('\nNew Trigger. Trigger %d',trigger_counter);
                         FIG.push.close   = uicontrol(FIG.handle,'callback','CAP(''start_trigger'');','style','pushbutton','Units','normalized',...
                             'position',[.06 .6 .09 .09],'string','Stop Trigger','fontsize',12,'fontangle','normal','fontweight','normal');
                         invoke(RP3,'SetTagVal','StartTrig', 4); %start sending trigger
+                        invoke(RP3,'SetTagVal','TrigCounter', trigger_counter);
+
                         %Grab current level and frequency, save into
                         %triggers.txt
                         current_atten = Stimuli.atten_dB;

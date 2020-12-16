@@ -46,9 +46,12 @@ for zfrequency = frequencies %New outer loop, KH 10Jan2012
         
         set(FIG.asldr.val, 'string', ['-' num2str(attenLevel)]);
         set(FIG.asldr.SPL,'string',sprintf('%.1f dBSPL',Stimuli.MaxdBSPLCalib-attenLevel));
-        invoke(RP3,'SetTagVal','StartTrig', 4); %start sending trigger
-        
         trigger_counter = trigger_counter + 1;
+        fprintf('\nNew Trigger. Trigger %d',trigger_counter);
+        invoke(RP3,'SetTagVal','StartTrig', 4); %start sending trigger
+        invoke(RP3,'SetTagVal','TrigCounter', trigger_counter);
+
+        
         %Grab current level and frequency, save into
         %triggers.txt
         current_atten = Stimuli.atten_dB;

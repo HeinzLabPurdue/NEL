@@ -94,10 +94,11 @@ for zfrequency = frequencies %New outer loop, KH 10Jan2012
         CAP_set_attns(attenLevel,Stimuli.channel,Stimuli.KHosc,RP1,RP2);
         set(FIG.asldr.val, 'string', sprintf('- %.1f',attenLevel));
         set(FIG.asldr.SPL,'string',sprintf('%.1f dBSPL',Stimuli.MaxdBSPLCalib-attenLevel));
-        invoke(RP3,'SetTagVal','StartTrig', 4); %start sending trigger 
-        
         trigger_counter = trigger_counter + 1;
-        invoke(RP3,'SetTagVal','StartTrig', 1); %stop sending trigger
+        fprintf('\nNew Trigger. Trigger %d',trigger_counter);
+        invoke(RP3,'SetTagVal','StartTrig', 4); %start sending trigger
+        invoke(RP3,'SetTagVal','TrigCounter', trigger_counter);
+
         %pause(5);
         %Grab current level and frequency, save into
         %triggers.txt
