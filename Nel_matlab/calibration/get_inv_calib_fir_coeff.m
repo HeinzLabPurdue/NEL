@@ -31,7 +31,7 @@ dBspl_at0dB_atten=data(:,2);
 % We are playing = 10V pp (TDT max Output)
 % RMS= 10/sqrt(2); : should be ~(100+17)=~117 dB
 % 117 dB: too loud. So set ideal dB SPL to something between 90-100 dB
-dBSPL_ideal= 100; 
+dBSPL_ideal= 105; 
 filter_gain= dBSPL_ideal-dBspl_at0dB_atten;
 
 % Suppress high frequency gain (Taper to zero?)

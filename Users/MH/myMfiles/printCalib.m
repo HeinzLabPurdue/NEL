@@ -1,7 +1,7 @@
 function lHan= printCalib(picNUMs)
 
 COLORS = {'r','b','g','k','c','m','y'};
-cdd
+% cdd
 figure(picNUMs(1))
 legendTEXT='';
 lHan= nan(length(picNUMs),1);
@@ -20,7 +20,9 @@ end
 xlabel('Freq (kHz)')
 ylabel('dB SPL')
 grid
-xlim([.050 20])
+xlim([.05 20])
 ylim([75 120])
-set(gca,'XTickLabels',[1 10])
+xtick_vals= [.2 .5 1 2 4 8 10];
+xtick_labs= num2str(xtick_vals(:));
+set(gca,'xtick', xtick_vals, 'XTickLabels', xtick_labs)
 legend(legendTEXT)

@@ -84,8 +84,8 @@ for attenIND= 1
     for currStim = 0:2*RunLevels_params.nPairs
         
         if currStim
-            set(FIG.statText.status, 'String', sprintf('STATUS: averaging at -%.1f dB (%d/%d)...', ...
-                attenLevel, currStim, rejections)); % KHZZ 2011 Nov 4
+            set(FIG.statText.status, 'String', sprintf('STATUS: averaging at -%.1f dB [%d | %d | %d]...', ...
+                attenLevel, currStim, rejections, 2*RunLevels_params.nPairs)); % KHZZ 2011 Nov 4
         end
         
         if (strcmp(get(FIG.push.forget_now, 'Userdata'), 'save') && ~mod(currStim,2))

@@ -4,6 +4,7 @@ function rate_params = default_plot_rate(index,rate_params,plot_info,nCh)
 % AF 10/10/01
 
 global spikes NumDrivenSpikes nstim
+% fprintf('Starting rate params\n');
 
 if isempty(nstim)
     nstim=1;

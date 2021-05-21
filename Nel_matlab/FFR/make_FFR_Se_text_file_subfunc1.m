@@ -26,8 +26,8 @@ if contains(fname, 'pink')
 end
 
 % for harmonic complex EFR
-fname= strrep(fname, 'high', '_H'); % SP Nov 8, 18: Filename too long, so file doesn't load. 
-fname= strrep(fname, 'low', 'L'); % SP Nov 8, 18: Filename too long, so file doesn't load. 
+% fname= strrep(fname, 'high', '_H'); % SP Nov 8, 18: Filename too long, so file doesn't load. 
+% fname= strrep(fname, 'low', 'L'); % SP Nov 8, 18: Filename too long, so file doesn't load. 
 fname= strrep(fname, 'complex_', '');
 
 

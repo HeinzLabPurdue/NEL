@@ -20,7 +20,7 @@ if nargin < 1
     radio = cell2struct(cell(1,5),{'fast','slow','left','right','both'},2);
     checkbox = cell2struct(cell(1,1), {'fixedPhase'},2);
     statText  = cell2struct(cell(1,2),{'memReps','status'},2);
-    %     popup = cell2struct(cell(1,1),{'spike_channel'},2);   % added by GE 17Jan2003.
+    %     popup = cell2struct(cell(1,1),{'spike_channel'},2);   % added by0 GE 17Jan2003.
     fsldr = cell2struct(cell(1,4),{'slider','min','max','val'},2);
     asldr = cell2struct(cell(1,4),{'slider','min','max','val'},2);
     ax = cell2struct(cell(1,2),{'axis','line'},2);
@@ -34,7 +34,13 @@ if nargin < 1
     
     CAP_ins;
     
-    if ~RunThroughABRFlag
+    if strcmp(interface_type, 'CAP (fMask)')
+        fMaskCodesDir= [NelData.General.RootDir 'Nel_matlab\CAPfmasked'];
+        cd(fMaskCodesDir);
+        h_fig= fmaskedCAP();
+        cd(root_dir);
+        
+    elseif ~RunThroughABRFlag
         FIG.handle = figure('NumberTitle','off','Name','CAP Interface','Units','normalized','position',[0.045  0.013  0.9502  0.7474],'Visible','off','MenuBar','none','Tag','CAP_Main_Fig');
         set(FIG.handle,'CloseRequestFcn','CAP(''close'');')
         colordef none;

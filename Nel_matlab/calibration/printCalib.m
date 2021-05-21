@@ -1,7 +1,7 @@
 function printCalib(picNUMs)
 
-COLORS = {'r','b','g','k','c','m','y'};
-cdd
+COLORS = {'r','b','g','k','c','m','y','k'};
+% cdd
 figure(picNUMs(1))
 legendTEXT='';
 for i =1:length(picNUMs)

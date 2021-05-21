@@ -7,7 +7,7 @@ global RP PROG FIG Stimuli FFR_Gating root_dir prog_dir Display NelData
 % global fc fm pol dur
 prog_dir = [root_dir 'FFR\'];
 
-if strcmp(NelData.General.WindowsHostName, '1353lyl303501d') % means NEL1
+if contains(NelData.General.WindowsHostName, {'1353lyl303501d', 'HHSSLHS-FKJ2JL2'}) % means NEL1
     %     RP1=actxcontrol('RPco.x',[0 0 1 1]);
     %     invoke(RP1,'ConnectRP2',NelData.General.TDTcommMode,1);
     RP1= connect_tdt('RP2', 1);

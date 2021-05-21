@@ -1,9 +1,4 @@
-% SP on 10/17/19
-% Original file: data_acquisition_loop_NI
-% Going to remove commenting from this file. Look at
-% data_acquisition_loop_NI file for comments in original versions
-
-function [block_info,stim_info] = data_acquisition_loop_NI_fast(DAL,nChannels,h_status,EP_nChannels)
+function [block_info,stim_info] = data_acquisition_loop_NI_marker(DAL,nChannels,h_status,EP_nChannels)
 global root_dir
 global RP PA Trigger SwitchBox
 global NelData
@@ -46,7 +41,7 @@ end
 if (isfield(DAL,'endLinePlotParams'))
     endLinePlotParams = DAL.endLinePlotParams;
 else
-    endLinePlotParams  = default_plot_rate_params(DAL.Gating.Period/1000,DAL.Gating.Duration/1000);
+    endLinePlotParams  = default_plot_rate_params_marker(DAL.Gating.Period/1000,DAL.Gating.Duration/1000);
 end
 if (isfield(DAL,'endBlockPlotParams'))
     endBlockPlotParams = DAL.endBlockPlotParams;
@@ -75,7 +70,7 @@ msdl(1,nChannels);
 if (isfield(NelData.General,'EP'))
     for i_ep = 1:EP_nChannels
         if (NelData.General.EP(i_ep).record == 1)
-            [ep, rc] = EP_record(i_ep, NelData.General.EP(i_ep).duration, NelData.General.EP(i_ep).start); %% ADD i_ep in the future
+            [ep,rc] = EP_record(i_ep, NelData.General.EP(i_ep).duration, NelData.General.EP(i_ep).start); %% ADD i_ep in the future
             NelData.General.EP(i_ep).sampleInterval = 1000 / RP(2).sampling_rate;   % Equal to 1000msec/sampleFreq(Hz) for RP(2).
             NelData.General.EP(i_ep).lineLength = ...
                 floor(NelData.General.EP(i_ep).duration / NelData.General.EP(i_ep).sampleInterval);
@@ -121,8 +116,8 @@ else
     %% Pre-allocate space for all possible stim_info lines, but fill with NaN's and {'XXX'}'s
     stim_info(2:MAX_pre_nlines) = repmat(mark_stim_invalid(stim_info(1)), MAX_pre_nlines-1,1);
     [select,connect,PAattns] = find_mix_settings(stim_info(1).attens_devices);
-    if (isempty(select) || isempty(connect))
-        nelerror('''data_acquisition_loop_NI_fast'': Can''t find appropriate select and connect parameters. Aborting...');
+    if (isempty(select) | isempty(connect))
+        nelerror('''data_acquisition_loop'': Can''t find appropriate select and connect parameters. Aborting...');
         return;
     end
     rc = SBset(select,connect) & (rc==1);
@@ -232,7 +227,6 @@ while (end_of_loop_flag == 0)
     %       if (check_stop_request), break; end
     %    end
     
-    
     %   if (trig_state_debug~=1)
     %% For debugging MSDL
     debug_info.msdl_times(1,debug_info.msdl_counter) = etime(clock,TRIGstart_time)-(index-1)*DAL.Gating.Period/1000; %%X
@@ -279,9 +273,6 @@ while (end_of_loop_flag == 0)
     
     
     [trig_state, count_down] = TRIGget_state;
-    
-    
-    
     
     %% For debugging
     %%%      PRINTyes=1;  % uncomment to see indices for every loop pass, o/w only on errors
@@ -409,11 +400,10 @@ while (end_of_loop_flag == 0)
     call_user_func(contPlotParams.func,spk,contPlotParams);
     concat_spikes(spk);
     drawnow
-    
     if (check_stop_request), break; end
     
     %% CHECK if ready to load new stimulus
-    if ((index-Nbadstim>last_stimsent_index)&&(trig_state == 2))  % Trigger pulse switched to off
+    if ((index-Nbadstim>last_stimsent_index) && (trig_state == 2))  % Trigger pulse switched to off
         number_of_presented_stims = index;  % This stores total stim presented (good or bad)
         % Check again for user break before we prepare for the next stimulus
         if (check_stop_request), break; end
@@ -426,7 +416,7 @@ while (end_of_loop_flag == 0)
         
         %Prepare for next stimulus
         if (index-Nbadstim < nlines)
-            
+
             % MH debug: ~~~~~WOrks here%     %% GE debug: replaced line here 30oct2003.
             %          call_user_func(endLinePlotParams.func,prev_index,endLinePlotParams);  % MH debug
             
@@ -434,7 +424,7 @@ while (end_of_loop_flag == 0)
             
             [stim_info(index+1)] = call_user_func(DAL.Inloop.Name,common,DAL.Inloop.params);
             
-            
+
             if (~isstruct(stim_info(index+1)))
                 rc =0; break;
             end
@@ -465,7 +455,7 @@ while (end_of_loop_flag == 0)
                 
                 %% Mark stiminfo(index+1)=INVALID, because we can't be sure it was completely loaded
                 stim_info(index+1)=mark_stim_invalid(stim_info(index+1),'STIMULUS INVALID');
-                
+
                 %% Update plotting values to deal with repeats: if bad lines, spikes not plotted
                 contPlotParams.var_vals(index+2:end+1)= ...
                     contPlotParams.var_vals(index+1:end);
@@ -493,7 +483,6 @@ while (end_of_loop_flag == 0)
             rc = SBset([7 7],[0 0]);
         end
     end
-    
     % AF & MGH (7/16/02): added prev_index to simplify detection of new line
     %                     and changed the plot to work with prev_index instead of index-1.
     if (index>prev_index)  %% Simple detection for plotting, no matter if badstim
