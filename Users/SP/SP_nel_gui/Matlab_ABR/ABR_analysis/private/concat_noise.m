@@ -33,7 +33,9 @@ for freq_var=1:length(AllFreq)
         if iscell(xx.AD_Data.AD_Avg_V)
             xx.AD_Data.AD_Avg_V=xx.AD_Data.AD_Avg_V{1};
         end
-        fs= xx.AD_Data.SampleRate;
+%         fs= xx.AD_Data.SampleRate;    % Apr 26 2021 MH - why this var?
+%         use regualr storage pf RPsamplrate
+        fs = xx.Stimuli.RPsamprate_Hz;
         indStart= max(1, round(fs*noiseStart));
         indEnd= min(round(fs*noiseEnd), length(xx.AD_Data.AD_Avg_V));
         temp_snippet=xx.AD_Data.AD_Avg_V(indStart:indEnd);

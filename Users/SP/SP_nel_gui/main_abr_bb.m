@@ -2,12 +2,15 @@ function thresh=main_abr_bb(dataDIR,CalibPIC,PIClist)
 
 global abr_Stimuli
 
+cur_dir=pwd;
+cdd
 if contains(getFileName(CalibPIC), 'inv')
     coef_file= load(sprintf('coef_%04d_calib.mat', CalibPIC-1));
     invFIRdelay= mean(grpdelay(coef_file.b, 1, 2^12))/48e3*1e3;
 else
     invFIRdelay= 0;
 end
+cd(cur_dir)
 
 abr_Stimuli.start=4 + invFIRdelay;
 abr_Stimuli.endval=20 + invFIRdelay;

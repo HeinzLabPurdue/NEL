@@ -298,15 +298,15 @@ while isempty(get(FIG.push.close,'Userdata'))
                             
                             if isnan(AutoLevel_params.AutoThresh1)
                                 AutoLevel_params.AutoThresh1=25;
-                                disp('You must be debuggin, else something is wrong!');
+                                disp('You must be debuggin (THR=NaN), else something is wrong!');
                                 ding;
                             elseif AutoLevel_params.AutoThresh1<0
                                 AutoLevel_params.AutoThresh1=25;
-                                disp('You must be debuggin, else something is wrong!');
+                                disp('You must be debuggin (THR<0), else something is wrong!');
                                 ding;
                             elseif AutoLevel_params.AutoThresh1>80
                                 AutoLevel_params.AutoThresh1=25;
-                                disp('You must be debuggin, else something is wrong!');
+                                disp('You must be debuggin (THR>80), else something is wrong!');
                                 ding;
                             end
                             

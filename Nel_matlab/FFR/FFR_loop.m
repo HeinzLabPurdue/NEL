@@ -9,6 +9,7 @@ if NelData.General.RP2_3and4 && (~NelData.General.RX8) % NEL1 with RP2 #3 & #4
     RP1= connect_tdt('RP2', 1);
     invoke(RP1,'ClearCOF');
     invoke(RP1,'LoadCOF',[prog_dir '\object\FFR_wav_polIN.rcx']);
+    stimRCXfName= [prog_dir '\object\FFR_wav_polIN.rcx'];
     
     RP2= connect_tdt('RP2', 2);
     invoke(RP2,'ClearCOF');
@@ -29,6 +30,7 @@ elseif (~NelData.General.RP2_3and4) && (~NelData.General.RX8) % NEL1 without (RP
     RP1= connect_tdt('RP2', 1);
     invoke(RP1,'ClearCOF');
     invoke(RP1,'LoadCOF',[prog_dir '\object\FFR_wav_polIN.rcx']);
+    stimRCXfName= [prog_dir '\object\FFR_wav_polIN.rcx'];
     
     %     RP2=actxcontrol('RPco.x',[0 0 1 1]);
     %     invoke(RP2,'ConnectRP2',NelData.General.TDTcommMode,2);
@@ -42,6 +44,7 @@ elseif NelData.General.RX8  %NEL2 with RX8
     RP1= connect_tdt('RP2', 1);
     invoke(RP1,'ClearCOF');
     invoke(RP1,'LoadCOF',[prog_dir '\object\FFR_wav_polIN_NEL2.rcx']);
+    stimRCXfName= [prog_dir '\object\FFR_wav_polIN_NEL2.rcx'];
     
     %% For bit-select
     %     RP2=actxcontrol('RPco.x',[0 0 1 1]);
@@ -239,7 +242,8 @@ while isempty(get(FIG.push.close,'Userdata'))
                     % reloads the COF, resets the plots
                     invoke(RP1,'Halt');
                     invoke(RP1,'ClearCOF');
-                    invoke(RP1,'LoadCOF',[prog_dir '\object\FFR_wav_polIN.rcx']);
+                    invoke(RP1,'LoadCOF', stimRCXfName);
+                    
                     % AEH circuit below was active on 12/12/14, since 1/27/14 (?)
                     %                 invoke(RP1,'LoadCOF',[prog_dir '\object\FFR_wav_polIN_AEH.rcx']); % AEH 1/27/14 Fs=24k
                     invoke(RP1,'SetTagVal','StmOn',FFR_Gating.duration_ms);

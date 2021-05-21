@@ -111,7 +111,7 @@ else
     e1= false;
 end
 if e1
-    if doInvCalib
+    if doInvCalib==1
         if doINVcheck
             fprintf('invFIR Coefs loaded successfully (%s) \n', datestr(datetime));
         else
