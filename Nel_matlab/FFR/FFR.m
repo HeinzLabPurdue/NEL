@@ -99,8 +99,8 @@ elseif strcmp(command_str,'fmtone') %%% added by Dave Axe 9/7/16
    [Stimuli.filename, fn_inv]=make_FM_tone(Stimuli.fc,Stimuli.RPsamprate_Hz,FFR_Gating.duration_ms/1000,5e-3,60,Stimuli.fm,Stimuli.mod,Stimuli.pol);
    %    [Stimuli.filename, fn_inv] = amtoneFFR(Stimuli.fc,Stimuli.fm,FFR_Gating.duration_ms/1000,Stimuli.pol,Stimuli.mod,Stimuli.RPsamprate_Hz);
    set(FIG.wavfile.func,'string',Stimuli.filename);
-   copyfile(Stimuli.filename,'C:\NEL1_2\Nel_matlab\FFR\Signals\tone_org.wav','f');
-   copyfile(fn_inv,'C:\NEL1_2\Nel_matlab\FFR\Signals\tone_inv.wav','f');
+   copyfile(Stimuli.filename, [NelData.General.RootDir 'Nel_matlab\FFR\Signals\tone_org.wav'],'f');
+   copyfile(fn_inv, [NelData.General.RootDir 'Nel_matlab\FFR\Signals\tone_inv.wav'],'f');
 
 
 % WAV file loader, copies file from original location to default locaton
@@ -128,8 +128,8 @@ elseif strcmp(command_str,'amtone')
    % 12/7/11: MH&KH: changed to pass Sampling rate as param - defined once in FFR_ins - needs to match RPvds code
    [Stimuli.filename, fn_inv] = amtoneFFR(Stimuli.fc,Stimuli.fm,FFR_Gating.duration_ms/1000,Stimuli.pol,Stimuli.mod,Stimuli.RPsamprate_Hz);
    set(FIG.wavfile.func,'string',Stimuli.filename);
-   copyfile(Stimuli.filename,'C:\NEL1_2\Nel_matlab\FFR\Signals\tone_org.wav','f');
-   copyfile(fn_inv,'C:\NEL1_2\Nel_matlab\FFR\Signals\tone_inv.wav','f');
+   copyfile(Stimuli.filename, [NelData.General.RootDir 'Nel_matlab\FFR\Signals\tone_org.wav'],'f');
+   copyfile(fn_inv, [NelData.General.RootDir 'Nel_matlab\FFR\Signals\tone_inv.wav'],'f');
 
 
 % WAV file loader, copies file from original location to default locaton
@@ -156,8 +156,8 @@ elseif strcmp(command_str,'logSwept_amtone')
    % 12/7/11: MH&KH: changed to pass Sampling rate as param - defined once in FFR_ins - needs to match RPvds code
    [Stimuli.filename, fn_inv] = logSwept_amtoneFFR(Stimuli.fc,Stimuli.fm,FFR_Gating.duration_ms/1000,Stimuli.pol,Stimuli.mod,Stimuli.RPsamprate_Hz);
    set(FIG.wavfile.func,'string',Stimuli.filename);
-   copyfile(Stimuli.filename,'C:\NEL1_2\Nel_matlab\FFR\Signals\tone_org.wav','f');
-   copyfile(fn_inv,'C:\NEL1_2\Nel_matlab\FFR\Signals\tone_inv.wav','f');
+   copyfile(Stimuli.filename, [NelData.General.RootDir 'Nel_matlab\FFR\Signals\tone_org.wav'],'f');
+   copyfile(fn_inv,[NelData.General.RootDir 'Nel_matlab\FFR\Signals\tone_inv.wav'],'f');
 
 
 % WAV file loader, copies file from original location to default locaton
@@ -170,8 +170,8 @@ elseif strcmp(command_str,'wavfile')
    Stimuli.filename = cell2str(cellname);
    
    % copies file to both "original" and "polarized" locations
-   copyfile(Stimuli.filename,'C:\NEL1_2\Nel_matlab\FFR\Signals\tone_org.wav','f');
-   copyfile(Stimuli.filename,'C:\NEL1_2\Nel_matlab\FFR\Signals\tone_inv.wav','f');
+   copyfile(Stimuli.filename, [NelData.General.RootDir 'Nel_matlab\FFR\Signals\tone_org.wav'],'f');
+   copyfile(Stimuli.filename, [NelData.General.RootDir 'Nel_matlab\FFR\Signals\tone_inv.wav'],'f');
 
 
 elseif strcmp(command_str,'fast')

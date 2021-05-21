@@ -45,7 +45,7 @@ if (exist('stimulus_vals','var') == 1)
     %% updating to use calib filter at all freqs instead of just at CF calib: (Nov 28, 2018) [SP]
     audio_fName=[NelData.General.RootDir 'Signals\MH\SNRenv\SNR_0\FLN_Stim_S_P.wav'];
     cdd;
-    calibFiles= dir('*calib*');
+    calibFiles= dir('*calib*'); % assumes last invCalib file
     calib_picNum= getPicNum(calibFiles(end).name);
     plotYes=0 ;
     verbose=0;
@@ -113,17 +113,21 @@ if contains(curDataDir, {'NH', 'setup'})
 elseif contains(curDataDir, {'PTS', 'HI'})
     spl2use= 80;
 elseif contains(curDataDir, {'CA'})
-    spl2use= 70;
+    spl2use= 75;
 else 
-    spl2use= 80;
+    spl2use= 65;
 end
 
+cdd;
+calibFiles= dir('*calib*'); % assumes last invCalib file
+calib_picNum= getPicNum(calibFiles(end).name);
+rdd;
 %%%%%%%%%%%%%%%%%%%%
 %% Inloop Section
 %%%%%%%%%%%%%%%%%%%%
 
 IO_def.Inloop.List_File             = {sprintf('%sLists\\MH\\SNRenv\\SNRenv_0.m', signals_dir)  };
-IO_def.Inloop.CalibPicNum  =  {1   ''       [0 6000]};
+IO_def.Inloop.CalibPicNum  =  {calib_picNum   ''       [0 6000]};
 IO_def.Inloop.Level  =  {spl2use 'dB SPL'       [-50    150]   0  0};
 IO_def.Inloop.Repetitions            = { 25                        ''      [1    Inf]      };
 IO_def.Inloop.UpdateRate        = { 100000                  'Hz'      [1    NI6052UsableRate_Hz(Inf)]      };

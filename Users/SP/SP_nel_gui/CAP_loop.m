@@ -1,7 +1,5 @@
 %global root_dir NelData
 
-global DEBUG_FLAG
-
 if Stimuli.clickYes==1  %KH 06Jan2012
     clickAmp=5; toneAmp=0;
     CAP_Gating.duration_ms=Stimuli.clickLength_ms;
@@ -15,8 +13,9 @@ else
 end
 
 %% For stimulus
-RP1=actxcontrol('RPco.x',[0 0 1 1]);
-invoke(RP1,'ConnectRP2',NelData.General.TDTcommMode,1);
+% RP1=actxcontrol('RPco.x',[0 0 1 1]);
+% invoke(RP1,'ConnectRP2',NelData.General.TDTcommMode,1);
+RP1= connect_tdt('RP2', 1);
 invoke(RP1,'ClearCOF');
 invoke(RP1,'LoadCOF',[prog_dir '\object\CAP_left.rcx']);
 
@@ -38,28 +37,50 @@ invoke(RP1,'SetTagVal','RiseFall',CAP_Gating.rftime_ms);
 invoke(RP1,'Run');
 
 
-if NelData.General.RP2_3and4
+if NelData.General.RP2_3and4 && (~NelData.General.RX8) % NEL1 with RP2 #3 & #4
     %% For bit select (RP2#3 is not connected to Mix/Sel). So have to use RP2#2. May use RP2#1?
-    RP2=actxcontrol('RPco.x',[0 0 1 1]);
-    invoke(RP2,'ConnectRP2',NelData.General.TDTcommMode,2);
+    %     RP2=actxcontrol('RPco.x',[0 0 1 1]);
+    %     invoke(RP2,'ConnectRP2',NelData.General.TDTcommMode,2);
+    RP2= connect_tdt('RP2', 2);
     invoke(RP2,'LoadCOF',[prog_dir '\object\CAP_BitSet.rcx']);
     invoke(RP2,'Run');
     
     %% For ADC (data in)
-    RP3=actxcontrol('RPco.x',[0 0 1 1]);
-    invoke(RP3,'ConnectRP2',NelData.General.TDTcommMode,3);
+    %     RP3=actxcontrol('RPco.x',[0 0 1 1]);
+    %     invoke(RP3,'ConnectRP2',NelData.General.TDTcommMode,3);
+    RP3= connect_tdt('RP2', 3);
     invoke(RP3,'ClearCOF');
     invoke(RP3,'LoadCOF',[prog_dir '\object\ABR_right.rcx']);
-else
-    RP2=actxcontrol('RPco.x',[0 0 1 1]);
-    invoke(RP2,'ConnectRP2',NelData.General.TDTcommMode,2);
+
+elseif ~(NelData.General.RP2_3and4) && (~NelData.General.RX8) % NEL1 without (RP2 #3 & #4), and not NEL2 because no RX8
+    %     RP2=actxcontrol('RPco.x',[0 0 1 1]);
+    %     invoke(RP2,'ConnectRP2',NelData.General.TDTcommMode,2);
+    RP2= connect_tdt('RP2', 2);
     
     RP3= RP2;
     invoke(RP3,'ClearCOF');
     invoke(RP3,'LoadCOF',[prog_dir '\object\CAP_right.rcx']);
+
+elseif NelData.General.RX8  %NEL2 with RX8
+    %     RP2=actxcontrol('RPco.x',[0 0 1 1]);
+    %     invoke(RP2,'ConnectRP2',NelData.General.TDTcommMode,2);
+    RP2= connect_tdt('RP2', 2);
+    invoke(RP2,'LoadCOF',[prog_dir '\object\CAP_BitSet.rcx']);
+    invoke(RP2,'Run');
+    
+    RP3= connect_tdt('RX8', 1);
+    invoke(RP3,'ClearCOF');
+    invoke(RP3,'LoadCOF',[prog_dir '\object\ABR_RX8_ADC_invCalib.rcx']);
+    %     [~, ~, b_invCalib_coef]= run_invCalib(-2);
+    b_invCalib_coef= [1 zeros(1, 255)];
+    e_invCalib_status= RP3.WriteTagV('FIR_Coefs', 0, b_invCalib_coef);
+else 
+    nelerror('Cannot figure out whether NEL1 or NEL2')
 end
+
 invoke(RP3,'SetTagVal','ADdur', CAP_Gating.CAPlength_ms);
 invoke(RP3,'Run');
+Stimuli.RPsamprate_Hz= RP3.GetSFreq; % 12207.03125;  % Hard coded for now, eventually get from RP
 
 CAP_set_attns(Stimuli.atten_dB,Stimuli.channel,Stimuli.KHosc,RP1,RP2);  %% debug deal with later Khite
 CAPnpts=floor(CAP_Gating.CAPlength_ms/1000*Stimuli.RPsamprate_Hz); % SP: Changed from ceil to floor on 21Aug19: one extra point was collected in ABR serial buffer

@@ -129,7 +129,7 @@ if ~isdir(OutFolder) % means files have not been created for this track/unit
 end
 wavFiles= dir([OutFolder '*.wav']);
 if isempty(wavFiles)
-    CodesDir= 'C:\NEL1_2\Users\MH\SynchronyCapture\';
+    CodesDir= [NelData.General.RootDir 'Users\MH\SynchronyCapture\'];
     % here call Klatt functions to create these files.
     addpath(CodesDir);
     create_vowel_A_reBF(OutFolder, NelData.File_Manager.unit.BF*1e3);

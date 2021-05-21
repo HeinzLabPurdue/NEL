@@ -158,7 +158,7 @@ switch interface_type
          'CAPmem_reps',  100, ...
          'threshV', 0.2, ... %for artifact rejection KH 2011 Jun 08
          'clickYes', 0, ... % added by KH 06Jan2012
-          'clickLength_ms', 0.05, ... %KH 10Jan2012
+         'clickLength_ms', 0.05, ... %KH 10Jan2012
           ... %not cleaned up yet
          'ear', 'right' ...  % set in CAP.m
          );

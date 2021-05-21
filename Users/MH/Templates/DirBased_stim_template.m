@@ -124,7 +124,7 @@ else
     spl2use= 80;
 end
 
-OutFolder= 'C:\NEL1_2\Users\MH\DirBasedStimuli\';
+OutFolder= [NelData.General.RootDir 'Users\MH\DirBasedStimuli\'];
 if ~isdir(OutFolder) % means files have not been created for this track/unit
     error('What''s the point if no directory? Create directory and add wav-files at 100k sampling rate. Need to add this sampling frequency check somewhere.');
 end
@@ -141,7 +141,7 @@ rdd;
 IO_def.Inloop.List_Folder             = {OutFolder};
 IO_def.Inloop.CalibPicNum  =  {calib_picNum   ''       [0 6000]};
 IO_def.Inloop.Level  =  {spl2use 'dB SPL'       [-50    150]   0  0};
-IO_def.Inloop.Repetitions            = { 25                        ''      [1    Inf]      };
+IO_def.Inloop.Repetitions            = { 15                        ''      [1    Inf]      };
 IO_def.Inloop.UpdateRate        = { 100000                  'Hz'      [1    NI6052UsableRate_Hz(Inf)]      };
 
 %%%%%%%%%%%%%%%%%%%%

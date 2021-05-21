@@ -20,7 +20,7 @@ if nargin < 1
     radio = cell2struct(cell(1,5),{'fast','slow','left','right','both'},2);
     checkbox = cell2struct(cell(1,1), {'fixedPhase'},2);
     statText  = cell2struct(cell(1,2),{'memReps','status'},2);
-    %     popup = cell2struct(cell(1,1),{'spike_channel'},2);   % added by0 GE 17Jan2003.
+    %     popup = cell2struct(cell(1,1),{'spike_channel'},2);   % added by GE 17Jan2003.
     fsldr = cell2struct(cell(1,4),{'slider','min','max','val'},2);
     asldr = cell2struct(cell(1,4),{'slider','min','max','val'},2);
     ax = cell2struct(cell(1,2),{'axis','line'},2);
@@ -323,7 +323,7 @@ elseif strcmp(command_str,'audiogram') %KH 10Jan2012
 elseif strcmp(command_str,'clickYes') %KH 10Jan2012
     Stimuli.clickYes = get(FIG.radio.clickYes,'value');
     FIG.NewStim = 16;
-    if NelData.General.RP2_3and4
+    if NelData.General.RP2_3and4 && (~NelData.General.RX8)
         if Stimuli.clickYes
             run_invCalib(true); % Initialize with allpass RP2_3
         else
@@ -332,7 +332,7 @@ elseif strcmp(command_str,'clickYes') %KH 10Jan2012
     end
     
 elseif strcmp(command_str,'close')
-    if NelData.General.RP2_3and4
+    if NelData.General.RP2_3and4 && (~NelData.General.RX8)
         run_invCalib(false); % Initialize with allpass RP2_3
     end
     set(FIG.push.close,'Userdata',1);

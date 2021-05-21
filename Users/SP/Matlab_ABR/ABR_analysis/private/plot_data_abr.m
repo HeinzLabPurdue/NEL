@@ -50,7 +50,7 @@ else
     end
 end
 
-dt=500/x.Stimuli.RPsamprate_Hz; %sampling period after oversampling
+dt=500/x.AD_Data.SampleRate; %sampling period after oversampling
 
 %% sort abrs in order of increasing attenuation
 [aa, order]=sort(-attn);
