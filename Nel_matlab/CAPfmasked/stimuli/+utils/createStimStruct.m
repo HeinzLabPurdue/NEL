@@ -1,5 +1,5 @@
 function stimStruct = createStimStruct(nbands, bandParamsArr)
-    stimStruct=struct('type', 'noise-bands', 'comment', 'created with noiseBandMaskerDesigner');
+    stimStruct=struct('type', 'noise-bands', 'comment', ['created with noiseBandMaskerDesigner.m ' date]);
     stimStruct.n_bands=nbands;
     stimStruct.bands=cell(1, nbands);
     for i=1:nbands

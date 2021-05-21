@@ -13,7 +13,7 @@ stim_json=fileread(filename);
 stim_struct=jsondecode(stim_json);
 
 
-sig = create_signal_func(config_struct, stim_struct);
+sig = fmaskedCAP_create_signal_func(config_struct, stim_struct);
 
 %useful params
 fs=config_struct.fs;

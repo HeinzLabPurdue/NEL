@@ -1,4 +1,4 @@
-classdef noiseBandMaskerDesigner < matlab.apps.AppBase
+classdef noiseBandMaskerDesigner_notchnoiseHACK < matlab.apps.AppBase
     % small GUI for the creation of maskers with multiple bands.
     
     % Properties that correspond to app components
@@ -221,22 +221,75 @@ classdef noiseBandMaskerDesigner < matlab.apps.AppBase
         
         
         function amplitudeValueChanged(app, component)
+            
             ntab=app.currentTab();
+            
+            
+            %HACK for notch noise -> band 2 modifies band 1 and 3
+            if ntab==2
+               ntab0=2;
+               ntab=1;
+            else
+               ntab0=ntab;
+            end
 
             slider=app.BandTabComponents{ntab}.amplitudeSlider;
             editField=app.BandTabComponents{ntab}.amplitudeEditField;
             
+            slider0=app.BandTabComponents{ntab0}.amplitudeSlider;
+            editField0=app.BandTabComponents{ntab0}.amplitudeEditField;
+            
             
             if strcmp(component, 'Slider')
-                editField.Value=slider.Value;
+                slider.Value=slider0.Value;
+                editField0.Value=slider0.Value;
+                editField.Value=slider0.Value;
                 
                 editField.Value=round(editField.Value, 0);
+                
+                editField0.Value=round(editField.Value, 0);
             elseif strcmp(component, 'EditField')
-                editField.Value=round(editField.Value, 1);
-                slider.Value=max(min(editField.Value, slider.Limits(2)), slider.Limits(1));
+                editField.Value=round(editField0.Value, 1);
+                
+                slider.Value=max(min(editField0.Value, slider0.Limits(2)), slider0.Limits(1));
+                slider0.Value=max(min(editField0.Value, slider0.Limits(2)), slider0.Limits(1));
             end
             
             app.BandTabParams{ntab}.amp=editField.Value;
+            
+            
+            
+            if ntab0==2
+                ntab=3;
+                slider=app.BandTabComponents{ntab}.amplitudeSlider;
+                editField=app.BandTabComponents{ntab}.amplitudeEditField;
+
+                slider0=app.BandTabComponents{ntab0}.amplitudeSlider;
+                editField0=app.BandTabComponents{ntab0}.amplitudeEditField;
+
+
+                if strcmp(component, 'Slider')
+                    slider.Value=slider0.Value;
+                    editField.Value=slider0.Value;
+
+                    editField.Value=round(editField.Value, 0);
+                elseif strcmp(component, 'EditField')
+                    editField.Value=round(editField0.Value, 1);
+                    slider.Value=max(min(editField0.Value, slider0.Limits(2)), slider0.Limits(1));
+                end
+
+                app.BandTabParams{ntab}.amp=editField.Value;
+             
+                
+                
+                 pause(0.2)
+                 slider0.Value=-60;
+                 editField0.Value=-100;
+                 app.BandTabParams{ntab0}.amp=editField0.Value;
+                
+                
+            end
+           
             
             app.plotBands()
         end
@@ -648,7 +701,7 @@ classdef noiseBandMaskerDesigner < matlab.apps.AppBase
     methods (Access = public)
 
         % Construct app
-        function app = noiseBandMaskerDesigner
+        function app = noiseBandMaskerDesigner_notchnoiseHACK
 
             % Create UIFigure and components
             createComponents(app)

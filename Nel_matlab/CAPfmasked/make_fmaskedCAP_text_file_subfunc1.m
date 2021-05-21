@@ -2,6 +2,7 @@
 
 if isfield(Stimuli_adv.masker, 'name')
     maskerName = ['_' Stimuli_adv.masker.name];
+    maskerName= strrep(maskerName, '-', '_');
 else
     maskerName='';
 end

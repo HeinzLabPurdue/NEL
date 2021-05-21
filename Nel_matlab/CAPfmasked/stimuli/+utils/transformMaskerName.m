@@ -11,6 +11,7 @@ function newName = transformMaskerName(name, bandParams, npic)
         for deltastr={'d', 'D', 'Delta', 'delta', 'Delta_','delta_'}
             name=strrep(name, ['{' deltastr{1} 'f' istr '}'], int2str(round((params.fright-params.fleft)*1000)));
         end
+        name=strrep(name, ['{bw' istr '}'], int2str(round((params.fright-params.fleft)*1000)));
         for ampstr={'amp', 'dB'}
             name=strrep(name, ['{' ampstr{1} istr '}'], [int2str(round(params.amp)) 'dB']);
         end

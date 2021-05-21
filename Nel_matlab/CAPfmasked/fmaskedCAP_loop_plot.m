@@ -23,8 +23,8 @@ FIG.statText.info_asldr2 =  uicontrol(FIG.handle, 'callback', '', 'style', 'text
 
 
 % FIG.edit         = uicontrol(FIG.handle,'Visible','off','style','edit','Units','normalized','position',[.12 .75 .1 .04],'string',num2str(UNIT),'fontsize',14);
-FIG.statText.memReps =  uicontrol(FIG.handle, 'callback', '', 'style', 'text','Units','normalized', 'position', [.05 .415 .12 .03], 'string', 'Forget Time (reps):','fontsize',12,'BackgroundColor','w');   % disabled, no freerun
-FIG.edit.memReps = uicontrol(FIG.handle,'callback','fmaskedCAP(''memReps'');','style','edit','Units','normalized','position',[.18 .415 .04 .04],'string',Stimuli.CAPmem_reps,'fontsize',12, 'Enable', 'off');
+FIG.statText.memReps =  uicontrol(FIG.handle, 'callback', '', 'style', 'text','Units','normalized', 'position', [.05 .415 .12 .03], 'string', 'Reps (free run) :','fontsize',12,'BackgroundColor','w');  
+FIG.edit.memReps = uicontrol(FIG.handle,'callback','fmaskedCAP(''memReps'');','style','edit','Units','normalized','position',[.18 .415 .04 .04],'string',Stimuli.CAPmem_reps,'fontsize',12, 'Enable', 'oN');
 FIG.statText.threshV =  uicontrol(FIG.handle, 'callback', '', 'style', 'text','Units','normalized', 'position', [.05 .465 .12 .03], 'string', 'Reject thresh (V):','fontsize',12,'BackgroundColor','w');   % added by kh 2011Jun08
 FIG.edit.threshV = uicontrol(FIG.handle,'callback','fmaskedCAP(''threshV'');','style','edit','Units','normalized','position',[.18 .465 .04 .04],'string',Stimuli.threshV,'fontsize',12); % KH 2011 Jun 08
 
@@ -38,8 +38,8 @@ FIG.radio.right  = uicontrol(FIG.handle,'callback','fmaskedCAP(''right'');','sty
 FIG.radio.both   = uicontrol(FIG.handle,'callback','fmaskedCAP(''both'');', 'style','radio','Enable','on','Units','normalized','position',[.125 .175 .08 .03],'string','Both Ears','fontsize',12,'BackgroundColor','w','value',0);
 
 
-FIG.push.run_levels = uicontrol(FIG.handle,'callback','fmaskedCAP(''run_levels'');','style','pushbutton','Units','normalized',...
-    'position',[.06 .63 .09 .09],'string','Run levels...','fontsize',12,'fontangle','normal','fontweight','normal', 'Enable', 'off'); %disabled, not necessarily useful
+FIG.push.free_run = uicontrol(FIG.handle,'callback','fmaskedCAP(''free_run'');','style','pushbutton','Units','normalized',...
+    'position',[.06 .63 .09 .09],'string','Free run...','fontsize',12,'fontangle','normal','fontweight','normal', 'Enable', 'on'); 
 FIG.push.run_stimuli = uicontrol(FIG.handle,'callback','fmaskedCAP(''run_stimuli'');','style','pushbutton','Units','normalized',...
     'position',[.18 .63 .09 .09],'string','Run stimuli...','fontsize',12,'fontangle','normal','fontweight','normal');
 
@@ -64,10 +64,10 @@ FIG.edit.yscale     = uicontrol(FIG.handle,'callback','fmaskedCAP(''YLim'');','s
 
 
 if ~noNEL
-    if (CAP_set_attns(0,1,0) == 0)
+    if (fmaskedCAP_set_attns(0,0,1,0) == 0)
         set(FIG.radio.left,'Enable','off');
     end    
-    if (CAP_set_attns(0,2,0) == 0)
+    if (fmaskedCAP_set_attns(0,0,2,0) == 0)
         set(FIG.radio.right,'Enable','off');
     end
 end
@@ -77,11 +77,10 @@ set(FIG.handle,'Visible','on');
 
 % Init Gating
 if get(FIG.radio.fast, 'value') == 1
-   CAP_Gating=Stimuli.fast;
+   CAP_intervals=Stimuli.fast;
 else
-   CAP_Gating=Stimuli.slow;
+   CAP_intervals=Stimuli.slow;
 end   
-CAP_intervals=CAP_Gating;
 
 % Init Voltage_Display_Factor
 if strcmp(Display.Voltage,'atELEC')

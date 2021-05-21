@@ -17,7 +17,7 @@ set(FIG.ax.line,'xdata',[],'ydata',[]); drawnow;  % clear the plot.
 
 %atten set in RunStimuli
 
-CAPnpts=ceil(CAP_Gating.CAPlength_ms/1000*Stimuli.RPsamprate_Hz);
+CAPnpts=ceil(CAP_intervals.CAPlength_ms/1000*Stimuli.RPsamprate_Hz);
 CAPdataAvg = zeros(1, CAPnpts);
 CAPdataReps = zeros(2*RunLevels_params.nPairs,CAPnpts);
 
@@ -97,7 +97,7 @@ for currPair = 1:RunLevels_params.nPairs
     end
     
     if currPair
-        set(FIG.ax.line,'xdata',0:(1/Stimuli.RPsamprate_Hz):CAP_Gating.CAPlength_ms/1000, ...
+        set(FIG.ax.line,'xdata',0:(1/Stimuli.RPsamprate_Hz):CAP_intervals.CAPlength_ms/1000, ...
             'ydata',(CAPdataAvg-mean(CAPdataAvg))/(2*currPair)*Display.PlotFactor); % added demean SP 21 Aug 2018
         set(FIG.ax.line2(1),'ydata',max([CAPobs1 CAPobs2])); %KH 2011 June 08
         drawnow;

@@ -14,11 +14,23 @@ for i=1:length([files])
     file=files(i);
     filename=[file.folder '/' file.name];
 
+    %duplicate code here to avoid unecessary computations
+    if create_wavefiles
+        [filepath,name,ext] = fileparts(filename);
+        wav_filename=[name '_' int2str(round(fs)) '_' int2str(filter_order*n_casc) '_' int2str(round(T)) '.wav'];
+
+        if isfile([filepath '/' wav_filename])
+            warning('wavefile already exists, not saving new signal')
+            continue
+        end
+    end
+            
+            
     %load stimulus file
     stim_json=fileread(filename);
     stim_struct=jsondecode(stim_json);
 
-    sig = create_signal_func(config_struct, stim_struct);
+    sig = fmaskedCAP_create_signal_func(config_struct, stim_struct);
 
     %useful params
     fs=config_struct.fs;
@@ -50,7 +62,7 @@ for i=1:length([files])
         assert(~any(sig>1.), 'a value in the generated signal exceeds 1')
         wav_filename=[name '_' int2str(round(fs)) '_' int2str(filter_order*n_casc) '_' int2str(round(T)) '.wav'];
 
-        if isfile([filepath wav_filename])
+        if isfile([filepath '/' wav_filename])
             warning('wavefile already exists, not saving new signal')
         else
             audiowrite([filepath '/' wav_filename], sig, fs)
