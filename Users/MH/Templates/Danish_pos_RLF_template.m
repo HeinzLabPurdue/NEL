@@ -153,7 +153,7 @@ rdd;
 %%%%%%%%%%%%%%%%%%%%
 %% Inloop Section
 %%%%%%%%%%%%%%%%%%%%
-IO_def.Inloop.File           = { fullfile(signals_dir,'MH','Env_Level_Coding','SSN_Stim_S_P.wav') '' [] 1 };
+IO_def.Inloop.File           = { fullfile(signals_dir,'MH','Env_Level_Coding','Danish_Speech_HRTFed_S_P.wav') '' [] 1 };
 IO_def.Inloop.CalibPicNum    =  {calib_picNum   ''       [0 6000]};
 IO_def.Inloop.Low_dBSPL      = { 0             'dB'    [0    120]      };
 IO_def.Inloop.High_dBSPL     = { 75           'dB'    [0    120]      };

@@ -160,7 +160,7 @@ while (end_of_loop_flag == 0)
     prev_index      = index;
     %%% SWITCHED ORDER (MH & AF: 7/16/02) (index before TRIGstate) TO SIMPLIFY detecting occurence of trigger downswing
     
-    [spk, index, msdl_status] = msdl(2);
+    [spk, index, msdl_status] = msdl(2); index
     
     [trig_state, count_down] = TRIGget_state;
     

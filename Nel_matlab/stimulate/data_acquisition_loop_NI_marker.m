@@ -202,7 +202,6 @@ debug_info.DALinloop_times = NaN*zeros(2,nlines); %%X
 debug_info.DALinloop_lines = NaN*zeros(1,nlines); %%X
 %%
 
-fprintf('New Debug point setup \n');
 while (end_of_loop_flag == 0)
     
     
@@ -434,15 +433,9 @@ while (end_of_loop_flag == 0)
             rc = rc_set & (rc==1);
             if (~all(nan_equal(stim_info(index+1).attens_devices,stim_info(index).attens_devices)))
                 [select,connect,PAattns] = find_mix_settings(stim_info(index+1).attens_devices);
-                if isempty(PAattns)
-                    fprintf('Debug point PA#0 \n');
-                end
-                fprintf('Debug point PA#1 \n');
-
                 rc = SBset(select,connect);
                 rc = PAset(PAattns);
             end
-            fprintf('Debug point #5 \n');
             %%% Check that next trigger has not occurred before stimulus loaded!!!!
             index_increment=msdl(4);
             if (index-Nbadstim+index_increment-last_stimsent_index>1)  % MAJOR PROBLEM: STIMULUS NOT LOADED IN TIME
@@ -478,11 +471,9 @@ while (end_of_loop_flag == 0)
                 %%%%%
                 stimstat_index=last_stimsent_index+2;  % Show stim that was loaded UNSUCCESSFULLY
                 Nbadstim=Nbadstim+1;
-                fprintf('Debug point #6 \n');
             else
                 last_stimsent_index=last_stimsent_index+1;  % Only count SUCCESSFULLY loaded stim
                 stimstat_index=last_stimsent_index+1;
-                fprintf('Debug point #7 \n');
             end
         else
             % If last stim has finished (MH: 7/19/02), turn off sound to avoid hearing extra stimuli
@@ -490,9 +481,7 @@ while (end_of_loop_flag == 0)
             %% But are hard-coded here to avoid 'find_mix_settings.m' warning that nothing will be heard
             rc = PAset(PAattns-PAattns+120);
             rc = SBset([7 7],[0 0]);
-            fprintf('Debug point #8 \n');
         end
-    fprintf('Debug point #9 \n');
     end
     % AF & MGH (7/16/02): added prev_index to simplify detection of new line
     %                     and changed the plot to work with prev_index instead of index-1.

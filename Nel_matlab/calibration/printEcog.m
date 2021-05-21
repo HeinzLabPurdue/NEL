@@ -6,7 +6,7 @@
 
 function printEcog(picNums)
 
-cdd
+% cdd
 close all
 
 f = figure('units', 'normalized', 'outerposition', [0 0 1 1]); %makes image fullscreen
