@@ -14,7 +14,7 @@ object_dir = [root_dir 'calibration\object'];
 [COMM.handle.RP2_4, status_rp2]= connect_tdt('RP2', 4);
 [COMM.handle.RX8, status_rx8]= connect_tdt('RX8', 1);
 
-if status_rp2 && status_rp2
+if status_rp2 && status_rx8
     error('How are RP2#4 and RX8 both in the circuit?');
 end
 

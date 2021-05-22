@@ -3,7 +3,7 @@ function rc = tdtinit(h)
 
 % AF 8/22/01
 
-global RP PA Trigger SwitchBox NelData
+global RP PA RX Trigger SwitchBox NelData
 
 % if (~ishandle(h))
 %     h = gcf;
@@ -52,6 +52,7 @@ if yesRX8
     NelData.General.RX8= true; % RX8 is connected
 else
     NelData.General.RX8= false; % RX8 is connected
+    clear global RX;
 end
 
 
