@@ -50,7 +50,9 @@ for devIter= 1:numel(deviceNumbers)
             elseif initFlag
                 TDTout=actxcontrol('RPco.x', [0 0 1 1]);
                 status= TDTout.ConnectRX8(NelData.General.TDTcommMode, devNum);
-                RX(devNum).activeX= TDTout;
+                if status
+                    RX(devNum).activeX= TDTout;
+                end
             end
     end
     varargout{2*devIter-1}= TDTout;
