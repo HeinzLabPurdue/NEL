@@ -32,7 +32,7 @@ addpath([root_dir  'NELanalysis_Mfiles']);
 
 %% Decide whether to run FAKE_TDT (e.g., on a PC not connected to TDT) or REAL_TDT 
 % if (isunix)
-%    [rc host] = dos('hostname');
+%    [rc, host] = dos('hostname');
 %    host = lower(strtok(host,'.'));
 % else
 %    host = lower(getenv('hostname'));
@@ -55,7 +55,7 @@ else
         fprintf( '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n');
     end
 end
-nelinit
+nelinit;
 
 % switch (host)
 %    %case {'alon_home','chernoble','south-chamber','behemoth','providence'}
