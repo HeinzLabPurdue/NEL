@@ -1,6 +1,7 @@
 %% For stimulus
 % RP1=actxcontrol('RPco.x',[0 0 1 1]);
 % invoke(RP1,'ConnectRP2',NelData.General.TDTcommMode,1);
+stimRCXfName= [prog_dir '\object\FFR_wav_polIN.rcx'];
 
 if NelData.General.RP2_3and4 && (~NelData.General.RX8) % NEL1 with RP2 #3 & #4
     %% For bit-select
@@ -8,8 +9,7 @@ if NelData.General.RP2_3and4 && (~NelData.General.RX8) % NEL1 with RP2 #3 & #4
     %     invoke(RP2,'ConnectRP2',NelData.General.TDTcommMode,2);
     RP1= connect_tdt('RP2', 1);
     invoke(RP1,'ClearCOF');
-    invoke(RP1,'LoadCOF',[prog_dir '\object\FFR_wav_polIN.rcx']);
-    stimRCXfName= [prog_dir '\object\FFR_wav_polIN.rcx'];
+    invoke(RP1,'LoadCOF', stimRCXfName);
     
     RP2= connect_tdt('RP2', 2);
     invoke(RP2,'ClearCOF');
@@ -29,22 +29,20 @@ if NelData.General.RP2_3and4 && (~NelData.General.RX8) % NEL1 with RP2 #3 & #4
 elseif (~NelData.General.RP2_3and4) && (~NelData.General.RX8) % NEL1 without (RP2 #3 & #4), and not NEL2 because no RX8
     RP1= connect_tdt('RP2', 1);
     invoke(RP1,'ClearCOF');
-    invoke(RP1,'LoadCOF',[prog_dir '\object\FFR_wav_polIN.rcx']);
-    stimRCXfName= [prog_dir '\object\FFR_wav_polIN.rcx'];
+    invoke(RP1,'LoadCOF', stimRCXfName);
     
     %     RP2=actxcontrol('RPco.x',[0 0 1 1]);
     %     invoke(RP2,'ConnectRP2',NelData.General.TDTcommMode,2);
     RP2= connect_tdt('RP2', 2);
     invoke(RP2,'ClearCOF');
-    invoke(RP2,'LoadCOF',[prog_dir '\object\FFR_right2.rcx']);
+    invoke(RP2,'LoadCOF',[prog_dir '\object\FFR_right2.rcx']); % because only 2 rp2s, this rp2 has both bitset and data collection
     invoke(RP2,'Run');
     RP3= RP2;
     
 elseif NelData.General.RX8  %NEL2 with RX8
     RP1= connect_tdt('RP2', 1);
     invoke(RP1,'ClearCOF');
-    invoke(RP1,'LoadCOF',[prog_dir '\object\FFR_wav_polIN_NEL2.rcx']);
-    stimRCXfName= [prog_dir '\object\FFR_wav_polIN_NEL2.rcx'];
+    invoke(RP1,'LoadCOF', stimRCXfName);
     
     %% For bit-select
     %     RP2=actxcontrol('RPco.x',[0 0 1 1]);

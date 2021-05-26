@@ -6,10 +6,11 @@ end
 
 %% For stimulus
 % RP*={1,2,3} are already defined (in FFR_SNRenv)
+stimRCXfName= [prog_dir '\object\FFR_wav_polIN_sp.rcx'];
 
 if NelData.General.RP2_3and4 && (~NelData.General.RX8) % NEL1 with RP2 #3 & #4
     invoke(RP1,'ClearCOF');
-    invoke(RP1,'LoadCOF',[prog_dir '\object\FFR_wav_polIN_sp.rcx']);
+    invoke(RP1,'LoadCOF', stimRCXfName);
     
     %% For bit-select
     invoke(RP2,'ClearCOF');
@@ -23,7 +24,7 @@ if NelData.General.RP2_3and4 && (~NelData.General.RX8) % NEL1 with RP2 #3 & #4
     invoke(RP3,'Run');
 elseif (~NelData.General.RP2_3and4) && (~NelData.General.RX8) % NEL1 without (RP2 #3 & #4), and not NEL2 because no RX8
     invoke(RP1,'ClearCOF');
-    invoke(RP1,'LoadCOF',[prog_dir '\object\FFR_wav_polIN_sp.rcx']);
+    invoke(RP1,'LoadCOF', stimRCXfName);
     
     %     RP2=actxcontrol('RPco.x',[0 0 1 1]);
     %     invoke(RP2,'ConnectRP2',NelData.General.TDTcommMode,2);
@@ -35,7 +36,7 @@ elseif (~NelData.General.RP2_3and4) && (~NelData.General.RX8) % NEL1 without (RP
     
 elseif NelData.General.RX8  %NEL2 with RX8
     invoke(RP1,'ClearCOF');
-    invoke(RP1,'LoadCOF',[prog_dir '\object\FFR_wav_polIN_sp_NEL2.rcx']);
+    invoke(RP1,'LoadCOF', stimRCXfName);
     
     %% For bit-select
     %     RP2=actxcontrol('RPco.x',[0 0 1 1]);
@@ -231,11 +232,8 @@ while isempty(get(FIG.push.close,'Userdata'))
                     invoke(RP1,'Halt');
                     %% SP: Is it necessary to clear COF?
                     invoke(RP1,'ClearCOF');
-                    if ~NelData.General.RX8
-                        invoke(RP1,'LoadCOF',[prog_dir '\object\FFR_wav_polIN_sp.rcx']);
-                    else
-                        invoke(RP1,'LoadCOF',[prog_dir '\object\FFR_wav_polIN_sp_NEL2.rcx']);
-                    end
+                    invoke(RP1,'LoadCOF', stimRCXfName);
+                    
                     % set_RP_tagvals(RP1, RP2, FFR_Gating, Stimuli);
                     
                     %%
