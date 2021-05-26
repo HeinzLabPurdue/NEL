@@ -359,7 +359,7 @@ elseif strcmp(command_str,'close')
     if NelData.General.RP2_3and4 && (~NelData.General.RX8)
         run_invCalib(false); % Initialize with allpass RP2_3
     end
-    rmpath('C:\NEL1_2\Users\SP\SP_nel_gui\')
+    rmpath([NelData.General.RootDir 'Users\SP\SP_nel_gui\']);
     set(FIG.push.close,'Userdata',1);
     cd([NelData.General.RootDir 'Nel_matlab\nel_general']);
 end

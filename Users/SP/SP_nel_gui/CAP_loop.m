@@ -394,13 +394,13 @@ while isempty(get(FIG.push.close,'Userdata'))
                                 AutoLevel_params.ReRun_dBSPL=sort(rerunSPLs);
                                 
                                 FIG.NewStim = 17;
-                                delete(2); % Delete the ABR analysis plot
+                                delete(findobj( 'Type', 'Figure', 'Name', 'ABR peaks' )); % Delete the ABR analysis plot
                                 cd (cur_dir);
                                 AutoLevel_params.ReRunFlag=1;
                                 break;
                                 
                         end
-                        delete(2); % Delete the ABR analysis plot
+                        delete(findobj( 'Type', 'Figure', 'Name', 'ABR peaks' )); % Delete the ABR analysis plot
                         cd (cur_dir);
                     end
             end

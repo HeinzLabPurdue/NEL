@@ -123,6 +123,6 @@ if e1
         fprintf('Allpass Coefs loaded successfully (%s) \n', datestr(datetime));
     end
 elseif (~e1) && (doInvCalib ~= -2)
-    fprintf('Could not connect to RP2 or load FIR_Coefs (%s) \n', datestr(datetime));
+    fprintf('Could not connect to RP2/RX8 or load FIR_Coefs (%s) \n', datestr(datetime));
 end
 
