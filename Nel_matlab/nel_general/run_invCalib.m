@@ -18,10 +18,12 @@ if status_rp2 && status_rx8
     error('How are RP2#4 and RX8 both in the circuit?');
 end
 
-if status_rp2
-    invoke(COMM.handle.RP2_4,'LoadCof',[object_dir '\calib_invFIR_right.rcx']);
-elseif status_rx8 % Most call for run_invCalib are from NEL1. For NEL2 (with RX8), only needed for calibrate and dpoae.
-    invoke(COMM.handle.RX8,'LoadCof',[object_dir '\calib_invFIR_right_RX8.rcx']);
+if doInvCalib~=-2
+    if status_rp2
+        invoke(COMM.handle.RP2_4,'LoadCof',[object_dir '\calib_invFIR_right.rcx']);
+    elseif status_rx8 % Most call for run_invCalib are from NEL1. For NEL2 (with RX8), only needed for calibrate and dpoae.
+        invoke(COMM.handle.RX8,'LoadCof',[object_dir '\calib_invFIR_right_RX8.rcx']);
+    end
 end
 
 
@@ -111,7 +113,7 @@ else
     e1= false;
 end
 if e1
-    if doInvCalib
+    if doInvCalib==1
         if doINVcheck
             fprintf('invFIR Coefs loaded successfully (%s) \n', datestr(datetime));
         else

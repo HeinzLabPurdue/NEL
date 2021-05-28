@@ -345,7 +345,14 @@ if contains(version, '2019')
 elseif contains(version, '2020')
     % now (after R2020a)
     all_handles_temp= findall(InputFig);
-    all_handles_temp_notAnotPan= all_handles_temp([1:4 6 8]);
+    validAxes= [];
+    for hanVar=1:length(all_handles_temp)
+        if ~strcmpi(all_handles_temp(hanVar).Type, 'annotationpane')
+            validAxes= [validAxes, hanVar];
+        end
+    end
+    
+    all_handles_temp_notAnotPan= all_handles_temp(validAxes);
     set(all_handles_temp_notAnotPan,'Units','normalized','HandleVisibility','callback');
 else 
     error('Check matlab version!!');

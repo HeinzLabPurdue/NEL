@@ -77,7 +77,10 @@ if nargin < 1
         end
     else
         cd([NelData.General.RootDir 'Users\SP\SP_nel_gui']);
-        CAP;
+        h_fig = CAP;
+        if ishandle(h_fig)
+            delete(h_fig); % SP on 5.28.2021: not sure why h_fig is not deleted inside CAP after CAP. So forcefully deleting here. 
+        end
     end
     
     %  elseif strcmp(command_str,'tone')

@@ -34,9 +34,9 @@ if nargin < 1
     
     
     [FIG, FFR_Gating, Display]=FFR_SNRenv_loop_plot(FIG,Display,Stimuli,interface_type);
-    if ~(double(invoke(RP1,'GetTagVal', 'Stage')) == 2)
-        FFR_set_attns(-120,-120,Stimuli.channel,Stimuli.KHosc,RP1,RP2); %% Check with MH
-    end
+%     if ~(double(invoke(RP1,'GetTagVal', 'Stage')) == 2)
+%         FFR_set_attns(-120,-120,Stimuli.channel,Stimuli.KHosc,RP1,RP2); %% Check with MH
+%     end
     FFR_SNRenv('update_stim', 'spl');
     FFR_SNRenv('invCalib'); % Initialize RP2_4 with InvFilter
     ffr_snrenv_loop2; % Working

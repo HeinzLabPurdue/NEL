@@ -40,7 +40,7 @@ if nargin < 1
     
     FIG.handle = figure('NumberTitle','off','Name','CAP Interface','Units','normalized','position',[0.045  0.013  0.9502  0.7474],...
         'Visible','off','MenuBar','none','Tag','CAP_Main_Fig');
-    set(FIG.handle,'CloseRequestFcn','CAP(''close'');')
+    %     set(FIG.handle,'CloseRequestFcn','CAP(''close'');')
     colordef none;
     whitebg('w');
     

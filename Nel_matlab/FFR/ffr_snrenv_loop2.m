@@ -1,8 +1,8 @@
 global prog_dir PROG data_dir NelData
 
-if ~(double(invoke(RP1,'GetTagVal', 'Stage')) == 2)
-    FFR_set_attns(-120,-120,Stimuli.channel,Stimuli.KHosc,RP1,RP2); %% Check with MH
-end
+% if ~(double(invoke(RP1,'GetTagVal', 'Stage')) == 2)
+%     FFR_set_attns(-120,-120,Stimuli.channel,Stimuli.KHosc,RP1,RP2); %% Check with MH
+% end
 
 %% For stimulus
 % RP*={1,2,3} are already defined (in FFR_SNRenv)
