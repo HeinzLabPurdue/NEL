@@ -9,6 +9,17 @@ global data_dir RunThroughABRFlag interface_type
 % FIG is defined
 
 if nargin < 1
+    
+    h_fig = findobj('Tag','CAP_Main_Fig'); %% Finds handle for CAP-Figure
+    if ishandle(h_fig)
+        delete(h_fig);
+    end
+        
+%     if length(h_fig)>2
+%         h_fig= h_fig(1);
+%     end
+    
+    
     prog_dir = [root_dir 'CAP\'];
     
     PROG = struct('name','CAP(v1.ge_mh.1).m');  % modified by GE 26Apr2004.
@@ -27,10 +38,6 @@ if nargin < 1
     FIG   = struct('handle',[],'edit',[],'push',push,'radio',radio,'checkbox',checkbox,'statText', statText, 'fsldr',fsldr,'asldr',asldr,'NewStim',0,'ax',ax);
     %    FIG   = struct('handle',[],'edit',[],'push',push,'radio',radio,'fsldr',fsldr,'asldr',asldr,'NewStim',0,'ax',ax,'popup',popup, 'statText', statText);  % modified by GE 17Jan2003.
     
-    h_fig = findobj('Tag','CAP_Main_Fig');    %% Finds handle for TC-Figure
-    if length(h_fig)>2
-        h_fig= h_fig(1);
-    end
     
     CAP_ins;
     
