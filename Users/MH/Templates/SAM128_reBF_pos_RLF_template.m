@@ -102,7 +102,7 @@ if (exist('stimulus_vals','var') == 1)
     DAL.Inloop = Inloop;
     DAL.Gating = stimulus_vals.Gating;
     DAL.Mix         = mix_params2devs(stimulus_vals.Mix,used_devices); % GE debug: see 'used_devices.File' line at beginning of function
-    DAL.short_description   = 'SAM8_pos_rlf';
+    DAL.short_description   = 'SAM128_pos_rlf';
     
     %   DAL.endLinePlotParams                  = nel_plot_pst_params(DAL.Gating.Period/1000, DAL.Gating.Duration/1000);  % GE 04Nov2003.
     
