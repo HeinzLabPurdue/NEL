@@ -245,7 +245,7 @@ if iscell(filenames) || length(filenames)>1 || filenames~=0
             else
                 
                 audiowrite(path2, sig, config_struct.fs)
-                wavefile_duration=config_struct.duration_s;
+                wavefile_duration=config_struct.duration_s*1000;
             end
             %TODO change in func of time of computation?
             %HACK, time to recover from masking,
