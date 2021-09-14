@@ -83,7 +83,13 @@ if nargin < 1
             end
         end
     else
-        cd([NelData.General.RootDir 'Users\SP\SP_nel_gui']);
+        %cd([NelData.General.RootDir 'Users\SP\SP_nel_gui']);
+        usr = NelData.General.User;
+        addpath([NelData.General.RootDir 'Users\' usr filesep usr '_nel_gui']);
+        addpath([NelData.General.RootDir 'Users\',usr]);
+%         usr = NelData.General.User;
+%         addpath([NelData.General.RootDir 'Users\SP\SP_nel_gui']);
+%         addpath([NelData.General.RootDir 'Users\',usr]);
         h_fig = CAP;
         if ishandle(h_fig)
             delete(h_fig); % SP on 5.28.2021: not sure why h_fig is not deleted inside CAP after CAP. So forcefully deleting here. 
