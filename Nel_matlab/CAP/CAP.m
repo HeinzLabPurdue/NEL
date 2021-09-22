@@ -73,13 +73,21 @@ if nargin < 1
             if strcmp(interface_type, 'FFR')
                 h_fig = FFR();
             elseif strcmp(interface_type, 'SFR')
-                h_fig = FFR_SNRenv();
+                usr = NelData.General.User;
+                % Work around hack for JMR Sept 21
+                if strcmp(usr,'JMR')
+                    addpath([NelData.General.RootDir 'Users\',usr filesep 'FFR']);
+                    h_fig = FFR_SNRenv_2chan();
+                else
+                    h_fig = FFR_SNRenv();
+                end
             elseif strcmp(interface_type, 'SFR-mask')
                 h_fig = SFR_pink_mask_SNRenv;
             elseif strcmp(interface_type, 'SFR_pink')
                 h_fig = SFR_pink_mask_tdt;
             elseif strcmp(interface_type, 'EFR_HrmCpx')
                 h_fig = EFR_Harm_Cmplx;
+
             end
         end
     else

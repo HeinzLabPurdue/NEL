@@ -18,10 +18,15 @@ end
 freqIND=0;
 
 critVal=Stimuli.threshV;  %for artifact rejection, KH Jun2011
+art_factor = 15;
+critVal2 = critVal*art_factor;    % for channel 2 (ECochG) artefact rejection JMR Sept21
 
 set(FIG.push.Automate_Levels,'string','Abort');
 bAbort = 0;
-set(FIG.ax.line,'xdata',[],'ydata',[]); 
+set(FIG.ax.line(1),'xdata',[],'ydata',[]); drawnow;  % clear the plot.
+set(FIG.ax.line(2),'xdata',[],'ydata',[]); drawnow; 
+set(FIG.ax.line(3),'xdata',[],'ydata',[]); drawnow;  %EcochG
+set(FIG.ax.line(4),'xdata',[],'ydata',[]); drawnow;  %EcochG
 drawnow;  % clear the plot.
 
 if ~AutoLevel_params.ReRunFlag
@@ -69,6 +74,11 @@ CAPattens=cell(size(AutoLevel_params.dBs2RUN));
 
 CAPdataAvg=cell(size(rejections));  % Average data, KH 10Jan2012
 CAPdataReps=cell(size(rejections));  % All Reps
+CAPdataAvg_inverse=cell(size(rejections)); %inverse average (for TFS), JMR 2021
+% ECochG
+CAPdataAvg2=cell(size(rejections));  % Average data, KH 10Jan2012
+CAPdataReps2=cell(size(rejections));  % All Reps
+CAPdataAvg_inverse2=cell(size(rejections)); %inverse average (for TFS), JMR 2021
 
 % Atten_dBs= fliplr(AutoLevel_params.stepdB*AutoLevel_params.attenMask)+Stimuli.cur_freq_calib_dbshift;
 % Atten_dBs=Atten_dBs(Atten_dBs>=0);
@@ -91,9 +101,19 @@ for zfrequency = frequencies %New outer loop, KH 10Jan2012
         set(FIG.asldr.val, 'string', sprintf('- %.1f',attenLevel));
         set(FIG.asldr.SPL,'string',sprintf('%.1f dBSPL',Stimuli.MaxdBSPLCalib-attenLevel));
         
-        
+        % pre-define variables
+        % Chan 1 ABR
         CAPdataAvg{freqIND,attenIND} = zeros(1, CAPnpts);
         CAPdataReps{freqIND,attenIND} = zeros(2*AutoLevel_params.nPairs,CAPnpts);
+        CAPdataAvg_inverse{freqIND,attenIND} = zeros(1, CAPnpts);
+        
+        % Chan 2 ECochG JMR 21
+        CAPdataAvg2{freqIND,attenIND} = zeros(1, CAPnpts);
+        CAPdataReps2{freqIND,attenIND} = zeros(2*AutoLevel_params.nPairs,CAPnpts);
+        CAPdataAvg_inverse2{freqIND,attenIND} = zeros(1, CAPnpts);
+        
+        
+        
         % 28Apr2004 M.Heinz: Setup to skip 1st pulse pair, which is sometimes from previous level condition
         for currPair = 0:AutoLevel_params.nPairs
             if currPair
@@ -111,16 +131,30 @@ for zfrequency = frequencies %New outer loop, KH 10Jan2012
                 if(invoke(RP3,'GetTagVal','BufFlag') == 1)
                     if(invoke(RP1,'GetTagVal','ampPolarity') > 0 || (Stimuli.fixedPhase == 1)) 
                              % check for stim polarity, if necessary
-                        CAPdata1 = invoke(RP3,'ReadTagV','ADbuf',0,CAPnpts);
+                             
+                        % Added channel 2 JMR Sept 21
+                        CAPdata1 = invoke(RP3,'ReadTagV','ADbuf',0,CAPnpts); %ABR
+                        CAPdata2 = invoke(RP3,'ReadTagV','ADbuf2',0,CAPnpts); %ECochG
+                        
                         CAPobs1=max(abs(CAPdata1(1:end-2)-mean(CAPdata1(1:end-2)))); %KH Jun2011
+                        CAPobs2=max(abs(CAPdata2(1:end-2)-mean(CAPdata2(1:end-2)))); %KH Jun2011
                         % ^^  Added SP because DC shift in abr probably affects the whole signal except the last point
-                        if CAPobs1 <= critVal %Artifact rejection KH 2011 June 08
+                        if CAPobs1 <= critVal && CAPobs2 <= critVal2 % Double artefact criteria JMR Sept 21
                             bNoSampleObtained = 0;
                             % Need to skip 1st pair, which is from last stimulus
                             if currPair
+                                %ABR
                                 CAPdataReps{freqIND,attenIND}(2*(currPair-1)+1,:) = CAPdata1;
                                 CAPdataAvg{freqIND,attenIND} = CAPdataAvg{freqIND,attenIND}...
                                     + CAPdataReps{freqIND,attenIND}(2*(currPair-1)+1,:);
+                                CAPdataAvg_inverse{freqIND,attenIND} = CAPdataAvg_inverse{freqIND,attenIND}...
+                                    + CAPdataReps{freqIND,attenIND}(2*(currPair-1)+1,:);
+                                %ECochG
+                                CAPdataReps2{freqIND,attenIND}(2*(currPair-1)+1,:) = CAPdata2;
+                                CAPdataAvg2{freqIND,attenIND} = CAPdataAvg2{freqIND,attenIND}...
+                                    + CAPdataReps2{freqIND,attenIND}(2*(currPair-1)+1,:);
+                                CAPdataAvg_inverse2{freqIND,attenIND} = CAPdataAvg_inverse2{freqIND,attenIND}...
+                                    + CAPdataReps2{freqIND,attenIND}(2*(currPair-1)+1,:);
                             end
                         else
                             rejections(freqIND,attenIND)=rejections(freqIND,attenIND)+1;
@@ -135,14 +169,28 @@ for zfrequency = frequencies %New outer loop, KH 10Jan2012
                 if(invoke(RP3,'GetTagVal','BufFlag') == 1)
                     if(invoke(RP1,'GetTagVal','ampPolarity') < 0 || (Stimuli.fixedPhase == 1)) 
                              % check for stim polarity, if necessary
-                        CAPdata2 = invoke(RP3,'ReadTagV','ADbuf',0,CAPnpts);
-                        CAPobs2=max(abs(CAPdata2(1:end-2)-mean(CAPdata2(1:end-2))));
-                        if CAPobs2 <= critVal %Artifact rejection KH 2011 June 08
+                        
+                        % Added channel 2 JMR Sept 21
+                        CAPdata12 = invoke(RP3,'ReadTagV','ADbuf',0,CAPnpts); %ABR
+                        CAPdata22 = invoke(RP3,'ReadTagV','ADbuf2',0,CAPnpts); %ECochG
+                        
+                        CAPobs12=max(abs(CAPdata12(1:end-2)-mean(CAPdata12(1:end-2)))); %KH Jun2011
+                        CAPobs22=max(abs(CAPdata22(1:end-2)-mean(CAPdata22(1:end-2)))); %KH Jun2011
+                        
+                        if CAPobs12 <= critVal && CAPobs22 <= critVal2 %double artefact criteria JM Sept 21
                             bNoSampleObtained = 0;
                             if currPair
-                                CAPdataReps{freqIND,attenIND}(2*currPair,:) = CAPdata2;
+                                CAPdataReps{freqIND,attenIND}(2*currPair,:) = CAPdata12;
                                 CAPdataAvg{freqIND,attenIND} = CAPdataAvg{freqIND,attenIND}...
                                     + CAPdataReps{freqIND,attenIND}(2*currPair,:);
+                                CAPdataAvg_inverse{freqIND,attenIND} = CAPdataAvg_inverse{freqIND,attenIND}...
+                                    - CAPdataReps{freqIND,attenIND}(2*currPair,:);
+                                %ECochG
+                                CAPdataReps2{freqIND,attenIND}(2*(currPair),:) = CAPdata22;
+                                CAPdataAvg2{freqIND,attenIND} = CAPdataAvg2{freqIND,attenIND}...
+                                    + CAPdataReps2{freqIND,attenIND}(2*(currPair),:);
+                                CAPdataAvg_inverse2{freqIND,attenIND} = CAPdataAvg_inverse2{freqIND,attenIND}...
+                                    - CAPdataReps2{freqIND,attenIND}(2*(currPair),:);
                             end
                         else
                             rejections(freqIND,attenIND)=rejections(freqIND,attenIND)+1;
@@ -152,18 +200,44 @@ for zfrequency = frequencies %New outer loop, KH 10Jan2012
                 end
             end
             if currPair
-                set(FIG.ax.line,'xdata',(1:CAPnpts)/Stimuli.RPsamprate_Hz, ...
-                    'ydata',(CAPdataAvg{freqIND,attenIND}-mean(CAPdataAvg{freqIND,attenIND}))/(2*currPair)*Display.PlotFactor); 
-                set(FIG.ax.line2(1),'ydata',max([CAPobs1 CAPobs2])); %KH 2011 June 08
+                set(FIG.ax.line(1),'xdata',(1:CAPnpts)/Stimuli.RPsamprate_Hz, ...
+                    'ydata',(CAPdataAvg{freqIND,attenIND}-mean(CAPdataAvg{freqIND,attenIND}))/(2*currPair)*Display.PlotFactor);
+                set(FIG.ax.line(2),'xdata',(1:CAPnpts)/Stimuli.RPsamprate_Hz, ...
+                    'ydata',(CAPdataAvg_inverse{freqIND,attenIND}-mean(CAPdataAvg_inverse{freqIND,attenIND}))/(2*currPair)*Display.PlotFactor);
+                 set(FIG.ax.line(3),'xdata',(1:CAPnpts)/Stimuli.RPsamprate_Hz, ...
+                    'ydata',(CAPdataAvg2{freqIND,attenIND}-mean(CAPdataAvg2{freqIND,attenIND}))/(2*currPair)*Display.PlotFactor);               
+                 set(FIG.ax.line(4),'xdata',(1:CAPnpts)/Stimuli.RPsamprate_Hz, ...
+                    'ydata',(CAPdataAvg_inverse2{freqIND,attenIND}-mean(CAPdataAvg_inverse2{freqIND,attenIND}))/(2*currPair)*Display.PlotFactor); 
+                
+                set(FIG.ax.line2(1),'ydata',max([CAPobs1 CAPobs12])); %KH 2011 June 08
+                set(FIG.ax.line2(3),'ydata',max([CAPobs2 CAPobs22]));
                 drawnow;
             end
         end
         if (bAbort == 1)
             break;
         end
-        CAPdataAvg{freqIND,attenIND} = CAPdataAvg{freqIND,attenIND} / (2*AutoLevel_params.nPairs);
-        set(FIG.ax.line,'xdata',(1:CAPnpts)/Stimuli.RPsamprate_Hz, ...
-            'ydata',(CAPdataAvg{freqIND,attenIND}-mean(CAPdataAvg{freqIND,attenIND}))*Display.PlotFactor); drawnow;
+        %plotting
+        
+        CAPdataAvg{freqIND,attenIND} = CAPdataAvg{freqIND,attenIND} / (2*RunLevels_params.nPairs);
+        CAPdataAvg_inverse{freqIND,attenIND} = CAPdataAvg_inverse{freqIND,attenIND} / (2*RunLevels_params.nPairs);
+        set(FIG.ax.line(1),'xdata',(1:CAPnpts)/Stimuli.RPsamprate_Hz, ...
+            'ydata',(CAPdataAvg{freqIND,attenIND}-mean(CAPdataAvg{freqIND,attenIND}))*Display.PlotFactor);% drawnow;
+        %inverse
+        set(FIG.ax.line(2),'xdata',(1:CAPnpts)/Stimuli.RPsamprate_Hz, ...
+            'ydata',(CAPdataAvg_inverse{freqIND,attenIND}-mean(CAPdataAvg_inverse{freqIND,attenIND}))*Display.PlotFactor); 
+        
+        %ECochG
+        CAPdataAvg2{freqIND,attenIND} = CAPdataAvg2{freqIND,attenIND} / (2*RunLevels_params.nPairs);
+        CAPdataAvg_inverse2{freqIND,attenIND} = CAPdataAvg_inverse2{freqIND,attenIND} / (2*RunLevels_params.nPairs);
+        %inverse
+        set(FIG.ax.line(3),'xdata',(1:CAPnpts)/Stimuli.RPsamprate_Hz, ...
+            'ydata',(CAPdataAvg2{freqIND,attenIND}-mean(CAPdataAvg2{freqIND,attenIND}))*Display.PlotFactor);
+        %inverse
+        set(FIG.ax.line(4),'xdata',(1:CAPnpts)/Stimuli.RPsamprate_Hz, ...
+            'ydata',(CAPdataAvg_inverse2{freqIND,attenIND}-mean(CAPdataAvg_inverse2{freqIND,attenIND}))*Display.PlotFactor); 
+                
+        drawnow;
     end
     if (bAbort == 1)
         break;

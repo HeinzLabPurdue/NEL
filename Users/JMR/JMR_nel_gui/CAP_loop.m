@@ -12,6 +12,8 @@ else
     end
 end
 
+% Artefact threshold for chan 2 :JMR Sept 21
+art_factor = 15;
 %% For stimulus
 % RP1=actxcontrol('RPco.x',[0 0 1 1]);
 % invoke(RP1,'ConnectRP2',NelData.General.TDTcommMode,1);
@@ -70,11 +72,12 @@ elseif NelData.General.RX8  %NEL2 with RX8
     
     RP3= connect_tdt('RX8', 1);
     invoke(RP3,'ClearCOF');
-    invoke(RP3,'LoadCOF',[prog_dir '\object\ABR_RX8_ADC_invCalib.rcx']);
+    %invoke(RP3,'LoadCOF',[prog_dir '\object\ABR_RX8_ADC_invCalib.rcx']);
+    invoke(RP3,'LoadCOF',[prog_dir '\object\ABR_RX8_ADC_invCalib_2chan.rcx']); %JMR 2 channel setup
     %     [~, ~, b_invCalib_coef]= run_invCalib(-2);
     b_invCalib_coef= [1 zeros(1, 255)];
     e_invCalib_status= RP3.WriteTagV('FIR_Coefs', 0, b_invCalib_coef);
-else 
+else
     nelerror('Cannot figure out whether NEL1 or NEL2')
 end
 
@@ -97,8 +100,12 @@ while isempty(get(FIG.push.close,'Userdata'))
         delete(FIG.ax.axis);
     end
     FIG.ax.axis = axes('position',[.35 .34 .525 .62]);
-    FIG.ax.line = plot(0,0,'-');
-    set(FIG.ax.line,'MarkerSize',2,'Color','k');
+    FIG.ax.line = plot(0,0,'-',0,0,'-',0,0,'-',0,0,'-'); %ADDING INVERSE LINE + ECochG: JMR 2021
+    set(FIG.ax.line(1),'MarkerSize',2,'Color','k');
+    set(FIG.ax.line(2),'MarkerSize',2,'Color',[0.6 0.6 0.6]);
+    set(FIG.ax.line(3),'MarkerSize',2,'Color','b');
+    set(FIG.ax.line(4),'MarkerSize',2,'Color',[0.9 .1 1]);
+    
     xlim([CAP_Gating.XstartPlot_ms/1000 CAP_Gating.XendPlot_ms/1000]);
     ylim([-Display.YLim Display.YLim]);  % ge debug: set large enough for A/D input range
     %   axis([CAP_Gating.XstartPlot_ms/1000 .010 -1 1]);  % ge debug: set large enough for A/D input range
@@ -108,6 +115,7 @@ while isempty(get(FIG.push.close,'Userdata'))
     set(FIG.ax.axis,'YTickMode','auto');
     %    ylim('auto');
     xlabel('Time (sec)','fontsize',12,'FontWeight','Bold');
+    legend('Chan 1','Chan 1 invert','Chan 2','Chan 2 invert','location','best');
     if strcmp(Display.Voltage,'atELEC')
         FIG.ax.ylabel=ylabel('Voltage at Electrode (V)','fontsize',12,'FontWeight','Bold');
     else
@@ -119,14 +127,14 @@ while isempty(get(FIG.push.close,'Userdata'))
     
     %New axes for showing maximum of each input waveform - KH 2011 Jun 08
     FIG.ax.axis2 = axes('position',[.925 .34 .025 .62]);
-    FIG.ax.line2 = plot(0.5,0,'r*',[0 1],[Stimuli.threshV Stimuli.threshV],':r');
+    FIG.ax.line2 = plot(0.4,0,'r*',[0 1],[Stimuli.threshV Stimuli.threshV],':r',0.6,0,'b*',[0 1],[Stimuli.threshV*art_factor Stimuli.threshV*art_factor],':b');
     xlim([0 1]); ylim([0 10]);
     set(FIG.ax.axis2,'XTickMode','auto');
     set(FIG.ax.axis2,'YTickMode','auto');
     ylabel('Max AD Voltage (1 rep)','fontsize',12,'FontWeight','Bold');
     box on;
     
-    demean_flag= 0; % set 0 to not demean
+    demean_flag= 1; % set 0 to not demean
     
     
     invoke(RP1,'SoftTrg',1);
@@ -138,10 +146,14 @@ while isempty(get(FIG.push.close,'Userdata'))
         % Start: Main body. excluding interrupt for FIG.push.close or FIG.NewStim
         % ---------------------------------------------------------------------------------------------------------------------------------------
         if(invoke(RP3,'GetTagVal','BufFlag') == 1)
-            CAPdata = invoke(RP3,'ReadTagV','ADbuf',0,CAPnpts);
+            CAPdata = invoke(RP3,'ReadTagV','ADbuf',0,CAPnpts);   % ABR
+            CAPdata2 = invoke(RP3,'ReadTagV','ADbuf2',0,CAPnpts); % ECochG Added JMR Sept 2021
             %           CAPdata = ones(size(CAPdata)); % ge debug
             
             CAPobs=max(abs(CAPdata(1:end-2)-demean_flag*mean(CAPdata(1:end-2)))); %KH 08Jun2011
+            CAPobs2=max(abs(CAPdata2(1:end-2)-demean_flag*mean(CAPdata2(1:end-2)))); %ECochG artefact
+            
+            %CAPobs2=max(abs(CAPdata2(1:end-2)-demean_flag*mean(CAPdata2(1:end-2)))); 
             % ^^ added SP (because there is a dc shift probably affects the whole signal except the last point)
             
             if ~veryfirstSTIM  % MH 18Nov2003 Skip very first, all zeros
@@ -152,19 +164,33 @@ while isempty(get(FIG.push.close,'Userdata'))
                         CAPdataAvg_freerun = CAP_memFact * CAPdataAvg_freerun ...
                             + (1 - CAP_memFact)*CAPdata;
                         CAPdataAvg_freerun=CAPdataAvg_freerun-demean_flag*mean(CAPdataAvg_freerun); %added demean SP Aug 21 2018
+                        
+                        %ECochG channel
+                        CAPdataAvg_freerun2 = CAP_memFact * CAPdataAvg_freerun2 ...
+                            + (1 - CAP_memFact)*CAPdata2;
+                        CAPdataAvg_freerun2=CAPdataAvg_freerun2-demean_flag*mean(CAPdataAvg_freerun2); %added demean SP Aug 21 2018
                     end
                     
                 else
                     CAPdataAvg_freerun = CAPdata;
+                    CAPdataAvg_freerun2 = CAPdata2; %ECochG channel JMR
                     firstSTIM=0;
                 end
                 %                 set(FIG.ax.line,'xdata',[0:(1/Stimuli.RPsamprate_Hz):CAP_Gating.CAPlength_ms/1000], ...
                 %                     'ydata',CAPdataAvg_freerun*Display.PlotFactor);
-                set(FIG.ax.line,'xdata',(1:length(CAPdataAvg_freerun))/Stimuli.RPsamprate_Hz, ...
+                %set(FIG.ax.line(2),'xdata',(1:length(CAPdataAvg_freerun))/Stimuli.RPsamprate_Hz, ...
+                %    'ydata',CAPdataAvg_freerun*Display.PlotFactor);
+                set(FIG.ax.line(1),'xdata',(1:length(CAPdataAvg_freerun))/Stimuli.RPsamprate_Hz, ...
                     'ydata',CAPdataAvg_freerun*Display.PlotFactor);
+                set(FIG.ax.line(3),'xdata',(1:length(CAPdataAvg_freerun2))/Stimuli.RPsamprate_Hz, ...
+                    'ydata',CAPdataAvg_freerun2*Display.PlotFactor);
+                set(FIG.ax.line(2),'xdata',[], ...
+                    'ydata',[]);                
+                set(FIG.ax.line(4),'xdata',[], ...
+                    'ydata',[]);   
                 
                 set(FIG.ax.line2(1),'ydata',CAPobs-demean_flag*mean(CAPobs)); %KH 10Jan2012 % added demean SP (Aug 21 2018)
-                
+                set(FIG.ax.line2(3),'ydata',CAPobs2-demean_flag*mean(CAPobs2));
                 drawnow;
             else
                 veryfirstSTIM=0;
@@ -240,6 +266,7 @@ while isempty(get(FIG.push.close,'Userdata'))
                     
                 case 13 %KH 08Jun2011
                     set(FIG.ax.line2(2),'ydata',[Stimuli.threshV Stimuli.threshV]);
+                    set(FIG.ax.line2(4),'ydata',[Stimuli.threshV*art_factor Stimuli.threshV*art_factor]);
                     drawnow;
                     
                 case 15 % Runs through Stimuli.audiogramFreqs at levels specified, KH 10Jan2012
@@ -281,46 +308,47 @@ while isempty(get(FIG.push.close,'Userdata'))
                             break;
                         end
                         
-                        if ~AutoLevel_params.ReRunFlag  % <1> Case when runs for the first time afrer MANthresh-20:MANthresh+50
-                            % calculates autoThresh silently, runs the 5 dB step around autoThresh
-                            %% Change to min(90,thresh+50) <to-do SP>
-                            picNUMlist=NelData.File_Manager.picture-fliplr((1:AutoLevel_params.numAttens_1)-1);
-                            dBSPLlist=fliplr(AutoLevel_params.maxdBSPLtoRUN -((1:AutoLevel_params.numAttens_1)-1)*AutoLevel_params.stepdB);
-                            lastdBSPL=60; %AutoLevel_params.ManThresh_dBSPL+AutoLevel_params.dBaboveTHRman_for_autoTHRcorr;
-                            % Added SP (Sep 10, 2018) % May have to change depending on PTS/ NH
-                            [xx,lastdBindex]=min(abs(dBSPLlist-lastdBSPL));
-                            picstoSEND=picNUMlist(1:lastdBindex);  % list of PICS to send to Ken's code to avoid usinig too high an SPL for template
-                            
-                            CalibPIC= Stimuli.calibPicNum;
-                            dataDIR=NelData.File_Manager.dirname;
-                                                        
-                            AutoLevel_params.AutoThresh1=main_abr_bb(dataDIR,CalibPIC,picstoSEND);
-                            
-                            if isnan(AutoLevel_params.AutoThresh1)
-                                AutoLevel_params.AutoThresh1=25;
-                                disp('You must be debuggin, else something is wrong!');
-                                ding;
-                            elseif AutoLevel_params.AutoThresh1<0
-                                AutoLevel_params.AutoThresh1=25;
-                                disp('You must be debuggin, else something is wrong!');
-                                ding;
-                            elseif AutoLevel_params.AutoThresh1>80
-                                AutoLevel_params.AutoThresh1=25;
-                                disp('You must be debuggin, else something is wrong!');
-                                ding;
-                            end
-                            
-                            Stimuli.atten_dB= Stimuli.MaxdBSPLCalib-(5+10*floor(AutoLevel_params.AutoThresh1/10));
-                            
-                            FIG.NewStim = 10;
-                            AutoLevel_params.dB5Flag=1;
-                            break;
-                            % It goes to run_level and runs the 5dB step
-                        else % <3> To run the user defined levels
-                            FIG.NewStim = 17;
-                            AutoLevel_params.dB5Flag=1;
-                            break;
-                        end
+                        %COMMENTED BY JMR Sept 21
+%                         if ~AutoLevel_params.ReRunFlag  % <1> Case when runs for the first time afrer MANthresh-20:MANthresh+50
+%                             % calculates autoThresh silently, runs the 5 dB step around autoThresh
+%                             %% Change to min(90,thresh+50) <to-do SP>
+%                             picNUMlist=NelData.File_Manager.picture-fliplr((1:AutoLevel_params.numAttens_1)-1);
+%                             dBSPLlist=fliplr(AutoLevel_params.maxdBSPLtoRUN -((1:AutoLevel_params.numAttens_1)-1)*AutoLevel_params.stepdB);
+%                             lastdBSPL=60; %AutoLevel_params.ManThresh_dBSPL+AutoLevel_params.dBaboveTHRman_for_autoTHRcorr;
+%                             % Added SP (Sep 10, 2018) % May have to change depending on PTS/ NH
+%                             [xx,lastdBindex]=min(abs(dBSPLlist-lastdBSPL));
+%                             picstoSEND=picNUMlist(1:lastdBindex);  % list of PICS to send to Ken's code to avoid usinig too high an SPL for template
+%                             
+%                             CalibPIC= Stimuli.calibPicNum;
+%                             dataDIR=NelData.File_Manager.dirname;
+%                                                         
+%                             AutoLevel_params.AutoThresh1=main_abr_bb(dataDIR,CalibPIC,picstoSEND);
+%                             
+%                             if isnan(AutoLevel_params.AutoThresh1)
+%                                 AutoLevel_params.AutoThresh1=25;
+%                                 disp('You must be debuggin, else something is wrong!');
+%                                 ding;
+%                             elseif AutoLevel_params.AutoThresh1<0
+%                                 AutoLevel_params.AutoThresh1=25;
+%                                 disp('You must be debuggin, else something is wrong!');
+%                                 ding;
+%                             elseif AutoLevel_params.AutoThresh1>80
+%                                 AutoLevel_params.AutoThresh1=25;
+%                                 disp('You must be debuggin, else something is wrong!');
+%                                 ding;
+%                             end
+%                             
+%                             Stimuli.atten_dB= Stimuli.MaxdBSPLCalib-(5+10*floor(AutoLevel_params.AutoThresh1/10));
+%                             
+%                             FIG.NewStim = 10;
+%                             AutoLevel_params.dB5Flag=1;
+%                             break;
+%                             % It goes to run_level and runs the 5dB step
+%                         else % <3> To run the user defined levels
+%                             FIG.NewStim = 17;
+%                             AutoLevel_params.dB5Flag=1;
+%                             break;
+%                         end
                     else
                         AutoLevel_params.dB5Flag=0;
                         
