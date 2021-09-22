@@ -1,4 +1,4 @@
-function h_fig = FFR_SNRenv(command_str,eventdata)
+function h_fig = FFR_SNRenv_2chan(command_str,eventdata)
 
 % ge debug ABR 26Apr2004: replace "FFR" with more generalized nomenclature, throughout entire system.
 
@@ -131,7 +131,7 @@ elseif strcmp(command_str,'update_stim')
     xpr=resample(xp,round(Stimuli.RPsamprate_Hz), fsp);
     audiowrite([Stimuli.UPDdir Stimuli.filename], xpr, round(Stimuli.RPsamprate_Hz));
     copyfile([Stimuli.UPDdir Stimuli.filename],Stimuli.STIMfile,'f');
-    FFR_SNRenv('invCalib'); % Initialize RP2_4 with InvFilter
+    FFR_SNRenv_2chan('invCalib'); % Initialize RP2_4 with InvFilter
     
     if update_gating_flag % right now, this will update only for dir based, later for all stims
         Stimuli.fast.duration_ms= round(length(xp)/fsp*1e3);
@@ -144,10 +144,10 @@ elseif strcmp(command_str,'update_stim')
 
         if get(FIG.radio.fast, 'value') % Fast
             Stimuli.fast.period_ms= Stimuli.fast.duration_ms+501;
-            FFR_SNRenv('fast');
+            FFR_SNRenv_2chan('fast');
         elseif get(FIG.radio.slow, 'value') == 1 % Slow
             Stimuli.slow.period_ms= Stimuli.fast.duration_ms+1000;
-            FFR_SNRenv('slow');
+            FFR_SNRenv_2chan('slow');
         end
     end
     
@@ -213,7 +213,13 @@ elseif strcmp(command_str,'slide_atten')
     %     set_RP_tagvals(RP1, RP2, FFR_SNRenv_Gating, Stimuli);
     FFR_set_attns(Stimuli.atten_dB,-120,Stimuli.channel,Stimuli.KHosc,RP1,RP2); 
     set(FIG.asldr.SPL,'string',sprintf('%.1f dB SPL',Stimuli.calib_dBSPLout-abs(get(FIG.asldr.slider,'val'))));
-    
+    if get(FIG.bg.spl.dB65, 'value')
+        Stimuli.atten_dB = Stimuli.calib_dBSPLout-65;
+    elseif get(FIG.bg.spl.dB85, 'value')
+        Stimuli.atten_dB = Stimuli.calib_dBSPLout-85;
+    end
+    FFR_set_attns(Stimuli.atten_dB,-120,Stimuli.channel,Stimuli.KHosc,RP1,RP2); 
+    set(FIG.asldr.SPL,'string',sprintf('%.1f dB SPL',Stimuli.calib_dBSPLout-abs(get(FIG.asldr.slider,'val'))));
     % LQ 01/31/05
 elseif strcmp(command_str, 'slide_atten_text')
     FIG.NewStim = 0;

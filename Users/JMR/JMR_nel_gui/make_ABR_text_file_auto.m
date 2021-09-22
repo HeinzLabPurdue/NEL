@@ -28,15 +28,34 @@ if ~(AutoLevel_params.bMultiOutputFiles)  % added by GE 26Apr2004.
             end
         end
     end
+   % New for 2 channel JMR 21
+     CAPdataReps_dec2=cell(size(AutoLevel_params.attenMask));  
+    for i=1:size(CAPdataAvg2,1) % changed from i=1:length(CAPdataAvg)- Dave 4/9/15
+        for m=1:size(CAPdataAvg2,2) %m loop added to account for multiple frequencies in audiogram -Dave
+            if (AutoLevel_params.decimateFact~=1)
+                CAPdataAvg2{i,m} = decimate(CAPdataAvg2{i,m}, AutoLevel_params.decimateFact);
+                CAPdataReps_dec2{i,m} = zeros(2*AutoLevel_params.nPairs,length(CAPdataAvg2{i,m}));
+                % MH 18Nov2003: Add code to save all Reps
+                for j=1:2*AutoLevel_params.nPairs
+                    CAPdataReps_dec2{i,m}(j,:) = decimate(CAPdataReps2{i,m}(j,:), AutoLevel_params.decimateFact);
+                end
+            else
+                CAPdataReps_dec2{i,m} = CAPdataReps2{i,m};
+            end
+        end
+    end
     
     x.AD_Data.AD_All_V = CAPdataReps_dec; % modified by GE 26Apr2004.
     x.AD_Data.AD_Avg_V = CAPdataAvg{1};
+    x.AD_Data.AD_All_V_chan2 = CAPdataReps_dec2;
+    x.AD_Data.AD_Avg_V_chan2 = CAPdataAvg2{1};    
     
     make_CAP_text_file_subfunc2;
     
     %remove all data and save the average data only! 
     temp_struct=x.AD_Data;
     temp_struct1=rmfield(temp_struct,'AD_All_V');
+    temp_struct1 = rmfield(temp_struct1,'AD_All_V_chan2');
     x.AD_Data=temp_struct1;
     
     make_CAP_text_file_subfunc3;

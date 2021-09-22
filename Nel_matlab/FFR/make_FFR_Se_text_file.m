@@ -5,6 +5,7 @@
 % if ~(RunLevels_params.bMultiOutputFiles)  % added by GE 26Apr2004.
 
 % Edited by SP
+% Edited by JMR
 
 function NelData= make_FFR_Se_text_file(misc, Stimuli, PROG, NelData, comment, ...
     RunLevels_params, FFR_Gating, FFRdataAvg_PO, FFRdataAvg_NP, FFRdataStoreNP, ...
