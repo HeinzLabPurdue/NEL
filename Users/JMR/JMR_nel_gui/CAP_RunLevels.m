@@ -216,7 +216,7 @@ if (bAbort == 0)
         
         temp=AutoLevel_params.bMultiOutputFiles;
         AutoLevel_params.bMultiOutputFiles=0;
-        make_ABR_text_file_auto;
+        make_ABR_text_file_auto_2chan;
         AutoLevel_params.bMultiOutputFiles=temp;
         clear temp;
         

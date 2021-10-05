@@ -43,18 +43,19 @@ for i=1:length(FFRdataAvg_NP2)
 end
 
 save_all_reps=1; % change to 0 to only save averages.
-
+x.AD_Data.Label{1} = {'Channel 1'};
+x.AD_Data.Label{2} = {'Channel 2'};
 if save_all_reps==1
-    x.AD_Data.AD_All_V_chan1 = FFRdataReps1; 
-    x.AD_Data.AD_All_V_chan2 = FFRdataReps2;     
+    x.AD_Data.AD_All_V{1} = FFRdataReps1; 
+    x.AD_Data.AD_All_V{2} = FFRdataReps2;     
     % _dec removed from end of FFRdataReps % modified by GE 26Apr2004. 
     %  Removed zz 04nov2011. Added DA 7/25/13
 end
 % 	x.AD_Data.AD_Avg_V = FFRdataAvg;
-x.AD_Data.AD_Avg_NP_V_chan1 = FFRdataAvg_NP1;
-x.AD_Data.AD_Avg_PO_V_chan1 = FFRdataAvg_PO1;
-x.AD_Data.AD_Avg_NP_V_chan2 = FFRdataAvg_NP2;
-x.AD_Data.AD_Avg_PO_V_chan2 = FFRdataAvg_PO2;
+x.AD_Data.AD_Avg_NP_V{1} = FFRdataAvg_NP1;
+x.AD_Data.AD_Avg_PO_V{1} = FFRdataAvg_PO1;
+x.AD_Data.AD_Avg_NP_V{2} = FFRdataAvg_NP2;
+x.AD_Data.AD_Avg_PO_V{2} = FFRdataAvg_PO2;
 
 
 NelData= make_FFR_Se_text_file_subfunc2_2chan(fname, x, aux_fname, NelData);

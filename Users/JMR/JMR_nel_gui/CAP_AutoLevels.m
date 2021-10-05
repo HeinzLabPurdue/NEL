@@ -270,7 +270,7 @@ if (bAbort == 0)
     if ~strcmp(ButtonName,'No')
         set(FIG.statText.status, 'String', 'STATUS: saving data...');
         
-        make_ABR_text_file_auto;
+        make_ABR_text_file_auto_2chan;
         
         filename = current_data_file('CAP',1); %strcat(FILEPREFIX,num2str(FNUM),'.m');
         uiresume; % Allow Nel's main window to update the Title
