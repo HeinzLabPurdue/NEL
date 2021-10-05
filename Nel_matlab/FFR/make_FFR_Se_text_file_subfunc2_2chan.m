@@ -12,8 +12,7 @@ end
 % ADDED DA 7/25/13
 % REMOVED as there is no longer storing of all data zz 04nov2011
 aux_x=x;
-aux_x.AD_Data=rmfield(aux_x.AD_Data,'AD_All_V_chan1');
-aux_x.AD_Data=rmfield(aux_x.AD_Data,'AD_All_V_chan2');
+aux_x.AD_Data=rmfield(aux_x.AD_Data,'AD_All_V');
 rc = write_nel_matdata(aux_fname,aux_x,0);
 
 while (rc < 0)
