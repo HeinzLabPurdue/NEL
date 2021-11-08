@@ -18,7 +18,7 @@ end
 freqIND=0;
 
 critVal=Stimuli.threshV;  %for artifact rejection, KH Jun2011
-art_factor = 15;
+art_factor = 6;
 critVal2 = critVal*art_factor;    % for channel 2 (ECochG) artefact rejection JMR Sept21
 
 set(FIG.push.Automate_Levels,'string','Abort');

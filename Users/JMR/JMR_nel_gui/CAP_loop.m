@@ -13,7 +13,7 @@ else
 end
 
 % Artefact threshold for chan 2 :JMR Sept 21
-art_factor = 15;
+art_factor = 6;
 %% For stimulus
 % RP1=actxcontrol('RPco.x',[0 0 1 1]);
 % invoke(RP1,'ConnectRP2',NelData.General.TDTcommMode,1);
