@@ -19,7 +19,7 @@ if nargin < 1
     push  = cell2struct(cell(1,6),{'run_levels','close','x1','x10','x100', 'forget_now'},2);
     %     radio = cell2struct(cell(1,8),{'noise','tone','khite','fast','slow','left','right','both'},2);
     % ge debug ABR 26Apr2004: need to add buttons to select between tone/noise/click
-    radio = cell2struct(cell(1,5),{'fast','slow','left','right','both'},2);
+    radio = cell2struct(cell(1,8),{'fast','slow','left','right','both','chan_1','chan_2','Simultaneous'},2);
     checkbox = cell2struct(cell(1,1), {'fixedPhase'},2);
     statText  = cell2struct(cell(1,2),{'memReps','status'},2);
     %     popup = cell2struct(cell(1,1),{'spike_channel'},2);   % added by GE 17Jan2003.
@@ -132,6 +132,36 @@ elseif strcmp(command_str,'both')
     else
         set(FIG.radio.both,'value',1);
     end
+
+elseif strcmp(command_str,'chan_1')
+    if get(FIG.radio.chan_1, 'value') == 1
+        FIG.NewStim = 18;
+        Stimuli.rec_channel = 1;
+        set(FIG.radio.chan_2,'value',0);
+        set(FIG.radio.Simultaneous,'value',0);
+    else
+        set(FIG.radio.chan_1,'value',1);
+    end    
+    
+elseif strcmp(command_str,'chan_2')
+    if get(FIG.radio.chan_2, 'value') == 1
+        FIG.NewStim = 18;
+        Stimuli.rec_channel = 2;
+        set(FIG.radio.chan_1,'value',0);
+        set(FIG.radio.Simultaneous,'value',0);
+    else
+        set(FIG.radio.chan_2,'value',1);
+    end     
+    
+elseif strcmp(command_str,'Simultaneous')
+    if get(FIG.radio.Simultaneous, 'value') == 1
+        FIG.NewStim = 18;
+        Stimuli.rec_channel = 3;
+        set(FIG.radio.chan_1,'value',0);
+        set(FIG.radio.chan_2,'value',0);
+    else
+        set(FIG.radio.Simultaneous,'value',1);
+    end      
     
 elseif strcmp(command_str,'slide_freq')
     FIG.NewStim = 6;
@@ -229,6 +259,17 @@ elseif strcmp(command_str,'threshV')   %KH 2011 Jun 08, for artifact rejection
         Stimuli.threshV = oldThreshV;
     end
     set(FIG.edit.threshV,'string', num2str(Stimuli.threshV));
+
+elseif strcmp(command_str,'threshV2')   %JMR nov 21 for artifact rejection channel 2
+    FIG.NewStim = 13;
+    oldThreshV2 = Stimuli.threshV2;
+    Stimuli.threshV2 = str2num(get(FIG.edit.threshV2,'string'));
+    if (isempty(Stimuli.threshV2))  % check is empty
+        Stimuli.threshV2 = oldThreshV2;
+    elseif ( Stimuli.threshV<0 )  % check range
+        Stimuli.threshV2 = oldThreshV2;
+    end
+    set(FIG.edit.threshV2,'string', num2str(Stimuli.threshV2));    
     
 elseif strcmp(command_str,'fixedPhase')
     Stimuli.fixedPhase = get(FIG.checkbox.fixedPhase,'value');

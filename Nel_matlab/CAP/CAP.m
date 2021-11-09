@@ -93,18 +93,27 @@ if nargin < 1
     else
         %cd([NelData.General.RootDir 'Users\SP\SP_nel_gui']);
         usr = NelData.General.User;
-        if exist([NelData.General.RootDir 'Users\' usr],'dir')
-            addpath([NelData.General.RootDir 'Users\' usr filesep usr '_nel_gui']);
+        %addpath([NelData.General.RootDir 'Nel_matlab' filesep 'nel_gui_ABR_new']);
+        addpath([NelData.General.RootDir 'Nel_matlab' filesep 'nel_gui_ABR_new']);
+        if exist([NelData.General.RootDir 'Users\' usr filesep 'CAP'],'dir')
+            %addpath([NelData.General.RootDir 'Users' filesep usr filesep usr '_nel_gui']);
+            addpath([NelData.General.RootDir 'Users\' usr filesep 'CAP']);
             addpath([NelData.General.RootDir 'Users\',usr]);
         else
             % usr = NelData.General.User;
-            addpath([NelData.General.RootDir 'Users\SP\SP_nel_gui']);
-            addpath([NelData.General.RootDir 'Users\SP']);
+            %addpath([NelData.General.RootDir 'Users\SP\SP_nel_gui']);
+            %addpath([NelData.General.RootDir 'Users\SP']);
         end
         h_fig = CAP;
         if ishandle(h_fig)
             delete(h_fig); % SP on 5.28.2021: not sure why h_fig is not deleted inside CAP after CAP. So forcefully deleting here. 
         end
+        % bring back to nel_gui original
+        rmpath([NelData.General.RootDir 'Nel_matlab' filesep 'nel_gui_ABR_new']);
+        if exist([NelData.General.RootDir 'Users\' usr filesep 'CAP'],'dir')
+            rmpath([NelData.General.RootDir 'Users\' usr filesep 'CAP']);
+        end
+        addpath([NelData.General.RootDir 'Nel_matlab' filesep 'nel_gui']);
     end
     
     %  elseif strcmp(command_str,'tone')
@@ -188,6 +197,8 @@ elseif strcmp(command_str,'both')
     else
         set(FIG.radio.both,'value',1);
     end
+
+
     
 elseif strcmp(command_str,'slide_freq')
     FIG.NewStim = 6;

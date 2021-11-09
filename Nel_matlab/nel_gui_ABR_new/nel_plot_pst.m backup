@@ -1,0 +1,74 @@
+function rate_params = nel_plot_pst(index,rate_params,plot_info,nCh)
+%
+
+% adapted by GE (28Jul2003) from "default_plot_rate" written by AF 10/10/01
+
+global spikes
+persistent pst_collected_lines pst_histo
+
+pst = rate_params.pst;
+firstBin = pst.firstBin_sec;
+lastBin = pst.lastBin_sec;
+binWidth = pst.binWidth_sec;
+if (index > 0)
+   for i = 1:length(spikes.times) % number of input spike channels
+      yd = pst_histo; % rate axis data of pst histogram.
+      yd = yd * pst_collected_lines * binWidth; % "de-normalize"
+      indices = max(1,index-1):index;  % recalculate the last index in case we missed spikes
+                                       % line numbers that have passed since last plot update.
+      for index = indices
+         spike_inds = find(spikes.times{i}(1:spikes.last(1),1) == index); % indices of spikes in lines since last update.
+         for j = spike_inds
+            spikeTime_sec = spikes.times{i}(j, 2);
+            binNumber = floor((spikeTime_sec - firstBin) / binWidth) + 1;
+				if (binNumber<1 | binNumber>(size(xd, 2)))  % spike time is not in an available bin.
+					continue;
+				else   % add a count to the appropriate bin.
+					pst_histo(binNumber) = pst_histo(binNumber) + 1;
+				end
+         end
+         pst_collected_lines = pst_collected_lines + 1;
+      end
+      yd = pst_histo / (binWidth * pst_collected_lines); % normalize;
+      if (pst.nullThreshold > 0)
+			yd(find(yd > pst.nullThreshold)) = NaN;
+		end
+      set(rate_params.cache(i).hdriven,'Ydata',xd,'Xdata',yd);
+      curr_maxy = max(get(rate_params.cache(i).haxes,'XLim')); % check and re-scale axis if necessary.
+      maxy = max(yd);
+      if ((maxy > 0.9*curr_maxy) | (maxy < 0.5*curr_maxy))
+         set(rate_params.cache(i).haxes,'XLim',[0 max(maxy/0.9, 100)]);
+         set(rate_params.cache(i).haxes,'XTick', [0 50 100:100:1000]);
+         if (maxy/0.9 > 150)
+            set(rate_params.cache(i).haxes,'XTick', [0:100:1000]);
+         end
+         if (maxy/0.9 > 600)
+            set(rate_params.cache(i).haxes,'XTick', [0:200:1000]);
+         end
+      end
+   end
+   drawnow;
+   return;
+end
+
+% No spikes to plot. Create axes if necessary and set properties.
+if ((exist('plot_info','var') ~= 1))
+   plot_info = [];
+end
+if ((exist('rate_params','var') ~= 1))
+   rate_params = [];
+end
+if ((exist('nCh','var') ~= 1))
+   nCh = 1;
+end
+
+spikes_fig(nCh);
+[dummy rate_params] = spikes_fig('reset_axes',[],rate_params,plot_info);
+xd = [rate_params.pst.firstBin_sec:rate_params.pst.binWidth_sec:rate_params.pst.lastBin_sec];
+                                                                        % time axis data of pst histogram.
+pst_histo = xd;  % initialize with correct dimensions;
+pst_histo(:) = 0;
+set(rate_params.cache(i).haxes,'YLim',[0 max(xd)]);
+set(rate_params.cache(i).haxes,'YTick',[0:max(xd)/10:max(xd)]);
+pst_collected_lines = 0;
+
