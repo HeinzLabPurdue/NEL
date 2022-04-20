@@ -18,7 +18,9 @@ end
     
 if nargin < 1
     if ~noNEL
-        run_invCalib(false);
+        if (~NelData.General.RX8)
+            run_invCalib(false);
+        end
         prog_dir = [root_dir 'CAPfmasked\'];
         addpath(prog_dir);
     else
@@ -60,20 +62,23 @@ if nargin < 1
     %init actx controls
     if ~noNEL 
         RP1=actxcontrol('RPco.x',[0 0 1 1]);
-        if NelData.General.RP2_3and4
+        if NelData.General.RP2_3and4 && (~NelData.General.RX8)
             % For bit select (RP2#3 is not connected to Mix/Sel). So have to use RP2#2. May use RP2#1?
             RP2=actxcontrol('RPco.x',[0 0 1 1]);
             RP3=actxcontrol('RPco.x',[0 0 1 1]);
-        else
+        elseif (~NelData.General.RX8)
             RP2=actxcontrol('RPco.x',[0 0 1 1]);
             RP3= RP2;
+        else
+                RP2= connect_tdt('RP2', 2);
+                RP3= connect_tdt('RX8', 1);
         end
     end
     
     
     
     %inv filters (LPC for click/invCalib for maskers)
-    if ~noNEL
+    if ~noNEL             
          computeLPCYesNo=questdlg('Use LPC coeffs for inverse filtering on click?', ...
             'Save Prompt', ...
             'Yes','No','Yes');
@@ -84,8 +89,11 @@ if nargin < 1
             case 'No'
                 RunLevels_params.lpcInvFilterOnClick=0;
         end
+      
         
-        fmaskedCAP_compute_inv_filters;       
+        fmaskedCAP_compute_inv_filters;     
+        
+   
     end
         
     
@@ -99,7 +107,7 @@ if nargin < 1
             invoke(RP1,'LoadCOF',[prog_dir '\object\fmasking_CAP.rcx']);
         end
         
-        if NelData.General.RP2_3and4 && ~debugStimuliGeneration
+        if NelData.General.RP2_3and4 && (~NelData.General.RX8)
             % For bit select (RP2#3 is not connected to Mix/Sel). So have to use RP2#2. May use RP2#1?
             invoke(RP2,'ConnectRP2',NelData.General.TDTcommMode,2);
             invoke(RP2,'ClearCOF');
@@ -111,11 +119,21 @@ if nargin < 1
             invoke(RP3,'ClearCOF');
 
             invoke(RP2,'LoadCOF',[prog_dir '\object\CAP_BitSet.rcx']);
-            invoke(RP3,'LoadCOF',[prog_dir '\object\fmasking_CAP_ADC.rcx']);
+                        
+            if debugStimuliGeneration
+                invoke(RP3,'LoadCOF',[prog_dir '\object\fmasking_CAP_ADC_debug.rcx']);  %NOT TESTED
+                CAP_intervals.CAPlength_ms=CAP_intervals.period_ms;
+                CAP_intervals.XendPlot_ms=CAP_intervals.period_ms;
+                CAP_intervals.period_ms=CAP_intervals.period_ms*2;
+            else
+                invoke(RP3,'LoadCOF',[prog_dir '\object\fmasking_CAP_ADC.rcx']);
+            end
+           
+            
             % Only difference w/ ABR: Input Channel number
             % For CAP: AD chan #1
             
-        else
+        elseif (~NelData.General.RX8)
             invoke(RP2,'ConnectRP2',NelData.General.TDTcommMode,2);
             invoke(RP2,'ClearCOF');
             RP3=RP2;
@@ -127,6 +145,26 @@ if nargin < 1
             else
                 invoke(RP3,'LoadCOF',[prog_dir '\object\fmasking_CAP_right.rcx']);
             end
+        else   %RX8
+            
+            invoke(RP2,'ClearCOF');
+            invoke(RP2,'LoadCOF',[prog_dir '\object\CAP_BitSet.rcx']);
+            invoke(RP2,'Run');
+            
+            invoke(RP3,'ClearCOF');
+            
+           
+            if debugStimuliGeneration
+                invoke(RP3,'LoadCOF',[prog_dir '\object\fmasking_CAP_ADC_debug_RX8.rcx']);  %NOT TESTED
+                CAP_intervals.CAPlength_ms=CAP_intervals.period_ms;
+                CAP_intervals.XendPlot_ms=CAP_intervals.period_ms;
+                CAP_intervals.period_ms=CAP_intervals.period_ms*2;
+            else
+                invoke(RP3,'LoadCOF',[prog_dir '\object\fmasking_CAP_ADC_RX8.rcx']);
+           end
+            
+
+              
         end
         
         Stimuli.RPsamprate_Hz = 48828;
