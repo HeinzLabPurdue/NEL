@@ -227,6 +227,7 @@ while (end_of_loop_flag == 0)
     %       if (check_stop_request), break; end
     %    end
     
+    
     %   if (trig_state_debug~=1)
     %% For debugging MSDL
     debug_info.msdl_times(1,debug_info.msdl_counter) = etime(clock,TRIGstart_time)-(index-1)*DAL.Gating.Period/1000; %%X
@@ -400,10 +401,11 @@ while (end_of_loop_flag == 0)
     call_user_func(contPlotParams.func,spk,contPlotParams);
     concat_spikes(spk);
     drawnow
+    
     if (check_stop_request), break; end
     
     %% CHECK if ready to load new stimulus
-    if ((index-Nbadstim>last_stimsent_index) && (trig_state == 2))  % Trigger pulse switched to off
+    if ((index-Nbadstim>last_stimsent_index)&(trig_state == 2))  % Trigger pulse switched to off
         number_of_presented_stims = index;  % This stores total stim presented (good or bad)
         % Check again for user break before we prepare for the next stimulus
         if (check_stop_request), break; end
@@ -416,7 +418,7 @@ while (end_of_loop_flag == 0)
         
         %Prepare for next stimulus
         if (index-Nbadstim < nlines)
-
+            
             % MH debug: ~~~~~WOrks here%     %% GE debug: replaced line here 30oct2003.
             %          call_user_func(endLinePlotParams.func,prev_index,endLinePlotParams);  % MH debug
             
@@ -424,7 +426,7 @@ while (end_of_loop_flag == 0)
             
             [stim_info(index+1)] = call_user_func(DAL.Inloop.Name,common,DAL.Inloop.params);
             
-
+            
             if (~isstruct(stim_info(index+1)))
                 rc =0; break;
             end

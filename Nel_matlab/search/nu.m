@@ -1,6 +1,7 @@
 PAset([120 120 120 120]);
-RP1=actxcontrol('RPco.x',[0 0 1 1]);
-invoke(RP1,'ConnectRP2','USB',1);
+% RP1=actxcontrol('RPco.x',[0 0 1 1]);
+% invoke(RP1,'ConnectRP2','USB',1);
+RP1= connect_tdt('RP', 1);
 invoke(RP1,'ClearCOF');
 invoke(RP1,'LoadCOF',[prog_dir '\object\search_left.rco']);
 
@@ -17,8 +18,9 @@ invoke(RP1,'SetTagVal','StmOn',Stimuli.duration);
 invoke(RP1,'SetTagVal','StmOff',Stimuli.period-Stimuli.duration);
 invoke(RP1,'Run');
 
-RP2=actxcontrol('RPco.x',[0 0 1 1]);
-invoke(RP2,'ConnectRP2','USB',2);
+% RP2=actxcontrol('RPco.x',[0 0 1 1]);
+% invoke(RP2,'ConnectRP2','USB',2);
+RP2= connect_tdt('RP', 2);
 invoke(RP2,'ClearCOF');
 invoke(RP2,'LoadCOF',[prog_dir '\object\search_right.rco']);
 invoke(RP2,'Run');

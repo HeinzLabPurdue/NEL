@@ -245,7 +245,7 @@ if iscell(filenames) || length(filenames)>1 || filenames~=0
             else
                 
                 audiowrite(path2, sig, config_struct.fs)
-                wavefile_duration=config_struct.duration_s;
+                wavefile_duration=config_struct.duration_s*1000;
             end
             %TODO change in func of time of computation?
             %HACK, time to recover from masking,
@@ -286,12 +286,18 @@ if iscell(filenames) || length(filenames)>1 || filenames~=0
                     invoke(RP3,'SetTagVal','clickDelay', CAP_intervals.clickDelay);
                     invoke(RP3,'Run');
                 else
-                    RP3= RP2;
+                    if (~NelData.General.RX8)
+                        RP3= RP2;
+                    else
+                        invoke(RP2,'Run');
+                    end
                     invoke(RP3,'SetTagVal','ADdur', CAP_intervals.CAPlength_ms);
                     invoke(RP3,'SetTagVal','gateTime',CAP_intervals.rftime_ms);
                     invoke(RP3,'SetTagVal','clickDelay', CAP_intervals.clickDelay);
                     invoke(RP3,'Run');
+                    
                 end
+                    
             end
             
             
@@ -362,7 +368,7 @@ if iscell(filenames) || length(filenames)>1 || filenames~=0
             colors = get(plot1,'Color');
             for j=beginind:ind_file
                 
-                plot(j, CAPmaxArr(j)*Display.PlotFactor, '*', 'Color', colors{j-beginind+1});
+                plot(j, CAPmaxArr(j)*Display.PlotFactor, '*', 'Color', colors{1+mod(j-1, 12)});
                 hold on;
             end
             xlabel('Stimuli');
@@ -400,9 +406,11 @@ if iscell(filenames) || length(filenames)>1 || filenames~=0
     end
    
     
+    
+    
     if ~noNEL
         %HALT RPS (already done for RP1)
-        if NelData.General.RP2_3and4 &&  ~debugStimuliGeneration
+        if (NelData.General.RP2_3and4 && ~debugStimuliGeneration) || NelData.General.RX8
             invoke(RP2,'Halt');
         end
         invoke(RP3,'Halt');

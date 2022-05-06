@@ -4,3 +4,7 @@ Nel_matlab/FFR_NEL2satya/**
 **/*.wav
 Nel_matlab/calibrationOLD/**
 Mikes*Setup*Stuff_REORG/**
+
+#matlab autosave
+*.asv
+*.m~

@@ -5,8 +5,7 @@ global object_dir COMM FIG Stimuli newCalib coefFileNum NelData
 error = 0;
 
 %%
-useInvFIR= NelData.General.RP2_3and4; % run Inv calib if RP2:3 and 4 exist
-if useInvFIR
+if (NelData.General.RP2_3and4 || NelData.General.RX8)
     cdd;
     all_Calib_files= dir('p*calib*');
     if isempty(all_Calib_files)
@@ -21,8 +20,7 @@ if useInvFIR
     end
     rdd;
     doInvCalib= ~newCalib; % if not new (means old => coef-file exists), then run inverse calibration
-    forceCalib= true;
-    coefFileNum= run_invCalib(doInvCalib, forceCalib);
+    coefFileNum= run_invCalib(doInvCalib);
 else
     newCalib= true;
 end

@@ -1,4 +1,4 @@
-This folder contains useful files and tools for the generation of stimuli for the maskers. The generation of the stimuli is done in two steps: 1) generation of config .JSON files (text files), 2) creation of wavefiles based on the information contained in the config files. 
+This folder contains useful files and tools for the generation of maskers. The generation is done in two steps: 1) generation of config .JSON files (text files), 2) creation of wavefiles based on the information contained in the config files (note: better if done 'on the fly' during expe by Matlab, implemented in NEL). 
 
 Config files and creation of wavefiles
 -------------------
@@ -16,7 +16,7 @@ Config files and creation of wavefiles
 
     filter order is `filter_order x filter_order_mult` (cascade of Butterworth filters),  [x2 (band-pass filter)]
 
-* The stimuli config files contain the parameters required to generate the signals (with the exception of the parameters in the general config file defined above that are independent from the stimuli params). Ex: 
+* The stimuli config files contain the other parameters required to generate the signals. Ex: 
 
     ```json
     {
@@ -30,11 +30,11 @@ Config files and creation of wavefiles
     }
     ```
 
-    WARNING; wav files saturate at 1, it is advised to use amplitudes <1, but the values should not be too small neither. (amplitude means the value of the amplitude spectral density within the band). Amplitude of a single frequency component of 'amplitude' 1 will be equal to $\sim 1/\sqrt{N}$ where N is the number of points ($T \times f_s$).
+    Note: wav files saturate at 1, it is advised to use amplitudes <1, but the values should not be too small neither (e.g. -20 dB for max spectral amplitude). 
 
 * A config struct. can also have a field `extra_atten_dB` for extra attenuation (applied to every band).
 
-* When a wave file is created with `create_signals.m` , info on the generation (basically the general audio config) is added to the stim json file (warning: if only one field in 'wavefiles', matlab will not generate a list).  Ex: 
+* When a wave file is created with `create_signals.m` , info on the generation (basically the general audio config) is added to the stim json file (generally not needed because wavefiles can be generated during expe with NEL).  Ex: 
 
     ```json
     {
@@ -81,5 +81,3 @@ Creation of stim config files
 | {amp1}, {dB1}                   | amplitude in dB (with 'dB')                                  |
 | {atten1}, {attn1}               | attenuation in dB  (with 'dB')                               |
 | {pic}, {npic}                   | 'picture number'  <br />(counter that increments each time a stim. config file is created)  <br />note: choosing a new folder reinits npic |
-
-(note: a few scripts during expes rely on the names following a specific pattern, e.g. notch[CF]\_[bw]\_[attn]dB)

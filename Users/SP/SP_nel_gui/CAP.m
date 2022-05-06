@@ -40,7 +40,7 @@ if nargin < 1
     
     FIG.handle = figure('NumberTitle','off','Name','CAP Interface','Units','normalized','position',[0.045  0.013  0.9502  0.7474],...
         'Visible','off','MenuBar','none','Tag','CAP_Main_Fig');
-    set(FIG.handle,'CloseRequestFcn','CAP(''close'');')
+    %     set(FIG.handle,'CloseRequestFcn','CAP(''close'');')
     colordef none;
     whitebg('w');
     
@@ -334,7 +334,7 @@ elseif strcmp(command_str,'invCalib') %SP 24Jan2016
     %%% Account for Calibration to set Level in dB SPL
     
     %     if ~exist('CalibData', 'var')
-    if NelData.General.RP2_3and4
+    if NelData.General.RP2_3and4 && (~NelData.General.RX8)
         [~, Stimuli.calibPicNum]= run_invCalib(get(FIG.radio.invCalib,'value'));
     elseif isnan(Stimuli.calibPicNum)
         cdd;
@@ -356,10 +356,13 @@ elseif strcmp(command_str,'invCalib') %SP 24Jan2016
     
     
 elseif strcmp(command_str,'close')
-    if NelData.General.RP2_3and4
+    if NelData.General.RP2_3and4 && (~NelData.General.RX8)
         run_invCalib(false); % Initialize with allpass RP2_3
     end
-    rmpath('C:\NEL1_2\Users\SP\SP_nel_gui\')
+    pathCell= regexp(path, pathsep, 'split');
+    if any(strcmpi([NelData.General.RootDir 'Users\SP\SP_nel_gui\'], pathCell))
+        rmpath([NelData.General.RootDir 'Users\SP\SP_nel_gui\']);
+    end
     set(FIG.push.close,'Userdata',1);
     cd([NelData.General.RootDir 'Nel_matlab\nel_general']);
 end

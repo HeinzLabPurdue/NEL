@@ -1,8 +1,11 @@
-masker_type=questdlg('Select masker type:','','No masker','Broadband noise','No masker'); 
+masker_type=questdlg('Select masker type:','','No masker','Broadband noise', 'hp-6000', 'No masker'); 
 
 if strcmp(masker_type, 'No masker')
     dirpath=[prog_dir 'stimuli/'];
     filename= 'nomasker.json'; 
+elseif  strcmp(masker_type, 'hp-6000')
+      dirpath=[prog_dir 'stimuli/'];
+    filename= '5-hp-6000Hz.json';       
 else
     dirpath=[prog_dir 'stimuli/'];
     filename= 'broadband-noise.json'; 
@@ -121,7 +124,11 @@ if ~noNEL
             invoke(RP3,'SetTagVal','clickDelay', CAP_intervals.clickDelay);
             invoke(RP3,'Run');
     else
+        if (~NelData.General.RX8)
             RP3= RP2;
+        else
+            invoke(RP2,'Run');
+        end
             invoke(RP3,'SetTagVal','ADdur', CAP_intervals.CAPlength_ms);
             invoke(RP3,'SetTagVal','gateTime',CAP_intervals.rftime_ms); 
             invoke(RP3,'SetTagVal','clickDelay', CAP_intervals.clickDelay);
@@ -355,7 +362,7 @@ if ~noNEL
 
 
     invoke(RP1,'Halt');
-    if NelData.General.RP2_3and4 && ~debugStimuliGeneration
+    if (NelData.General.RP2_3and4 && ~debugStimuliGeneration) || NelData.General.RX8
         invoke(RP2,'Halt');
     end
      invoke(RP3,'Halt');

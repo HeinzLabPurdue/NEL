@@ -31,12 +31,14 @@ if nargin == 0  % LAUNCH GUI
     Refresh_Template_List(handles); % TODO: include the user templates (NelData.User_block_templates)
     Set_Menu_Accelerators(handles);
     Set_Global_Handles_Lists(handles);
-    tdtinit(fig);
+    %     tdtinit(fig); % SP on Aug 12, 2020
     if (isempty(NelData.UnSaved))
         set(handles.Menu_Save_pic,'Enable','off');
     end
     set(handles.Menu_Open,'Enable','off'); % Untill this option is implemented
     set(fig,'Visible','on');
+    set(NelData.General.main_handle,'handlevisib','on'); % SP added on Aug 12, 2020
+    tdtinit(NelData.General.main_handle);
     
     if nargout > 0
         varargout{1} = fig;
@@ -100,7 +102,7 @@ while ((isempty(user) | isempty(user{1})))
     if SKIPintro
         user = {'MH'};
     else
-        user = inputdlg({'User Name:'},title,1,{NelData.General.User}, 180);
+        user = inputdlg({'User Name:'},title,1,{NelData.General.User},180);
     end
     if (isempty(user))
         Nel_Main_CloseRequestFcn(handles.Nel_Main, [], handles,{});
@@ -1210,9 +1212,10 @@ end
 external_run_checkout(handles);
 
 function varargout = Menu_Tools_calibrateOLD_Callback(h, eventdata, handles, varargin)
+global NelData
 external_run_checkin(handles);
 currDIR=pwd;
-cd('C:\NEL1_2\Nel_matlab\calibrationOLD') 
+cd([NelData.General.RootDir 'Nel_matlab\calibrationOLD']) 
 h_calib = calibrate;
 while (ishandle(h_calib))
     uiwait(h_calib);

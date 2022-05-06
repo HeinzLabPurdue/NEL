@@ -59,7 +59,8 @@ else
     end
 end
 date1=x.General.date; date=[date1(1:2) date1(4:6) date1(8:11)];
-dt=500/x.Stimuli.RPsamprate_Hz; %sampling period after oversampling
+% dt=500/x.Stimuli.RPsamprate_Hz; %sampling period after oversampling
+dt=500/x.AD_Data.SampleRate; %sampling period after oversampling
 
 %% sort abrs in order of increasing attenuation
 [~, order]=sort(-attn);
@@ -131,7 +132,7 @@ stdev_peak=std(peaks);
 abr_xx=zeros(length(abr)*2-1,num);
 for i = 1:num
         abr_xx(:,i) = xcorr(abr(:,i),template);
-end;
+end
 abr_xx2=(abr_xx(length(abr):length(abr)*2-length(template),:)-mean_peak)/stdev_peak; %Z score
 
 %for plotting xcor fxns
@@ -147,7 +148,9 @@ bin_of_max=NaN*ones(1,num);
 [data.z.score(1,1),bin_of_max(1,1)]=max(abr_xx2(:,1));
 for i = 2:num
 	add_attn=attn(1,i-1)-attn(1,i); exp_bin=bin_of_max(1,i-1) + bin_of_time(add_attn/40) - 1;
-    [data.z.score(1,i),delay]=max(abr_xx2(round(exp_bin-bin_of_time(1)):round(exp_bin+bin_of_time(1)), i));
+    ind_start= max(1, round(exp_bin-bin_of_time(1)));
+    ind_end= min(size(abr_xx2, 1), max(2, round(exp_bin+bin_of_time(1))));
+    [data.z.score(1,i),delay]= max(abr_xx2(ind_start:ind_end, i));
 	bin_of_max(1,i)=exp_bin-bin_of_time(1)+delay-1;
 end;
 delay_of_max=time_of_bin(bin_of_max);
@@ -184,7 +187,7 @@ set(han.peak_panel,'XTick',[abr_Stimuli.start:1:abr_Stimuli.end],...
 axes(han.xcor_panel); set(han.xcor_panel,'NextPlot','ReplaceChildren')
 plot(0,0,'-w');
 set(han.xcor_panel,'NextPlot','Add','Box','on','YTick',[])
-axis(han.xcor_panel,[0 max(xcor_time) 0 xcor_yscale])
+axis(han.xcor_panel,[0 max(xcor_time) 0 max(eps, xcor_yscale)])
 for i=1:num
 	plot(xcor_time,abr_xx3(:,i)+xcor_low_bound(1,i),'-k',...
 	     [0 max(xcor_time)],[3+xcor_low_bound(1,i) 3+xcor_low_bound(1,i)],':r',...

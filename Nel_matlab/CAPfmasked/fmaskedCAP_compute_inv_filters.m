@@ -5,35 +5,32 @@ cdd
  lpc_fName = 'fmasked_coef_lpc';
  if RunLevels_params.lpcInvFilterOnClick && ~isfile([lpc_fName '.mat'])
     %FIND LPC COEFFICIENTS
+    
     invoke(RP1,'ConnectRP2',NelData.General.TDTcommMode,1);
-
     invoke(RP1,'ClearCOF');
-    invoke(RP1,'LoadCOF',[prog_dir '\object\LPC\run_gauss_noise.rcx']); %NB: rcx is loaded again at each new stimulus anyway for RP1
+    invoke(RP1,'LoadCOF',[prog_dir '\object\LPC\run_gauss_noise.rcx']);
 
-
-    if NelData.General.RP2_3and4
-        %only need RP2
+    if (~NelData.General.RX8) 
+        %assert(~NelData.General.RP2_3and4)
         invoke(RP2,'ConnectRP2',NelData.General.TDTcommMode,2);
-        invoke(RP2,'ClearCOF');
-        %invoke(RP2,'LoadCOF',[prog_dir '\object\CAP_BitSet.rcx']);
-        invoke(RP2,'LoadCOF',[prog_dir '\object\LPC\gauss_noise_right.rcx']);
+   else  %NEL2
+       %RP2 already invoked
        
-        %invoke(RP3,'ConnectRP2',NelData.General.TDTcommMode,3);
-        %invoke(RP3,'ClearCOF');
-
-        %invoke(RP3,'LoadCOF',[prog_dir '\object\LPC\gauss_noise_ADC.rcx']);
-
-         invoke(RP2,'Run');
-         %invoke(RP3,'Run');
-    else
-
-        invoke(RP2,'ConnectRP2',NelData.General.TDTcommMode,2);
-        invoke(RP2,'ClearCOF');
-
-        invoke(RP2,'LoadCOF',[prog_dir '\object\LPC\gauss_noise_right.rcx']);
-
-        invoke(RP2,'Run');
+       %but needs to load circuit on RP3 to bypass fir filter?
+            invoke(RP3,'ClearCOF');
+            invoke(RP3,'LoadCOF',[prog_dir '\object\LPC\gauss_noise_RX8.rcx']); 
+            invoke(RP3,'Run');
     end
+        
+        
+    %NEL1/2: calib in on RP2#2
+    invoke(RP2,'ClearCOF');
+
+    invoke(RP2,'LoadCOF',[prog_dir '\object\LPC\gauss_noise_right.rcx']);
+
+    invoke(RP2,'Run');
+
+   
     
     dur_noise_ms = 5000;  %duration noise played in ms 
 
@@ -58,6 +55,9 @@ cdd
     invoke(RP1,'Halt');
     invoke(RP2,'Halt');
 
+    if NelData.General.RX8
+       invoke(RP3,'Halt');
+    end
     fmaskedCAP_set_attns(120, 120, Stimuli.channel,Stimuli.KHosc,RP1,RP2);
 
     t=(1:npts)/Stimuli.RPsamprate_Hz;

@@ -9,6 +9,17 @@ global data_dir RunThroughABRFlag interface_type
 % FIG is defined
 
 if nargin < 1
+    
+    h_fig = findobj('Tag','CAP_Main_Fig'); %% Finds handle for CAP-Figure
+    if ishandle(h_fig)
+        delete(h_fig);
+    end
+        
+%     if length(h_fig)>2
+%         h_fig= h_fig(1);
+%     end
+    
+    
     prog_dir = [root_dir 'CAP\'];
     
     PROG = struct('name','CAP(v1.ge_mh.1).m');  % modified by GE 26Apr2004.
@@ -20,17 +31,13 @@ if nargin < 1
     radio = cell2struct(cell(1,5),{'fast','slow','left','right','both'},2);
     checkbox = cell2struct(cell(1,1), {'fixedPhase'},2);
     statText  = cell2struct(cell(1,2),{'memReps','status'},2);
-    %     popup = cell2struct(cell(1,1),{'spike_channel'},2);   % added by0 GE 17Jan2003.
+    %     popup = cell2struct(cell(1,1),{'spike_channel'},2);   % added by GE 17Jan2003.
     fsldr = cell2struct(cell(1,4),{'slider','min','max','val'},2);
     asldr = cell2struct(cell(1,4),{'slider','min','max','val'},2);
     ax = cell2struct(cell(1,2),{'axis','line'},2);
     FIG   = struct('handle',[],'edit',[],'push',push,'radio',radio,'checkbox',checkbox,'statText', statText, 'fsldr',fsldr,'asldr',asldr,'NewStim',0,'ax',ax);
     %    FIG   = struct('handle',[],'edit',[],'push',push,'radio',radio,'fsldr',fsldr,'asldr',asldr,'NewStim',0,'ax',ax,'popup',popup, 'statText', statText);  % modified by GE 17Jan2003.
     
-    h_fig = findobj('Tag','CAP_Main_Fig');    %% Finds handle for TC-Figure
-    if length(h_fig)>2
-        h_fig= h_fig(1);
-    end
     
     CAP_ins;
     
@@ -77,7 +84,10 @@ if nargin < 1
         end
     else
         cd([NelData.General.RootDir 'Users\SP\SP_nel_gui']);
-        CAP;
+        h_fig = CAP;
+        if ishandle(h_fig)
+            delete(h_fig); % SP on 5.28.2021: not sure why h_fig is not deleted inside CAP after CAP. So forcefully deleting here. 
+        end
     end
     
     %  elseif strcmp(command_str,'tone')
@@ -323,7 +333,7 @@ elseif strcmp(command_str,'audiogram') %KH 10Jan2012
 elseif strcmp(command_str,'clickYes') %KH 10Jan2012
     Stimuli.clickYes = get(FIG.radio.clickYes,'value');
     FIG.NewStim = 16;
-    if NelData.General.RP2_3and4
+    if NelData.General.RP2_3and4 && (~NelData.General.RX8)
         if Stimuli.clickYes
             run_invCalib(true); % Initialize with allpass RP2_3
         else
@@ -332,7 +342,7 @@ elseif strcmp(command_str,'clickYes') %KH 10Jan2012
     end
     
 elseif strcmp(command_str,'close')
-    if NelData.General.RP2_3and4
+    if NelData.General.RP2_3and4 && (~NelData.General.RX8)
         run_invCalib(false); % Initialize with allpass RP2_3
     end
     set(FIG.push.close,'Userdata',1);

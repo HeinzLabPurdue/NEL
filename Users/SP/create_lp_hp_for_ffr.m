@@ -1,4 +1,4 @@
-[sig, fs] = audioread('C:\NEL1_2\Users\SP\SNRenv_stimuli\FFRSNRenv_short_stationary_org\dyn_harm_complex_SFRbased.wav');
+[sig, fs] = audioread([NelData.General.RootDir 'Users\SP\SNRenv_stimuli\FFRSNRenv_short_stationary_org\dyn_harm_complex_SFRbased.wav']);
 
 lpFilt= designfilt('lowpassiir','FilterOrder', 8, ...
 'PassbandFrequency',0.5e3,'PassbandRipple',0.2, ...
@@ -25,5 +25,5 @@ plot_dpss_psd(sig_lp, fs);
 plot_dpss_psd(sig_hp, fs);
 
 
-audiowrite('C:\NEL1_2\Users\SP\SNRenv_stimuli\FFRSNRenv_short_stationary_org\LP_dyn_harm_complex_SFRbased.wav', sig_lp, fs);
-audiowrite('C:\NEL1_2\Users\SP\SNRenv_stimuli\FFRSNRenv_short_stationary_org\HP_dyn_harm_complex_SFRbased.wav', sig_hp, fs);
+audiowrite([NelData.General.RootDir 'Users\SP\SNRenv_stimuli\FFRSNRenv_short_stationary_org\LP_dyn_harm_complex_SFRbased.wav'], sig_lp, fs);
+audiowrite([NelData.General.RootDir 'Users\SP\SNRenv_stimuli\FFRSNRenv_short_stationary_org\HP_dyn_harm_complex_SFRbased.wav'], sig_hp, fs);

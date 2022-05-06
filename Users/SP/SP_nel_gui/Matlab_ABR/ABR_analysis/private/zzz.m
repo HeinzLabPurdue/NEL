@@ -53,7 +53,8 @@ else
      end
 end
 date1=x.General.date; date=[date1(1:2) date1(4:6) date1(8:11)];
-dt=500/x.Stimuli.RPsamprate_Hz; %sampling period after oversampling
+% dt=500/x.Stimuli.RPsamprate_Hz; %sampling period after oversampling
+dt=500/x.AD_Data.SampleRate; 
 
 %sort abrs in order of increasing attenuation
 [~, order]=sort(-attn);
@@ -104,7 +105,7 @@ for i=1:abr_Stimuli.num_templates
 	[~, delay1(1,i)]=max(txcor(:,i));
 	delay(1,i)=(delay1(1,i)-delay1(1,1))*dt;
 	template1(:,1)=abr(round(bin_of_time(abr_Stimuli.start_template+delay(1,i))):round(bin_of_time(abr_Stimuli.end_template+delay(1,i)),i));
-end;
+end
 template=mean(template1,2);
 
 %Cross-correlate template with noise

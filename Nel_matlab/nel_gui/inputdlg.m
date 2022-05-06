@@ -340,12 +340,23 @@ drawnow
 
 % --------------------
 % before R2020a
-% set(findall(InputFig),'Units','normalized','HandleVisibility','callback');
-
-% now (after R2020a)
-all_handles_temp= findall(InputFig);
-all_handles_temp_notAnotPan= all_handles_temp([1:4 6 8]);
-set(all_handles_temp_notAnotPan,'Units','normalized','HandleVisibility','callback');
+if contains(version, '2019')
+    set(findall(InputFig),'Units','normalized','HandleVisibility','callback');
+elseif contains(version, '2020')
+    % now (after R2020a)
+    all_handles_temp= findall(InputFig);
+    validAxes= [];
+    for hanVar=1:length(all_handles_temp)
+        if ~strcmpi(all_handles_temp(hanVar).Type, 'annotationpane')
+            validAxes= [validAxes, hanVar];
+        end
+    end
+    
+    all_handles_temp_notAnotPan= all_handles_temp(validAxes);
+    set(all_handles_temp_notAnotPan,'Units','normalized','HandleVisibility','callback');
+else 
+    error('Check matlab version!!');
+end
 % --------------------
 
 set(InputFig,'Units','points')

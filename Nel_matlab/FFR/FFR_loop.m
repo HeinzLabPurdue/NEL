@@ -1,33 +1,70 @@
 %% For stimulus
-RP1=actxcontrol('RPco.x',[0 0 1 1]);
-invoke(RP1,'ConnectRP2',NelData.General.TDTcommMode,1);
-invoke(RP1,'ClearCOF');
+% RP1=actxcontrol('RPco.x',[0 0 1 1]);
+% invoke(RP1,'ConnectRP2',NelData.General.TDTcommMode,1);
+stimRCXfName= [prog_dir '\object\FFR_wav_polIN.rcx'];
 
-invoke(RP1,'LoadCOF',[prog_dir '\object\FFR_wav_polIN.rcx']);
-
-if NelData.General.RP2_3and4
+if NelData.General.RP2_3and4 && (~NelData.General.RX8) % NEL1 with RP2 #3 & #4
     %% For bit-select
-    RP2=actxcontrol('RPco.x',[0 0 1 1]);
-    invoke(RP2,'ConnectRP2',NelData.General.TDTcommMode,2);
+    %     RP2=actxcontrol('RPco.x',[0 0 1 1]);
+    %     invoke(RP2,'ConnectRP2',NelData.General.TDTcommMode,2);
+    RP1= connect_tdt('RP2', 1);
+    invoke(RP1,'ClearCOF');
+    invoke(RP1,'LoadCOF', stimRCXfName);
+    
+    RP2= connect_tdt('RP2', 2);
     invoke(RP2,'ClearCOF');
     invoke(RP2,'LoadCOF',[prog_dir '\object\FFR_BitSet.rcx']);
     invoke(RP2,'Run');
     
     %% For ADC (data in)
-    RP3=actxcontrol('RPco.x',[0 0 1 1]);
-    invoke(RP3,'ConnectRP2',NelData.General.TDTcommMode,3);
+    %     RP3=actxcontrol('RPco.x',[0 0 1 1]);
+    %     invoke(RP3,'ConnectRP2',NelData.General.TDTcommMode,3);
+    RP3= connect_tdt('RP2', 3);
     invoke(RP3,'ClearCOF');
     % invoke(RP2,'LoadCOF',[prog_dir '\object\FFR_right.rco']); % MH/KH Dec 8 2011
     invoke(RP3,'LoadCOF',[prog_dir '\object\FFR_ADC.rcx']);
     invoke(RP3,'SetTagVal','ADdur', FFR_Gating.FFRlength_ms);
     invoke(RP3,'Run');
-else
-    RP2=actxcontrol('RPco.x',[0 0 1 1]);
-    invoke(RP2,'ConnectRP2',NelData.General.TDTcommMode,2);
+    
+elseif (~NelData.General.RP2_3and4) && (~NelData.General.RX8) % NEL1 without (RP2 #3 & #4), and not NEL2 because no RX8
+    RP1= connect_tdt('RP2', 1);
+    invoke(RP1,'ClearCOF');
+    invoke(RP1,'LoadCOF', stimRCXfName);
+    
+    %     RP2=actxcontrol('RPco.x',[0 0 1 1]);
+    %     invoke(RP2,'ConnectRP2',NelData.General.TDTcommMode,2);
+    RP2= connect_tdt('RP2', 2);
     invoke(RP2,'ClearCOF');
-    invoke(RP2,'LoadCOF',[prog_dir '\object\FFR_right2.rcx']);
+    invoke(RP2,'LoadCOF',[prog_dir '\object\FFR_right2.rcx']); % because only 2 rp2s, this rp2 has both bitset and data collection
     invoke(RP2,'Run');
     RP3= RP2;
+    
+elseif NelData.General.RX8  %NEL2 with RX8
+    RP1= connect_tdt('RP2', 1);
+    invoke(RP1,'ClearCOF');
+    invoke(RP1,'LoadCOF', stimRCXfName);
+    
+    %% For bit-select
+    %     RP2=actxcontrol('RPco.x',[0 0 1 1]);
+    %     invoke(RP2,'ConnectRP2',NelData.General.TDTcommMode,2);
+    RP2= connect_tdt('RP2', 2);
+    invoke(RP2,'ClearCOF');
+    invoke(RP2,'LoadCOF',[prog_dir '\object\FFR_BitSet.rcx']);
+    invoke(RP2,'Run');
+    
+    %% For ADC (data in)
+    %     RP3=actxcontrol('RPco.x',[0 0 1 1]);
+    %     invoke(RP3,'ConnectRP2',NelData.General.TDTcommMode,3);
+    %     [~, ~, b_invCalib_coef]= run_invCalib(-2);
+    b_invCalib_coef= [1 zeros(1, 255)]; % All pass because FFR does not have invCalib functionality
+    
+    RP3= connect_tdt('RX8', 1);
+    invoke(RP3,'ClearCOF');
+    % invoke(RP2,'LoadCOF',[prog_dir '\object\FFR_right.rco']); % MH/KH Dec 8 2011
+    invoke(RP3,'LoadCOF',[prog_dir '\object\FFR_RX8_ADC_invCalib.rcx']);
+    e_invCalib_status= RP3.WriteTagV('FIR_Coefs', 0, b_invCalib_coef);
+    invoke(RP3,'SetTagVal','ADdur', FFR_Gating.FFRlength_ms);
+    invoke(RP3,'Run');
 end
 
 
@@ -203,7 +240,8 @@ while isempty(get(FIG.push.close,'Userdata'))
                     % reloads the COF, resets the plots
                     invoke(RP1,'Halt');
                     invoke(RP1,'ClearCOF');
-                    invoke(RP1,'LoadCOF',[prog_dir '\object\FFR_wav_polIN.rcx']);
+                    invoke(RP1,'LoadCOF', stimRCXfName);
+                    
                     % AEH circuit below was active on 12/12/14, since 1/27/14 (?)
                     %                 invoke(RP1,'LoadCOF',[prog_dir '\object\FFR_wav_polIN_AEH.rcx']); % AEH 1/27/14 Fs=24k
                     invoke(RP1,'SetTagVal','StmOn',FFR_Gating.duration_ms);

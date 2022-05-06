@@ -1,15 +1,17 @@
-global prog_dir PROG data_dir NelData 
+global prog_dir PROG data_dir NelData
 
-if ~(double(invoke(RP1,'GetTagVal', 'Stage')) == 2)
-    FFR_set_attns(-120,-120,Stimuli.channel,Stimuli.KHosc,RP1,RP2); %% Check with MH
-end
+% if ~(double(invoke(RP1,'GetTagVal', 'Stage')) == 2)
+%     FFR_set_attns(-120,-120,Stimuli.channel,Stimuli.KHosc,RP1,RP2); %% Check with MH
+% end
 
 %% For stimulus
 % RP*={1,2,3} are already defined (in FFR_SNRenv)
-invoke(RP1,'ClearCOF');
-invoke(RP1,'LoadCOF',[prog_dir '\object\FFR_wav_polIN_sp.rcx']);
+stimRCXfName= [prog_dir '\object\FFR_wav_polIN_sp.rcx'];
 
-if NelData.General.RP2_3and4
+if NelData.General.RP2_3and4 && (~NelData.General.RX8) % NEL1 with RP2 #3 & #4
+    invoke(RP1,'ClearCOF');
+    invoke(RP1,'LoadCOF', stimRCXfName);
+    
     %% For bit-select
     invoke(RP2,'ClearCOF');
     invoke(RP2,'LoadCOF',[prog_dir '\object\FFR_BitSet.rcx']);
@@ -20,20 +22,48 @@ if NelData.General.RP2_3and4
     invoke(RP3,'LoadCOF',[prog_dir '\object\FFR_ADC.rcx']);
     invoke(RP3,'SetTagVal','ADdur', FFR_Gating.FFRlength_ms);
     invoke(RP3,'Run');
-else
-%     RP2=actxcontrol('RPco.x',[0 0 1 1]);
-%     invoke(RP2,'ConnectRP2',NelData.General.TDTcommMode,2);
+elseif (~NelData.General.RP2_3and4) && (~NelData.General.RX8) % NEL1 without (RP2 #3 & #4), and not NEL2 because no RX8
+    invoke(RP1,'ClearCOF');
+    invoke(RP1,'LoadCOF', stimRCXfName);
+    
+    %     RP2=actxcontrol('RPco.x',[0 0 1 1]);
+    %     invoke(RP2,'ConnectRP2',NelData.General.TDTcommMode,2);
     invoke(RP2,'ClearCOF');
     invoke(RP2,'LoadCOF',[prog_dir '\object\FFR_right2.rcx']);
     invoke(RP2,'SetTagVal','ADdur', FFR_Gating.FFRlength_ms);
     invoke(RP2,'Run');
-%     RP3= RP2;
+    %     RP3= RP2;
+    
+elseif NelData.General.RX8  %NEL2 with RX8
+    invoke(RP1,'ClearCOF');
+    invoke(RP1,'LoadCOF', stimRCXfName);
+    
+    %% For bit-select
+    %     RP2=actxcontrol('RPco.x',[0 0 1 1]);
+    %     invoke(RP2,'ConnectRP2',NelData.General.TDTcommMode,2);
+    invoke(RP2,'ClearCOF');
+    invoke(RP2,'LoadCOF',[prog_dir '\object\FFR_BitSet.rcx']);
+    invoke(RP2,'Run');
+    
+    %% For ADC (data in)
+    %     RP3=actxcontrol('RPco.x',[0 0 1 1]);
+    %     invoke(RP3,'ConnectRP2',NelData.General.TDTcommMode,3);
+    RP3= connect_tdt('RX8', 1);
+    [~, ~, b_invCalib_coef]= run_invCalib(-2);
+    
+    invoke(RP3,'ClearCOF');
+    % invoke(RP2,'LoadCOF',[prog_dir '\object\FFR_right.rco']); % MH/KH Dec 8 2011
+    invoke(RP3,'LoadCOF',[prog_dir '\object\FFR_RX8_ADC_invCalib.rcx']);
+    e_invCalib_status= RP3.WriteTagV('FIR_Coefs', 0, b_invCalib_coef);
+    invoke(RP3,'SetTagVal','ADdur', FFR_Gating.FFRlength_ms);
+    invoke(RP3,'Run');
+    
 end
 % Avoiding using set_RP_tagvals: somehow set_RP_tagvals doesn't let FFR
-% loops run as expected. 
+% loops run as expected.
 % set_RP_tagvals(RP1, RP2, FFR_Gating, Stimuli);
 
-FFR_set_attns(Stimuli.atten_dB,-120,Stimuli.channel,Stimuli.KHosc,RP1,RP2); 
+FFR_set_attns(Stimuli.atten_dB,-120,Stimuli.channel,Stimuli.KHosc,RP1,RP2);
 
 FFRnpts=ceil(FFR_Gating.FFRlength_ms/1000*Stimuli.RPsamprate_Hz);
 if Stimuli.FFRmem_reps>0
@@ -192,17 +222,18 @@ while isempty(get(FIG.push.close,'Userdata'))
                     firstSTIM=or(pair1,pair2);
                     set(FIG.ax.line ,'xdata',[],'ydata',[]);
                     set(FIG.ax.line2,'xdata',[],'ydata',[]);
-                    set(FIG.ax.line3,'xdata',[],'ydata',[]); 
+                    set(FIG.ax.line3,'xdata',[],'ydata',[]);
                     drawnow;  % clear the plot.
                     FIG.NewStim = 0;
                     break
                     
                 case 2 % case: updated wav-file
-%                     RP1= connect_tdt('RP2', 1);
+                    %                     RP1= connect_tdt('RP2', 1);
                     invoke(RP1,'Halt');
-                    %% SP: Is it necessary to clear COF? 
+                    %% SP: Is it necessary to clear COF?
                     invoke(RP1,'ClearCOF');
-                    invoke(RP1,'LoadCOF',[prog_dir '\object\FFR_wav_polIN_sp.rcx']);
+                    invoke(RP1,'LoadCOF', stimRCXfName);
+                    
                     % set_RP_tagvals(RP1, RP2, FFR_Gating, Stimuli);
                     
                     %%
@@ -211,7 +242,7 @@ while isempty(get(FIG.push.close,'Userdata'))
                     invoke(RP1, 'SetTagVal', 'RiseFall', FFR_Gating.rftime_ms);
                     invoke(RP1,'Run');
                     
-                    FFR_set_attns(Stimuli.atten_dB,-120,Stimuli.channel,Stimuli.KHosc,RP1,RP2); 
+                    FFR_set_attns(Stimuli.atten_dB,-120,Stimuli.channel,Stimuli.KHosc,RP1,RP2);
                     % debug deal with later Khite
                     
                     FFRnpts=ceil(FFR_Gating.FFRlength_ms/1000*Stimuli.RPsamprate_Hz);
@@ -289,7 +320,7 @@ while isempty(get(FIG.push.close,'Userdata'))
 end
 
 Stimuli.KHosc = 0;    % added by GE/MH, 17Jan2003.  To force Krohn-Hite to disconnect.
-FFR_set_attns(-120,-120,Stimuli.channel,Stimuli.KHosc,RP1,RP2);
+% FFR_set_attns(-120,-120, Stimuli.channel, Stimuli.KHosc, RP1, RP2);
 rc = PAset([120;120;120;120]); % added by GE/MH, 17Jan2003.  To force all attens to 120
 
 invoke(RP1,'Halt');

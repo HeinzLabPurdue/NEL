@@ -7,24 +7,20 @@ global RP PROG FIG Stimuli FFR_Gating root_dir prog_dir Display NelData
 % global fc fm pol dur
 prog_dir = [root_dir 'FFR\'];
 
-if contains(NelData.General.WindowsHostName, {'1353lyl303501d', 'HHSSLHS-FKJ2JL2'}) % means NEL1
-    %     RP1=actxcontrol('RPco.x',[0 0 1 1]);
-    %     invoke(RP1,'ConnectRP2',NelData.General.TDTcommMode,1);
-    RP1= connect_tdt('RP2', 1);
-    %     RP2=actxcontrol('RPco.x',[0 0 1 1]);
-    %     invoke(RP2,'ConnectRP2',NelData.General.TDTcommMode,2);
-    RP2= connect_tdt('RP2', 2);
-    %     RP3=actxcontrol('RPco.x',[0 0 1 1]);
-    %     invoke(RP3,'ConnectRP2',NelData.General.TDTcommMode,3);
-    if NelData.General.RP2_3and4
-        RP3= connect_tdt('RP2', 3);  %#ok<*NASGU>
-    else 
-        RP3= RP2; 
-    end
-else % means NEL2??
-    RP1= RP.activeX;        %MW10062016  use global control object rather than reinitialize
-    RP2 = RP1;      %MW10062016  only one device with RX8
+% if strcmp(NelData.General.WindowsHostName, '1353lyl303501d') % means NEL1
+RP1= connect_tdt('RP2', 1);
+RP2= connect_tdt('RP2', 2);
+if NelData.General.RP2_3and4 && (~NelData.General.RX8)
+    RP3= connect_tdt('RP2', 3);  %#ok<*NASGU>
+elseif (~NelData.General.RP2_3and4) && (~NelData.General.RX8)
+    RP3= RP2;
+elseif NelData.General.RX8
+    RP3= connect_tdt('RX8', 1);
 end
+% else % means NEL2??
+%     RP1= RP.activeX;        %MW10062016  use global control object rather than reinitialize
+%     RP2 = RP1;      %MW10062016  only one device with RX8
+% end
 
 %%
 if nargin < 1
@@ -38,9 +34,9 @@ if nargin < 1
     
     
     [FIG, FFR_Gating, Display]=FFR_SNRenv_loop_plot(FIG,Display,Stimuli,interface_type);
-    if ~(double(invoke(RP1,'GetTagVal', 'Stage')) == 2)
-        FFR_set_attns(-120,-120,Stimuli.channel,Stimuli.KHosc,RP1,RP2); %% Check with MH
-    end
+%     if ~(double(invoke(RP1,'GetTagVal', 'Stage')) == 2)
+%         FFR_set_attns(-120,-120,Stimuli.channel,Stimuli.KHosc,RP1,RP2); %% Check with MH
+%     end
     FFR_SNRenv('update_stim', 'spl');
     FFR_SNRenv('invCalib'); % Initialize RP2_4 with InvFilter
     ffr_snrenv_loop2; % Working
@@ -316,7 +312,7 @@ elseif strcmp(command_str,'YLim')
     set(FIG.edit.yscale,'string', num2str(Display.YLim_atAD));
     
 elseif strcmp(command_str,'invCalib')
-    if NelData.General.RP2_3and4
+    if NelData.General.RP2_3and4 && (~NelData.General.RX8)
         [~, Stimuli.calibPicNum]= run_invCalib(get(FIG.radio.invCalib,'value'));
     elseif isnan(Stimuli.calibPicNum)
         cdd;
@@ -335,7 +331,7 @@ elseif strcmp(command_str,'invCalib')
     set(FIG.asldr.SPL,'string',sprintf('%.1f dB SPL',Stimuli.calib_dBSPLout-abs(str2double(get(FIG.asldr.val, 'string')))));
     
 elseif strcmp(command_str,'close')
-    if NelData.General.RP2_3and4
+    if NelData.General.RP2_3and4 && (~NelData.General.RX8)
         run_invCalib(false); % Initialize with allpass RP2_3
     end
     set(FIG.push.close,'Userdata',1);

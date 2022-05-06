@@ -66,30 +66,45 @@ NelData.General.RootDir= [fileparts(fileparts(pwd)) filesep];
 % if RP2 or RX8
 % if USB or GB: assuming same connection mode for both RP2s and PA5s
 % if 2 or 4 RP2s
-figure(314);
-text(0, .5,  'connecting to TDT', 'FontSize', 20);
-RPtemp= actxcontrol('RPco.x',[0 0 1 1]);
-yesUSB= invoke(RPtemp,'ConnectRP2', 'USB', 1);
-yesGB= invoke(RPtemp,'ConnectRP2', 'GB', 1);
-if yesUSB && ~yesGB
-    NelData.General.TDTcommMode= 'USB';
-elseif yesGB && ~yesUSB
-    NelData.General.TDTcommMode= 'GB';
-end
+% % % figure(314);
+% % % text(0, .5,  'connecting to TDT', 'FontSize', 20);
+% % % RPtemp= actxcontrol('RPco.x',[0 0 1 1]);
+% % % yesUSB= invoke(RPtemp,'ConnectRP2', 'USB', 1);
+% % % yesGB= invoke(RPtemp,'ConnectRP2', 'GB', 1);
+% % % if yesUSB && ~yesGB
+% % %     NelData.General.TDTcommMode= 'USB';
+% % % elseif yesGB && ~yesUSB
+% % %     NelData.General.TDTcommMode= 'GB';
+% % % end
+% % % 
+% % % % Assuming RP2s only: will be different for RX8
+% % % % Check how many RP2s
+% % % initFlag= true;
+% % % [~, yesRP1]= connect_tdt('RP2', 1, initFlag);
+% % % [~, yesRP2]= connect_tdt('RP2', 2, initFlag);
+% % % [~, yesRP3]= connect_tdt('RP2', 3, initFlag);
+% % % [~, yesRP4]= connect_tdt('RP2', 4, initFlag);
+% % % % yesRP1=invoke(RPtemp,'ConnectRP2', NelData.General.TDTcommMode, 1);
+% % % % yesRP2=invoke(RPtemp,'ConnectRP2', NelData.General.TDTcommMode, 2);
+% % % % yesRP3=invoke(RPtemp,'ConnectRP2', NelData.General.TDTcommMode, 3);
+% % % % yesRP4=invoke(RPtemp,'ConnectRP2', NelData.General.TDTcommMode, 4);
+% % % 
+% % % if (yesRP1&&yesRP2) && (yesRP3&&yesRP4) % All RP2s are connected
+% % %     NelData.General.RP2_3and4= true; % RP2 #3 and #4 are connected
+% % % elseif (yesRP1&&yesRP2) && ~(yesRP3||yesRP4) % RP2s (1 and 2) connected, 3 and 4 do not exist
+% % %     NelData.General.RP2_3and4= false; % RP2 #3 and #4 do are not connected
+% % % else % Why is this happening
+% % %     NelData.General.RP2_3and4= nan; % Error
+% % % end
+% % % 
+% % % [~, yesRX8]= connect_tdt('RX8', 1, initFlag);
+% % % % yesRX8=invoke(RPtemp,'ConnectRX8', NelData.General.TDTcommMode, 1);
+% % % if yesRX8
+% % %     NelData.General.RX8= true; % RX8 is connected
+% % % else 
+% % %     NelData.General.RX8= false; % RX8 is connected
+% % % end
+% % % close(314);
 
-% Assuming RP2s only: will be different for RX8
-% Check how many RP2s
-yesRP1=invoke(RPtemp,'ConnectRP2', NelData.General.TDTcommMode, 1);
-yesRP2=invoke(RPtemp,'ConnectRP2', NelData.General.TDTcommMode, 2);
-yesRP3=invoke(RPtemp,'ConnectRP2', NelData.General.TDTcommMode, 3);
-yesRP4=invoke(RPtemp,'ConnectRP2', NelData.General.TDTcommMode, 4);
-if (yesRP1&&yesRP2) && (yesRP3&&yesRP4) % All RP2s connected
-    NelData.General.RP2_3and4= true; % RP2- 3 and 4 exist
-elseif (yesRP1&&yesRP2) && ~(yesRP3||yesRP4) % RP2s (1 and 2) connected, 3 and 4 do not exist
-    NelData.General.RP2_3and4= false; % RP2- 3 and 4 do not exist
-else % Why is this happening
-    NelData.General.RP2_3and4= nan; % Error
-end
-close(314);
 %%
 nel;
