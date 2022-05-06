@@ -410,7 +410,7 @@ if iscell(filenames) || length(filenames)>1 || filenames~=0
     
     if ~noNEL
         %HALT RPS (already done for RP1)
-        if NelData.General.RP2_3and4 || NelData.General.RX8
+        if (NelData.General.RP2_3and4 && ~debugStimuliGeneration) || NelData.General.RX8
             invoke(RP2,'Halt');
         end
         invoke(RP3,'Halt');

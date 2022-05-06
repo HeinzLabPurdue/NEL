@@ -11,6 +11,12 @@ Stimuli
 
  * Masker and click attenuations can be set independently with the GUI and are handled by the PA attenuators.
 
+*Folders (04/2022):*
+ * *regular_expe*: around 150 maskers that were used for the main paper explaining the method (*estimation of cochlear freq. selectivity*)
+ * *regular_expe_short*: same kind of expe, 68 maskers. Only probes: 3,4,5,6 kHz. Can be used for expe on compressive nonlinearities before *5kHz_difflevels*
+ * *5kHz_difflevels*: various maskers with varying part around 5 kHz. To be presented with different sound levels.
+ *  * *5kHz_difflevels_lowered*: same, but frequencies are lowered by a ~0.9 mult. factor.
+
 Typical experiment
 ----
 
