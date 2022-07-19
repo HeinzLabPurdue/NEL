@@ -6,4 +6,7 @@ function nelerror(strs)
 
 % AF 12/1/01
 
+ding()
 nel('nelerror',strs,0);
+disp('FIX nelerror.m');
+%nelerror(app, strs, 0);
