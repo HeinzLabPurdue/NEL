@@ -50,11 +50,16 @@ SwitchBox = struct('select_key',{select_key select_key} ...
 %     h = gcf;
 % end
 
-figure(NelData.General.main_handle);
+%figure(NelData.General.main_handle);
+%toAppDesignerTag - creating a dummy figure to allow actxcontrol to work...
+rp_temp_fig_forActiveX = figure();
+set(rp_temp_fig_forActiveX, 'Visible','off')
 
-RPtemp= actxcontrol('RPco.x',[0 0 1 1],NelData.General.main_handle);
+%RPtemp= actxcontrol('RPco.x',[0 0 1 1],NelData.General.main_handle);
+RPtemp= actxcontrol('RPco.x',[0 0 1 1],rp_temp_fig_forActiveX);
 yesUSB= invoke(RPtemp,'ConnectRP2', 'USB', 1);
 yesGB= invoke(RPtemp,'ConnectRP2', 'GB', 1);
+
 if yesUSB && ~yesGB
     NelData.General.TDTcommMode= 'USB';
 elseif yesGB && ~yesUSB
@@ -86,7 +91,6 @@ temp_serNum= num2cell(1:numel(RP));
 [~, yesPA5(2)]= connect_tdt('PA5', 2, initFlag);
 [~, yesPA5(3)]= connect_tdt('PA5', 3, initFlag);
 [~, yesPA5(4)]= connect_tdt('PA5', 4, initFlag);
-
 
 temp_serNum= num2cell(1:numel(PA));
 [PA.('attn')]= deal(-1);
@@ -143,4 +147,5 @@ Trigger.activeX = RP(Trigger.RP_index).activeX;
 if all(yesPA5)
     PAset(120.0);
 end
+
 SBset([],[]);
