@@ -107,7 +107,7 @@ if nargin < 1
             invoke(RP1,'LoadCOF',[prog_dir '\object\fmasking_CAP.rcx']);
         end
         
-        if NelData.General.RP2_3and4 && (~NelData.General.RX8) && ~debugStimuliGeneration   %if debug, we only use RP2#2
+        if NelData.General.RP2_3and4 && (~NelData.General.RX8)
             % For bit select (RP2#3 is not connected to Mix/Sel). So have to use RP2#2. May use RP2#1?
             invoke(RP2,'ConnectRP2',NelData.General.TDTcommMode,2);
             invoke(RP2,'ClearCOF');
@@ -120,14 +120,14 @@ if nargin < 1
 
             invoke(RP2,'LoadCOF',[prog_dir '\object\CAP_BitSet.rcx']);
                         
-%             if debugStimuliGeneration
-%                 invoke(RP3,'LoadCOF',[prog_dir '\object\fmasking_CAP_ADC_debug.rcx']);  
-%                 CAP_intervals.CAPlength_ms=CAP_intervals.period_ms;
-%                 CAP_intervals.XendPlot_ms=CAP_intervals.period_ms;
-%                 CAP_intervals.period_ms=CAP_intervals.period_ms*2;
-%             else
+            if debugStimuliGeneration
+                invoke(RP3,'LoadCOF',[prog_dir '\object\fmasking_CAP_ADC_debug.rcx']);  %NOT TESTED
+                CAP_intervals.CAPlength_ms=CAP_intervals.period_ms;
+                CAP_intervals.XendPlot_ms=CAP_intervals.period_ms;
+                CAP_intervals.period_ms=CAP_intervals.period_ms*2;
+            else
                 invoke(RP3,'LoadCOF',[prog_dir '\object\fmasking_CAP_ADC.rcx']);
-%             end
+            end
            
             
             % Only difference w/ ABR: Input Channel number

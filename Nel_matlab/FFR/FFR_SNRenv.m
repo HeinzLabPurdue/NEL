@@ -6,6 +6,7 @@ global RP PROG FIG Stimuli FFR_Gating root_dir prog_dir Display NelData
 %Stimuli.OLDDir
 % global fc fm pol dur
 prog_dir = [root_dir 'FFR\'];
+usr = NelData.General.User; % current nel user
 
 % if strcmp(NelData.General.WindowsHostName, '1353lyl303501d') % means NEL1
 RP1= connect_tdt('RP2', 1);
@@ -26,6 +27,10 @@ end
 if nargin < 1
     PROG = struct('name','FFR(v1.ge_mh.1).m');  % modified by GE 26Apr2004.
     [FIG, h_fig]=get_FIG_ffr_srnenv(); % Initialize FIG
+    
+    if strcmp(usr,'JMR')
+        addpath([NelData.General.RootDir 'Users\JMR\FFR']);
+    end
     [misc, Stimuli, RunLevels_params, Display, interface_type]=FFR_SNRenv_ins(NelData); ...
         %#ok<ASGLU> % should already be populated by CAP_ins
     

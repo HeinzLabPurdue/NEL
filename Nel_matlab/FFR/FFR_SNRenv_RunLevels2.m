@@ -128,6 +128,7 @@ for attenIND= 1
                             % had POS and NEG polarity switched in the
                             % average
                             FFRdataAvg_PO_plot{attenIND} = FFRdataAvg_PO_plot{attenIND}*(1 - weight) + weight*FFRdata;
+
                         else
                             FFRdataAvg_NP_plot{attenIND} = FFRdataAvg_NP_plot{attenIND}*(1 - weight) + weight*FFRdata;
                         end
