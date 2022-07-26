@@ -1,4 +1,4 @@
-# NEL1_2
+# NEL
 NEL2 code with RP2 on top rack and RX8 after 4 PA5s. Based on NEL1 codes using 4 RP2s and 4 PA5s. Previously, NEL2 was based on a single RX8 and no RP2s. 
 
 To-Do list: 
