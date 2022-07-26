@@ -45,6 +45,7 @@ for devIter= 1:numel(deviceNumbers)
             end
         case {'RX', 'RX8'}
             if devNum <= numel(RX) && (~initFlag)
+                %TDTout=actxcontrol('RPco.x', [0 0 1 1]);
                 TDTout= RX(devNum).activeX;
                 status= true;
             elseif initFlag

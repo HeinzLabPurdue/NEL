@@ -5,5 +5,8 @@ function nelwarn(strs)
 %          See Also:  nelerror, errordlg, warndlg.
 
 % AF 12/1/01
-
+ding()
 nel('nelerror',strs,1);
+disp('FIX nelerror.m');
+%toAppDesignerTag
+%nel_App('nelerror',strs,1);
