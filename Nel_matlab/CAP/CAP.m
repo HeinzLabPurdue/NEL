@@ -91,27 +91,34 @@ if nargin < 1
             end
         end
     else % Case where ABRFlag thrown
-        %cd([NelData.General.RootDir 'Users\SP\SP_nel_gui']);
+       
         usr = NelData.General.User;
-        %addpath([NelData.General.RootDir 'Nel_matlab' filesep 'nel_gui_ABR_new']);
+        
+        % ABR files all live here: 
         addpath([NelData.General.RootDir 'Nel_matlab' filesep 'CAP\ABR']);
+        
+        % If user has an ABR folder in their dir, add that folder to the
+        % path so that we use their ABR_ins parameters
         if exist([NelData.General.RootDir 'Users\' usr filesep 'ABR'],'dir')
-            %addpath([NelData.General.RootDir 'Users' filesep usr filesep usr '_nel_gui']);
             addpath([NelData.General.RootDir 'Users\' usr filesep 'ABR']);
             addpath([NelData.General.RootDir 'Users\',usr]);
         end
         
-        %h_fig = CAP;
+        % Open ABR stuff and Run: 
         h_fig = ABR; 
         
+        % Clean up and exit gracefully: 
         if ishandle(h_fig)
-            delete(h_fig); % SP on 5.28.2021: not sure why h_fig is not deleted inside CAP after CAP. So forcefully deleting here. 
+            delete(h_fig); 
         end
-        % bring back to nel_gui original
+        
+        RunThroughABRFlag = 0;  
         rmpath([NelData.General.RootDir 'Nel_matlab' filesep 'CAP\ABR']);
+      
         if exist([NelData.General.RootDir 'Users\' usr filesep 'ABR'],'dir')
             rmpath([NelData.General.RootDir 'Users\' usr filesep 'ABR']);
         end
+       
         addpath([NelData.General.RootDir 'Nel_matlab' filesep 'nel_gui']);
     end
     
