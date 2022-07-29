@@ -1,3 +1,4 @@
+global CAP_interface_type
 % UNIT = sprintf('%1d.%02d', NelData.File_Manager.track.No, NelData.File_Manager.unit.No);
 
 % FIG.radio.noise  = uicontrol(FIG.handle,'callback','CAP(''noise'');','style','radio','Enable','on','Units','normalized','position',[.125 .425 .08 .03],'string','Noise','fontsize',12,'BackgroundColor','w','value',1);
@@ -27,7 +28,7 @@ FIG.statText.memReps =  uicontrol(FIG.handle, 'callback', '', 'style', 'text','U
 FIG.edit.memReps = uicontrol(FIG.handle,'callback','CAP(''memReps'');','style','edit','Units','normalized','position',[.18 .49 .04 .04],'string',Stimuli.CAPmem_reps,'fontsize',12);
 FIG.statText.threshV =  uicontrol(FIG.handle, 'callback', '', 'style', 'text','Units','normalized', 'position', [.05 .54 .12 .03], 'string', 'Reject thresh (V):','fontsize',12,'BackgroundColor','w');   % added by kh 2011Jun08
 FIG.edit.threshV = uicontrol(FIG.handle,'callback','CAP(''threshV'');','style','edit','Units','normalized','position',[.18 .54 .04 .04],'string',Stimuli.threshV,'fontsize',12); % KH 2011 Jun 08
-FIG.statText.status =  uicontrol(FIG.handle, 'callback', '', 'style', 'text','Units','normalized', 'position', [.05 .9 .25 .03], 'string', ['STATUS (' interface_type '): free running...'],'fontsize',12,'BackgroundColor','w','horizontalalignment','left');   % added by GE 17Jan2003.
+FIG.statText.status =  uicontrol(FIG.handle, 'callback', '', 'style', 'text','Units','normalized', 'position', [.05 .9 .25 .03], 'string', ['STATUS (' CAP_interface_type '): free running...'],'fontsize',12,'BackgroundColor','w','horizontalalignment','left');   % added by GE 17Jan2003.
 
 FIG.push.x1      = uicontrol(FIG.handle,'callback','CAP(''mult_1x'');','style','pushbutton','Enable','on','Units','normalized','position',[.5 .23 .05 .037],'string','1X','fontsize',12,'fontangle','normal','fontweight','normal','foregroundcolor',[0 0 0]);
 FIG.push.x10     = uicontrol(FIG.handle,'callback','CAP(''mult_10x'');','style','pushbutton','Enable','on','Units','normalized','position',[.585 .23 .05 .037],'string','10X','fontsize',12,'fontangle','normal','fontweight','normal','foregroundcolor',[1 1 1]);

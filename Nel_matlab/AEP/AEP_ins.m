@@ -1,24 +1,30 @@
 % To send you to the specific AEP measure
 
-global RunThroughABRFlag
-RunThroughABRFlag=0;
+global interface_type
 
 interface_type=questdlg('Select AEP Measure:','AEP','CAP','ABR','FFR','CAP'); %SP 30Jun2016
 
-if strcmp(interface_type,'FFR')
-    command_str='close';
+% Set up for specific AEP
+usr = NelData.General.User;
+% Add folder where that measure lives: 
+addpath([NelData.General.RootDir 'Nel_matlab' filesep 'AEP' filesep interface_type]);
+
+% If user has the specific AEP folder in their dir, add that folder to the
+% path so that we use their ABR_ins parameters
+if exist([NelData.General.RootDir 'Users\' usr filesep interface_type],'dir')
+    addpath([NelData.General.RootDir 'Users\' usr filesep interface_type]);
+    addpath([NelData.General.RootDir 'Users\',usr]);
 end
 
-if strcmp(interface_type,'ABR')
-    ABR_ins; 
-    %interface_type='ABR';
+switch interface_type
+    case 'ABR'
+        ABR_ins; 
+    case 'FFR' 
+         command_str='close';
+    case 'CAP'
+        CAP_ins;
 end
-
-if strcmp(interface_type,'CAP')
-    CAP_ins;
-    %interface_type=questdlg('Select CAP Measure:','CAP','CAP (RW)','ECochG (EarCanal)','CAP (fMask)','CAP (RW)'); %SP 30Jun2016
-end
-
+     
 Stimuli.RPsamprate_Hz=12207.03125;  % Hard coded for now, eventually get from RP
 
 % 

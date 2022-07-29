@@ -1,5 +1,6 @@
 % UNIT = sprintf('%1d.%02d', NelData.File_Manager.track.No, NelData.File_Manager.unit.No);
 % Changing all CAP to ABR - Done
+global interface_type
 
 FIG.checkbox.fixedPhase = uicontrol(FIG.handle, 'callback', 'ABR(''fixedPhase'');','style','checkbox','Enable','on','Units','normalized','position',[.125 .375 .09 .03],'string','fixedPhase','fontsize',12,'BackgroundColor','w','value',Stimuli.fixedPhase);
 FIG.radio.invCalib      = uicontrol(FIG.handle,'callback','ABR(''invCalib'');','style','radio','Enable','on','Units','normalized','position',[.125 .345 .08 .03],'string','invCalib','fontsize',12,'BackgroundColor','w','value',1);

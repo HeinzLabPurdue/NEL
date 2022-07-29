@@ -39,109 +39,22 @@ if nargin < 1
     %    FIG   = struct('handle',[],'edit',[],'push',push,'radio',radio,'fsldr',fsldr,'asldr',asldr,'NewStim',0,'ax',ax,'popup',popup, 'statText', statText);  % modified by GE 17Jan2003.
     
     
-    CAP_ins; %sending here to throw ABRFlag
+    h_fig = findobj('Tag','AEP_Main_Fig');    %% Finds handle for TC-Figure
     
-    if strcmp(interface_type, 'CAP (fMask)')
-        fMaskCodesDir= [NelData.General.RootDir 'Nel_matlab\CAPfmasked'];
-        cd(fMaskCodesDir);
-        h_fig= fmaskedCAP();
-        cd(root_dir);
-        
-    elseif ~RunThroughABRFlag
-        FIG.handle = figure('NumberTitle','off','Name','CAP Interface','Units','normalized','position',[0.045  0.013  0.9502  0.7474],'Visible','off','MenuBar','none','Tag','CAP_Main_Fig');
-        set(FIG.handle,'CloseRequestFcn','CAP(''close'');')
-        colordef none;
-        whitebg('w');
-        
-        if ~strcmp(interface_type, 'FFR')
-            CAP_loop_plot;
-            CAP('clickYes'); % Start invCalib = true or false based on default clickYes value
-            CAP_loop;
-        elseif strcmp(interface_type,'FFR')
-            %             interface_type=questdlg('Which
-            %             FFR:','','FFR','SFR','SFR-mask','SFR'); %SP 30Jun2016
-            %-->
-            %SP 14Nov2018
-            % commented SFR-mask, using that button space for
-            % EFR_harm_complex = EFR_HrmCpx
-            interface_type=questdlg('Which FFR:','','FFR','SFR','SFR_pink','SFR');
-            %<--
-            if ishandle(h_fig)
-                delete(h_fig);
-            end
-            
-            if strcmp(interface_type, 'FFR')
-                h_fig = FFR();
-            elseif strcmp(interface_type, 'SFR')
-                usr = NelData.General.User;
-                % Work around hack for JMR Sept 21
-                if strcmp(usr,'JMR')
-                    addpath([NelData.General.RootDir 'Users\',usr filesep 'FFR']);
-                    h_fig = FFR_SNRenv_2chan();
-                else
-                    h_fig = FFR_SNRenv();
-                end
-            elseif strcmp(interface_type, 'SFR-mask')
-                h_fig = SFR_pink_mask_SNRenv;
-            elseif strcmp(interface_type, 'SFR_pink')
-                h_fig = SFR_pink_mask_tdt;
-            elseif strcmp(interface_type, 'EFR_HrmCpx')
-                h_fig = EFR_Harm_Cmplx;
-
-            end
-        end
-    else % Case where ABRFlag thrown
-       
-        usr = NelData.General.User;
-        
-        % ABR files all live here: 
-        addpath([NelData.General.RootDir 'Nel_matlab' filesep 'CAP\ABR']);
-        
-        % If user has an ABR folder in their dir, add that folder to the
-        % path so that we use their ABR_ins parameters
-        if exist([NelData.General.RootDir 'Users\' usr filesep 'ABR'],'dir')
-            addpath([NelData.General.RootDir 'Users\' usr filesep 'ABR']);
-            addpath([NelData.General.RootDir 'Users\',usr]);
-        end
-        
-        % Open ABR stuff and Run: 
-        h_fig = ABR; 
-        
-        % Clean up and exit gracefully: 
-        if ishandle(h_fig)
-            delete(h_fig); 
-        end
-        
-        RunThroughABRFlag = 0;  
-        rmpath([NelData.General.RootDir 'Nel_matlab' filesep 'CAP\ABR']);
-      
-        if exist([NelData.General.RootDir 'Users\' usr filesep 'ABR'],'dir')
-            rmpath([NelData.General.RootDir 'Users\' usr filesep 'ABR']);
-        end
-       
-        addpath([NelData.General.RootDir 'Nel_matlab' filesep 'nel_gui']);
+    if length(h_fig)>2
+        h_fig= h_fig(1);
     end
     
-    %  elseif strcmp(command_str,'tone')
-    %      FIG.NewStim = 1;
-    %      Stimuli.KHosc = 0;
-    %      set(FIG.fsldr.val,'string',num2str(Stimuli.freq_hz));
-    %     set(FIG.radio.khite,'value',0);
-    %      set(FIG.radio.noise,'value',0);
-    %
-    %  elseif strcmp(command_str,'noise')
-    %      FIG.NewStim = 2;
-    %      Stimuli.KHosc = 0;
-    %      set(FIG.fsldr.val,'string','noise');
-    %      set(FIG.radio.khite,'value',0);
-    %      set(FIG.radio.tone,'value',0);
-    %
-    %  elseif strcmp(command_str,'khite')
-    %      FIG.NewStim = 3;
-    %      Stimuli.KHosc = 2;
-    %      set(FIG.fsldr.val,'string','Osc');
-    %      set(FIG.radio.tone,'value',0);
-    % %         set(FIG.radio.noise,'value',0);
+
+    FIG.handle = figure('NumberTitle','off','Name','CAP Interface','Units','normalized','position',[0.045  0.013  0.9502  0.7474],...
+        'Visible','off','MenuBar','none','Tag','AEP_Main_Fig');
+
+    colordef none;
+    whitebg('w');
+    
+    CAP_loop_plot;
+    CAP('clickYes'); % Start invCalib = true or false based on default clickYes value
+    CAP_loop;
     
 elseif strcmp(command_str,'fast')
     if get(FIG.radio.fast, 'value') == 1
