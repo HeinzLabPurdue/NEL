@@ -1,26 +1,17 @@
-function h_fig = CAP(command_str)
-
+function h_fig = ABR(command_str)
+% TODO:  make sure stay within this abr file (callbacks)
 % ge debug ABR 26Apr2004: replace "CAP" with more generalized nomenclature, throughout entire system.
 
 global PROG FIG Stimuli CAP_Gating root_dir prog_dir NelData devices_names_vector Display
-global data_dir RunThroughABRFlag interface_type
+global data_dir picstoSEND_deBUG picstoSEND dBSPLlist picNUMlist FLAG_RERUN_FOR_ABR_ANALYSIS CalibFileNum  CalibFileRefresh
+FLAG_RERUN_FOR_ABR_ANALYSIS=0;
+
 
 % h_fig = findobj('Tag','CAP_Main_Fig'); % SP on 22Sep19: Moved to after
 % FIG is defined
-
 if nargin < 1
-    
-    h_fig = findobj('Tag','CAP_Main_Fig'); %% Finds handle for CAP-Figure
-    if ishandle(h_fig)
-        delete(h_fig);
-    end
-        
-%     if length(h_fig)>2
-%         h_fig= h_fig(1);
-%     end
-    
-    
     prog_dir = [root_dir 'CAP\'];
+    
     
     PROG = struct('name','CAP(v1.ge_mh.1).m');  % modified by GE 26Apr2004.
     
@@ -28,99 +19,37 @@ if nargin < 1
     push  = cell2struct(cell(1,6),{'run_levels','close','x1','x10','x100', 'forget_now'},2);
     %     radio = cell2struct(cell(1,8),{'noise','tone','khite','fast','slow','left','right','both'},2);
     % ge debug ABR 26Apr2004: need to add buttons to select between tone/noise/click
-    radio = cell2struct(cell(1,5),{'fast','slow','left','right','both'},2);
+    radio = cell2struct(cell(1,8),{'fast','slow','left','right','both','chan_1','chan_2','Simultaneous'},2);
     checkbox = cell2struct(cell(1,1), {'fixedPhase'},2);
     statText  = cell2struct(cell(1,2),{'memReps','status'},2);
     %     popup = cell2struct(cell(1,1),{'spike_channel'},2);   % added by GE 17Jan2003.
     fsldr = cell2struct(cell(1,4),{'slider','min','max','val'},2);
     asldr = cell2struct(cell(1,4),{'slider','min','max','val'},2);
     ax = cell2struct(cell(1,2),{'axis','line'},2);
-    FIG   = struct('handle',[],'edit',[],'push',push,'radio',radio,'checkbox',checkbox,'statText', statText, 'fsldr',fsldr,'asldr',asldr,'NewStim',0,'ax',ax);
-    %    FIG   = struct('handle',[],'edit',[],'push',push,'radio',radio,'fsldr',fsldr,'asldr',asldr,'NewStim',0,'ax',ax,'popup',popup, 'statText', statText);  % modified by GE 17Jan2003.
-    
-    
-    CAP_ins; %sending here to throw ABRFlag
-    
-    if strcmp(interface_type, 'CAP (fMask)')
-        fMaskCodesDir= [NelData.General.RootDir 'Nel_matlab\CAPfmasked'];
-        cd(fMaskCodesDir);
-        h_fig= fmaskedCAP();
-        cd(root_dir);
-        
-    elseif ~RunThroughABRFlag
-        FIG.handle = figure('NumberTitle','off','Name','CAP Interface','Units','normalized','position',[0.045  0.013  0.9502  0.7474],'Visible','off','MenuBar','none','Tag','CAP_Main_Fig');
-        set(FIG.handle,'CloseRequestFcn','CAP(''close'');')
-        colordef none;
-        whitebg('w');
-        
-        if ~strcmp(interface_type, 'FFR')
-            CAP_loop_plot;
-            CAP('clickYes'); % Start invCalib = true or false based on default clickYes value
-            CAP_loop;
-        elseif strcmp(interface_type,'FFR')
-            %             interface_type=questdlg('Which
-            %             FFR:','','FFR','SFR','SFR-mask','SFR'); %SP 30Jun2016
-            %-->
-            %SP 14Nov2018
-            % commented SFR-mask, using that button space for
-            % EFR_harm_complex = EFR_HrmCpx
-            interface_type=questdlg('Which FFR:','','FFR','SFR','SFR_pink','SFR');
-            %<--
-            if ishandle(h_fig)
-                delete(h_fig);
-            end
-            
-            if strcmp(interface_type, 'FFR')
-                h_fig = FFR();
-            elseif strcmp(interface_type, 'SFR')
-                usr = NelData.General.User;
-                % Work around hack for JMR Sept 21
-                if strcmp(usr,'JMR')
-                    addpath([NelData.General.RootDir 'Users\',usr filesep 'FFR']);
-                    h_fig = FFR_SNRenv_2chan();
-                else
-                    h_fig = FFR_SNRenv();
-                end
-            elseif strcmp(interface_type, 'SFR-mask')
-                h_fig = SFR_pink_mask_SNRenv;
-            elseif strcmp(interface_type, 'SFR_pink')
-                h_fig = SFR_pink_mask_tdt;
-            elseif strcmp(interface_type, 'EFR_HrmCpx')
-                h_fig = EFR_Harm_Cmplx;
-
-            end
-        end
-    else % Case where ABRFlag thrown
-       
-        usr = NelData.General.User;
-        
-        % ABR files all live here: 
-        addpath([NelData.General.RootDir 'Nel_matlab' filesep 'CAP\ABR']);
-        
-        % If user has an ABR folder in their dir, add that folder to the
-        % path so that we use their ABR_ins parameters
-        if exist([NelData.General.RootDir 'Users\' usr filesep 'ABR'],'dir')
-            addpath([NelData.General.RootDir 'Users\' usr filesep 'ABR']);
-            addpath([NelData.General.RootDir 'Users\',usr]);
-        end
-        
-        % Open ABR stuff and Run: 
-        h_fig = ABR; 
-        
-        % Clean up and exit gracefully: 
-        if ishandle(h_fig)
-            delete(h_fig); 
-        end
-        
-        RunThroughABRFlag = 0;  
-        rmpath([NelData.General.RootDir 'Nel_matlab' filesep 'CAP\ABR']);
-      
-        if exist([NelData.General.RootDir 'Users\' usr filesep 'ABR'],'dir')
-            rmpath([NelData.General.RootDir 'Users\' usr filesep 'ABR']);
-        end
-       
-        addpath([NelData.General.RootDir 'Nel_matlab' filesep 'nel_gui']);
+    FIG   = struct('handle',[],'edit',[],'push',push,'radio',radio,'checkbox',checkbox,'statText', statText,...
+        'fsldr',fsldr,'asldr',asldr,'NewStim',0,'ax',ax);
+    %    FIG   = struct('handle',[],'edit',[],'push',push,'radio',radio,'fsldr',fsldr,'asldr',asldr,...
+    %    'NewStim',0,'ax',ax,'popup',popup, 'statText', statText);  % modified by GE 17Jan2003.
+    h_fig = findobj('Tag','CAP_Main_Fig');    %% Finds handle for TC-Figure
+    if length(h_fig)>2
+        h_fig= h_fig(1);
     end
+    
+    ABR_ins;
+    
+    
+    FIG.handle = figure('NumberTitle','off','Name','CAP Interface','Units','normalized','position',[0.045  0.013  0.9502  0.7474],...
+        'Visible','off','MenuBar','none','Tag','CAP_Main_Fig');
+    %     set(FIG.handle,'CloseRequestFcn','CAP(''close'');')
+    colordef none;
+    whitebg('w');
+    
+    ABR_loop_plot;
+    ABR('invCalib'); %SP: load calib-picNum once to populate calibdata
+    ABR('clickYes'); % Start invCalib = true or false based on default clickYes value
+    %     Stimuli.MaxdBSPLCalib=90+Stimuli.cur_freq_calib_dbshift;
+    
+    ABR_loop;
     
     %  elseif strcmp(command_str,'tone')
     %      FIG.NewStim = 1;
@@ -204,12 +133,41 @@ elseif strcmp(command_str,'both')
         set(FIG.radio.both,'value',1);
     end
 
-
+elseif strcmp(command_str,'chan_1')
+    if get(FIG.radio.chan_1, 'value') == 1
+        FIG.NewStim = 18;
+        Stimuli.rec_channel = 1;
+        set(FIG.radio.chan_2,'value',0);
+        set(FIG.radio.Simultaneous,'value',0);
+    else
+        set(FIG.radio.chan_1,'value',1);
+    end    
+    
+elseif strcmp(command_str,'chan_2')
+    if get(FIG.radio.chan_2, 'value') == 1
+        FIG.NewStim = 18;
+        Stimuli.rec_channel = 2;
+        set(FIG.radio.chan_1,'value',0);
+        set(FIG.radio.Simultaneous,'value',0);
+    else
+        set(FIG.radio.chan_2,'value',1);
+    end     
+    
+elseif strcmp(command_str,'Simultaneous')
+    if get(FIG.radio.Simultaneous, 'value') == 1
+        FIG.NewStim = 18;
+        Stimuli.rec_channel = 3;
+        set(FIG.radio.chan_1,'value',0);
+        set(FIG.radio.chan_2,'value',0);
+    else
+        set(FIG.radio.Simultaneous,'value',1);
+    end      
     
 elseif strcmp(command_str,'slide_freq')
     FIG.NewStim = 6;
     Stimuli.freq_hz = floor(get(FIG.fsldr.slider,'value')*Stimuli.fmult);
     set(FIG.fsldr.val,'string',num2str(Stimuli.freq_hz));
+    ABR('invCalib');
     
     % LQ 01/31/05
 elseif strcmp(command_str,'slide_freq_text')
@@ -222,6 +180,7 @@ elseif strcmp(command_str,'slide_freq_text')
         Stimuli.freq_hz = new_freq;
         set(FIG.fsldr.slider, 'value', Stimuli.freq_hz/Stimuli.fmult);
     end
+    ABR('invCalib');
     
 elseif strcmp(command_str,'mult_1x')
     Stimuli.fmult = 1;
@@ -231,6 +190,8 @@ elseif strcmp(command_str,'mult_1x')
     FIG.NewStim = 6;
     Stimuli.freq_hz = floor(get(FIG.fsldr.slider,'value')*Stimuli.fmult);
     set(FIG.fsldr.val,'string',num2str(Stimuli.freq_hz));
+    ABR('invCalib');
+    
     
 elseif strcmp(command_str,'mult_10x')
     Stimuli.fmult = 10;
@@ -240,6 +201,7 @@ elseif strcmp(command_str,'mult_10x')
     FIG.NewStim = 6;
     Stimuli.freq_hz = floor(get(FIG.fsldr.slider,'value')*Stimuli.fmult);
     set(FIG.fsldr.val,'string',num2str(Stimuli.freq_hz));
+    ABR('invCalib');
     
 elseif strcmp(command_str,'mult_100x')
     Stimuli.fmult = 100;
@@ -249,11 +211,13 @@ elseif strcmp(command_str,'mult_100x')
     FIG.NewStim = 6;
     Stimuli.freq_hz = floor(get(FIG.fsldr.slider,'value')*Stimuli.fmult);
     set(FIG.fsldr.val,'string',num2str(Stimuli.freq_hz));
+    ABR('invCalib');
     
 elseif strcmp(command_str,'slide_atten')
     FIG.NewStim = 7;
     Stimuli.atten_dB = floor(-get(FIG.asldr.slider,'value'));
     set(FIG.asldr.val,'string',num2str(-Stimuli.atten_dB));
+    set(FIG.asldr.SPL,'string',sprintf('%.1f dB SPL',Stimuli.MaxdBSPLCalib-Stimuli.atten_dB));
     
     % LQ 01/31/05
 elseif strcmp(command_str, 'slide_atten_text')
@@ -264,12 +228,14 @@ elseif strcmp(command_str, 'slide_atten_text')
         set(FIG.asldr.val,'string', new_atten);
     end
     new_atten = str2num(new_atten);
-    if new_atten < get(FIG.asldr.slider,'min') | new_atten > get(FIG.asldr.slider,'max')
+    if new_atten < get(FIG.asldr.slider,'min') || new_atten > get(FIG.asldr.slider,'max')
         set( FIG.asldr.val, 'string', num2str(-Stimuli.atten_dB));
     else
         Stimuli.atten_dB = -new_atten;
         set(FIG.asldr.slider, 'value', new_atten);
     end
+    set(FIG.asldr.SPL,'string',sprintf('%.1f dB SPL',Stimuli.MaxdBSPLCalib-Stimuli.atten_dB));
+    
     
 elseif strcmp(command_str,'memReps')
     FIG.NewStim = 9;
@@ -293,6 +259,17 @@ elseif strcmp(command_str,'threshV')   %KH 2011 Jun 08, for artifact rejection
         Stimuli.threshV = oldThreshV;
     end
     set(FIG.edit.threshV,'string', num2str(Stimuli.threshV));
+
+elseif strcmp(command_str,'threshV2')   %JMR nov 21 for artifact rejection channel 2
+    FIG.NewStim = 13;
+    oldThreshV2 = Stimuli.threshV2;
+    Stimuli.threshV2 = str2num(get(FIG.edit.threshV2,'string'));
+    if (isempty(Stimuli.threshV2))  % check is empty
+        Stimuli.threshV2 = oldThreshV2;
+    elseif ( Stimuli.threshV<0 )  % check range
+        Stimuli.threshV2 = oldThreshV2;
+    end
+    set(FIG.edit.threshV2,'string', num2str(Stimuli.threshV2));    
     
 elseif strcmp(command_str,'fixedPhase')
     Stimuli.fixedPhase = get(FIG.checkbox.fixedPhase,'value');
@@ -367,18 +344,66 @@ elseif strcmp(command_str,'audiogram') %KH 10Jan2012
 elseif strcmp(command_str,'clickYes') %KH 10Jan2012
     Stimuli.clickYes = get(FIG.radio.clickYes,'value');
     FIG.NewStim = 16;
-    if NelData.General.RP2_3and4 && (~NelData.General.RX8)
-        if Stimuli.clickYes
-            run_invCalib(true); % Initialize with allpass RP2_3
-        else
-            run_invCalib(false); % Initialize with allpass RP2_3
-        end
+    %     Comment on Nov/5/19: added "invCalib" radio button.
+    % % %     if NelData.General.RP2_3and4
+    % % %         if Stimuli.clickYes
+    % % %             run_invCalib(true); % Initialize with allpass RP2_3
+    % % %         else
+    % % %             run_invCalib(false); % Initialize with allpass RP2_3
+    % % %         end
+    % % %     end
+    
+elseif strcmp(command_str,'Automate_Levels') %SP 24Jan2016
+    
+    FIG.NewStim = 17;
+    
+    
+    if (strcmp(get(FIG.push.Automate_Levels,'string'), 'Abort'))  % In Run-levels mode, go back to free-run
+        set(FIG.push.Automate_Levels,'Userdata','abort');  % so that "CAP_loop" knows an abort was requested.
+        set(FIG.push.close,'Enable','on');
+        set(FIG.push.forget_now,'Enable','on');
+    else
+        set(FIG.push.close,'Enable','off');
+        set(FIG.push.forget_now,'Enable','off');
     end
+    
+    
+elseif strcmp(command_str,'invCalib') %SP 24Jan2016
+    %%% Needs to be called whenever the frequency is changed!!!
+    %% ?SP? Should the whole thing be called everytime the frequency is changed or should it be saved?
+    
+    %%% Account for Calibration to set Level in dB SPL
+    
+    %     if ~exist('CalibData', 'var')
+    if NelData.General.RP2_3and4 && (~NelData.General.RX8)
+        [~, Stimuli.calibPicNum]= run_invCalib(get(FIG.radio.invCalib,'value'));
+    elseif isnan(Stimuli.calibPicNum)
+        cdd;
+        allCalibFiles= dir('*calib*raw*');
+        Stimuli.calibPicNum= getPicNum(allCalibFiles(end).name);
+        Stimuli.calibPicNum= str2double(inputdlg('Enter Calibration File Number','Load Calib File', 1,{num2str(Stimuli.calibPicNum)}));
+        rdd;
+    end
+
+    cdd;
+    x=loadpic(Stimuli.calibPicNum);
+    CalibData=x.CalibData(:,1:2);
+    CalibData(:,2)=trifilt(CalibData(:,2)',5)';
+    rdd;
+
+    Stimuli.MaxdBSPLCalib=CalibInterp(Stimuli.freq_hz/1000, CalibData);
+    set(FIG.asldr.SPL, 'string', sprintf('%.1f dB SPL', Stimuli.MaxdBSPLCalib-Stimuli.atten_dB));
+    
+    
     
 elseif strcmp(command_str,'close')
     if NelData.General.RP2_3and4 && (~NelData.General.RX8)
         run_invCalib(false); % Initialize with allpass RP2_3
     end
+    pathCell= regexp(path, pathsep, 'split');
+    if any(strcmpi([NelData.General.RootDir 'Users\SP\SP_nel_gui\'], pathCell))
+        rmpath([NelData.General.RootDir 'Users\SP\SP_nel_gui\']);
+    end
     set(FIG.push.close,'Userdata',1);
+    cd([NelData.General.RootDir 'Nel_matlab\nel_general']);
 end
-

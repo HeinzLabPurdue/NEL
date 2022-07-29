@@ -24,8 +24,8 @@ h_push_abort  = uicontrol(h_fig,'callback','distortion_product(''abort'');','sty
 h_push_stop = uicontrol(h_fig,'callback','distortion_product(''stop'');','style','pushbutton','Enable','off','Units','normalized', ...
    'position',[.41 .16 .08 .075],'string','Stop','Userdata',[],'fontsize',12,'fontangle','normal','fontweight','normal');
 
-h_push_close = uicontrol(h_fig,'callback','distortion_product(''close'');','style','pushbutton','Units','normalized', ...
-   'position',[.44 .0 .12 .075],'string','Close','fontsize',12,'fontangle','normal','fontweight','normal');
+% h_push_close = uicontrol(h_fig,'callback','distortion_product(''close'');','style','pushbutton','Units','normalized', ...
+%    'position',[.44 .0 .12 .075],'string','Close','fontsize',12,'fontangle','normal','fontweight','normal');
 
 
 h_ax1 = axes('position',[.1 .415-0.08 .8 .56+0.08]);	%se3 axis size to accommodate dimensions of image file
