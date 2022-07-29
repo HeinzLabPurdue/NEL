@@ -64,15 +64,26 @@ if ~strcmp(command_str,'initialize')		%you're returning via callback, retrieve f
     h_ax3   = handles(11);
     h_push_stop  = handles(12);
     h_push_start = handles(13);
-    h_push_close = handles(14);
-    h_push_params = handles(15);
-    h_push_saveNquit = handles(16);
-    h_push_restart = handles(17);
-    h_push_abort = handles(18);
-    h_text3b = handles(19);
-    h_text4b = handles(20);
-    h_text5b = handles(21);
-    h_text6b = handles(22);
+%     
+%     h_push_close = handles(14);
+%     h_push_params = handles(15);
+%     h_push_saveNquit = handles(16);
+%     h_push_restart = handles(17);
+%     h_push_abort = handles(18);
+%     h_text3b = handles(19);
+%     h_text4b = handles(20);
+%     h_text5b = handles(21);
+%     h_text6b = handles(22);
+    
+    %removed close button (AS/MH)
+    h_push_params = handles(14);
+    h_push_saveNquit = handles(15);
+    h_push_restart = handles(16);
+    h_push_abort = handles(17);
+    h_text3b = handles(18);
+    h_text4b = handles(19);
+    h_text5b = handles(20);
+    h_text6b = handles(21);
     
     dpoaedata= get(h_push_start,'Userdata');
     if NelData.General.RP2_3and4 || NelData.General.RX8 % if NEL1 || NEL2
@@ -113,8 +124,12 @@ if strcmp(command_str,'initialize')		   %initialize and display GUI
     eval('dpoaeplot');
     
     % put everything in a handle for the call back
+%     handles = [h_text1, h_text2, h_text3, h_text4, h_text5, h_text6, h_text7, h_ax1, h_line1, h_ax2, h_ax3, ...
+%         h_push_stop, h_push_start, h_push_close, h_push_params, h_push_saveNquit, h_push_restart, h_push_abort, ...
+%         h_text3b, h_text4b, h_text5b, h_text6b];
+
     handles = [h_text1, h_text2, h_text3, h_text4, h_text5, h_text6, h_text7, h_ax1, h_line1, h_ax2, h_ax3, ...
-        h_push_stop, h_push_start, h_push_close, h_push_params, h_push_saveNquit, h_push_restart, h_push_abort, ...
+        h_push_stop, h_push_start, h_push_params, h_push_saveNquit, h_push_restart, h_push_abort, ...
         h_text3b, h_text4b, h_text5b, h_text6b];
     set(h_fig,'Userdata',handles);
     %save the workspace so you can return to this point on callback from other functions
@@ -149,7 +164,7 @@ elseif strcmp(command_str,'return from parameter change')
     set(h_text6,'string', {PARAMS(10); PARAMS(12)});
     set(h_text6b,'string', {PARAMS(13); ear_txt});
     set(h_push_saveNquit,'Enable','off');
-    set(h_push_close,'Enable','on');
+    %set(h_push_close,'Enable','on');
     set(h_push_params,'Enable','on');
     
 elseif strcmp(command_str,'start')
@@ -163,7 +178,7 @@ elseif strcmp(command_str,'start')
     set(h_push_restart,'Enable','on');
     set(h_push_start,'Enable','off');
     set(h_push_saveNquit,'Enable','off');
-    set(h_push_close,'Enable','off');
+    %set(h_push_close,'Enable','off');
     set(h_push_params,'Enable','off');
     set(h_text3,'buttondownfcn','distortion_product(''change_levels/freqs'');');
     set(h_text4,'buttondownfcn','distortion_product(''change_levels/freqs'');');
