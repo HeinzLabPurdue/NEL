@@ -3,7 +3,7 @@ function h_fig = CAP(command_str)
 % ge debug ABR 26Apr2004: replace "CAP" with more generalized nomenclature, throughout entire system.
 
 global PROG FIG Stimuli CAP_Gating root_dir prog_dir NelData devices_names_vector Display
-global data_dir RunThroughABRFlag interface_type
+global data_dir RunThroughABRFlag CAP_interface_type
 
 % h_fig = findobj('Tag','CAP_Main_Fig'); % SP on 22Sep19: Moved to after
 % FIG is defined
@@ -20,7 +20,7 @@ if nargin < 1
 %     end
     
     
-    prog_dir = [root_dir 'CAP\'];
+    prog_dir = [root_dir 'AEP\'];
     
     PROG = struct('name','CAP(v1.ge_mh.1).m');  % modified by GE 26Apr2004.
     
@@ -45,17 +45,27 @@ if nargin < 1
         h_fig= h_fig(1);
     end
     
-
-    FIG.handle = figure('NumberTitle','off','Name','CAP Interface','Units','normalized','position',[0.045  0.013  0.9502  0.7474],...
-        'Visible','off','MenuBar','none','Tag','AEP_Main_Fig');
-
-    colordef none;
-    whitebg('w');
+    CAP_ins; 
     
-    CAP_loop_plot;
-    CAP('clickYes'); % Start invCalib = true or false based on default clickYes value
-    CAP_loop;
+    if strcmp(CAP_interface_type, 'CAP (fMask)')
+        fMaskCodesDir= [NelData.General.RootDir 'Nel_matlab\AEP\CAP\CAPfmasked'];
+        cd(fMaskCodesDir);
+        h_fig= fmaskedCAP();
+        cd(root_dir);
+        
+    else
+        FIG.handle = figure('NumberTitle','off','Name','CAP Interface','Units','normalized','position',[0.045  0.013  0.9502  0.7474],...
+            'Visible','off','MenuBar','none','Tag','AEP_Main_Fig');
+
+        colordef none;
+        whitebg('w');
+
+        CAP_loop_plot;
+        CAP('clickYes'); % Start invCalib = true or false based on default clickYes value
+        CAP_loop;
+    end
     
+%% callback functions: 
 elseif strcmp(command_str,'fast')
     if get(FIG.radio.fast, 'value') == 1
         FIG.NewStim = 4;

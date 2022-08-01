@@ -2,7 +2,7 @@
 
 global interface_type
 
-interface_type=questdlg('Select AEP Measure:','AEP','CAP','ABR','FFR','CAP'); %SP 30Jun2016
+interface_type=questdlg('Select AEP Measure:','AEP','CAP','ABR','FFR','ABR'); %SP 30Jun2016
 
 % Set up for specific AEP
 usr = NelData.General.User;
@@ -22,6 +22,7 @@ switch interface_type
     case 'FFR' 
          command_str='close';
     case 'CAP'
+        % could separate CAP type here 
         CAP_ins;
 end
      

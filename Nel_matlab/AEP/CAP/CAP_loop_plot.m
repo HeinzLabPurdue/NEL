@@ -38,15 +38,12 @@ FIG.radio.left   = uicontrol(FIG.handle,'callback','CAP(''left'');', 'style','ra
 FIG.radio.right  = uicontrol(FIG.handle,'callback','CAP(''right'');','style','radio','Enable','on','Units','normalized','position',[.125 .205 .08 .03],'string','Right Ear','fontsize',12,'BackgroundColor','w','value',1);
 FIG.radio.both   = uicontrol(FIG.handle,'callback','CAP(''both'');', 'style','radio','Enable','on','Units','normalized','position',[.125 .175 .08 .03],'string','Both Ears','fontsize',12,'BackgroundColor','w','value',0);
 
-if strcmp(interface_type,'ABR')
-    FIG.push.run_levels = uicontrol(FIG.handle,'callback','CAP(''run_levels'');','style','pushbutton','Units','normalized',...
-        'position',[.1 .726 .125 .09],'string','Run levels...','fontsize',12,'fontangle','normal','fontweight','normal');
-else
-    FIG.push.run_levels = uicontrol(FIG.handle,'callback','CAP(''run_levels'');','style','pushbutton','Units','normalized',...
-        'position',[.06 .726 .09 .09],'string','Run levels...','fontsize',12,'fontangle','normal','fontweight','normal');
-    FIG.push.run_audiogram = uicontrol(FIG.handle,'callback','CAP(''audiogram'');','style','pushbutton','Units','normalized',...
-        'position',[.18 .726 .09 .09],'string','Audiogram...','fontsize',12,'fontangle','normal','fontweight','normal'); %added by KH 05Jan2012
-end
+
+FIG.push.run_levels = uicontrol(FIG.handle,'callback','CAP(''run_levels'');','style','pushbutton','Units','normalized',...
+    'position',[.06 .726 .09 .09],'string','Run levels...','fontsize',12,'fontangle','normal','fontweight','normal');
+FIG.push.run_audiogram = uicontrol(FIG.handle,'callback','CAP(''audiogram'');','style','pushbutton','Units','normalized',...
+    'position',[.18 .726 .09 .09],'string','Audiogram...','fontsize',12,'fontangle','normal','fontweight','normal'); %added by KH 05Jan2012
+
 
 FIG.push.forget_now = uicontrol(FIG.handle,'callback','CAP(''forget_now'');','style','pushbutton','Units','normalized','position',[.07 .43 .125 .05],'string','Forget NOW','fontsize',12,'fontangle','normal','fontweight','normal');
 

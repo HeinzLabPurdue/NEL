@@ -1,4 +1,5 @@
 %global root_dir NelData
+global CAP_interface_type
 
 
 if Stimuli.clickYes==1  %KH 06Jan2012
@@ -45,7 +46,7 @@ if NelData.General.RP2_3and4 && (~NelData.General.RX8) % NEL1 with RP2 #3 & #4
     %     invoke(RP3,'ConnectRP2',NelData.General.TDTcommMode,3);
     RP3= connect_tdt('RP2', 3);
     invoke(RP3,'ClearCOF');
-    if contains(interface_type, {'CAP', 'ECochG'})
+    if contains(CAP_interface_type, {'CAP', 'ECochG'})
         invoke(RP3,'LoadCOF',[prog_dir '\object\CAP_ADC.rcx']);
         % Only difference: Input Channel number
         % For CAP: AD chan #2
@@ -72,7 +73,7 @@ elseif NelData.General.RX8  %NEL2 with RX8
     
     RP3= connect_tdt('RX8', 1);
     invoke(RP3,'ClearCOF');
-    if contains(interface_type, {'CAP', 'ECochG'})
+    if contains(CAP_interface_type, {'CAP', 'ECochG'})
         invoke(RP3,'LoadCOF',[prog_dir '\object\CAP_RX8_ADC_invCalib.rcx']);
         % Only difference: Input Channel number
         % For CAP: AD chan #2

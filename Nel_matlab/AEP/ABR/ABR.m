@@ -16,7 +16,7 @@ if nargin < 1
     checkbox = cell2struct(cell(1,1), {'fixedPhase'},2);
     statText  = cell2struct(cell(1,2),{'memReps','status'},2);
     fsldr = cell2struct(cell(1,4),{'slider','min','max','val'},2);
-    asldr = cell2struct(cell(1,4),{'slider','min','max','val'},2);
+    asldr = cell2struct(cell(1,5),{'slider','min','max','val', 'SPL'},2);
     ax = cell2struct(cell(1,2),{'axis','line'},2);
     FIG   = struct('handle',[],'edit',[],'push',push,'radio',radio,'checkbox',checkbox,'statText', statText,...
         'fsldr',fsldr,'asldr',asldr,'NewStim',0,'ax',ax);

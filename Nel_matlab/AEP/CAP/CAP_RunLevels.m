@@ -4,6 +4,7 @@
 % Script for Taking CAP data (Run Levels), called at "case 10" within CAP_loop
 %
 
+global CAP_interface_type
 
 % Setup panel for acquire/write mode:
 
@@ -153,7 +154,7 @@ if (bAbort == 0)
 end
 
 % Reset to "free running..." mode:
-set(FIG.statText.status, 'String', ['STATUS (' interface_type '): free running...']);
+set(FIG.statText.status, 'String', ['STATUS CAP: free running...']);
 CAP_set_attns(Stimuli.atten_dB,Stimuli.channel,Stimuli.KHosc,RP1,RP2);
 set(FIG.push.run_levels,'string','Run levels...');
 set(FIG.push.run_levels,'Userdata','');
