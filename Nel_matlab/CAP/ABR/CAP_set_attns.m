@@ -25,14 +25,24 @@ else
    devices = nel_devices_vector('1.1');
 end
 attens_devices = NaN(length(devices),2);
-if (bitget(ear,1)) % Left
+if (bitget(ear,1)) % Right
    attens_devices(:,2) = devices;
 end
-if (bitget(ear,2)) % Right
+if (bitget(ear,2)) % Left
    attens_devices(:,1) = devices;
 end
 attens_devices = attn * attens_devices;
 [select,connect,PAattns] = find_mix_settings(attens_devices);
+
+%hopefully works AS/MH/SH - 03/17/2023
+if(~bitget(ear,1)) %Right
+    %set left PA5-3 to 120 attn
+    PAattns(4) = 120;
+end
+if(~bitget(ear,2)) %Left
+    PAattns(3) = 120;
+end
+
 if (isempty(select))
    % nelerror('CAP: can''t find proper select/connect configuration');
    rc = 0;

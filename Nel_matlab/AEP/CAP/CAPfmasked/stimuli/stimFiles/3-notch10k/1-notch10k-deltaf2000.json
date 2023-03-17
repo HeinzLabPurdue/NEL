@@ -1,0 +1,30 @@
+{
+    "type":"noise-bands", 
+    "comment":"created with noiseBandMaskerDesigner", 
+    "n_bands":3, 
+    "bands":[
+        {
+            "amplitude":0.1, 
+            "fc_low":200, 
+            "fc_high":9000
+        }, 
+        {
+            "amplitude":0.0001, 
+            "fc_low":9000, 
+            "fc_high":11000
+        }, 
+        {
+            "amplitude":0.1, 
+            "fc_low":11000, 
+            "fc_high":12000
+        }
+    ], 
+    "name":"1-notch10k-deltaf2000", 
+    "wavefiles":{
+        "fs":48828, 
+        "duration_s":3, 
+        "filter_order":64, 
+        "filter_order_mult":2, 
+        "filename":"1-notch10k-deltaf2000_48828_128_3.wav"
+    }
+}

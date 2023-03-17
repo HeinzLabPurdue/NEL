@@ -1,0 +1,24 @@
+{
+    "type":"noise-bands", 
+    "comment":"created with noiseBandMaskerDesigner.m 21-Jan-2021", 
+    "n_bands":3, 
+    "bands":[
+        {
+            "amplitude":0.1, 
+            "fc_low":200, 
+            "fc_high":3400
+        }, 
+        {
+            "amplitude":1E-5, 
+            "fc_low":3400, 
+            "fc_high":4200
+        }, 
+        {
+            "amplitude":0.1, 
+            "fc_low":4200, 
+            "fc_high":12000
+        }
+    ], 
+    "name":"1-notch3800_bw800", 
+    "extra_atten_dB":0
+}
