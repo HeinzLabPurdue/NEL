@@ -150,7 +150,7 @@ while isempty(get(FIG.push.close,'Userdata'))
                 if ~firstSTIM
                     set(FIG.ax.line3,'ydata',FFRobs);
                     %KHZZ 2011 Nov 4 - artifact rejection while ensuring polarity remains the same
-                    stim_inv_pol = invoke(RP1,'GetTagVal','ORG');
+                    stim_inv_pol = invoke(RP1,'GetTagVal','ORG')
                     mod(misc.n,2);
                     if ((FFRobs <= Stimuli.threshV) && (stim_inv_pol == mod(misc.n,2)))
                         misc.n = mod(misc.n + 1,100);    % counter for stimuli for polarity zz 31oct11

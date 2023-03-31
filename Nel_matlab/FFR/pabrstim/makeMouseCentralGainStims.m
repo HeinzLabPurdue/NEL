@@ -4,7 +4,7 @@
 fs = 48828.125;
 fc_list = [500, 1000, 2000, 4000, 8000];
 burst_rate = 40;
-n_epochs = 1;
+n_epochs = 30;
 dur = 1.0;
 n_cycles_per_burst = 5;
 n_samps = floor(fs * dur);
