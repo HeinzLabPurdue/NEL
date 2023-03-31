@@ -126,10 +126,11 @@ elseif strcmp(command_str,'amtone')
    
    
    % 12/7/11: MH&KH: changed to pass Sampling rate as param - defined once in FFR_ins - needs to match RPvds code
-   [Stimuli.filename, fn_inv] = amtoneFFR(Stimuli.fc,Stimuli.fm,FFR_Gating.duration_ms/1000,Stimuli.pol,Stimuli.mod,Stimuli.RPsamprate_Hz);
-   set(FIG.wavfile.func,'string',Stimuli.filename);
-   copyfile(Stimuli.filename, [NelData.General.RootDir 'Nel_matlab\FFR\Signals\tone_org.wav'],'f');
-   copyfile(fn_inv, [NelData.General.RootDir 'Nel_matlab\FFR\Signals\tone_inv.wav'],'f');
+%    [Stimuli.filename, fn_inv,trains_amtone] = amtoneFFR(Stimuli.fc,Stimuli.fm,FFR_Gating.duration_ms/1000,Stimuli.pol,Stimuli.mod,Stimuli.RPsamprate_Hz);
+   [Stimuli.filename, fn_inv,trains_amtone] = amtoneFFR();
+   copyfile(Stimuli.filename, [NelData.General.RootDir 'Nel_matlab\FFR\Signals\tonepabr_org.wav'],'f');
+   copyfile(fn_inv, [NelData.General.RootDir 'Nel_matlab\FFR\Signals\tonepabr_inv.wav'],'f');
+   copyfile(trains_amtone, [NelData.General.RootDir 'Nel_matlab\FFR\Signals\trains_amtone_inv.mat'],'f');
 
 
 % WAV file loader, copies file from original location to default locaton
