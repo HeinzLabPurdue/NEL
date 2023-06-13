@@ -28,10 +28,12 @@ stim.noiseatt = 60:-6:0; %Note makeNBNoiseFFT returns RMS of -20 dB re: 1
 
 % stim.noiseatt = stim.noiseatt + 6; % WITH HB7 USING DIFFERENTIAL OUPUT
 stim.ThrowAway = 1;
- stim.Averages = 32;
+
+%TODO: Change back to 32 after debugging
+stim.Averages = 3;
 
 %stim.Averages = 9     
-%disp('CHANGED to 9 reps for testing***')
+disp('CHANGED to 3 reps for testing***')
 
 % stim.Averages = 10;
 stim.pad = 256; % Number of samples extra to read in after stim ends
