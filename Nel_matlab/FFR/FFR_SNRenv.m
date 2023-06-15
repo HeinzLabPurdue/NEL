@@ -29,7 +29,7 @@ if nargin < 1
     [FIG, h_fig]=get_FIG_ffr_srnenv(); % Initialize FIG
     
     if strcmp(usr,'JMR')
-        addpath([NelData.General.RootDir 'Users\JMR\FFR']);
+        addpath([NelData.General.RootDir 'Users\',usr,'\FFR']);
     end
     [misc, Stimuli, RunLevels_params, Display, interface_type]=FFR_SNRenv_ins(NelData); ...
         %#ok<ASGLU> % should already be populated by CAP_ins
