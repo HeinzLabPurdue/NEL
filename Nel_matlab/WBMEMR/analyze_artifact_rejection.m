@@ -4,7 +4,7 @@ if seefigure == 1
    %Figure for each loop
    figure(loop);
 else
-   close all;
+%    close all;
    figure(loop)
 end
 

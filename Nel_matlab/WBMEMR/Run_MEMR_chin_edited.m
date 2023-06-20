@@ -4,7 +4,7 @@ fig_num=99;
 GB_ch=2;
 FS_tag = 3;
 Fs = 48828.125;
-[f1RZ,RZ,~]=load_play_circuit_Nel2(FS_tag,fig_num,GB_ch);
+[f1RZ,RZ,~]=load_play_circuit_Nel1(FS_tag,fig_num,GB_ch);
 
 
 subj = input('Please subject ID:', 's');

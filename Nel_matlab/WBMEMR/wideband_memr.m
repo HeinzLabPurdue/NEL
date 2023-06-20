@@ -15,7 +15,7 @@ h_fig = findobj('Tag','WBMEMR_Main_Fig');    %% Finds handle for TC-Figure
 
 if nargin<1
     PARAMS = zeros(1,18);				%initialize before opening parameter files
-    PROG = 'DPOAErp2.m';						%program name is recorded in the data file
+    PROG = 'wbmemr.m';						%program name is recorded in the data file
     DATE = date;
     
     if NelData.General.RP2_3and4 
@@ -77,15 +77,16 @@ if strcmp(command_str,'start')
     
     %****** Data collection loop ******
     %    eval('dpoae','nelerror(lasterr); msdl(0);');   %% 11/30/18: VM/MH/SP: why msdl(0) used??  cut out.
-    eval('wbmemr_dummy','nelerror(lasterr);');
+%     eval('wbmemr','nelerror(lasterr);');
+     wbmemr;
     
 %     if strcmp(NelData.WBMEMR.rc,'restart')
-        wideband_memr('start');
+%         wideband_memr('start');
 %     end
-    
     
 elseif strcmp(command_str,'stop')
     set(h_push_stop,'Userdata','stop');
+    
     
 elseif strcmp(command_str,'restart')
     set(h_push_stop,'Userdata','restart');
@@ -93,6 +94,14 @@ elseif strcmp(command_str,'restart')
 elseif strcmp(command_str,'abort')
     set(h_push_stop,'Userdata','abort');
 
+elseif strcmp(command_str, 'close')
+    if NelData.General.RP2_3and4 || NelData.General.RX8
+        run_invCalib(false);
+    end
+    close('Wideband Middle Ear Muscle Reflex');
 
+elseif strcmp(command_str,'saveNquit')
+    set(h_push_stop,'Userdata','saveNquit');
+    
 end
 
