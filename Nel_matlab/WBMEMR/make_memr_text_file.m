@@ -14,7 +14,7 @@ x.General.comment       = 'FILL IN LATER';
 
 %saving important MEMR data
 x.stim = stim;
-if exists('stim_AR',1)
+if exist('stim_AR','var')
     x.stim_AR = stim_AR;
 end 
 

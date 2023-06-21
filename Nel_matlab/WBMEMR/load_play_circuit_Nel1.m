@@ -11,7 +11,7 @@ function [f1,RP,FS]=load_play_circuit_Nel1(FS_tag,fig_num,GB_ch)
 warning('off'); 
 
 global NelData
-CIR_PATH='BasicPlay_OAE_Nel1.rcx'; %The *.rco circuit used to play the files
+CIR_PATH='C:\NEL\Nel_matlab\WBMEMR\BasicPlay_OAE_Nel1.rcx'; %The *.rco circuit used to play the files
 
 % DPOAE - Build config structures [1st number is LEFT channel; 2nd number is RIGHT channel in TDT]
 % RP2-1-out1 is NOT USED
@@ -56,7 +56,7 @@ end
 % RPco1=actxcontrol('RPco.x',[0 0 1 1]);
 % invoke(RPco1, 'ConnectRP2',NelData.General.TDTcommMode,1);
 [RPco1, rc]= connect_tdt('RP2', 1);
-rc = rc & invoke(RPco1,'LoadCof',['blank_left.rcx']);
+rc = rc & invoke(RPco1,'LoadCof',['C:\NEL\Nel_matlab\WBMEMR\blank_left.rcx']);
 rc = rc & invoke(RPco1,'SetTagVal','Select_L',config.sel(left_SB));
 rc = rc & invoke(RPco1,'SetTagVal','Connect_L',config.conn(left_SB));
 rc = rc & invoke(RPco1,'Run');

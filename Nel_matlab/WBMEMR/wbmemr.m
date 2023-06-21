@@ -213,7 +213,6 @@ switch NelData.WBMEMR.rc
             [filename, shortfname] = current_data_file('memr',1);
             make_memr_text_file;
             text_str = sprintf('%s %s','Saved data file: ',shortfname);
-            set(h_text7,'String',text_str,'FontSize',10);
 %             update_dpoae_params;
             filename = current_data_file('memr',1);
             %set(h_push_close,'Enable','off');
@@ -224,14 +223,14 @@ switch NelData.WBMEMR.rc
         
         set(h_push_restart,'Enable','on');
         set(h_push_abort,'Enable','on');
-        set(h_push_params,'Enable','on');
+%         set(h_push_params,'Enable','on');
 
         while isempty(get(h_push_stop,'Userdata')) % Wait for user to do something else
             pause(.1)
         end
         
-        set(h_ax1,'ButtonDownFcn','')
-        set(h_line1,'ButtonDownFcn','')
+%         set(h_ax1,'ButtonDownFcn','')
+%         set(h_line1,'ButtonDownFcn','')
         NelData.WBMEMR.rc=get(h_push_stop,'Userdata');
         set(h_push_stop,'Userdata',[]);
         
@@ -241,7 +240,7 @@ switch NelData.WBMEMR.rc
         
         switch NelData.WBMEMR.rc
             case 'abort'
-                distortion_product('close');
+                wideband_memr('close');
                 return;
             case 'restart'
                 return;
@@ -254,7 +253,7 @@ switch NelData.WBMEMR.rc
                 set(h_push_restart,'Enable','off');
                 set(h_push_abort,'Enable','on');
                 set(h_push_saveNquit,'Enable','off');
-                set(h_push_params,'Enable','off');
+%                 set(h_push_params,'Enable','off');
                 
                 dlg_pos=[40.9600   1.5  122.8800   15.5000];
                 
