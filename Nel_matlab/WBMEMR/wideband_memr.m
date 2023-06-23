@@ -10,10 +10,10 @@ global PARAMS PROG VERSION VOLTS
 global root_dir NelData
 
 
-
 h_fig = findobj('Tag','WBMEMR_Main_Fig');    %% Finds handle for TC-Figure
 
 if nargin<1
+    disp('no command string!');
     PARAMS = zeros(1,18);				%initialize before opening parameter files
     PROG = 'wbmemr.m';						%program name is recorded in the data file
     DATE = date;
@@ -24,10 +24,8 @@ if nargin<1
         VERSION = 'NEL2';
     end
     
-    MicGain = 40;
-    
-    MicGain = inputdlg('What is the microphone gain?','Mic Gain',1,{num2str(MicGain)});
-    MicGain = str2double(MicGain{1});
+    %this starts the initialize process similar to that in
+    %distortion_product.m
     
     if (ishandle(h_fig))
         delete(h_fig);
@@ -41,49 +39,42 @@ if nargin<1
     
     eval('memrplot');
     
-%     run_invCalib(true); % DPOAEs play 2 tones: easier to use raw-calib file with an allpass system;     
-    
     handles = [h_push_stop, h_push_saveNquit, h_push_restart, h_push_abort];
     set(h_fig,'Userdata',handles);
     %save the workspace so you can return to this point on callback from other functions
 %     feval('save',fullfile(root_dir,'DPOAE','workspace','dpoaebjm'),'PARAMS','PROG','VERSION');
 %     set(h_fig,'Visible','on');
-    
 
     wideband_memr('start'); % Auto start
     command_str = 'initialize'; %set command string to initialize graphic interface    
-end
-
-if ~strcmp(command_str,'initialize')
+else
     handles = get(h_fig,'Userdata');
     h_push_stop = handles(1);
     h_push_saveNquit = handles(2);
     h_push_restart = handles(3);
     h_push_abort = handles(4);
+    
+    disp(command_str)
 end
 
 if strcmp(command_str,'start')
     
-    
-    set(h_push_stop,'Enable','on');
+    set(h_push_stop,'Enable','off'); %Functionally unused, but userdata holds command stringss
     set(h_push_abort,'Enable','on');
     set(h_push_restart,'Enable','on');
-    set(h_push_saveNquit,'Enable','off');
+    set(h_push_saveNquit,'Enable','on');
     
     error = 0;
     
       set(h_push_stop,'Userdata',[]);
 %     set(h_push_start,'Userdata',dpoaedata);
-    
-    %****** Data collection loop ******
-    %    eval('dpoae','nelerror(lasterr); msdl(0);');   %% 11/30/18: VM/MH/SP: why msdl(0) used??  cut out.
-%     eval('wbmemr','nelerror(lasterr);');
      wbmemr;
     
-%     if strcmp(NelData.WBMEMR.rc,'restart')
-%         wideband_memr('start');
-%     end
-    
+    if strcmp(NelData.WBMEMR.rc,'restart')
+        wideband_memr('start');
+    end    
+    wideband_memr('close');
+
 elseif strcmp(command_str,'stop')
     set(h_push_stop,'Userdata','stop');
     
@@ -93,11 +84,11 @@ elseif strcmp(command_str,'restart')
     
 elseif strcmp(command_str,'abort')
     set(h_push_stop,'Userdata','abort');
-
+    
 elseif strcmp(command_str, 'close')
-    if NelData.General.RP2_3and4 || NelData.General.RX8
-        run_invCalib(false);
-    end
+%     if NelData.General.RP2_3and4 || NelData.General.RX8
+%         run_invCalib(false);
+%     end
     close('Wideband Middle Ear Muscle Reflex');
 
 elseif strcmp(command_str,'saveNquit')

@@ -11,7 +11,7 @@ if ~exist('rawstim', 'var')
     stim.fc = 4500; % 1 - 8 kHz
     stim.bw = 8000;
     stim.noiseramp = 5;
-    stim.nreps = 7; % How many reps per trial
+    stim.nreps = 3; % How many reps per trial
 else
     stim = rawstim;
 end
@@ -21,7 +21,7 @@ stim.clickatt = 12;
 % stim.clickatt = stim.clickatt + 6; % WITH HB7 USING DIFFERENTIAL OUPUT
 stim.noiseatt = 60:-6:0; %Note makeNBNoiseFFT returns RMS of -20 dB re: 1
 % stim.noiseatt = 42:-6:0; %Note makeNBNoiseFFT returns RMS of -20 dB re: 1
-% stim.noiseatt = 6:-6:0; %Note makeNBNoiseFFT returns RMS of -20 dB re: 1
+stim.noiseatt = 6:-6:0; %Note makeNBNoiseFFT returns RMS of -20 dB re: 1
 
 
 % stim.noiseatt = fliplr(stim.noiseatt(end-4:end));

@@ -12,7 +12,7 @@ Channel = 1; %??? AS
 
 %Insert NEL/GUI Parameters here...none for WBMEMR
 
-NelData.MEMR.rc = 'start';
+% NelData.WBMEMR.rc = 'start';
 %% Calibration
 
 %default WBMEMR calib...needs improvement
@@ -68,6 +68,7 @@ uiwait(warndlg('Set ER-10B+ GAIN to 40 dB','SET ER-10B+ GAIN WARNING','modal'));
 stim = makeMEMRstim_500to8500Hz;
 stim.subj = subj;
 stim.ear = ear;
+stim.mic_gain = mic_gain;
 
 pause(3);
 
@@ -85,10 +86,23 @@ stim.resp = zeros(stim.nLevels, stim.Averages, stim.nreps, resplength);
 % *1) re-order stim presentation
 % *2) way to exit data collection (Fig: KeyPressfnc)
 % *3) plot at end of each 3rd rep (after throw away)
-continueDATA=1;
-h=figure('KeyPressFcn','continueDATA=0');
-disp('Press any key in FIG to STOP data collection')
+
+%Hannah's old loop stopping 
+% continueDATA=1;
+% h=figure('KeyPressFcn','continueDATA=0');
+% disp('Press any key in FIG to STOP data collection')
+
+
 AR = 0; %0=No Artifact rejection, 1=Do Artifact rejection
+
+%NEEDS TO BE CLEANED UP ASAP. 
+% 1. run_invCalib needs cleaned up...currently clunky
+% 2. Need calibration to be correct for MEMR (currently all pass, w/o calib)
+
+[~, calibPicNum, ~] = run_invCalib(false);
+[coefFileNum, ~, ~] = run_invCalib(-2);
+
+coefFileNum = NaN;
 
 for nTRIALS = 1: (stim.Averages + stim.ThrowAway) 
     for L = 1:stim.nLevels
@@ -128,18 +142,39 @@ for nTRIALS = 1: (stim.Averages + stim.ThrowAway)
             % Get ready for next trial
             invoke(RP, 'SoftTrg', 8); % Reset OAE buffer
             
-            fprintf(1, 'Done with Level #%d, Trial # %d \n', L, nTRIALS);
+            fprintf(1, 'Done with Level #%d, Trial # %d, Rep #%d\n', L, nTRIALS,k);
         end
         
-        if ~continueDATA
-            break
+        
+        ud_status = get(h_push_stop,'Userdata');
+        
+        if strcmp(ud_status,'abort')
+            break;
         end
+%         if ~continueDATA
+%             break
+%         end
         
     end  % levels
     pause(2);
-    if ~continueDATA
-        break
+    
+    ud_status = get(h_push_stop,'Userdata');
+    
+    if ~isempty(ud_status)
+        switch ud_status
+            case 'stop'
+                return;
+            case 'saveNquit'
+                break;
+            case 'abort'
+                break;
+        end
     end
+    
+%     
+%     if ~continueDATA
+%         break
+%     end
     
     if nTRIALS>stim.ThrowAway
         if ~rem((nTRIALS-stim.ThrowAway),3)
@@ -153,11 +188,33 @@ for nTRIALS = 1: (stim.Averages + stim.ThrowAway)
     
 end
 
-stim.mat2Pa = 1 / (DR_onesided * mic_gain * mic_sens * P_ref);
+%gets the last button command
+
+if ~isempty(ud_status)
+    NelData.WBMEMR.rc = ud_status;
+else
+    NelData.WBMEMR.rc = 'saveNquit';
+end
+
+
+
+
+%% Shut Down TDT, no matter what button pushed, or if ended naturally
+close_play_circuit(f1RP, RP);
+for atten_num = 1:4
+    %     invoke(PAco1,'ConnectPA5',NelData.General.TDTcommMode,atten_num);
+    PAco1= connect_tdt('PA5', atten_num);
+    invoke(PAco1,'SetAtten',120.0);
+end
+run_invCalib(false);
+
+if strcmp(NelData.WBMEMR.rc,'abort')
+    return;
+end
 
 %% Set up data structure to save
+stim.mat2Pa = 1 / (DR_onesided * mic_gain * mic_sens * P_ref);
 stim.date = datestr(clock);
-
 
 %artifact rejection
 answer = questdlg('Would you like to perform artifact rejection?'...
@@ -175,20 +232,14 @@ switch answer
     case {'No'}
         %Completed, do nothing
 end
+
 warning('off');
 %% Right place to do this?
 
-if (isempty(get(h_push_stop,'UserData')))  %% Went through all freqs, i.e., finished on its own
-    set(h_push_stop,'Userdata','stop');
-end
-NelData.WBMEMR.rc=get(h_push_stop,'Userdata');
-%% Shut down TDT
-close_play_circuit(f1RP, RP);
-for atten_num = 1:4
-    %     invoke(PAco1,'ConnectPA5',NelData.General.TDTcommMode,atten_num);
-    PAco1= connect_tdt('PA5', atten_num);
-    invoke(PAco1,'SetAtten',120.0);
-end
+% if (isempty(get(h_push_stop,'UserData')))  %% Went through all freqs, i.e., finished on its own
+%     set(h_push_stop,'Userdata','stop');
+% end
+
 
 %% Communicate closing with GUI and Nel_App
 %communicate with GUI
@@ -196,18 +247,19 @@ set(h_push_stop,'Enable','off');
 set(h_push_restart,'Enable','off');
 set(h_push_abort,'Enable','off');
 set(h_push_saveNquit,'Enable','off');
+% wideband_memr('close');
 
 %% Big Switch case to handle end of data collection
 
 switch NelData.WBMEMR.rc
-    case 'abort'
-        wideband_memr('close');
-        return;
+%     case 'abort'
+%         wideband_memr('close');
+%         return;
     case 'restart'
         return;
     case 'stop'
         last_stim=nTRIALS;
-        
+         
         if last_stim == stim.Averages + stim.ThrowAway
             %run save...all frequencies are run, ended naturally
             [filename, shortfname] = current_data_file('memr',1);
@@ -238,40 +290,30 @@ switch NelData.WBMEMR.rc
         h = msgbox('Please remember to turn off the microphone');
         uiwait(h);
         
-        switch NelData.WBMEMR.rc
-            case 'abort'
-                wideband_memr('close');
-                return;
-            case 'restart'
-                return;
-%             case 'params'
-%                 h_dpoae_params = view_dpoae_params;
-%                 uiwait(h_dpoae_params);
-%                 distortion_product('start');
-%                 return;
-            case 'saveNquit'
-                set(h_push_restart,'Enable','off');
-                set(h_push_abort,'Enable','on');
-                set(h_push_saveNquit,'Enable','off');
+        %needed?
+%         wideband_memr('close');
+        case 'saveNquit'
+            set(h_push_restart,'Enable','off');
+            set(h_push_abort,'Enable','on');
+            set(h_push_saveNquit,'Enable','off');
 %                 set(h_push_params,'Enable','off');
-                
-                dlg_pos=[40.9600   1.5  122.8800   15.5000];
-                
-                % add in comment ability later...
-                % comment=NelData.File_Manager.unit.comment;
-                comment='NOTHING FOR NOW';
-                
-                [filename, shortfname] = current_data_file('memr',1);
-                make_memr_text_file;
-                text_str = sprintf('%s %s','Saved data file: ',shortfname);
-                set(h_text7,'String',text_str,'FontSize',10);
-%                 update_dpoae_params;
-                filename = current_data_file('memr',1);
-                %set(h_push_close,'Enable','on');
-                %uiresume;
-                wideband_memr('close');
-                return;
-        end
+
+            dlg_pos=[40.9600   1.5  122.8800   15.5000];
+
+            % add in comment ability later...
+            % comment=NelData.File_Manager.unit.comment;
+            comment='NOTHING FOR NOW';
+
+            [filename, shortfname] = current_data_file('memr',1);
+            make_memr_text_file;
+%             text_str = sprintf('%s %s','Saved data file: ',shortfname);
+% %                 update_dpoae_params;
+            filename = current_data_file('memr',1);
+            %set(h_push_close,'Enable','on');
+            %uiresume;
+            wideband_memr('close');
+            return;
+       
 end
 
 
