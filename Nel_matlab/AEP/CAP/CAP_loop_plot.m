@@ -8,22 +8,27 @@ FIG.radio.fast   = uicontrol(FIG.handle,'callback','CAP(''fast'');','style','rad
 FIG.radio.slow   = uicontrol(FIG.handle,'callback','CAP(''slow'');','style','radio','Enable','on','Units','normalized','position',[.125 .285 .08 .03],'string','Slow','fontsize',12,'BackgroundColor','w');
 FIG.checkbox.fixedPhase = uicontrol(FIG.handle, 'callback', 'CAP(''fixedPhase'');','style','checkbox','Enable','on','Units','normalized','position',[.125 .365 .09 .03],'string','fixedPhase','fontsize',12,'BackgroundColor','w','value',Stimuli.fixedPhase);
 FIG.push.close   = uicontrol(FIG.handle,'callback','CAP(''close'');','style','pushbutton','Units','normalized','position',[.1 .6 .125 .09],'string','Close','fontsize',12,'fontangle','normal','fontweight','normal');
-FIG.fsldr.slider = uicontrol(FIG.handle,'callback','CAP(''slide_freq'');','style','slider','SliderStep',[0.001 0.01],'Enable','on','min',100,'max',1000,'Units','normalized','position',[.35 .175 .525 .04],'Value',Stimuli.freq_hz/Stimuli.fmult);
 
 FIG.radio.clickYes = uicontrol(FIG.handle,'callback','CAP(''clickYes'');','style','radio','Enable','on','Units','normalized','position',[.89 .175 .08 .03],'string','Click','fontsize',12,'BackgroundColor','w','value',Stimuli.clickYes); %added by KH 06Jan2012
 
+FIG.fsldr.slider = uicontrol(FIG.handle,'callback','CAP(''slide_freq'');','style','slider','SliderStep',[0.001 0.01],'Enable','on','min',100,'max',1000,'Units','normalized','position',[.35 .175 .525 .04],'Value',Stimuli.freq_hz/Stimuli.fmult);
 FIG.fsldr.min    = uicontrol(FIG.handle,'style','text','string',num2str(get(FIG.fsldr.slider,'min')),'backgroundcolor',[1 1 1],'Units','normalized','position',[.33 .14 .05 .03],'fontsize',10);
 FIG.fsldr.max    = uicontrol(FIG.handle,'style','text','string',num2str(get(FIG.fsldr.slider,'max')),'backgroundcolor',[1 1 1],'Units','normalized','position',[.835 .14 .05 .03],'fontsize',10,'horizontalalignment','right');
 % LQ 01/31/05 add callback
 %FIG.fsldr.val    = uicontrol(FIG.handle,'style','edit','Units','normalized','position',[.5825 .175 .06 .04],'string',num2str(Stimuli.freq_hz),'fontsize',12);
 FIG.fsldr.val    = uicontrol(FIG.handle,'style','edit','Units','normalized','position',[.5825 .175 .06 .04],'string',num2str(Stimuli.freq_hz),'fontsize',12,'callback', 'CAP(''slide_freq_text'');');
-FIG.asldr.slider = uicontrol(FIG.handle,'callback','CAP(''slide_atten'');','style','slider','SliderStep',[1/120 5/120],'Enable','on','min',-120,'max',0,'Units','normalized','position',[.35 .075 .525 .04],'Value',-Stimuli.atten_dB);
+
+FIG.asldr.slider = uicontrol(FIG.handle,'callback','CAP(''slide_atten'');','style','slider','SliderStep',[1/120 5/120],'Enable','on','min',-120,'max',0,'Units','normalized','position',[.35 .075 .525 .04],'value',-Stimuli.atten_dB);
 FIG.asldr.min    = uicontrol(FIG.handle,'style','text','string',num2str(get(FIG.asldr.slider,'min')),'backgroundcolor',[1 1 1],'Units','normalized','position',[.33 .04 .05 .03],'fontsize',10);
 FIG.asldr.max    = uicontrol(FIG.handle,'style','text','string',num2str(get(FIG.asldr.slider,'max')),'backgroundcolor',[1 1 1],'Units','normalized','position',[.825 .04 .05 .03],'fontsize',10,'horizontalalignment','right');
 % LQ 01/31/05 add callback
 %FIG.asldr.val    = uicontrol(FIG.handle,'style','edit','Units','normalized','Userdata',Stimuli.atten_dB,'position',[.5825 .075 .06 .04],'string',num2str(-Stimuli.atten_dB),'fontsize',12);
 FIG.asldr.val    = uicontrol(FIG.handle,'style','edit','Units','normalized','Userdata',Stimuli.atten_dB,'position',[.5825 .075 .06 .04],'string',num2str(-Stimuli.atten_dB),'fontsize',12,'callback', 'CAP(''slide_atten_text'');');
-% FIG.edit         = uicontrol(FIG.handle,'Visible','off','style','edit','Units','normalized','position',[.12 .75 .1 .04],'string',num2str(UNIT),'fontsize',14);
+FIG.asldr.SPL    = uicontrol(FIG.handle,'style','text','string',sprintf('%.1f dB SPL',120+get(FIG.asldr.slider,'Value')),...
+    'backgroundcolor',[1 1 1],'Units','normalized','position',[.9 .06 .1 .03],'fontsize',10,'horizontalalignment','right');
+
+
+FIG.edit         = uicontrol(FIG.handle,'Visible','off','style','edit','Units','normalized','position',[.12 .75 .1 .04],'string',num2str(UNIT),'fontsize',14);
 FIG.statText.memReps =  uicontrol(FIG.handle, 'callback', '', 'style', 'text','Units','normalized', 'position', [.05 .49 .12 .03], 'string', 'Forget Time (reps):','fontsize',12,'BackgroundColor','w');   % added by GE 17Jan2003.
 FIG.edit.memReps = uicontrol(FIG.handle,'callback','CAP(''memReps'');','style','edit','Units','normalized','position',[.18 .49 .04 .04],'string',Stimuli.CAPmem_reps,'fontsize',12);
 FIG.statText.threshV =  uicontrol(FIG.handle, 'callback', '', 'style', 'text','Units','normalized', 'position', [.05 .54 .12 .03], 'string', 'Reject thresh (V):','fontsize',12,'BackgroundColor','w');   % added by kh 2011Jun08
