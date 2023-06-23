@@ -57,7 +57,7 @@ for zfrequency = frequencies %New outer loop, KH 10Jan2012
         CAPattens{attenIND}=attenLevel;
         %   disp(attenLevel);
         %set(FIG.statText.status, 'String', sprintf('STATUS: averaging at %dHz, -%ddB...', zfrequency, attenLevel));
-        CAP_set_attns(attenLevel,Stimuli.channel,Stimuli.KHosc,RP1,RP2);
+        AEP_set_attns(attenLevel,Stimuli.channel,Stimuli.KHosc,RP1,RP2);
         
         set(FIG.asldr.val, 'string', ['-' num2str(attenLevel)]);
         set(FIG.asldr.SPL,'string',sprintf('%.1f dBSPL',Stimuli.MaxdBSPLCalib-attenLevel));
@@ -280,7 +280,7 @@ end
 
 % Reset to "free running..." mode:
 set(FIG.statText.status, 'String', ['STATUS ABR: free running...']);
-CAP_set_attns(Stimuli.atten_dB,Stimuli.channel,Stimuli.KHosc,RP1,RP2);
+AEP_set_attns(Stimuli.atten_dB,Stimuli.channel,Stimuli.KHosc,RP1,RP2);
 set(FIG.push.run_levels,'string','Run levels...');
 set(FIG.push.run_levels,'Userdata','');
 set(FIG.push.close,'Enable','on');

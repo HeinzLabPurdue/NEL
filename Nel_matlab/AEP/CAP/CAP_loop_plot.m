@@ -62,10 +62,10 @@ FIG.edit.yscale     = uicontrol(FIG.handle,'callback','CAP(''YLim'');','style','
 % if (isempty(strmatch('KH-oscillator', devices_names_vector,'exact')))
 %     set(FIG.radio.khite,'Enable','off');
 % end
-if (CAP_set_attns(0,1,0) == 0)
+if (AEP_set_attns(0,1,0) == 0)
     set(FIG.radio.left,'Enable','off');
 end    
-if (CAP_set_attns(0,2,0) == 0)
+if (AEP_set_attns(0,2,0) == 0)
     set(FIG.radio.right,'Enable','off');
 end
 set(FIG.handle,'Userdata',struct('handles',FIG));

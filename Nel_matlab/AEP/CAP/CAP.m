@@ -47,7 +47,7 @@ if nargin < 1
     
     CAP_ins; 
     
-    if strcmp(CAP_interface_type, 'CAP (fMask)')
+    if strcmp(CAP_interface_type, 'CAP (fMask)') % for FD's special version. Freezes NEL right now 6/23/23 SH. Not closing right. 
         fMaskCodesDir= [NelData.General.RootDir 'Nel_matlab\AEP\CAP\CAPfmasked'];
         cd(fMaskCodesDir);
         h_fig= fmaskedCAP();

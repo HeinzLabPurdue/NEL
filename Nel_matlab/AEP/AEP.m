@@ -2,7 +2,7 @@ function h_fig = AEP(command_str)
 
 % ge debug ABR 26Apr2004: replace "CAP" with more generalized nomenclature, throughout entire system.
 
-global PROG FIG Stimuli CAP_Gating root_dir prog_dir NelData devices_names_vector Display
+global PROG FIG Stimuli CAP_Gating root_dir prog_dir NelData devices_names_vector Display interface_type
 global data_dir
 % global RunThroughABRFlag
 
@@ -80,13 +80,7 @@ if nargin < 1
     
     
 % 
-%     % Francois Deloche specific CAP 
-%     if strcmp(CAP_interface_type, 'CAP (fMask)')
-%         fMaskCodesDir= [NelData.General.RootDir 'Nel_matlab\AEP\CAP\CAPfmasked'];
-%         cd(fMaskCodesDir);
-%         h_fig= fmaskedCAP();
-%         cd(root_dir);
-%     end
+
 %      
 %    if strcmp(interface_type, 'FFR')
 %         interface_type=questdlg('Which FFR:','','FFR','SFR','SFR_pink','SFR');
@@ -205,8 +199,6 @@ elseif strcmp(command_str,'both')
         set(FIG.radio.both,'value',1);
     end
 
-
-    
 elseif strcmp(command_str,'slide_freq')
     FIG.NewStim = 6;
     Stimuli.freq_hz = floor(get(FIG.fsldr.slider,'value')*Stimuli.fmult);

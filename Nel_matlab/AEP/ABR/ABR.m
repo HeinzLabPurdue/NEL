@@ -2,7 +2,7 @@ function h_fig = ABR(command_str)
 % TODO:  make sure stay within this abr file (callbacks)
 % ge debug ABR 26Apr2004: replace "CAP" with more generalized nomenclature, throughout entire system.
 
-global PROG FIG Stimuli CAP_Gating root_dir prog_dir NelData devices_names_vector Display
+global PROG FIG Stimuli CAP_Gating root_dir prog_dir NelData devices_names_vector Display interface_type
 global data_dir picstoSEND_deBUG picstoSEND dBSPLlist picNUMlist FLAG_RERUN_FOR_ABR_ANALYSIS CalibFileNum  CalibFileRefresh
 FLAG_RERUN_FOR_ABR_ANALYSIS=0;
 
@@ -29,7 +29,7 @@ if nargin < 1
     
     ABR_ins; % This contains the parameters for running 2ch ABR
     
-    FIG.handle = figure('NumberTitle','off','Name','CAP Interface','Units','normalized','position',[0.045  0.013  0.9502  0.7474],...
+    FIG.handle = figure('NumberTitle','off','Name','ABR Interface','Units','normalized','position',[0.045  0.013  0.9502  0.7474],...
         'Visible','off','MenuBar','none','Tag','AEP_Main_Fig');
 
     colordef none;

@@ -84,7 +84,7 @@ invoke(RP3,'SetTagVal','ADdur', CAP_Gating.CAPlength_ms);
 invoke(RP3,'Run');
 Stimuli.RPsamprate_Hz= RP3.GetSFreq; % 12207.03125;  % Hard coded for now, eventually get from RP
 
-CAP_set_attns(Stimuli.atten_dB,Stimuli.channel,Stimuli.KHosc,RP1,RP2);  %% debug deal with later Khite
+AEP_set_attns(Stimuli.atten_dB,Stimuli.channel,Stimuli.KHosc,RP1,RP2);  %% debug deal with later Khite
 CAPnpts=floor(CAP_Gating.CAPlength_ms/1000*Stimuli.RPsamprate_Hz); % SP: Changed from ceil to floor on 21Aug19: one extra point was collected in ABR serial buffer
 if Stimuli.CAPmem_reps>0
     CAP_memFact=exp(-1/Stimuli.CAPmem_reps);
@@ -268,12 +268,12 @@ while isempty(get(FIG.push.close,'Userdata'))
                 case 1
                     invoke(RP1,'SetTagVal','freq',Stimuli.freq_hz);
                     invoke(RP1,'SetTagVal','tone',1);
-                    CAP_set_attns(Stimuli.atten_dB,Stimuli.channel,Stimuli.KHosc,RP1,RP2);
+                    AEP_set_attns(Stimuli.atten_dB,Stimuli.channel,Stimuli.KHosc,RP1,RP2);
                 case 2
                     invoke(RP1,'SetTagVal','tone',0);
-                    CAP_set_attns(Stimuli.atten_dB,Stimuli.channel,Stimuli.KHosc,RP1,RP2);
+                    AEP_set_attns(Stimuli.atten_dB,Stimuli.channel,Stimuli.KHosc,RP1,RP2);
                 case 3
-                    CAP_set_attns(Stimuli.atten_dB,Stimuli.channel,Stimuli.KHosc,RP1,RP2);
+                    AEP_set_attns(Stimuli.atten_dB,Stimuli.channel,Stimuli.KHosc,RP1,RP2);
                 case 4
                     invoke(RP1,'SetTagVal','StmOn',CAP_Gating.duration_ms);
                     invoke(RP1,'SetTagVal','StmOff',CAP_Gating.period_ms-CAP_Gating.duration_ms);
@@ -283,11 +283,11 @@ while isempty(get(FIG.push.close,'Userdata'))
                     FIG.NewStim = 0;
                     break
                 case 5
-                    CAP_set_attns(Stimuli.atten_dB,Stimuli.channel,Stimuli.KHosc,RP1,RP2);
+                    AEP_set_attns(Stimuli.atten_dB,Stimuli.channel,Stimuli.KHosc,RP1,RP2);
                 case 6
                     invoke(RP1,'SetTagVal','freq',Stimuli.freq_hz);
                 case 7
-                    CAP_set_attns(Stimuli.atten_dB,Stimuli.channel,Stimuli.KHosc,RP1,RP2);
+                    AEP_set_attns(Stimuli.atten_dB,Stimuli.channel,Stimuli.KHosc,RP1,RP2);
                 case 8
                     invoke(RP1,'SetTagVal','FixedPhase',Stimuli.fixedPhase);
                 case 9
@@ -541,7 +541,7 @@ while isempty(get(FIG.push.close,'Userdata'))
 end
 
 Stimuli.KHosc = 0;    % added by GE/MH, 17Jan2003.  To force Krohn-Hite to disconnect.
-CAP_set_attns(120,Stimuli.channel,Stimuli.KHosc,RP1,RP2);
+AEP_set_attns(120,Stimuli.channel,Stimuli.KHosc,RP1,RP2);
 rc = PAset([120;120;120;120]); % added by GE/MH, 17Jan2003.  To force all attens to 120
 
 invoke(RP1,'Halt');
