@@ -22,7 +22,7 @@ CIR_PATH='C:\NEL\Nel_matlab\WBMEMR\BasicPlay_OAE_Nel1.rcx'; %The *.rco circuit u
 % DPOAE - Set left/right SwitchBox (SB) parameters [ear not USED]
 left_SB  = 1;
 right_SB = 2;
-config = struct('atten',[1 1],'sel',[5 0],'conn',[2 1]); %[1st number is lEFT channel; 2nd number is RIGHT channel in TDT]
+config = struct('atten',[1 1],'sel',[5 0],'conn',[2 1]); %[1st number is lEFT channel; 2nd number is RIGHT channel in TDT; sel and conn are NEL mixer/selector bits to get wiring right ]
 
 %Generate the actx control window in a specified figure:
 %-------------------------------------------------------
@@ -61,7 +61,7 @@ rc = rc & invoke(RPco1,'SetTagVal','Select_L',config.sel(left_SB));
 rc = rc & invoke(RPco1,'SetTagVal','Connect_L',config.conn(left_SB));
 rc = rc & invoke(RPco1,'Run');
 if (rc ~= 1)
-    nelerror('dpoae.m: can''t load circuit to 1st RP2');
+    nelerror('wbmemr.m: can''t load circuit to 1st RP2');
 end
 
 % End of load_play_circuit

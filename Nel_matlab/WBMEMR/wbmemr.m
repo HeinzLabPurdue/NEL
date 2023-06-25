@@ -15,14 +15,13 @@ Channel = 1; %??? AS
 % NelData.WBMEMR.rc = 'start';
 %% Calibration
 
-%default WBMEMR calib...needs improvement
-
+%default WBMEMR calib...needs improvement  (based on NO invCalib so far -
+%FIX later
 mic_sens = 0.05; % V / Pa-RMS
 mic_gain = db2mag(40);
 P_ref = 20e-6; % Pa-RMS
 
 DR_onesided = 1;
-
 
 %% Meat and Potatoes of the external app you made (here it's RunMEMR_chin_edited_NEL1)
 
@@ -76,22 +75,11 @@ pause(3);
 invoke(RP, 'SetTagVal', 'onsetdel',0); % onset delay is in ms
 playrecTrigger = 1;
 
-%set attn and play
 % button = input('Do you want the subject to press a button to proceed? (Y or N):', 's');
 disp('Starting stimulation...');
 
 resplength = numel(stim.t);
 stim.resp = zeros(stim.nLevels, stim.Averages, stim.nreps, resplength);
-
-% *1) re-order stim presentation
-% *2) way to exit data collection (Fig: KeyPressfnc)
-% *3) plot at end of each 3rd rep (after throw away)
-
-%Hannah's old loop stopping 
-% continueDATA=1;
-% h=figure('KeyPressFcn','continueDATA=0');
-% disp('Press any key in FIG to STOP data collection')
-
 
 AR = 0; %0=No Artifact rejection, 1=Do Artifact rejection
 
@@ -99,7 +87,7 @@ AR = 0; %0=No Artifact rejection, 1=Do Artifact rejection
 % 1. run_invCalib needs cleaned up...currently clunky
 % 2. Need calibration to be correct for MEMR (currently all pass, w/o calib)
 
-[~, calibPicNum, ~] = run_invCalib(false);
+[~, calibPicNum, ~] = run_invCalib(false);   % skipping INV calib for now since based on 94 dB SPL benig highest value, bot the 105 dB SPL from inv Calib.
 [coefFileNum, ~, ~] = run_invCalib(-2);
 
 coefFileNum = NaN;
@@ -108,7 +96,7 @@ for nTRIALS = 1: (stim.Averages + stim.ThrowAway)
     for L = 1:stim.nLevels
         
         % Set attenuation on PA5 using Nel 2.0's PAset
-        rc = PAset([0, 0, stim.clickatt, stim.noiseatt(L)]);
+        rc = PAset([0, 0, stim.clickatt, stim.noiseatt(L)]);  % Need to use NEL PAset to keep book-keeping straight
         %     invoke(RP, 'SetTagVal', 'attA', stim.clickatt);
         %     invoke(RP, 'SetTagVal', 'attB', stim.noiseatt(L));
         invoke(RP, 'SetTagVal', 'nsamps', resplength);
@@ -143,39 +131,32 @@ for nTRIALS = 1: (stim.Averages + stim.ThrowAway)
             invoke(RP, 'SoftTrg', 8); % Reset OAE buffer
             
             fprintf(1, 'Done with Level #%d, Trial # %d, Rep #%d\n', L, nTRIALS,k);
-        end
+            
+            % Check for button push
+            % either ABORT or RESTART needs to break loop immediately,
+            % saveNquit will complete current LEVEL sweep
+            ud_status = get(h_push_stop,'Userdata');  % only call this once - ACT on 1st button push
+            if strcmp(ud_status,'abort') || strcmp(ud_status,'restart')
+                break;
+            end
+
+        end % nreps
         
-        
-        ud_status = get(h_push_stop,'Userdata');
-        
-        if strcmp(ud_status,'abort')
+        % either ABORT or RESTART needs to break loop immediately; saveNquit will complete current LEVEL sweep
+        if strcmp(ud_status,'abort') || strcmp(ud_status,'restart')  
             break;
         end
-%         if ~continueDATA
-%             break
-%         end
         
     end  % levels
-    pause(2);
-    
-    ud_status = get(h_push_stop,'Userdata');
-    
-    if ~isempty(ud_status)
-        switch ud_status
-            case 'stop'
-                return;
-            case 'saveNquit'
-                break;
-            case 'abort'
-                break;
-        end
+    if ~isempty(ud_status) % button has been pushed)
+        % only get ud_status once (above) - ACT on 1st button push
+        % saveNquit, abort, retart - all break, because all need to close
+        % out of TDT
+        break;
     end
     
-%     
-%     if ~continueDATA
-%         break
-%     end
-    
+    pause(2);      
+    % create plot every three reps (after ThrowAway)
     if nTRIALS>stim.ThrowAway
         if ~rem((nTRIALS-stim.ThrowAway),3)
             stimTEMP=stim;
@@ -186,31 +167,29 @@ for nTRIALS = 1: (stim.Averages + stim.ThrowAway)
         end
     end
     
-end
+end % TRIALS
 
-%gets the last button command
-
+%store last button command, or that it ended all reps
 if ~isempty(ud_status)
-    NelData.WBMEMR.rc = ud_status;
+    NelData.WBMEMR.rc = ud_status;  % button was pushed
 else
-    NelData.WBMEMR.rc = 'saveNquit';
+    NelData.WBMEMR.rc = 'saveNquit';  % ended all REPS - saveNquit
 end
-
-
-
 
 %% Shut Down TDT, no matter what button pushed, or if ended naturally
 close_play_circuit(f1RP, RP);
-for atten_num = 1:4
-    %     invoke(PAco1,'ConnectPA5',NelData.General.TDTcommMode,atten_num);
-    PAco1= connect_tdt('PA5', atten_num);
-    invoke(PAco1,'SetAtten',120.0);
-end
+rc = PAset(120.0*ones(1,4)); % ned to use PAset, since it save current value in PA, which is assumed way in NEL (causes problems when PAset is used to se attens later)
+% for atten_num = 1:4
+%     %     invoke(PAco1,'ConnectPA5',NelData.General.TDTcommMode,atten_num);
+%     PAco1= connect_tdt('PA5', atten_num);
+%     invoke(PAco1,'SetAtten',120.0);
+% end
 run_invCalib(false);
 
-if strcmp(NelData.WBMEMR.rc,'abort')
-    return;
+if strcmp(NelData.WBMEMR.rc,'abort') || strcmp(NelData.WBMEMR.rc,'restart')
+    return;  % don't need to save
 end
+
 
 %% Set up data structure to save
 stim.mat2Pa = 1 / (DR_onesided * mic_gain * mic_sens * P_ref);
@@ -236,10 +215,6 @@ end
 warning('off');
 %% Right place to do this?
 
-% if (isempty(get(h_push_stop,'UserData')))  %% Went through all freqs, i.e., finished on its own
-%     set(h_push_stop,'Userdata','stop');
-% end
-
 
 %% Communicate closing with GUI and Nel_App
 %communicate with GUI
@@ -247,17 +222,22 @@ set(h_push_stop,'Enable','off');
 set(h_push_restart,'Enable','off');
 set(h_push_abort,'Enable','off');
 set(h_push_saveNquit,'Enable','off');
-% wideband_memr('close');
+
+
+%% CLEAAN THIS UP
+% should only be saveNquit (from button or ended gracefully) as possibility here 
 
 %% Big Switch case to handle end of data collection
-
 switch NelData.WBMEMR.rc
 %     case 'abort'
 %         wideband_memr('close');
 %         return;
+
+    
+    % THESE CAN PROBABLY BE CUT
     case 'restart'
-        return;
-    case 'stop'
+        return
+    case 'stop'   % DOES THIS EVER HAPPEN?  stop not used - only saveNquit, ohtherwise, abort or restart is already out by here/
         last_stim=nTRIALS;
          
         if last_stim == stim.Averages + stim.ThrowAway

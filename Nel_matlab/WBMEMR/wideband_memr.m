@@ -9,7 +9,6 @@ function h_fig = wideband_memr(command_str)
 global PARAMS PROG VERSION VOLTS
 global root_dir NelData
 
-
 h_fig = findobj('Tag','WBMEMR_Main_Fig');    %% Finds handle for TC-Figure
 
 if nargin<1
@@ -46,7 +45,7 @@ if nargin<1
 %     set(h_fig,'Visible','on');
 
     wideband_memr('start'); % Auto start
-    command_str = 'initialize'; %set command string to initialize graphic interface    
+    command_str = 'initialize'; %set command string to initialize (not used anymore, but needs tobe non-empty to exit gracefully)
 else
     handles = get(h_fig,'Userdata');
     h_push_stop = handles(1);
@@ -54,17 +53,17 @@ else
     h_push_restart = handles(3);
     h_push_abort = handles(4);
     
-    disp(command_str)
+    disp(command_str) % debugging
 end
 
 if strcmp(command_str,'start')
     
-    set(h_push_stop,'Enable','off'); %Functionally unused, but userdata holds command stringss
+    set(h_push_stop,'Enable','off'); % Functionally unused, but userdata holds command stringss
     set(h_push_abort,'Enable','on');
     set(h_push_restart,'Enable','on');
     set(h_push_saveNquit,'Enable','on');
     
-    error = 0;
+    error = 0;  % ? needed  
     
       set(h_push_stop,'Userdata',[]);
 %     set(h_push_start,'Userdata',dpoaedata);
