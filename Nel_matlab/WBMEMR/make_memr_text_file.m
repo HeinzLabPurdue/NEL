@@ -1,6 +1,7 @@
 global NelData 
 
 fname = current_data_file('memr',1);
+
 x.General.program_name  = PROG;
 x.General.version = VERSION;
 x.General.picture_number = NelData.File_Manager.picture+1;
@@ -21,3 +22,4 @@ end
 
 save(fname,'x');
 
+NelData.File_Manager.picture = NelData.File_Manager.picture+1;

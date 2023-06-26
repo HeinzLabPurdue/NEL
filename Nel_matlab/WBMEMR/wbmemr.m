@@ -32,36 +32,40 @@ GB_ch=2;
 FS_tag = 3;
 Fs = 48828.125;
 
-%TODO: Make this a conditional to handle NEL1 vs NEL2
+%TODO: Make this a conditional to handle NEL1 vs NEL2 ??
+
 [f1RP,RP,~]=load_play_circuit_Nel1(FS_tag,fig_num,GB_ch);
 disp('circuit loaded');
 
-subj = input('Please subject ID:', 's');
-
-earflag = 1;
-while earflag == 1
-    ear = input('Please enter which year (L or R):', 's');
-    switch ear
-        case {'L', 'R', 'l', 'r', 'Left', 'Right', 'left', 'right',...
-                'LEFT', 'RIGHT'}
-            earname = strcat(ear, 'Ear');
-            earflag = 0;
-        otherwise
-            fprintf(2, 'Unrecognized ear type! Try again!');
+if ~isfield(NelData,'WBMEMR') % First time through, need to ask all this.
+    subj = input('Please subject ID:', 's');    % NelData.WBMEMR.subj,earflag
+    
+    earflag = 1;
+    while earflag == 1
+        ear = input('Please enter which year (L or R):', 's');
+        switch ear
+            case {'L', 'R', 'l', 'r', 'Left', 'Right', 'left', 'right',...
+                    'LEFT', 'RIGHT'}
+                earname = strcat(ear, 'Ear');
+                earflag = 0;
+            otherwise
+                fprintf(2, 'Unrecognized ear type! Try again!');
+        end
     end
+    
+    uiwait(warndlg('Set ER-10B+ GAIN to 40 dB','SET ER-10B+ GAIN WARNING','modal'));
+    
+    % Save in case if restart
+    NelData.WBMEMR.subj=subj;
+    NelData.WBMEMR.ear=ear;
+else
+    subj=NelData.WBMEMR.subj;
+    ear=NelData.WBMEMR.ear;
+    
+    disp(sprintf('RESTARTING: \n   Subj: %s;\n   Ear: %s',subj,ear))
+    uiwait(warndlg(sprintf('RESTARTING: \n   Subj: %s;\n   Ear: %s',subj,ear),'modal'));
 end
 
-uiwait(warndlg('Set ER-10B+ GAIN to 40 dB','SET ER-10B+ GAIN WARNING','modal'));
-
-% Make directory to save results (NOT NEEDED HERE)
-
-% paraDir = 'C:\NEL\Nel_matlab\WBMEMR';
-% % whichScreen = 1;
-% addpath(genpath(paraDir));
-% if(~exist(strcat(paraDir,'\',subj),'dir'))
-%     mkdir(strcat(paraDir,'\',subj));
-% end
-% respDir = strcat(paraDir,'\',subj,'\');
 
 %% DO FULL BAND FIRST
 stim = makeMEMRstim_500to8500Hz;
@@ -83,7 +87,7 @@ stim.resp = zeros(stim.nLevels, stim.Averages, stim.nreps, resplength);
 
 AR = 0; %0=No Artifact rejection, 1=Do Artifact rejection
 
-%NEEDS TO BE CLEANED UP ASAP. 
+%NEEDS TO BE CLEANED UP ASAP.
 % 1. run_invCalib needs cleaned up...currently clunky
 % 2. Need calibration to be correct for MEMR (currently all pass, w/o calib)
 
@@ -92,7 +96,7 @@ AR = 0; %0=No Artifact rejection, 1=Do Artifact rejection
 
 coefFileNum = NaN;
 
-for nTRIALS = 1: (stim.Averages + stim.ThrowAway) 
+for nTRIALS = 1: (stim.Averages + stim.ThrowAway)
     for L = 1:stim.nLevels
         
         % Set attenuation on PA5 using Nel 2.0's PAset
@@ -139,11 +143,11 @@ for nTRIALS = 1: (stim.Averages + stim.ThrowAway)
             if strcmp(ud_status,'abort') || strcmp(ud_status,'restart')
                 break;
             end
-
+            
         end % nreps
         
         % either ABORT or RESTART needs to break loop immediately; saveNquit will complete current LEVEL sweep
-        if strcmp(ud_status,'abort') || strcmp(ud_status,'restart')  
+        if strcmp(ud_status,'abort') || strcmp(ud_status,'restart')
             break;
         end
         
@@ -155,7 +159,7 @@ for nTRIALS = 1: (stim.Averages + stim.ThrowAway)
         break;
     end
     
-    pause(2);      
+    pause(2);
     % create plot every three reps (after ThrowAway)
     if nTRIALS>stim.ThrowAway
         if ~rem((nTRIALS-stim.ThrowAway),3)
@@ -168,6 +172,13 @@ for nTRIALS = 1: (stim.Averages + stim.ThrowAway)
     end
     
 end % TRIALS
+
+%% Shut off buttons once out of data collection loop 
+% until we put STOP functionality in, all roads mean we're done here
+set(h_push_stop,'Enable','off');
+set(h_push_restart,'Enable','off');
+set(h_push_abort,'Enable','off');
+set(h_push_saveNquit,'Enable','off');
 
 %store last button command, or that it ended all reps
 if ~isempty(ud_status)
@@ -212,88 +223,46 @@ switch answer
         %Completed, do nothing
 end
 
-warning('off');
-%% Right place to do this?
+warning('off');  % ??
 
-
-%% Communicate closing with GUI and Nel_App
-%communicate with GUI
-set(h_push_stop,'Enable','off');
-set(h_push_restart,'Enable','off');
-set(h_push_abort,'Enable','off');
-set(h_push_saveNquit,'Enable','off');
-
-
-%% CLEAAN THIS UP
-% should only be saveNquit (from button or ended gracefully) as possibility here 
 
 %% Big Switch case to handle end of data collection
 switch NelData.WBMEMR.rc
-%     case 'abort'
-%         wideband_memr('close');
-%         return;
-
-    
-    % THESE CAN PROBABLY BE CUT
-    case 'restart'
-        return
-    case 'stop'   % DOES THIS EVER HAPPEN?  stop not used - only saveNquit, ohtherwise, abort or restart is already out by here/
-        last_stim=nTRIALS;
-         
-        if last_stim == stim.Averages + stim.ThrowAway
-            %run save...all frequencies are run, ended naturally
-            [filename, shortfname] = current_data_file('memr',1);
-            make_memr_text_file;
-            text_str = sprintf('%s %s','Saved data file: ',shortfname);
-%             update_dpoae_params;
-            filename = current_data_file('memr',1);
-            %set(h_push_close,'Enable','off');
-            set(h_push_saveNquit,'Enable','off'); 
-        else
-            set(h_push_saveNquit,'Enable','on');
-        end
+    case 'stop'   % 6/2023MH: MAY ADDD LATER (to stop, reset chin, then restart from where stopped) for NOW - only saveNquit, ohtherwise, abort or restart is already out by here
+        % if want to RE-ADD stop, see DPOAE
         
-        set(h_push_restart,'Enable','on');
-        set(h_push_abort,'Enable','on');
-%         set(h_push_params,'Enable','on');
-
-        while isempty(get(h_push_stop,'Userdata')) % Wait for user to do something else
-            pause(.1)
-        end
+%         [filename, shortfname] = current_data_file('memr',1);
+%         make_memr_text_file;
+%         text_str = sprintf('%s %s','Saved data file: ',shortfname);
+    case 'saveNquit'
         
-%         set(h_ax1,'ButtonDownFcn','')
-%         set(h_line1,'ButtonDownFcn','')
-        NelData.WBMEMR.rc=get(h_push_stop,'Userdata');
-        set(h_push_stop,'Userdata',[]);
-        
-        % remind user to turn of microphone
+% MOVE TO END        % remind user to turn of microphone
         h = msgbox('Please remember to turn off the microphone');
         uiwait(h);
         
-        %needed?
-%         wideband_memr('close');
-        case 'saveNquit'
-            set(h_push_restart,'Enable','off');
-            set(h_push_abort,'Enable','on');
-            set(h_push_saveNquit,'Enable','off');
-%                 set(h_push_params,'Enable','off');
-
-            dlg_pos=[40.9600   1.5  122.8800   15.5000];
-
-            % add in comment ability later...
-            % comment=NelData.File_Manager.unit.comment;
-            comment='NOTHING FOR NOW';
-
-            [filename, shortfname] = current_data_file('memr',1);
-            make_memr_text_file;
-%             text_str = sprintf('%s %s','Saved data file: ',shortfname);
-% %                 update_dpoae_params;
-            filename = current_data_file('memr',1);
-            %set(h_push_close,'Enable','on');
-            %uiresume;
-            wideband_memr('close');
-            return;
-       
+        % add in comment ability later...
+        % comment=NelData.File_Manager.unit.comment;
+        comment='NOTHING FOR NOW';
+        stim.comment = comment;
+        
+        
+        %%%%%%%%%%%% WHY so much filename (make_memr_text_file does it
+        %%%%%%%%%%%% right before saving!!  JUST NEED ONCE
+        %%%%   NOT NEEDED IN NEL:   at top as well
+        
+        
+        [filename, shortfname] = current_data_file('memr',1);
+        make_memr_text_file;
+        text_str = sprintf('%s %s','Saved data file: ',shortfname);
+        disp(text_str)
+        %         wideband_memr('close');  % not needed - since it happens anyway
+        %         return;
+        
+        %%%%%   NOT UPDATING pic #s - check NEL bookkeeping & GUI refresh 
+        
+        
+        
+        
 end
 
 

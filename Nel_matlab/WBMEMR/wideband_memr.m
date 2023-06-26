@@ -12,6 +12,7 @@ global root_dir NelData
 h_fig = findobj('Tag','WBMEMR_Main_Fig');    %% Finds handle for TC-Figure
 
 if nargin<1
+    
     disp('no command string!');
     PARAMS = zeros(1,18);				%initialize before opening parameter files
     PROG = 'wbmemr.m';						%program name is recorded in the data file
@@ -71,8 +72,9 @@ if strcmp(command_str,'start')
     
     if strcmp(NelData.WBMEMR.rc,'restart')
         wideband_memr('start');
-    end    
-    wideband_memr('close');
+    else  % saveNquit, or abort - need to close fig, otherwise don't close
+        wideband_memr('close');
+    end
 
 elseif strcmp(command_str,'stop')
     set(h_push_stop,'Userdata','stop');
@@ -85,10 +87,12 @@ elseif strcmp(command_str,'abort')
     set(h_push_stop,'Userdata','abort');
     
 elseif strcmp(command_str, 'close')
-%     if NelData.General.RP2_3and4 || NelData.General.RX8
-%         run_invCalib(false);
-%     end
-    close('Wideband Middle Ear Muscle Reflex');
+    close('Wideband Middle Ear Muscle Reflex');  % MEMR GUI (buttons)
+    
+% % % %     %% close all figs, except GUI (?
+% % % %     set(handleToYourMainGUI, 'HandleVisibility', 'off');
+% % % %     close all;
+% % % %     set(handleToYourMainGUI, 'HandleVisibility', 'on');
 
 elseif strcmp(command_str,'saveNquit')
     set(h_push_stop,'Userdata','saveNquit');
