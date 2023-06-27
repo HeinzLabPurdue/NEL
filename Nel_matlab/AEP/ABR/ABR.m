@@ -356,10 +356,7 @@ elseif strcmp(command_str,'invCalib') %SP 24Jan2016
         Stimuli.calibPicNum= str2double(inputdlg('Enter RAW Calibration File Number','Load Calib File', 1,{num2str(Stimuli.calibPicNum)}));
         rdd;
         
-<<<<<<< HEAD
-        
-=======
->>>>>>> b1f9dded72c0e695099ab740072bb48f71fba27f
+
         %% FUTURE: have this use CALIB file picked by user, not automated
         %% SEE HOW TO DO THIS not every time,
         [~, Stimuli.calibPicNum]= run_invCalib(get(FIG.radio.invCalib,'value'));
@@ -370,13 +367,9 @@ elseif strcmp(command_str,'invCalib') %SP 24Jan2016
     end
     
     cdd;
-<<<<<<< HEAD
-    x=loadpic(Stimuli.calibPicNum);  % use INVERSE calib to compute MAX dB SPL
-=======
     
     x=loadpic(Stimuli.calibPicNum);  % use INVERSE calib to compute MAX dB SPL
     
->>>>>>> b1f9dded72c0e695099ab740072bb48f71fba27f
     CalibData=x.CalibData(:,1:2);
     CalibData(:,2)=trifilt(CalibData(:,2)',5)';
     rdd;
