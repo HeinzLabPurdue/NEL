@@ -1,6 +1,13 @@
 function [stim] = analyzeMEM_Fn(stim,AR)
 
-%ARTIFACT REJECTION
+global NelData
+
+%% Keep track of all figures generated in MEMR, so can close later
+% here we just use one figure each time called, overwrites next time
+% called
+NelData.WBMEMR.Fig2close=unique([NelData.WBMEMR.Fig2close NelData.WBMEMR.MEMR_figNum]);
+
+%% ARTIFACT REJECTION
 if AR == 1
    %Call artifact rejection function
    [stim] = artifact_rejection_Fn(stim);
@@ -60,7 +67,7 @@ cols = [103,0,31;
 cols = cols(end:-1:1, :)/255;
 
 % cols = jet(size(MEM, 1));
-figure;
+figure(NelData.WBMEMR.MEMR_figNum); clf
 axes('NextPlot','replacechildren', 'ColorOrder',cols);
 subplot(1,2,1); 
 semilogx(freq / 1e3, MEM, 'linew', 2);
@@ -73,7 +80,6 @@ set(lgd,'FontSize',8); %added
 xlabel('Frequency (kHz)', 'FontSize', 10);
 ylabel('Ear canal pressure (dB re: Baseline)', 'FontSize', 10);
 
-%figure;
 subplot(1,2,2);
 plot(elicitor, mean(abs(MEM(:, ind)), 2)*5 , 'ok-', 'linew', 2);
 hold on;

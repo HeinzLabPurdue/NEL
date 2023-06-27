@@ -8,6 +8,10 @@ function h_fig = wideband_memr(command_str)
 
 global PARAMS PROG VERSION VOLTS
 global root_dir NelData
+%%             ud = get(handles.Nel_Main,'Userdata');
+%% change_fig_height(app, handles, -44);   use bigger # 
+
+
 
 h_fig = findobj('Tag','WBMEMR_Main_Fig');    %% Finds handle for TC-Figure
 
@@ -17,6 +21,7 @@ if nargin<1
     PARAMS = zeros(1,18);				%initialize before opening parameter files
     PROG = 'wbmemr.m';						%program name is recorded in the data file
     DATE = date;
+    VOLTS = 5;   % NEL TDT is based on 5V peak as max voltage
     
     if NelData.General.RP2_3and4 
         VERSION = 'NEL1';

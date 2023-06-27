@@ -1,6 +1,6 @@
 function [stim] = artifact_rejection_Fn(stim)
 
-%close all
+global NelData
 
 %Create trial variable
 stim.nTrials = stim.Averages;
@@ -36,7 +36,7 @@ warning('off');
 MAXloops = 9; %
 OLDrejects = -1; 
 NEWrejects = 0;
-loop = 0;
+loop = NelData.WBMEMR.MEMR_figNum;   % MEMRfignumber
 %Add in counter of artifacts removed for each level
 stim.counter = ones(stim.nLevels,1)*stim.nTrials;
 
@@ -51,6 +51,8 @@ while NEWrejects > OLDrejects
   end
 end
 
+%% need to keep track of all figures generated in WBMEMR
+NelData.WBMEMR.Fig2close=[NelData.WBMEMR.MEMR_figNum:loop];
 
 end
 

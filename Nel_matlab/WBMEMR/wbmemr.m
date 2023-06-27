@@ -7,12 +7,8 @@ host=lower(getenv('hostname'));
 host = host(~isspace(host));
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-filename = current_data_file('wbmemr',1);
-Channel = 1; %??? AS
-
 %Insert NEL/GUI Parameters here...none for WBMEMR
 
-% NelData.WBMEMR.rc = 'start';
 %% Calibration
 
 %default WBMEMR calib...needs improvement  (based on NO invCalib so far -
@@ -20,7 +16,6 @@ Channel = 1; %??? AS
 mic_sens = 0.05; % V / Pa-RMS
 mic_gain = db2mag(40);
 P_ref = 20e-6; % Pa-RMS
-
 DR_onesided = 1;
 
 %% Meat and Potatoes of the external app you made (here it's RunMEMR_chin_edited_NEL1)
@@ -58,6 +53,8 @@ if ~isfield(NelData,'WBMEMR') % First time through, need to ask all this.
     % Save in case if restart
     NelData.WBMEMR.subj=subj;
     NelData.WBMEMR.ear=ear;
+    NelData.WBMEMR.Fig2close=[];  % set up the place to keep track of figures generted here (to be closed in NEL_App Checkout
+    NelData.WBMEMR.MEMR_figNum=177;  % arbitrary for wbMEMR
 else
     subj=NelData.WBMEMR.subj;
     ear=NelData.WBMEMR.ear;
@@ -79,7 +76,6 @@ pause(3);
 invoke(RP, 'SetTagVal', 'onsetdel',0); % onset delay is in ms
 playrecTrigger = 1;
 
-% button = input('Do you want the subject to press a button to proceed? (Y or N):', 's');
 disp('Starting stimulation...');
 
 resplength = numel(stim.t);
@@ -87,15 +83,17 @@ stim.resp = zeros(stim.nLevels, stim.Averages, stim.nreps, resplength);
 
 AR = 0; %0=No Artifact rejection, 1=Do Artifact rejection
 
+%% Inverse Calibration 
 %NEEDS TO BE CLEANED UP ASAP.
 % 1. run_invCalib needs cleaned up...currently clunky
 % 2. Need calibration to be correct for MEMR (currently all pass, w/o calib)
-
 [~, calibPicNum, ~] = run_invCalib(false);   % skipping INV calib for now since based on 94 dB SPL benig highest value, bot the 105 dB SPL from inv Calib.
 [coefFileNum, ~, ~] = run_invCalib(-2);
 
+stim.CalibPICnum2use = calibPicNum;  % save this so we know what calib file to use right from data file
 coefFileNum = NaN;
 
+%% Data Collection Loop
 for nTRIALS = 1: (stim.Averages + stim.ThrowAway)
     for L = 1:stim.nLevels
         
@@ -160,7 +158,8 @@ for nTRIALS = 1: (stim.Averages + stim.ThrowAway)
     end
     
     pause(2);
-    % create plot every three reps (after ThrowAway)
+
+    %% create plot every three reps (after ThrowAway)
     if nTRIALS>stim.ThrowAway
         if ~rem((nTRIALS-stim.ThrowAway),3)
             stimTEMP=stim;
@@ -180,89 +179,72 @@ set(h_push_restart,'Enable','off');
 set(h_push_abort,'Enable','off');
 set(h_push_saveNquit,'Enable','off');
 
+stim.NUMtrials_Completed = nTRIALS;  % save how many trials completed
+
 %store last button command, or that it ended all reps
 if ~isempty(ud_status)
     NelData.WBMEMR.rc = ud_status;  % button was pushed
+    stim.ALLtrials_Completed=0;
 else
     NelData.WBMEMR.rc = 'saveNquit';  % ended all REPS - saveNquit
+    stim.ALLtrials_Completed=1;
 end
 
 %% Shut Down TDT, no matter what button pushed, or if ended naturally
 close_play_circuit(f1RP, RP);
-rc = PAset(120.0*ones(1,4)); % ned to use PAset, since it save current value in PA, which is assumed way in NEL (causes problems when PAset is used to se attens later)
-% for atten_num = 1:4
-%     %     invoke(PAco1,'ConnectPA5',NelData.General.TDTcommMode,atten_num);
-%     PAco1= connect_tdt('PA5', atten_num);
-%     invoke(PAco1,'SetAtten',120.0);
-% end
+rc = PAset(120.0*ones(1,4)); % need to use PAset, since it saves current value in PA, which is assumed way in NEL (causes problems when PAset is used to set attens later)
 run_invCalib(false);
 
+%% Return to GUI script, unless need to save
 if strcmp(NelData.WBMEMR.rc,'abort') || strcmp(NelData.WBMEMR.rc,'restart')
     return;  % don't need to save
 end
-
 
 %% Set up data structure to save
 stim.mat2Pa = 1 / (DR_onesided * mic_gain * mic_sens * P_ref);
 stim.date = datestr(clock);
 
-%artifact rejection
+% artifact rejection
 answer = questdlg('Would you like to perform artifact rejection?'...
     ,'Artifact Rejection?','Yes','No','Dont know');
 %Handle response
 switch answer
     case {'Yes'}
-        figure;
+%         figure;    %need to close when done
         AR = 1;
-        %Call function
-        %instead of saving as a separate file, it just saves stim_AR in a
-        %pic file
+        % Call function
+        % instead of saving as a separate file, it just saves stim_AR in a
+        % pic file
         [stim_AR] = analyzeMEM_Fn(stim,AR);
         disp('Saving Artifact Rejected data ...')
     case {'No'}
-        %Completed, do nothing
+        % do nothing
 end
 
 warning('off');  % ??
-
 
 %% Big Switch case to handle end of data collection
 switch NelData.WBMEMR.rc
     case 'stop'   % 6/2023MH: MAY ADDD LATER (to stop, reset chin, then restart from where stopped) for NOW - only saveNquit, ohtherwise, abort or restart is already out by here
         % if want to RE-ADD stop, see DPOAE
         
-%         [filename, shortfname] = current_data_file('memr',1);
-%         make_memr_text_file;
-%         text_str = sprintf('%s %s','Saved data file: ',shortfname);
     case 'saveNquit'
+            
+        %% Option to save comment in data file
+        comment='';
+        TEMPans = inputdlg('Enter Comment (optional)');
+        if ~isempty(TEMPans)
+            comment=TEMPans{1};
+        end
+        stim.comment = comment
         
-% MOVE TO END        % remind user to turn of microphone
+        %% NEL based data saving script
+        make_memr_text_file;     
+    
+        %% remind user to turn of microphone
         h = msgbox('Please remember to turn off the microphone');
         uiwait(h);
-        
-        % add in comment ability later...
-        % comment=NelData.File_Manager.unit.comment;
-        comment='NOTHING FOR NOW';
-        stim.comment = comment;
-        
-        
-        %%%%%%%%%%%% WHY so much filename (make_memr_text_file does it
-        %%%%%%%%%%%% right before saving!!  JUST NEED ONCE
-        %%%%   NOT NEEDED IN NEL:   at top as well
-        
-        
-        [filename, shortfname] = current_data_file('memr',1);
-        make_memr_text_file;
-        text_str = sprintf('%s %s','Saved data file: ',shortfname);
-        disp(text_str)
-        %         wideband_memr('close');  % not needed - since it happens anyway
-        %         return;
-        
-        %%%%%   NOT UPDATING pic #s - check NEL bookkeeping & GUI refresh 
-        
-        
-        
-        
+       
 end
 
 

@@ -2,6 +2,7 @@ global NelData
 
 fname = current_data_file('memr',1);
 
+%% General NEL data saving
 x.General.program_name  = PROG;
 x.General.version = VERSION;
 x.General.picture_number = NelData.File_Manager.picture+1;
@@ -12,14 +13,32 @@ x.General.time          = datestr(now,13);
 x.General.spike_res     = 1e-5;
 x.General.spike_unit    = 'sec';
 x.General.timing_unit   = 'ms';
-x.General.comment       = 'FILL IN LATER';
+x.General.comment       = stim.comment;
 
-%saving important MEMR data
-x.stim = stim;
+x.Stimuli = [];  % general NEL structures - NOT used here, but keep for generality 
+x.Line    = [];
+x.User = [];
+x.Hardware.NELmaxvolts_V   = VOLTS;   % max volts in NEL circuit design
+x.Hardware.CalibPICnum2use = stim.CalibPICnum2use;  % Save Calib file to use for these data - based on how hardware is setup (run-invCalib)
+
+%% saving specific MEMR data
+x.MemrData.stim = stim;
 if exist('stim_AR','var')
-    x.stim_AR = stim_AR;
+    x.MemrData.stim_AR = stim_AR;
 end 
 
-save(fname,'x');
-
-NelData.File_Manager.picture = NelData.File_Manager.picture+1;
+%% Save data file
+MfileSAVE=0;
+if MfileSAVE
+    rc = write_nel_data(fname,x,0);
+    while (rc < 0)
+        title_str = ['Choose a different file name! Can''t write to ''' fname ''''];
+        [fname, dirname] = uiputfile([fileparts(fname) filesep '*.m'],title_str);
+        rc = write_nel_data(fullfile(dirname,fname),x,0);
+    end
+    fprintf('%s %s.m\n','Saved data file: ',fname);
+else
+    save(fname,'x');  % std mat file
+    fprintf('%s %s.mat\n','Saved data file: ',fname);
+end
+NelData.File_Manager.picture = NelData.File_Manager.picture+1;  % update pic num
