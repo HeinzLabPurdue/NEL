@@ -315,20 +315,10 @@ elseif strcmp(command_str,'audiogram') %KH 10Jan2012
 elseif strcmp(command_str,'clickYes') %KH 10Jan2012
     Stimuli.clickYes = get(FIG.radio.clickYes,'value');
     FIG.NewStim = 16;
-    %     Comment on Nov/5/19: added "invCalib" radio button.
-    % % %     if NelData.General.RP2_3and4
-    % % %         if Stimuli.clickYes
-    % % %             run_invCalib(true); % Initialize with allpass RP2_3
-    % % %         else
-    % % %             run_invCalib(false); % Initialize with allpass RP2_3
-    % % %         end
-    % % %     end
+    ABR('invCalib'); 
     
 elseif strcmp(command_str,'Automate_Levels') %SP 24Jan2016
-    
     FIG.NewStim = 17;
-    
-    
     if (strcmp(get(FIG.push.Automate_Levels,'string'), 'Abort'))  % In Run-levels mode, go back to free-run
         set(FIG.push.Automate_Levels,'Userdata','abort');  % so that "CAP_loop" knows an abort was requested.
         set(FIG.push.close,'Enable','on');
@@ -340,6 +330,7 @@ elseif strcmp(command_str,'Automate_Levels') %SP 24Jan2016
     
     
 elseif strcmp(command_str,'invCalib') %SP 24Jan2016
+    %% MH/AS Jun 15 2023: this is really CALIB, not invCalib
     %%% Needs to be called whenever the frequency is changed!!!
     %% ?SP? Should the whole thing be called everytime the frequency is changed or should it be saved?
     
@@ -352,12 +343,21 @@ elseif strcmp(command_str,'invCalib') %SP 24Jan2016
         cdd;
         allCalibFiles= dir('*calib*raw*');
         Stimuli.calibPicNum= getPicNum(allCalibFiles(end).name);
-        Stimuli.calibPicNum= str2double(inputdlg('Enter Calibration File Number','Load Calib File', 1,{num2str(Stimuli.calibPicNum)}));
+        Stimuli.calibPicNum= str2double(inputdlg('Enter RAW Calibration File Number','Load Calib File', 1,{num2str(Stimuli.calibPicNum)}));
         rdd;
+        
+        
+        %% FUTURE: have this use CALIB file picked by user, not automated
+        %% SEE HOW TO DO THIS not every time,
+        [~, Stimuli.calibPicNum]= run_invCalib(get(FIG.radio.invCalib,'value'));
+        Stimuli.invCalib=get(FIG.radio.invCalib,'value');
+        if get(FIG.radio.invCalib,'value')
+            Stimuli.calibPicNum=Stimuli.calibPicNum+1;  % FIX THIS LATER to not assume +1
+        end
     end
 
     cdd;
-    x=loadpic(Stimuli.calibPicNum);
+    x=loadpic(Stimuli.calibPicNum);  % use INVERSE calib to compute MAX dB SPL
     CalibData=x.CalibData(:,1:2);
     CalibData(:,2)=trifilt(CalibData(:,2)',5)';
     rdd;
