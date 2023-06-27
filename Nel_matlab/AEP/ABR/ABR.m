@@ -20,7 +20,7 @@ if nargin < 1
     ax = cell2struct(cell(1,2),{'axis','line'},2);
     FIG   = struct('handle',[],'edit',[],'push',push,'radio',radio,'checkbox',checkbox,'statText', statText,...
         'fsldr',fsldr,'asldr',asldr,'NewStim',0,'ax',ax);
-
+    
     h_fig = findobj('Tag','AEP_Main_Fig');    %% Finds handle for TC-Figure
     
     if length(h_fig)>2
@@ -31,7 +31,7 @@ if nargin < 1
     
     FIG.handle = figure('NumberTitle','off','Name','ABR Interface','Units','normalized','position',[0.045  0.013  0.9502  0.7474],...
         'Visible','off','MenuBar','none','Tag','AEP_Main_Fig');
-
+    
     colordef none;
     whitebg('w');
     
@@ -41,8 +41,8 @@ if nargin < 1
     ABR('clickYes'); % Start invCalib = true or false based on default clickYes value
     
     ABR_loop; %starts running ABR traces
-
-%% Callback functions: 
+    
+    %% Callback functions:
 elseif strcmp(command_str,'fast')
     if get(FIG.radio.fast, 'value') == 1
         FIG.NewStim = 4;
@@ -103,7 +103,7 @@ elseif strcmp(command_str,'both')
     else
         set(FIG.radio.both,'value',1);
     end
-
+    
 elseif strcmp(command_str,'chan_1')
     if get(FIG.radio.chan_1, 'value') == 1
         FIG.NewStim = 18;
@@ -112,7 +112,7 @@ elseif strcmp(command_str,'chan_1')
         set(FIG.radio.Simultaneous,'value',0);
     else
         set(FIG.radio.chan_1,'value',1);
-    end    
+    end
     
 elseif strcmp(command_str,'chan_2')
     if get(FIG.radio.chan_2, 'value') == 1
@@ -122,7 +122,7 @@ elseif strcmp(command_str,'chan_2')
         set(FIG.radio.Simultaneous,'value',0);
     else
         set(FIG.radio.chan_2,'value',1);
-    end     
+    end
     
 elseif strcmp(command_str,'Simultaneous')
     if get(FIG.radio.Simultaneous, 'value') == 1
@@ -132,7 +132,7 @@ elseif strcmp(command_str,'Simultaneous')
         set(FIG.radio.chan_2,'value',0);
     else
         set(FIG.radio.Simultaneous,'value',1);
-    end      
+    end
     
 elseif strcmp(command_str,'slide_freq')
     FIG.NewStim = 6;
@@ -230,7 +230,7 @@ elseif strcmp(command_str,'threshV')   %KH 2011 Jun 08, for artifact rejection
         Stimuli.threshV = oldThreshV;
     end
     set(FIG.edit.threshV,'string', num2str(Stimuli.threshV));
-
+    
 elseif strcmp(command_str,'threshV2')   %JMR nov 21 for artifact rejection channel 2
     FIG.NewStim = 13;
     oldThreshV2 = Stimuli.threshV2;
@@ -240,7 +240,7 @@ elseif strcmp(command_str,'threshV2')   %JMR nov 21 for artifact rejection chann
     elseif ( Stimuli.threshV<0 )  % check range
         Stimuli.threshV2 = oldThreshV2;
     end
-    set(FIG.edit.threshV2,'string', num2str(Stimuli.threshV2));    
+    set(FIG.edit.threshV2,'string', num2str(Stimuli.threshV2));
     
 elseif strcmp(command_str,'fixedPhase')
     Stimuli.fixedPhase = get(FIG.checkbox.fixedPhase,'value');
@@ -315,6 +315,8 @@ elseif strcmp(command_str,'audiogram') %KH 10Jan2012
 elseif strcmp(command_str,'clickYes') %KH 10Jan2012
     Stimuli.clickYes = get(FIG.radio.clickYes,'value');
     FIG.NewStim = 16;
+    
+    ABR('invCalib');
     %     Comment on Nov/5/19: added "invCalib" radio button.
     % % %     if NelData.General.RP2_3and4
     % % %         if Stimuli.clickYes
@@ -352,19 +354,34 @@ elseif strcmp(command_str,'invCalib') %SP 24Jan2016
         cdd;
         allCalibFiles= dir('*calib*raw*');
         Stimuli.calibPicNum= getPicNum(allCalibFiles(end).name);
-        Stimuli.calibPicNum= str2double(inputdlg('Enter Calibration File Number','Load Calib File', 1,{num2str(Stimuli.calibPicNum)}));
+        Stimuli.calibPicNum= str2double(inputdlg('Enter RAW Calibration File Number','Load Calib File', 1,{num2str(Stimuli.calibPicNum)}));
         rdd;
+        
+        %% FUTURE: have this use CALIB file picked by user, not automated
+        %% SEE HOW TO DO THIS not every time,
+        [~, Stimuli.calibPicNum]= run_invCalib(get(FIG.radio.invCalib,'value'));
+        Stimuli.invCalib=get(FIG.radio.invCalib,'value');
+        if get(FIG.radio.invCalib,'value')
+            Stimuli.calibPicNum=Stimuli.calibPicNum+1;  % FIX THIS LATER to not assume +1
+        end
     end
-
+    
     cdd;
-    x=loadpic(Stimuli.calibPicNum);
+    
+    x=loadpic(Stimuli.calibPicNum);  % use INVERSE calib to compute MAX dB SPL
+    
     CalibData=x.CalibData(:,1:2);
     CalibData(:,2)=trifilt(CalibData(:,2)',5)';
     rdd;
-
-    Stimuli.MaxdBSPLCalib=CalibInterp(Stimuli.freq_hz/1000, CalibData);
-    set(FIG.asldr.SPL, 'string', sprintf('%.1f dB SPL', Stimuli.MaxdBSPLCalib-Stimuli.atten_dB));
     
+    if get(FIG.radio.clickYes,'value')
+        Stimuli.MaxdBSPLCalib=median(CalibData(:,2));  %use this convention ALWAYS in analysis too!
+        %% LONG-TERM - decide if median is right - it avoids ends with very low values
+    else % tone
+        Stimuli.MaxdBSPLCalib=CalibInterp(Stimuli.freq_hz/1000, CalibData);
+    end
+    
+    set(FIG.asldr.SPL, 'string', sprintf('%.1f dB SPL', Stimuli.MaxdBSPLCalib-Stimuli.atten_dB));
     
     
 elseif strcmp(command_str,'close')
