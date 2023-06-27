@@ -1,9 +1,9 @@
-% newCalib= run_invCalib()
+%TODO FIX THIS AS/MH
+
 % if doInvCalib= 0, all pass
 % if doInvCalib= 1, inverse calib based on last coef* file
 % if doInvCalib= -1, query allpass or invFIR
 % if doInvCalib= -2, return b required from invFIR
-
 
 function [coefFileNum, calibPicNum, b]= run_invCalib(doInvCalib)
 
@@ -115,7 +115,7 @@ end
 if e1
     if doInvCalib==1
         if doINVcheck
-            fprintf('invFIR Coefs loaded successfully (%s) \n', datestr(datetime));
+            fprintf('most recent invFIR Coefs loaded successfully (%s) \n', datestr(datetime));
         else
             fprintf('Running allpass as no invCalib. allpass Coefs loaded successfully (%s) \n', datestr(datetime));
             warn_handle= warndlg('Running allpass as no invCalib', 'Run invCalib maybe?');

@@ -3,6 +3,7 @@ global NelData
 fname = current_data_file('dpoae',1);
 
 x.General.program_name  = PROG;
+x.General.version = VERSION;   % added 6/27/2023 MH
 x.General.picture_number = NelData.File_Manager.picture+1;
 x.General.track          = NelData.File_Manager.track.No;
 x.General.unit           = NelData.File_Manager.unit.No;

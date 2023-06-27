@@ -27,6 +27,7 @@ addpath([root_dir  'mex']);
 addpath([root_dir  'DPOAE']);
 % addpath([root_dir  'CAP']);
 addpath([root_dir  'AEP']);
+addpath([root_dir  'WBMEMR']);
 addpath(genpath([root_dir  'FFR']));
 addpath([root_dir  'NELanalysis_Mfiles']);
 % addpath([root_dir  'wiring_test']);   %LQ 10/29/04
