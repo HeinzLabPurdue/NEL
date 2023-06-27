@@ -52,7 +52,7 @@ SwitchBox = struct('select_key',{select_key select_key} ...
 
 %figure(NelData.General.main_handle);
 %toAppDesignerTag - creating a dummy figure to allow actxcontrol to work...
-rp_temp_fig_forActiveX = figure();
+rp_temp_fig_forActiveX = figure();  % creates figure(1) - need to be careful not to delete 
 set(rp_temp_fig_forActiveX, 'Visible','off')
 
 %RPtemp= actxcontrol('RPco.x',[0 0 1 1],NelData.General.main_handle);

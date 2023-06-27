@@ -29,7 +29,6 @@ if nargin < 1						   %program should be called without a command string
     MicGain = str2double(MicGain{1});
     
     
-    
     PARAMS(1) = F2frqlo;   % low frequency (in kHz) bounds for data
     PARAMS(2) = F2frqhi;   % high frequency (in kHz) bounds for data
     PARAMS(3) = fstlin;    % # of linear frequency steps (set = 0 for log steps)
