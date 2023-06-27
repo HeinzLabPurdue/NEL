@@ -1,4 +1,4 @@
-% make_CAP_text_file_subfunc1.m
+% make_ABR_text_file_subfunc1.m
 
 if Stimuli.clickYes ~= 1 %KH 09Jan2012
     fname = current_data_file([misc.fileExtension '_' num2str(Stimuli.freq_hz)],1);

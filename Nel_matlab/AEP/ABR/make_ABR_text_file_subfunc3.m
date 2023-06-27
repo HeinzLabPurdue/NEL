@@ -1,4 +1,4 @@
-% make_CAP_text_file_subfunc2.m
+% make_ABR_text_file_subfunc2.m
 
 rc = write_nel_data(aux_fname,x,0);      
 save(aux_fname,'x') %save mat-file along side picture file JMR Sept 21

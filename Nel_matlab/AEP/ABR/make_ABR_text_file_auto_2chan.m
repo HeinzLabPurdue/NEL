@@ -1,11 +1,11 @@
-% make_CAP_text_file.m
+% make_ABR_text_file.m
 % Adapted from "make_tc_text_file.m" by GE/MH, 02Nov2003.
 
 % ge debug ABR 26Apr2004: need to check boolean AutoLevel_params.bMultiOutputFiles and handle appropriately.
 
 if ~(AutoLevel_params.bMultiOutputFiles)  % added by GE 26Apr2004.
     
-    make_CAP_text_file_subfunc1;
+    make_ABR_text_file_subfunc1;
     
     x.Line.attens_dB = CAPattens; % cell array(3)
     if FIG.NewStim==17
@@ -61,7 +61,7 @@ if ~(AutoLevel_params.bMultiOutputFiles)  % added by GE 26Apr2004.
         x.AD_Data.AD_All_V{1} = CAPdataReps_dec;
         x.AD_Data.AD_Avg_V{1} = CAPdataAvg;
     end
-        make_CAP_text_file_subfunc2;
+        make_ABR_text_file_subfunc2;
         
         
         %remove all data and save the average data only!
@@ -70,13 +70,13 @@ if ~(AutoLevel_params.bMultiOutputFiles)  % added by GE 26Apr2004.
         %temp_struct1 = rmfield(temp_struct1,'AD_All_V_chan2');
         x.AD_Data=temp_struct1;
         
-        make_CAP_text_file_subfunc3;
+        make_ABR_text_file_subfunc3;
         x.AD_Data=temp_struct;
     
 else
     for attenInd = 1:length(AutoLevel_params.dBs2RUN)
         
-        make_CAP_text_file_subfunc1;
+        make_ABR_text_file_subfunc1;
         
         x.Line.attens_dB = CAPattens{attenInd}; % ge debug ABR 26Apr2004.
 %         x.Stimuli.atten_dB = Stimuli.atten_dB + AutoLevel_params.stepdB*AutoLevel_params.attenMask(attenInd); % added by GE 26Apr2004.
@@ -122,7 +122,7 @@ else
         end
 
 
-        make_CAP_text_file_subfunc2;
+        make_ABR_text_file_subfunc2;
         
         
         %remove all data and save the average data only!
@@ -131,7 +131,7 @@ else
         %temp_struct1 = rmfield(temp_struct1,'AD_All_V_chan2');
         x.AD_Data=temp_struct1;
         
-        make_CAP_text_file_subfunc3;
+        make_ABR_text_file_subfunc3;
         x.AD_Data=temp_struct;
         
         
