@@ -315,6 +315,7 @@ elseif strcmp(command_str,'audiogram') %KH 10Jan2012
 elseif strcmp(command_str,'clickYes') %KH 10Jan2012
     Stimuli.clickYes = get(FIG.radio.clickYes,'value');
     FIG.NewStim = 16;
+
     
     ABR('invCalib');
     %     Comment on Nov/5/19: added "invCalib" radio button.
@@ -327,10 +328,7 @@ elseif strcmp(command_str,'clickYes') %KH 10Jan2012
     % % %     end
     
 elseif strcmp(command_str,'Automate_Levels') %SP 24Jan2016
-    
     FIG.NewStim = 17;
-    
-    
     if (strcmp(get(FIG.push.Automate_Levels,'string'), 'Abort'))  % In Run-levels mode, go back to free-run
         set(FIG.push.Automate_Levels,'Userdata','abort');  % so that "CAP_loop" knows an abort was requested.
         set(FIG.push.close,'Enable','on');
@@ -342,6 +340,7 @@ elseif strcmp(command_str,'Automate_Levels') %SP 24Jan2016
     
     
 elseif strcmp(command_str,'invCalib') %SP 24Jan2016
+    %% MH/AS Jun 15 2023: this is really CALIB, not invCalib
     %%% Needs to be called whenever the frequency is changed!!!
     %% ?SP? Should the whole thing be called everytime the frequency is changed or should it be saved?
     
@@ -357,6 +356,10 @@ elseif strcmp(command_str,'invCalib') %SP 24Jan2016
         Stimuli.calibPicNum= str2double(inputdlg('Enter RAW Calibration File Number','Load Calib File', 1,{num2str(Stimuli.calibPicNum)}));
         rdd;
         
+<<<<<<< HEAD
+        
+=======
+>>>>>>> b1f9dded72c0e695099ab740072bb48f71fba27f
         %% FUTURE: have this use CALIB file picked by user, not automated
         %% SEE HOW TO DO THIS not every time,
         [~, Stimuli.calibPicNum]= run_invCalib(get(FIG.radio.invCalib,'value'));
@@ -367,9 +370,13 @@ elseif strcmp(command_str,'invCalib') %SP 24Jan2016
     end
     
     cdd;
+<<<<<<< HEAD
+    x=loadpic(Stimuli.calibPicNum);  % use INVERSE calib to compute MAX dB SPL
+=======
     
     x=loadpic(Stimuli.calibPicNum);  % use INVERSE calib to compute MAX dB SPL
     
+>>>>>>> b1f9dded72c0e695099ab740072bb48f71fba27f
     CalibData=x.CalibData(:,1:2);
     CalibData(:,2)=trifilt(CalibData(:,2)',5)';
     rdd;
