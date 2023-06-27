@@ -29,7 +29,7 @@ if nargin < 1
     [FIG, h_fig]=get_FIG_ffr_srnenv(); % Initialize FIG
     
     if strcmp(usr,'JMR')
-        addpath([NelData.General.RootDir 'Users\JMR\FFR']);
+        addpath([NelData.General.RootDir 'Users\',usr,'\FFR']);
     end
     [misc, Stimuli, RunLevels_params, Display, interface_type]=FFR_SNRenv_ins(NelData); ...
         %#ok<ASGLU> % should already be populated by CAP_ins
@@ -317,14 +317,30 @@ elseif strcmp(command_str,'YLim')
     set(FIG.edit.yscale,'string', num2str(Display.YLim_atAD));
     
 elseif strcmp(command_str,'invCalib')
+    %% MH/AS Jun 15 2023:  thisis really CALIB, not invCALIB
+    %% FIX LATER
+
     if NelData.General.RP2_3and4 && (~NelData.General.RX8)
-        [~, Stimuli.calibPicNum]= run_invCalib(get(FIG.radio.invCalib,'value'));
-    elseif isnan(Stimuli.calibPicNum)
+        [~, Stimuli.calibPicNum]= run_invCalib(get(FIG.radio.invCalib,'value')); %NEL 1
+    elseif isnan(Stimuli.calibPicNum)  % NEL2 
         cdd;
         allCalibFiles= dir('*calib*raw*');
         Stimuli.calibPicNum= getPicNum(allCalibFiles(end).name);
-        Stimuli.calibPicNum= str2double(inputdlg('Enter Calibration File Number','Load Calib File', 1,{num2str(Stimuli.calibPicNum)}));
+        Stimuli.calibPicNum= str2double(inputdlg('Enter RAW Calibration File Number','Load Calib File', 1,{num2str(Stimuli.calibPicNum)}));
         rdd;
+        
+        %% FUTURE: have this use CALIB file picked by user, not automated
+        %% SEE HOW TO DO THIS not every time,
+        [~, Stimuli.calibPicNum]= run_invCalib(get(FIG.radio.invCalib,'value'));
+        Stimuli.invCalib=get(FIG.radio.invCalib,'value');
+        if get(FIG.radio.invCalib,'value')
+            Stimuli.calibPicNum=Stimuli.calibPicNum+1;  % FIX THIS LATER to not assume +1
+        end
+
+        %% FIX LATER - won't handle toggle invCALI on/off
+        %% SET invCALIB always run, then no issue
+        
+        
     end
     [sig, fs] =audioread([Stimuli.UPDdir Stimuli.filename]);
     curDir= pwd;
@@ -336,9 +352,9 @@ elseif strcmp(command_str,'invCalib')
     set(FIG.asldr.SPL,'string',sprintf('%.1f dB SPL',Stimuli.calib_dBSPLout-abs(str2double(get(FIG.asldr.val, 'string')))));
     
 elseif strcmp(command_str,'close')
-    if NelData.General.RP2_3and4 && (~NelData.General.RX8)
-        run_invCalib(false); % Initialize with allpass RP2_3
-    end
+    %     if NelData.General.RP2_3and4 && (~NelData.General.RX8)
+    run_invCalib(false); % Initialize with allpass RP2_3
+    %     end
     set(FIG.push.close,'Userdata',1);
     cd([NelData.General.RootDir 'Nel_matlab\nel_general']);
 end
