@@ -177,7 +177,6 @@ elseif strcmp(command_str,'slide_atten')
     FIG.NewStim = 7;
     Stimuli.atten_dB = floor(-get(FIG.asldr.slider,'value'));
     set(FIG.asldr.val,'string',num2str(-Stimuli.atten_dB));
-    set(FIG.asldr.SPL,'string',sprintf('%.1f dB SPL',Stimuli.MaxdBSPLCalib-Stimuli.atten_dB));
     
     % LQ 01/31/05
 elseif strcmp(command_str, 'slide_atten_text')
@@ -194,8 +193,6 @@ elseif strcmp(command_str, 'slide_atten_text')
         Stimuli.atten_dB = -new_atten;
         set(FIG.asldr.slider, 'value', new_atten);
     end
-    set(FIG.asldr.SPL,'string',sprintf('%.1f dB SPL',Stimuli.MaxdBSPLCalib-Stimuli.atten_dB));
-    
     
 elseif strcmp(command_str,'memReps')
     FIG.NewStim = 9;
