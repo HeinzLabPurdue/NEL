@@ -3,12 +3,15 @@ function [misc,Stimuli, RunLevels_params, Display, interface_type]=FFR_SNRenv_in
 
 % SNRenvStimDir='C:\NEL2\Users\SP\SNRenv_stimuli\stimSetStationary\'; %
 % This was the data dir for pilot data before DTU. (Q313 and Q314).
+% This is new. Defaults stim directory to JMR 
+
 usr = NelData.General.User;
-if strcmp(usr,'JMR')
-SNRenvStimDir=[NelData.General.RootDir 'Users\JMR\SNRenv_stimuli\FFRSNRenv_short_stationary_org\'];    
+if strcmp(usr,'SP') || strcmp(usr,'JMR') || strcmp(usr,'AS')
+    SNRenvStimDir=[NelData.General.RootDir 'Users\',usr,'\SNRenv_stimuli\FFRSNRenv_short_stationary_org\'];
 else
-SNRenvStimDir=[NelData.General.RootDir 'Users\SP\SNRenv_stimuli\FFRSNRenv_short_stationary_org\'];
+    SNRenvStimDir=[NelData.General.RootDir 'Users\JMR\SNRenv_stimuli\FFRSNRenv_short_stationary_org\'];
 end
+
 % This is new.
 
 
@@ -72,7 +75,7 @@ switch interface_type
             );
         
         RunLevels_params = struct( ...
-            'nPairs', 80, ...
+            'nPairs', 100, ...
             'nPairs_actual', 1, ...
             'doneStims', zeros(length(fName),1), ...
             'stepdB', 0, ...

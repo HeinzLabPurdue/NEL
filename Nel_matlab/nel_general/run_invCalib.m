@@ -121,7 +121,7 @@ if e1
             warn_handle= warndlg('Running allpass as no invCalib', 'Run invCalib maybe?');
             uiwait(warn_handle);
         end
-    else
+    elseif doInvCalib==0
         fprintf('Allpass Coefs loaded successfully (%s) \n', datestr(datetime));
     end
 elseif (~e1) && (doInvCalib ~= -2)
