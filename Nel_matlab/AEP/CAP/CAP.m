@@ -14,10 +14,10 @@ if nargin < 1
     if ishandle(h_fig)
         delete(h_fig);
     end
-        
-%     if length(h_fig)>2
-%         h_fig= h_fig(1);
-%     end
+    
+    %     if length(h_fig)>2
+    %         h_fig= h_fig(1);
+    %     end
     
     
     prog_dir = [root_dir 'AEP\'];
@@ -45,9 +45,9 @@ if nargin < 1
         h_fig= h_fig(1);
     end
     
-    CAP_ins; 
+    CAP_ins;
     
-    if strcmp(CAP_interface_type, 'CAP (fMask)') % for FD's special version. Freezes NEL right now 6/23/23 SH. Not closing right. 
+    if strcmp(CAP_interface_type, 'CAP (fMask)') % for FD's special version. Freezes NEL right now 6/23/23 SH. Not closing right.
         fMaskCodesDir= [NelData.General.RootDir 'Nel_matlab\AEP\CAP\CAPfmasked'];
         cd(fMaskCodesDir);
         h_fig= fmaskedCAP();
@@ -56,16 +56,17 @@ if nargin < 1
     else
         FIG.handle = figure('NumberTitle','off','Name','CAP Interface','Units','normalized','position',[0.045  0.013  0.9502  0.7474],...
             'Visible','off','MenuBar','none','Tag','AEP_Main_Fig');
-
+        
         colordef none;
         whitebg('w');
-
+        
         CAP_loop_plot;
+        CAP('invCalib'); % SH adding to be same as ABR
         CAP('clickYes'); % Start invCalib = true or false based on default clickYes value
         CAP_loop;
     end
     
-%% callback functions: 
+    %% callback functions:
 elseif strcmp(command_str,'fast')
     if get(FIG.radio.fast, 'value') == 1
         FIG.NewStim = 4;
@@ -126,13 +127,12 @@ elseif strcmp(command_str,'both')
     else
         set(FIG.radio.both,'value',1);
     end
-
-
     
 elseif strcmp(command_str,'slide_freq')
     FIG.NewStim = 6;
     Stimuli.freq_hz = floor(get(FIG.fsldr.slider,'value')*Stimuli.fmult);
     set(FIG.fsldr.val,'string',num2str(Stimuli.freq_hz));
+    CAP('invCalib'); % SH added to match ABR 6/2023
     
     % LQ 01/31/05
 elseif strcmp(command_str,'slide_freq_text')
@@ -145,6 +145,7 @@ elseif strcmp(command_str,'slide_freq_text')
         Stimuli.freq_hz = new_freq;
         set(FIG.fsldr.slider, 'value', Stimuli.freq_hz/Stimuli.fmult);
     end
+    CAP('invCalib'); % SH added to match ABR 6/2023
     
 elseif strcmp(command_str,'mult_1x')
     Stimuli.fmult = 1;
@@ -154,6 +155,7 @@ elseif strcmp(command_str,'mult_1x')
     FIG.NewStim = 6;
     Stimuli.freq_hz = floor(get(FIG.fsldr.slider,'value')*Stimuli.fmult);
     set(FIG.fsldr.val,'string',num2str(Stimuli.freq_hz));
+    CAP('invCalib'); % SH added to match ABR 6/2023
     
 elseif strcmp(command_str,'mult_10x')
     Stimuli.fmult = 10;
@@ -163,6 +165,7 @@ elseif strcmp(command_str,'mult_10x')
     FIG.NewStim = 6;
     Stimuli.freq_hz = floor(get(FIG.fsldr.slider,'value')*Stimuli.fmult);
     set(FIG.fsldr.val,'string',num2str(Stimuli.freq_hz));
+    CAP('invCalib'); % SH added to match ABR 6/2023
     
 elseif strcmp(command_str,'mult_100x')
     Stimuli.fmult = 100;
@@ -172,11 +175,13 @@ elseif strcmp(command_str,'mult_100x')
     FIG.NewStim = 6;
     Stimuli.freq_hz = floor(get(FIG.fsldr.slider,'value')*Stimuli.fmult);
     set(FIG.fsldr.val,'string',num2str(Stimuli.freq_hz));
+    CAP('invCalib'); % SH added to match ABR 6/2023
     
 elseif strcmp(command_str,'slide_atten')
     FIG.NewStim = 7;
     Stimuli.atten_dB = floor(-get(FIG.asldr.slider,'value'));
     set(FIG.asldr.val,'string',num2str(-Stimuli.atten_dB));
+    set(FIG.asldr.SPL,'string',sprintf('%.1f dB SPL',Stimuli.MaxdBSPLCalib-Stimuli.atten_dB));
     
     % LQ 01/31/05
 elseif strcmp(command_str, 'slide_atten_text')
@@ -193,6 +198,8 @@ elseif strcmp(command_str, 'slide_atten_text')
         Stimuli.atten_dB = -new_atten;
         set(FIG.asldr.slider, 'value', new_atten);
     end
+    set(FIG.asldr.SPL,'string',sprintf('%.1f dB SPL',Stimuli.MaxdBSPLCalib-Stimuli.atten_dB));
+    
     
 elseif strcmp(command_str,'memReps')
     FIG.NewStim = 9;
@@ -297,6 +304,34 @@ elseif strcmp(command_str,'clickYes') %KH 10Jan2012
             run_invCalib(false); % Initialize with allpass RP2_3
         end
     end
+    
+elseif strcmp(command_str,'invCalib') %SP 24Jan2016 % SH copied from ABR
+    %%% Needs to be called whenever the frequency is changed!!!
+    %% ?SP? Should the whole thing be called everytime the frequency is changed or should it be saved?
+    
+    %%% Account for Calibration to set Level in dB SPL
+    
+    %     if ~exist('CalibData', 'var')
+    if NelData.General.RP2_3and4 && (~NelData.General.RX8)
+        [~, Stimuli.calibPicNum]= run_invCalib(get(FIG.radio.invCalib,'value'));
+    elseif isnan(Stimuli.calibPicNum)
+        cdd;
+        allCalibFiles= dir('*calib*raw*');
+        Stimuli.calibPicNum= getPicNum(allCalibFiles(end).name);
+        Stimuli.calibPicNum= str2double(inputdlg('Enter Calibration File Number','Load Calib File', 1,{num2str(Stimuli.calibPicNum)}));
+        rdd;
+    end
+    
+    cdd;
+    x=loadpic(Stimuli.calibPicNum);
+    CalibData=x.CalibData(:,1:2);
+    CalibData(:,2)=trifilt(CalibData(:,2)',5)';
+    rdd;
+    
+    Stimuli.MaxdBSPLCalib=CalibInterp(Stimuli.freq_hz/1000, CalibData);
+    set(FIG.asldr.SPL, 'string', sprintf('%.1f dB SPL', Stimuli.MaxdBSPLCalib-Stimuli.atten_dB));
+    
+    
     
 elseif strcmp(command_str,'close')
     if NelData.General.RP2_3and4 && (~NelData.General.RX8)

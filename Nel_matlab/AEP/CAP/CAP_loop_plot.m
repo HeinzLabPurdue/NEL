@@ -1,5 +1,5 @@
 global CAP_interface_type
-UNIT = sprintf('%1d.%02d', NelData.File_Manager.track.No, NelData.File_Manager.unit.No);
+% UNIT = sprintf('%1d.%02d', NelData.File_Manager.track.No, NelData.File_Manager.unit.No);
 
 % FIG.radio.noise  = uicontrol(FIG.handle,'callback','CAP(''noise'');','style','radio','Enable','on','Units','normalized','position',[.125 .425 .08 .03],'string','Noise','fontsize',12,'BackgroundColor','w','value',1);
 % FIG.radio.tone   = uicontrol(FIG.handle,'callback','CAP(''tone'');','style','radio','Enable','on','Units','normalized','position',[.125 .395 .08 .03],'string','Tone','fontsize',12,'BackgroundColor','w','value',1);
@@ -54,6 +54,9 @@ FIG.statText.voltDisplay = uicontrol(FIG.handle, 'callback', '', 'style', 'text'
 FIG.radio.atAD    = uicontrol(FIG.handle,'callback','CAP(''atAD'');', 'style','radio','Enable','on','Units','normalized','position',[.135 .07 .13 .03],'string','at AD;  YLim (AD): ', 'fontsize',12,'BackgroundColor','w','value',strcmp(Display.Voltage,'atAD'));
 FIG.radio.atELEC  = uicontrol(FIG.handle,'callback','CAP(''atELEC'');','style','radio','Enable','on','Units','normalized','position',[.135 .04 .12 .03],'string','at Electrode','fontsize',12,'BackgroundColor','w','value',~strcmp(Display.Voltage,'atAD'));
 FIG.edit.yscale     = uicontrol(FIG.handle,'callback','CAP(''YLim'');','style','edit','Units','normalized','position',[.265 .07 .05 .04],'string',Display.YLim_atAD,'fontsize',12);
+
+FIG.asldr.SPL    = uicontrol(FIG.handle,'style','text','string',sprintf('%.1f dB SPL',120+get(FIG.asldr.slider,'val')),...
+    'backgroundcolor',[1 1 1],'Units','normalized','position',[.9 .06 .1 .03],'fontsize',10,'horizontalalignment','right');
 
 
 % FIG.statText.spike_channel =  uicontrol(FIG.handle, 'callback', '', 'style', 'text','Units','normalized', 'position', [.1 .49 .13 .03], 'string', 'spike channel:','fontsize',12,'BackgroundColor','w');   % added by GE 17Jan2003.

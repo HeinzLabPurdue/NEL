@@ -508,7 +508,7 @@ while isempty(get(FIG.push.close,'Userdata'))
                                 AutoLevel_params.AutoThresh2=data.threshold;
                                 Stimuli.atten_dB = 120;
                                 set(FIG.asldr.val,'string',num2str(-Stimuli.atten_dB));
-                                set(FIG.asldr.SPL,'string',sprintf('%.1f dB SPL',Stimuli.MaxdBSPLCalib-Stimuli.atten_dB));
+                                set(FIG.asl.SPL,'string',sprintf('%.1f dB SPL',Stimuli.MaxdBSPLCalib-Stimuli.atten_dB));
                                 set(FIG.asldr.slider, 'value', -Stimuli.atten_dB);
                                 set(FIG.asldr.SPL,'string',sprintf('%.1f dB SPL',Stimuli.MaxdBSPLCalib-Stimuli.atten_dB));
                             case 'No'
