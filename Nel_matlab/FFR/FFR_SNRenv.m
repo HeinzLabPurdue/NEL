@@ -317,7 +317,7 @@ elseif strcmp(command_str,'YLim')
     set(FIG.edit.yscale,'string', num2str(Display.YLim_atAD));
     
 elseif strcmp(command_str,'invCalib')
-    %% MH/AS Jun 15 2023:  thisis really CALIB, not invCALIB
+    %% MH/AS Jun 15 2023:  this is really CALIB, not invCALIB
     %% FIX LATER
 
     if NelData.General.RP2_3and4 && (~NelData.General.RX8)
