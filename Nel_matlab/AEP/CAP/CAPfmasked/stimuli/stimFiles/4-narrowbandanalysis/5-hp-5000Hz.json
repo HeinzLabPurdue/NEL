@@ -1,0 +1,18 @@
+{
+    "type":"noise-bands", 
+    "comment":"created with noiseBandMaskerDesigner", 
+    "n_bands":1, 
+    "bands":{
+        "amplitude":0.1, 
+        "fc_low":5000, 
+        "fc_high":12000
+    }, 
+    "name":"5-hp-5000Hz", 
+    "wavefiles":{
+        "fs":48828, 
+        "duration_s":3, 
+        "filter_order":64, 
+        "filter_order_mult":2, 
+        "filename":"5-hp-5000Hz_48828_128_3.wav"
+    }
+}
