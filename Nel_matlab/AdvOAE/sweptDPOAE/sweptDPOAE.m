@@ -134,7 +134,7 @@ disp('Starting stimulation...');
             resp(k - stim.ThrowAway,  :) = vins;
         end
         
-        WaitSecs(0.25);
+        pause(0.25);
         
         fprintf(1, 'Done with # %d trials \n', k);
         
@@ -162,14 +162,14 @@ disp('Starting stimulation...');
             end
             
             model_noise = ...
-                [cos(nearfreqs*phiProbe_inst(win)) .* taper;
-                -sin(nearfreqs*phiProbe_inst(win)) .* taper;
-                cos(nearfreqs*phiProbe_inst(win)) .* taper;
-                -sin(nearfreqs*phiProbe_inst(win)) .* taper;
-                cos(nearfreqs*phiProbe_inst(win)) .* taper;
-                -sin(nearfreqs*phiProbe_inst(win)) .* taper;
-                cos(nearfreqs*phiProbe_inst(win)) .* taper;
-                -sin(nearfreqs*phiProbe_inst(win)) .* taper];
+                [cos(nearfreqs(1)*phiProbe_inst(win)) .* taper;
+                -sin(nearfreqs(1)*phiProbe_inst(win)) .* taper;
+                cos(nearfreqs(2)*phiProbe_inst(win)) .* taper;
+                -sin(nearfreqs(2)*phiProbe_inst(win)) .* taper;
+                cos(nearfreqs(3)*phiProbe_inst(win)) .* taper;
+                -sin(nearfreqs(3)*phiProbe_inst(win)) .* taper;
+                cos(nearfreqs(4)*phiProbe_inst(win)) .* taper;
+                -sin(nearfreqs(4)*phiProbe_inst(win)) .* taper];
             
             coeffs_temp(m,:) = model_dp' \ oae_win';
             coeffs_noise(m,:) = model_noise' \ oae_win';
@@ -244,7 +244,7 @@ else
 end
 
 %% Shut Down TDT, no matter what button pushed, or if ended naturally
-close_play_circuit(f1RP, RP);
+close_play_circuit(card.f1RP, card.RP);
 rc = PAset(120.0*ones(1,4)); % need to use PAset, since it saves current value in PA, which is assumed way in NEL (causes problems when PAset is used to set attens later)
 run_invCalib(false);
 

@@ -24,8 +24,8 @@ if(any(abs(buffdata(1,:)) > 1) || any(abs(buffdata(2,:)) > 1))
 end
 
 % Load the 2ch variable data:
-invoke(RP, 'WriteTagVEX', 'datainL', 0, 'F32', buffdataA);
-invoke(RP, 'WriteTagVEX', 'datainR', 0, 'F32', buffdataB);
+invoke(RP, 'WriteTagVEX', 'datainL', 0, 'F32', buffdata(1,:));
+invoke(RP, 'WriteTagVEX', 'datainR', 0, 'F32', buffdata(2,:));
 
 %Start playing from the buffer:
 invoke(RP, 'SoftTrg', playrecTrigger);
