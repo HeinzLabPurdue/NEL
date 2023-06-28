@@ -76,16 +76,18 @@ if strcmp(command_str,'start')
     %     set(h_push_start,'Userdata',dpoaedata);
     
     % Run to get stim params and choose which OAE type to use.
-    AdvOAE_type = questdlg('Select OAE Measure:','OAE Type','xSwept DP','Swept SF','xTEOAE','Swept SF)');
+    AdvOAE_type = questdlg('Select OAE Measure:','OAE Type','Swept DP','Swept SF','xTEOAE','Swept SF)');
     switch AdvOAE_type
         case 'Swept DP'
-            % PROG = 'sweptDPOAE.m';
-            % sweptDPOAE;
+            addpath('C:\NEL\Nel_matlab\AdvOAE\sweptDPOAE');
+            PROG = 'sweptDPOAE.m';
+            sweptDPOAE;
+            rmpath('C:\NEL\Nel_matlab\AdvOAE\sweptDPOAE');
         case 'Swept SF'
             addpath('C:\NEL\Nel_matlab\AdvOAE\sweptSFOAE');
             PROG = 'sweptSFOAE.m';	     % program name is recorded in the data file
             sweptSFOAE;
-            rmpath('sweptSFOAE');
+            rmpath('C:\NEL\Nel_matlab\AdvOAE\sweptSFOAE');
         case 'TEOAE'
             % PROG = 'teoae.m';
             % teoae.m
