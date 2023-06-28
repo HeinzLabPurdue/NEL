@@ -36,8 +36,8 @@ if nargin<1
     end
     
     % This is probably why it's turning white !!!
-    colordef none;
-    whitebg('w');
+    % colordef none;
+    % whitebg('w');
     
     h_fig = figure('NumberTitle','off','Name','Advanced Otoacoustic Emissions','Units','normalized',...
         'Visible','on', 'position',[0.045  0.045  0.17  0.14],'MenuBar','none','Tag','AdvOAE_Main_Fig');
@@ -79,22 +79,19 @@ if strcmp(command_str,'start')
     AdvOAE_type = questdlg('Select OAE Measure:','OAE Type','xSwept DP','Swept SF','xTEOAE','Swept SF)');
     switch AdvOAE_type
         case 'Swept DP'
-            % make_DPOAE / sweptDPOAE_ins;
             % PROG = 'sweptDPOAE.m';
             % sweptDPOAE;
         case 'Swept SF'
-            addpath('sweptSFOAE'); 
-            sweptSFOAE_ins;              % outputs stim
+            addpath('C:\NEL\Nel_matlab\AdvOAE\sweptSFOAE');
             PROG = 'sweptSFOAE.m';	     % program name is recorded in the data file
             sweptSFOAE;
-            rmpath('sweptSFOAE'); 
+            rmpath('sweptSFOAE');
         case 'TEOAE'
-            % make_TEOAE / TEOAE_ins;
             % PROG = 'teoae.m';
             % teoae.m
     end
     
-    if strcmp(NelData.WBMEMR.rc,'restart')
+    if strcmp(NelData.AdvOAE.rc,'restart')
         advanced_oae('start');
     else  % saveNquit, or abort - need to close fig, otherwise don't close
         advanced_oae('close');
@@ -111,7 +108,7 @@ elseif strcmp(command_str,'abort')
     set(h_push_stop,'Userdata','abort');
     
 elseif strcmp(command_str, 'close')
-    close('Wideband Middle Ear Muscle Reflex');  % MEMR GUI (buttons)
+    close('Advanced Otoacoustic Emissions');  % GUI (buttons)
     
     % % % %     %% close all figs, except GUI (?
     % % % %     set(handleToYourMainGUI, 'HandleVisibility', 'off');

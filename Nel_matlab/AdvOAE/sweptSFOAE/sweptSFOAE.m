@@ -1,4 +1,4 @@
-global root_dir NelData data_dir stim
+global root_dir NelData data_dir
 
 % NEL Version of RunMEMR_chin_edited_NEL1.m based off Hari's SNAPLab script
 
@@ -32,12 +32,8 @@ Fs = 48828.125;
 [f1RP,RP,~]=load_play_circuit_Nel1(FS_tag,fig_num,GB_ch);
 disp('circuit loaded');
 
-%Set the delay of the sound
-invoke(RP, 'SetTagVal', 'onsetdel',0); % onset delay is in ms
-playrecTrigger = 1;
-
 %% Enter subject information
-if ~isfield(NelData,'sweptSFOAE') % First time through, need to ask all this.
+if ~isfield(NelData,'AdvOAE') % First time through, need to ask all this.
     subj = input('Please subject ID:', 's');    % NelData.sweptSFOAE.subj,earflag
     
     earflag = 1;
@@ -56,14 +52,14 @@ if ~isfield(NelData,'sweptSFOAE') % First time through, need to ask all this.
     uiwait(warndlg('Set ER-10B+ GAIN to 40 dB','SET ER-10B+ GAIN WARNING','modal'));
     
     % Save in case if restart
-    NelData.sweptSFOAE.subj=subj;
-    NelData.sweptSFOAE.ear=ear;
-    NelData.sweptSFOAE.Fig2close=[];  % set up the place to keep track of figures generted here (to be closed in NEL_App Checkout)
-    NelData.sweptSFOAE.AdvOAE_figNum=178;  % +1 from wbMEMR
+    NelData.AdvOAE.subj=subj;
+    NelData.AdvOAE.ear=ear;
+    NelData.AdvOAE.Fig2close=[];  % set up the place to keep track of figures generted here (to be closed in NEL_App Checkout)
+    NelData.AdvOAE.AdvOAE_figNum=277;  % +100 from wbMEMR
     
 else
-    subj=NelData.sweptSFOAE.subj;
-    ear=NelData.sweptSFOAE.ear;
+    subj=NelData.AdvOAE.subj;
+    ear=NelData.AdvOAE.ear;
     
     disp(sprintf('RESTARTING: \n   Subj: %s;\n   Ear: %s',subj,ear))
     uiwait(warndlg(sprintf('RESTARTING: \n   Subj: %s;\n   Ear: %s',subj,ear),'modal'));
@@ -82,18 +78,18 @@ end
 % end
 
 %% Initializing SFOAE variables for running and live analysis
+sweptSFOAE_ins;
+
 doneWithTrials = 0;
 
-% SH?: Change figure name, give handle? 
-figure;
+% SH?: Change figure name, give handle?
+snr_fig = figure;
 
 % Make arrays to store measured mic outputs
 ProbeBuffs = zeros(stim.maxTrials, numel(stim.yProbe));
 SuppBuffs = zeros(stim.maxTrials, numel(stim.yProbe));
 BothBuffs = zeros(stim.maxTrials, numel(stim.yProbe));
 flip = -1;
-
-resplength = size(buffdata,2);
 
 % variable for live analysis
 k = 1;
@@ -125,18 +121,15 @@ stim.CalibPICnum2use = calibPicNum;  % save this so we know what calib file to u
 coefFileNum = NaN;
 
 %% Data Collection Loop
+
+%Set the delay of the sound
+invoke(RP, 'SetTagVal', 'onsetdel',0); % onset delay is in ms
+playrecTrigger = 1;
+RZ6ADdelay = 97; % Samples
+
 disp('Starting stimulation...');
 
 while doneWithTrials == 0
-    
-    % Check for button push
-    % either ABORT or RESTART needs to break loop immediately,
-    % saveNquit will complete current LEVEL sweep
-    % SH?: May want to do this after every sweep
-    ud_status = get(h_push_stop,'Userdata');  % only call this once - ACT on 1st button push
-    if strcmp(ud_status,'abort') || strcmp(ud_status,'restart')
-        break;
-    end
     
     % alternate phase of the suppressor
     flip = flip .* -1;
@@ -147,6 +140,12 @@ while doneWithTrials == 0
     buffdata = zeros(2, numel(stim.yProbe));
     buffdata(1, :) = stim.yProbe;
     
+    resplength = size(buffdata,2) + RZ6ADdelay;
+    
+    % Set attenuations
+    rc = PAset([0, 0, dropProbe, dropSupp]);
+    invoke(RP, 'SetTagVal', 'nsamps', resplength);
+    
     % SH?: filter data (FPL)
     % buffdata = filter(stim.b.Ph1, 1, buffdata, [], 1);
     
@@ -155,14 +154,9 @@ while doneWithTrials == 0
         error('What did you do!? Sound is clipping!! Cannot Continue!!\n');
     end
     
-    % Set attenuations
-    rc = PAset([0, 0, dropProbe, dropSupp]);
-    invoke(RP, 'SetTagVal', 'nsamps', resplength);
-    
     % Load the 2ch variable data:
     invoke(RP, 'WriteTagVEX', 'datainL', 0, 'F32', buffdata(1, :));
     invoke(RP, 'WriteTagVEX', 'datainR', 0, 'F32', buffdata(2, :));
-    % SH?: pause(1.5);
     
     %Start playing from the buffer:
     invoke(RP, 'SoftTrg', playrecTrigger);
@@ -177,15 +171,13 @@ while doneWithTrials == 0
     
     % Save data
     if k > stim.ThrowAway
-        ProbeBuffs(k - stim.ThrowAway,  :) = vin;
+        ProbeBuffs(k - stim.ThrowAway,  :) = vin((RZ6ADdelay + 1):end);
     end
     
     % Get ready for next trial
     invoke(RP, 'SoftTrg', 8); % Stop and clear "OAE" buffer
-    
-    % SH? had this before:
-    % Reset the play index to zero:
-    % invoke(RP, 'SoftTrg', 5); %Reset Trigger
+    %Reset the play index to zero:
+    invoke(RP, 'SoftTrg', 5); %Reset Trigger
     
     pause(0.5);
     
@@ -195,6 +187,12 @@ while doneWithTrials == 0
     buffdata = zeros(2, numel(stim.ySupp));
     buffdata(2, :) = flip.*stim.ySupp;
     
+    resplength = size(buffdata,2) + RZ6ADdelay;
+    
+    % Set attenuations
+    rc = PAset([0, 0, dropProbe, dropSupp]);
+    invoke(RP, 'SetTagVal', 'nsamps', resplength);
+    
     % SH?: filter data (FPL)
     % buffdata = filter(stim.b.Ph2, 1, buffdata, [], 1);
     
@@ -203,14 +201,9 @@ while doneWithTrials == 0
         error('What did you do!? Sound is clipping!! Cannot Continue!!\n');
     end
     
-    % Set attenuations
-    rc = PAset([0, 0, dropProbe, dropSupp]);
-    invoke(RP, 'SetTagVal', 'nsamps', resplength);
-    
     % Load the 2ch variable data:
     invoke(RP, 'WriteTagVEX', 'datainL', 0, 'F32', buffdata(1, :));
     invoke(RP, 'WriteTagVEX', 'datainR', 0, 'F32', buffdata(2, :));
-    % SH?: pause(1.5);
     
     %Start playing from the buffer:
     invoke(RP, 'SoftTrg', playrecTrigger);
@@ -225,11 +218,13 @@ while doneWithTrials == 0
     
     % Save data
     if k > stim.ThrowAway
-        SuppBuffs(k - stim.ThrowAway,  :) = vin;
+        SuppBuffs(k - stim.ThrowAway,  :) = vin((RZ6ADdelay + 1):end);
     end
     
     % Get ready for next trial
     invoke(RP, 'SoftTrg', 8); % Stop and clear "OAE" buffer
+    %Reset the play index to zero:
+    invoke(RP, 'SoftTrg', 5); %Reset Trigger
     
     pause(0.5);
     
@@ -240,6 +235,12 @@ while doneWithTrials == 0
     buffdata(1, :) = stim.yProbe;
     buffdata(2, :) = flip.*stim.ySupp;
     
+    resplength = size(buffdata,2) + RZ6ADdelay;
+    
+    % Set attenuations
+    rc = PAset([0, 0, dropProbe, dropSupp]);
+    invoke(RP, 'SetTagVal', 'nsamps', resplength);
+    
     % SH?: filter data (FPL)
     % buffdata(1,:) = filter(stim.b.Ph1, 1, buffdata(1,:), [], 1);
     % buffdata(2,:) = filter(stim.b.Ph2, 1, buffdata(2,:), [], 1);
@@ -249,14 +250,9 @@ while doneWithTrials == 0
         error('What did you do!? Sound is clipping!! Cannot Continue!!\n');
     end
     
-    % Set attenuations
-    rc = PAset([0, 0, dropProbe, dropSupp]);
-    invoke(RP, 'SetTagVal', 'nsamps', resplength);
-    
     % Load the 2ch variable data:
     invoke(RP, 'WriteTagVEX', 'datainL', 0, 'F32', buffdata(1, :));
     invoke(RP, 'WriteTagVEX', 'datainR', 0, 'F32', buffdata(2, :));
-    % SH?: pause(1.5);
     
     %Start playing from the buffer:
     invoke(RP, 'SoftTrg', playrecTrigger);
@@ -271,11 +267,13 @@ while doneWithTrials == 0
     
     % Save data
     if k > stim.ThrowAway
-        BothBuffs(k - stim.ThrowAway,  :) = vin;
+        BothBuffs(k - stim.ThrowAway,  :) = vin((RZ6ADdelay + 1):end);
     end
     
     % Get ready for next trial
     invoke(RP, 'SoftTrg', 8); % Stop and clear "OAE" buffer
+    %Reset the play index to zero:
+    invoke(RP, 'SoftTrg', 5); %Reset Trigger
     
     pause(0.5);
     
@@ -283,7 +281,8 @@ while doneWithTrials == 0
     
     %% Analysis to check SNR
     % test OAE
-    if k - stim.ThrowAway >= minTrials
+    windowdur = 0.5;
+    if k - stim.ThrowAway >= stim.minTrials
         SFOAEtrials = ProbeBuffs(1:(k - stim.ThrowAway), :) + SuppBuffs(1:(k - stim.ThrowAway), :) - BothBuffs(1:(k - stim.ThrowAway), :);
         SFOAE = median(SFOAEtrials,1);
         coeffs_temp = zeros(length(testfreq), 2);
@@ -299,10 +298,10 @@ while doneWithTrials == 0
             model_sf = [cos(2*pi*phiProbe_inst(win)) .* taper;
                 -sin(2*pi*phiProbe_inst(win)) .* taper];
             
-            if stim.speed > 0 
-                nearfreqs = [1.10, 1.12, 1.14, 1.16]; 
+            if stim.speed > 0
+                nearfreqs = [1.10, 1.12, 1.14, 1.16];
             else
-                nearfreqs = [.90, .88, .86, .84]; 
+                nearfreqs = [.90, .88, .86, .84];
             end
             
             model_noise = [cos(2*pi*nearfreqs(1)*phiProbe_inst(win)) .* taper;
@@ -329,6 +328,7 @@ while doneWithTrials == 0
         
         SNR_temp = db(oae) - db(noise);
         
+        figure(snr_fig);
         hold off;
         plot(testfreq./1000,db(oae.*10000), 'o', 'linew', 2);
         hold on;
@@ -341,16 +341,31 @@ while doneWithTrials == 0
         xlim([0.5, 16])
         
         
-        if SNR_temp(1:8) > SNRcriterion
+        if SNR_temp(1:8) > stim.SNRcriterion
             doneWithTrials = 1;
-        elseif k-stim.ThrowAway == maxTrials
+        elseif k-stim.ThrowAway == stim.maxTrials
             doneWithTrials = 1;
         end
         
     end
+    
     k = k + 1;
     
+    % Check for button push
+    % either ABORT or RESTART needs to break loop immediately,
+    % saveNquit will complete current LEVEL sweep
+    % SH?: May want to do this after every sweep
+    ud_status = get(h_push_stop,'Userdata');  % only call this once - ACT on 1st button push
+    if strcmp(ud_status,'abort') || strcmp(ud_status,'restart')
+        break;
+    end
+    
 end % End of Trials
+
+stim.ProbeBuffs = ProbeBuffs(1:k-1,:);
+stim.SuppBuffs = SuppBuffs(1:k-1,:);
+stim.BothBuffs = BothBuffs(1:k-1,:);
+
 
 %% Shut off buttons once out of data collection loop
 % until we put STOP functionality in, all roads mean we're done here
@@ -359,7 +374,7 @@ set(h_push_restart,'Enable','off');
 set(h_push_abort,'Enable','off');
 set(h_push_saveNquit,'Enable','off');
 
-stim.NUMtrials_Completed = nTRIALS;  % save how many trials completed
+stim.NUMtrials_Completed = k-1;  % save how many trials completed
 
 %store last button command, or that it ended all reps
 if ~isempty(ud_status)
@@ -383,7 +398,7 @@ end
 %% Set up data structure to save
 stim.date = datestr(clock);
 
-% SH? May want to add my analysis code here. 
+% SH? May want to add my analysis code here.
 % answer = questdlg('Would you like to perform artifact rejection?'...
 %     ,'Artifact Rejection?','Yes','No','Dont know');
 % %Handle response
@@ -415,10 +430,10 @@ switch NelData.AdvOAE.rc
         if ~isempty(TEMPans)
             comment=TEMPans{1};
         end
-        stim.comment = comment
+        stim.comment = comment; 
         
         %% NEL based data saving script
-        make_memr_text_file;
+        make_sfoae_text_file;
         
         %% remind user to turn of microphone
         h = msgbox('Please remember to turn off the microphone');
