@@ -1,4 +1,6 @@
-function vins = PlayCaptureNEL(buffdata, dropA, dropB, delayComp)
+function vins = PlayCaptureNEL(card, buffdata, dropA, dropB, delayComp)
+f1RP = card.f1RP; 
+RP = card.RP; 
 
 %Set the delay of the sound
 invoke(RP, 'SetTagVal', 'onsetdel',0); % onset delay is in ms

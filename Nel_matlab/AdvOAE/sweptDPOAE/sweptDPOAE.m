@@ -10,7 +10,7 @@ host = host(~isspace(host));
 %Insert NEL/GUI Parameters here...none for WBMEMR
 
 %% Initialize TDT
-initialize_card; 
+card = initialize_card; 
 
 %% Inverse Calibration
 %NEEDS TO BE CLEANED UP ASAP.
@@ -95,7 +95,7 @@ disp('Starting stimulation...');
     
     %% Add useful info to structure
     mic_sens = 50e-3; % mV/Pa
-    mic_gain = db2mag(gain + 6); % +6 for balanced cable
+    mic_gain = db2mag(40); % +6 for balanced cable
     P_ref = 20e-6;
     DR_onesided = 1;
     stim.VoltageToPascal = 1 / (DR_onesided * mic_gain * mic_sens);
@@ -128,7 +128,7 @@ disp('Starting stimulation...');
         k = k + 1;
         
         %Start playing from the buffer:
-        vins = PlayCaptureNEL(buffdata, drop_f1, drop_f2, delayComp);
+        vins = PlayCaptureNEL(card, buffdata, drop_f1, drop_f2, delayComp);
         
         if k > stim.ThrowAway
             resp(k - stim.ThrowAway,  :) = vins;
