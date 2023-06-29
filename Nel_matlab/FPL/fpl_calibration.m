@@ -1,4 +1,4 @@
-function h_fig = advanced_oae(command_str)
+function h_fig = fpl_calibration(command_str)
 
 %command_string: 'initialize','start','close'
 %AS/MH 06/13/2023: From distortion_product.m, purposely stripped down just
@@ -12,7 +12,7 @@ global root_dir NelData
 % ud = get(handles.Nel_Main,'Userdata');
 % change_fig_height(app, handles, -44);   use bigger #
 
-h_fig = findobj('Tag','AdvOAE_Main_Fig');    %% Finds handle for TC-Figure
+h_fig = findobj('Tag','FPL_Main_Fig');    %% Finds handle for TC-Figure
 
 if nargin<1
     
@@ -39,11 +39,11 @@ if nargin<1
     % colordef none;
     % whitebg('w');
     
-    h_fig = figure('NumberTitle','off','Name','Advanced Otoacoustic Emissions','Units','normalized',...
-        'Visible','on', 'position',[0.045  0.045  0.17  0.14],'MenuBar','none','Tag','AdvOAE_Main_Fig');
+    h_fig = figure('NumberTitle','off','Name','FPL Calibration','Units','normalized',...
+        'Visible','on', 'position',[0.045  0.045  0.17  0.14],'MenuBar','none','Tag','FPL_Main_Fig');
     
     % SH changed name to generalize
-    eval('AdvOAEplot');
+    eval('FPLplot');
     
     handles = [h_push_stop, h_push_saveNquit, h_push_restart, h_push_abort];
     set(h_fig,'Userdata',handles);
@@ -51,7 +51,7 @@ if nargin<1
     %     feval('save',fullfile(root_dir,'DPOAE','workspace','dpoaebjm'),'PARAMS','PROG','VERSION');
     %     set(h_fig,'Visible','on');
     
-    advanced_oae('start'); % Auto start
+    fpl_calibration('start'); % Auto start
     command_str = 'initialize'; %set command string to initialize (not used anymore, but needs tobe non-empty to exit gracefully)
 else
     handles = get(h_fig,'Userdata');
@@ -76,34 +76,33 @@ if strcmp(command_str,'start')
     %     set(h_push_start,'Userdata',dpoaedata);
     
     % Run to get stim params and choose which OAE type to use.
-    AdvOAE_type = questdlg('Select OAE Measure:','OAE Type','Swept DP','Swept SF','TEOAE','Swept SF');
-    switch AdvOAE_type
-        case 'Swept DP'
-            addpath('C:\NEL\Nel_matlab\AdvOAE\sweptDPOAE');
-            PROG = 'sweptDPOAE.m';
-            sweptDPOAE;
-            rmpath('C:\NEL\Nel_matlab\AdvOAE\sweptDPOAE');
-        case 'Swept SF'
-            addpath('C:\NEL\Nel_matlab\AdvOAE\sweptSFOAE');
-            PROG = 'sweptSFOAE.m';	     % program name is recorded in the data file
-            sweptSFOAE;
-            rmpath('C:\NEL\Nel_matlab\AdvOAE\sweptSFOAE');
-        case 'TEOAE'
-            addpath('C:\NEL\Nel_matlab\AdvOAE\TEOAE');
-            PROG = 'teoae.m';
-            teoae; 
-            rmpath('C:\NEL\Nel_matlab\AdvOAE\TEOAE');
+    FPL_type = questdlg('What type of Calibration:', 'Set Calib Type','Probe','Ear','Probe');
+    switch FPL_type
+        case 'Probe'
+            addpath('C:\NEL\Nel_matlab\FPL\Probe');
+            PROG = 'FPLprobe.m';
+            FPLprobe;
+            rmpath('C:\NEL\Nel_matlab\FPL\Probe');
+        case 'Ear'
+            addpath('C:\NEL\Nel_matlab\FPL\Ear');
+            PROG = 'FPLear.m';	     % program name is recorded in the data file
+            FPLear;
+            rmpath('C:\NEL\Nel_matlab\FPL\Ear');
+%         case 'Inverse'
+%             addpath('C:\NEL\Nel_matlab\FPL\TEOAE');
+%             PROG = 'teoae.m';
+%             teoae; 
+%             rmpath('C:\NEL\Nel_matlab\FPL\TEOAE');
     end
     
-    if strcmp(NelData.AdvOAE.rc,'restart')
-        advanced_oae('start');
+    if strcmp(NelData.FPL.rc,'restart')
+        fpl_calibration('start');
     else  % saveNquit, or abort - need to close fig, otherwise don't close
-        advanced_oae('close');
+        fpl_calibration('close');
     end
     
 elseif strcmp(command_str,'stop')
     set(h_push_stop,'Userdata','stop');
-    
     
 elseif strcmp(command_str,'restart')
     set(h_push_stop,'Userdata','restart');
@@ -112,7 +111,7 @@ elseif strcmp(command_str,'abort')
     set(h_push_stop,'Userdata','abort');
     
 elseif strcmp(command_str, 'close')
-    close('Advanced Otoacoustic Emissions');  % GUI (buttons)
+    close('FPL Calibration');  % GUI (buttons)
     
     % % % %     %% close all figs, except GUI (?
     % % % %     set(handleToYourMainGUI, 'HandleVisibility', 'off');
