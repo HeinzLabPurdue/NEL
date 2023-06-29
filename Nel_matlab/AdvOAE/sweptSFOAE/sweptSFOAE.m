@@ -398,22 +398,18 @@ end
 %% Set up data structure to save
 stim.date = datestr(clock);
 
-% SH? May want to add my analysis code here.
-% answer = questdlg('Would you like to perform artifact rejection?'...
-%     ,'Artifact Rejection?','Yes','No','Dont know');
-% %Handle response
-% switch answer
-%     case {'Yes'}
-%         %         figure;    %need to close when done
-%         AR = 1;
-%         % Call function
-%         % instead of saving as a separate file, it just saves stim_AR in a
-%         % pic file
-%         [stim_AR] = analyzeMEM_Fn(stim,AR);
-%         disp('Saving Artifact Rejected data ...')
-%     case {'No'}
-%         % do nothing
-% end
+answer = questdlg('Would you like to analyze this data?'...
+    ,'Analyze?','Yes','No');
+%Handle response
+switch answer
+    case {'Yes'}
+        % Call function
+        % instead of saving as a separate file, it just saves stim_AR in a
+        [res_SFOAE] = sweptSFOAE_analysis(stim);
+        disp('Saving Analyzed data ...')
+    case {'No'}
+        % do nothing
+end
 
 warning('off');  % ??
 

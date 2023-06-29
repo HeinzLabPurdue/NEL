@@ -19,7 +19,7 @@ card = initialize_card;
 [~, calibPicNum, ~] = run_invCalib(false);   % skipping INV calib for now since based on 94 dB SPL benig highest value, bot the 105 dB SPL from inv Calib.
 [coefFileNum, ~, ~] = run_invCalib(-2);
 
-stim.CalibPICnum2use = calibPicNum;  % save this so we know what calib file to use right from data file
+click.CalibPICnum2use = calibPicNum;  % save this so we know what calib file to use right from data file
 coefFileNum = NaN;
 
 %% Enter subject information
@@ -68,158 +68,51 @@ end
 % end
 
 %% Initializing SFOAE variables for running and live analysis
-sweptDPOAE_ins;
+teoae_ins;
 disp('Starting stimulation...');
 
 %% Running Script
 
-% Set stims in buffdata:
-buffdata = [stim.y1; stim.y2];
-% Check for clipping and load to buffer
-if(any(abs(buffdata(:)) > 1))
-    error('What did you do!? Sound is clipping!! Cannot Continue!!\n');
-end
+vo = click.y;
+buffdata = zeros(2, numel(vo));
+buffdata(click.driver, :) = vo; % The other source plays nothing
+click.vo = vo;
+odd = 1:2:click.Averages;
+even = 2:2:click.Averages;
 
-%% Set attenuation and play
-drop_f1 = stim.drop_f1;
-drop_f2 = stim.drop_f2;
-delayComp = 1; % Always
+drops = [120; 120];
+drops(click.driver) = click.Attenuation;
 
-windowdur = 0.5;
-SNRcriterion = stim.SNRcriterion;
-maxTrials = stim.maxTrials;
-minTrials = stim.minTrials;
-doneWithTrials = 0;
-snr_fig = figure;
+% Make arrays to store measured mic outputs
+resp = zeros(click.Averages, size(buffdata,2));
 
-%% Add useful info to structure
-mic_sens = 50e-3; % mV/Pa
-mic_gain = db2mag(40); % +6 for balanced cable
-P_ref = 20e-6;
-DR_onesided = 1;
-stim.VoltageToPascal = 1 / (DR_onesided * mic_gain * mic_sens);
-stim.PascalToLinearSPL = 1 /  P_ref;
-
-resp = zeros(maxTrials, size(buffdata,2));
-
-%% Loop for presenting stimuli
-% variable for live analysis
-k = 0;
-t = stim.t;
-testfreq = [.75, 1, 1.5, 2, 3, 4, 6, 8, 12].* 1000;
-
-if stim.speed < 0
-    f1 = stim.fmax;
-    f2 = stim.fmin;
-else
-    f1 = stim.fmin;
-    f2 = stim.fmax;
-end
-
-if stim.speed < 20
-    t_freq = log2(testfreq/f1)/stim.speed + stim.buffdur;
-else
-    t_freq = (testfreq-f1)/stim.speed + stim.buffdur;
-end
-
-
-while doneWithTrials == 0
-    k = k + 1;
+for k = 1:(click.Averages + click.ThrowAway)
     
-    %Start playing from the buffer:
-    vins = PlayCaptureNEL(card, buffdata, drop_f1, drop_f2, delayComp);
-    
-    if k > stim.ThrowAway
-        resp(k - stim.ThrowAway,  :) = vins;
-    end
-    
-    pause(0.25);
-    
-    fprintf(1, 'Done with # %d trials \n', k);
-    
-    % test OAE
-    
-    OAEtrials = resp(1:k-stim.ThrowAway, :);
-    OAE = median(OAEtrials,1);
-    coeffs_temp = zeros(length(testfreq), 2);
-    coeffs_noise = zeros(length(testfreq), 8);
-    for m = 1:length(testfreq)
-        win = find( (t > (t_freq(m)-windowdur/2)) & ...
-            (t < (t_freq(m)+windowdur/2)));
-        taper = hanning(numel(win))';
-        
-        oae_win = OAE(win) .* taper;
-        
-        phiProbe_inst = (2.*stim.phi1_inst - stim.phi2_inst) * 2 * pi;
-        
-        model_dp = [cos(phiProbe_inst(win)) .* taper;
-            -sin(phiProbe_inst(win)) .* taper];
-        if stim.speed > 0
-            nearfreqs = [1.10, 1.12, 1.14, 1.16];
-        else
-            nearfreqs = [.90, .88, .86, .84];
-        end
-        
-        model_noise = ...
-            [cos(nearfreqs(1)*phiProbe_inst(win)) .* taper;
-            -sin(nearfreqs(1)*phiProbe_inst(win)) .* taper;
-            cos(nearfreqs(2)*phiProbe_inst(win)) .* taper;
-            -sin(nearfreqs(2)*phiProbe_inst(win)) .* taper;
-            cos(nearfreqs(3)*phiProbe_inst(win)) .* taper;
-            -sin(nearfreqs(3)*phiProbe_inst(win)) .* taper;
-            cos(nearfreqs(4)*phiProbe_inst(win)) .* taper;
-            -sin(nearfreqs(4)*phiProbe_inst(win)) .* taper];
-        
-        coeffs_temp(m,:) = model_dp' \ oae_win';
-        coeffs_noise(m,:) = model_noise' \ oae_win';
-    end
-    
-    % for noise
-    noise2 = zeros(length(testfreq),4);
-    for i = 1:2:8
-        noise2(:,ceil(i/2)) = abs(complex(coeffs_noise(:,i), coeffs_noise(:,i+1)));
-    end
-    noise = mean(noise2, 2);
-    
-    oae = abs(complex(coeffs_temp(:,1), coeffs_temp(:,2)));
-    
-    SNR_temp = db(oae) - db(noise);
-    
-    mult = stim.VoltageToPascal .* stim.PascalToLinearSPL;
-    figure(snr_fig);
-    hold off;
-    plot(testfreq./1000,db(oae.*mult), 'o', 'linew', 2);
-    hold on;
-    plot(testfreq./1000,db(noise.*mult), 'x', 'linew', 2);
-    legend('DPOAE', 'NOISE');
-    xlabel('Frequency (Hz)')
-    ylabel('Median Amplitude dB')
-    set(gca, 'XScale', 'log', 'FontSize', 14)
-    xticks([.5, 1, 2, 4, 8, 16])
-    xlim([0.5, 16])
-    drawnow;
-    
-    % if SNR is good enough and we've hit the minimum number of
-    % trials, then stop.
-    if SNR_temp(1:8) > SNRcriterion
-        if k - stim.ThrowAway >= minTrials
-            doneWithTrials = 1;
-        end
-    elseif k == maxTrials
-        doneWithTrials = 1;
-    end
-    
-    % Check for button push
-    % either ABORT or RESTART needs to break loop immediately,
-    % saveNquit will complete current LEVEL sweep
+    % Check for abort or restart:
     ud_status = get(h_push_stop,'Userdata');  % only call this once - ACT on 1st button push
     if strcmp(ud_status,'abort') || strcmp(ud_status,'restart')
-        break;
+        break; % abort or restart button push breaks loop
     end
+    
+    vin = PlayCaptureNEL(card, buffdata, drops(1), drops(2), 1);
+    
+    % Save data
+    if k > click.ThrowAway
+        resp(k - click.ThrowAway,  :) = vin;
+    end
+    
+    fprintf(1, 'Done with trial %d / %d\n', k,...
+        (click.ThrowAway + click.Averages));
     
 end
 
-stim.resp = resp(1:k-stim.ThrowAway,:);
+click.resp = resp(:, (click.StimWin+1):(click.StimWin + click.RespDur)); % Remove stimulus by windowing
+
+%other things to save
+click.mic_sens = 50e-3; % mV/Pa. TO DO: change after calibration
+click.mic_gain = db2mag(40);
+click.P_ref = 20e-6;
+click.DR_onesided = 1;
 
 %% Shut off buttons once out of data collection loop
 % until we put STOP functionality in, all roads mean we're done here
@@ -228,15 +121,15 @@ set(h_push_restart,'Enable','off');
 set(h_push_abort,'Enable','off');
 set(h_push_saveNquit,'Enable','off');
 
-stim.NUMtrials_Completed = k;  % save how many trials completed
+click.NUMtrials_Completed = k;  % save how many trials completed
 
 %store last button command, or that it ended all reps
 if ~isempty(ud_status)
     NelData.AdvOAE.rc = ud_status;  % button was pushed
-    stim.ALLtrials_Completed=0;
+    click.ALLtrials_Completed=0;
 else
     NelData.AdvOAE.rc = 'saveNquit';  % ended all REPS - saveNquit
-    stim.ALLtrials_Completed=1;
+    click.ALLtrials_Completed=1;
 end
 
 %% Shut Down TDT, no matter what button pushed, or if ended naturally
@@ -250,17 +143,19 @@ if strcmp(NelData.AdvOAE.rc,'abort') || strcmp(NelData.AdvOAE.rc,'restart')
 end
 
 %% Set up data structure to save
-stim.date = datestr(clock);
+click.date = datestr(clock);
 
-% Option to analyze data
 answer = questdlg('Would you like to analyze this data?'...
-    ,'Analyze?','Yes','No');
+    ,'Analysis?','Yes','No');
 %Handle response
 switch answer
     case {'Yes'}
+        % figure;    %need to close when done
         % Call function
         % instead of saving as a separate file, it just saves stim_AR in a
-        [res_DPOAE] = sweptDPOAE_analysis(stim);
+        % pic file
+        
+        [teoae_res] = teoae_analysis(click);
         disp('Saving Analyzed data ...')
     case {'No'}
         % do nothing
@@ -281,10 +176,10 @@ switch NelData.AdvOAE.rc
         if ~isempty(TEMPans)
             comment=TEMPans{1};
         end
-        stim.comment = comment;
+        click.comment = comment;
         
         %% NEL based data saving script
-        make_sweptdpoae_text_file;
+        make_teoae_text_file;
         
         %% remind user to turn of microphone
         h = msgbox('Please remember to turn off the microphone');

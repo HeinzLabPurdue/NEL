@@ -1,4 +1,4 @@
-function vins = PlayCaptureNEL(card, buffdata, dropA, dropB, delayComp)
+function vin = PlayCaptureNEL(card, buffdata, dropA, dropB, delayComp)
 f1RP = card.f1RP; 
 RP = card.RP; 
 
@@ -38,7 +38,7 @@ end
 vin = invoke(RP, 'ReadTagVex', 'dataout', 0, resplength,...
     'F32','F64',1);
 
-vins = vin((ADdelay + 1):end);
+vin = vin((ADdelay + 1):end);
 
 % Get ready for next trial
 invoke(RP, 'SoftTrg', 8); % Stop and clear "OAE" buffer

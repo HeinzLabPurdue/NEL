@@ -15,6 +15,11 @@ stim.maxTrials = 3;
 stim.minTrials = 1;
 stim.ThrowAway = 1;
 
+% Analysis Params: 
+stim.analysis.windowdur = 0.25;
+stim.analysis.offsetwin = 0.0; % not finding additional delay
+stim.analysis.npoints = 512;
+
 % Create stimulus
 buffdur = stim.buffdur;
 Fs = stim.Fs; 

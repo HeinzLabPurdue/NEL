@@ -24,10 +24,10 @@ x.Hardware.CalibPICnum2use = stim.CalibPICnum2use;  % Save Calib file to use for
 %% saving specific MEMR data
 x.sweptSFOAEData.stim = stim;
 
-% SH?: Add analysis result: 
-% if exist('stim_AR','var')
-%     x.MemrData.stim_AR = stim_AR;
-% end 
+%Add analysis result: 
+if exist('res_SFOAE','var')
+    x.sweptSFOAEData.res = res_SFOAE;
+end 
 
 %% Save data file
 MfileSAVE=0;

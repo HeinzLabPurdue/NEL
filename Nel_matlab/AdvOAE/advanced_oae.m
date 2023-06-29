@@ -7,7 +7,7 @@ function h_fig = advanced_oae(command_str)
 %and dpoae.m)
 
 global PARAMS PROG VERSION VOLTS
-global root_dir NelData stim
+global root_dir NelData 
 
 % ud = get(handles.Nel_Main,'Userdata');
 % change_fig_height(app, handles, -44);   use bigger #
@@ -76,7 +76,7 @@ if strcmp(command_str,'start')
     %     set(h_push_start,'Userdata',dpoaedata);
     
     % Run to get stim params and choose which OAE type to use.
-    AdvOAE_type = questdlg('Select OAE Measure:','OAE Type','Swept DP','Swept SF','xTEOAE','Swept SF)');
+    AdvOAE_type = questdlg('Select OAE Measure:','OAE Type','Swept DP','Swept SF','TEOAE','Swept SF)');
     switch AdvOAE_type
         case 'Swept DP'
             addpath('C:\NEL\Nel_matlab\AdvOAE\sweptDPOAE');
@@ -89,8 +89,10 @@ if strcmp(command_str,'start')
             sweptSFOAE;
             rmpath('C:\NEL\Nel_matlab\AdvOAE\sweptSFOAE');
         case 'TEOAE'
-            % PROG = 'teoae.m';
-            % teoae.m
+            addpath('C:\NEL\Nel_matlab\AdvOAE\TEOAE');
+            PROG = 'teoae.m';
+            teoae; 
+            rmpath('C:\NEL\Nel_matlab\AdvOAE\TEOAE');
     end
     
     if strcmp(NelData.AdvOAE.rc,'restart')
