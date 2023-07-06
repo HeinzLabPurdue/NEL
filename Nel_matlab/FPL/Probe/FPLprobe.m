@@ -49,7 +49,7 @@ end
 % end
 
 %% Initializing SFOAE variables for running and live analysis
-calib = FPLprobe_ins;
+FPLprobe_ins;
 disp('Starting stimulation...');
 
 %% Running Script
