@@ -7,7 +7,7 @@ function h_fig = fpl_calibration(command_str)
 %and dpoae.m)
 
 global PARAMS PROG VERSION VOLTS
-global root_dir NelData 
+global root_dir NelData
 
 % ud = get(handles.Nel_Main,'Userdata');
 % change_fig_height(app, handles, -44);   use bigger #
@@ -76,7 +76,7 @@ if strcmp(command_str,'start')
     %     set(h_push_start,'Userdata',dpoaedata);
     
     % Run to get stim params and choose which OAE type to use.
-    FPL_type = questdlg('What type of Calibration:', 'Set Calib Type','Probe','Ear','Probe');
+    FPL_type = questdlg('What type of Calibration:', 'Set Calib Type','Probe','Ear','xInverse', 'Probe');
     switch FPL_type
         case 'Probe'
             addpath('C:\NEL\Nel_matlab\FPL\Probe');
@@ -87,12 +87,14 @@ if strcmp(command_str,'start')
             addpath('C:\NEL\Nel_matlab\FPL\Ear');
             PROG = 'FPLear.m';	     % program name is recorded in the data file
             FPLear;
-            rmpath('C:\NEL\Nel_matlab\FPL\Ear');
-%         case 'Inverse'
-%             addpath('C:\NEL\Nel_matlab\FPL\TEOAE');
-%             PROG = 'teoae.m';
-%             teoae; 
-%             rmpath('C:\NEL\Nel_matlab\FPL\TEOAE');
+            rmpath('C:\NEL\Nel_matlab\FPL\Ear')
+%       case 'Inverse'
+            % Want to be able to rerun Ear after the in-ear calibration to check that
+            % the generated filter is flattening things.
+            %             addpath('C:\NEL\Nel_matlab\FPL\TEOAE');
+            %             PROG = 'teoae.m';
+            %             teoae;
+            %             rmpath('C:\NEL\Nel_matlab\FPL\TEOAE');
     end
     
     if strcmp(NelData.FPL.rc,'restart')

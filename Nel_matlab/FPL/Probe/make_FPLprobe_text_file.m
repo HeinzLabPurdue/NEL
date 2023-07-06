@@ -1,6 +1,6 @@
 global NelData 
 
-fname = current_data_file('sweptDPOAE',1);
+fname = current_data_file('FPLprobe',1);
 
 %% General NEL data saving
 x.General.program_name  = PROG;
@@ -22,12 +22,12 @@ x.Hardware.NELmaxvolts_V   = VOLTS;   % max volts in NEL circuit design
 x.Hardware.CalibPICnum2use = stim.CalibPICnum2use;  % Save Calib file to use for these data - based on how hardware is setup (run-invCalib)
 
 %% saving specific MEMR data
-x.sweptDPOAEData.stim = stim;
+x.FPLprobeData.calib = calib;
 
-% Add analysis result: 
-if exist('res_DPOAE','var')
-    x.sweptDPOAEData.res = res_DPOAE;
-end 
+% Save to ProbeCal_Data folder for use later since general for that day
+generalfname = ['./ProbeCal_Data/FPLprobe_' date];  
+save(generalfname,'x');  % std mat file
+fprintf('%s %s.mat\n','Saved data file to general folder: ',generalfname);
 
 %% Save data file
 MfileSAVE=0;

@@ -26,12 +26,12 @@ coefFileNum = NaN;
 if ~isfield(NelData,'FPL') % First time through, need to ask all this.
     
     uiwait(warndlg('Set ER-10B+ GAIN to 40 dB','SET ER-10B+ GAIN WARNING','modal'));
-    gain = 40; 
+    gain = 40;
     
     % Save in case if restart
     NelData.FPL.Fig2close=[];  % set up the place to keep track of figures generted here (to be closed in NEL_App Checkout)
     NelData.FPL.FPL_figNum=477;  % +200 from wbMEMR
-
+    
 else
     fprintf('RESTARTING...\n')
 end
@@ -56,36 +56,102 @@ disp('Starting stimulation...');
 
 Fs = calib.SamplingRate * 1000; % to Hz
 
-driverflag = 1;
-while driverflag == 1
-    driver = input('Please enter whether you want driver 1, 2 or 3 (Aux on ER-10X):');
-    switch driver
-        case {1, 2}
-            drivername = strcat('Ph',num2str(driver));
-            driverflag = 0;
-        case 3
-            if strcmp(device, 'ER-10X')
-                drivername = 'PhAux';
-                driverflag = 0;
-            else
-                fprintf(2, 'Unrecognized driver! Try again!');
-            end
-        otherwise
-            fprintf(2, 'Unrecognized driver! Try again!');
-    end
-end
-
-calib.drivername = drivername;
-calib.driver = driver;
-
-vo = calib.y; 
+vo = calib.y;
 buffdata = zeros(2, numel(vo));
-buffdata(driver, :) = vo; % The other source plays nothing
 calib.vo = vo;
-vins = zeros(calib.CavNumb, calib.Averages, calib.BufferSize);
-calib.vavg = zeros(calib.CavNumb, calib.BufferSize);
+vins_1 = zeros(calib.CavNumb, calib.Averages, calib.BufferSize);
+vins_2 = zeros(calib.CavNumb, calib.Averages, calib.BufferSize);
+calib.vavg_1 = zeros(calib.CavNumb, calib.BufferSize);
+calib.vavg_2 = zeros(calib.CavNumb, calib.BufferSize);
 
 for m = 1: calib.CavNumb
+    
+    % Do driver 1 first:
+    driver = 1;
+    buffdata(driver, :) = vo; % The other source plays nothing
+    
+    drop = [120, 120];
+    drop(driver) = calib.Attenuation;
+    
+    for n = 1:(calib.Averages + calib.ThrowAway)
+        vin = PlayCaptureNEL(card, buffdata, drop(1), drop(2), 1);
+        
+        % Save data
+        if (n > calib.ThrowAway)
+            vins_1(m,n-calib.ThrowAway,:) = vin;
+        end
+    end
+    
+    %compute the average
+    
+    if calib.doFilt
+        % High pass at 100 Hz using IIR filter
+        [b, a] = butter(4, 100 * 2 * 1e-3/calib.SamplingRate, 'high');
+        vins_1(m, :, :) = filtfilt(b, a, squeeze(vins_1(m, :, :))')';
+    end
+    
+    vins_1(m, :, :) = demean(squeeze(vins_1(m, :, :)), 2);
+    energy = squeeze(sum(vins_1(m, :, :).^2, 3));
+    good = energy < median(energy) + 2*mad(energy);
+    vavg_1 = squeeze(mean(vins_1(m, good, :), 2));
+    calib.vavg_1(m, :) = vavg_1;
+    Vavg_1 = rfft(vavg_1);
+    
+    % Apply calibartions to convert voltage to pressure
+    % For ER-10X, this is approximate
+    mic_sens = 50e-3; % mV/Pa. TO DO: change after calibration
+    mic_gain = db2mag(gain); % +6 for balanced cable
+    P_ref = 20e-6;
+    DR_onesided = 1;
+    mic_output_V_1 = Vavg_1 / (DR_onesided * mic_gain);
+    output_Pa_1 = mic_output_V_1/mic_sens;
+    outut_Pa_20uPa_per_Vpp = output_Pa_1 / P_ref; % unit: 20 uPa / Vpeak
+    
+    freq = 1000*linspace(0,calib.SamplingRate/2,length(Vavg_1))';
+    calib.freq = freq;
+    
+    % CARD MAT2VOLTS = 5.0
+    Vo = rfft(calib.vo)*5*db2mag(-1 * calib.Attenuation);
+    calib.CavRespH_1(:,m) =  outut_Pa_20uPa_per_Vpp_1 ./ Vo; %save for later
+    
+    
+    %% Do driver 2 next:
+    driver = 2;
+    buffdata(driver, :) = vo; % The other source plays nothing
+    
+    drop = [120, 120];
+    drop(driver) = calib.Attenuation;
+    
+    for n = 1:(calib.Averages + calib.ThrowAway)
+        vin = PlayCaptureNEL(card, buffdata, drop(1), drop(2), 1);
+        
+        % Save data
+        if (n > calib.ThrowAway)
+            vins_2(m,n-calib.ThrowAway,:) = vin;
+        end
+    end
+    
+    %compute the average
+    
+    if calib.doFilt
+        % High pass at 100 Hz using IIR filter
+        [b, a] = butter(4, 100 * 2 * 1e-3/calib.SamplingRate, 'high');
+        vins_2(m, :, :) = filtfilt(b, a, squeeze(vins_2(m, :, :))')';
+    end
+    
+    vins_2(m, :, :) = demean(squeeze(vins_2(m, :, :)), 2);
+    energy = squeeze(sum(vins_2(m, :, :).^2, 3));
+    good = energy < median(energy) + 2*mad(energy);
+    vavg_2 = squeeze(mean(vins_2(m, good, :), 2));
+    calib.vavg_2(m, :) = vavg_2;
+    Vavg_2 = rfft(vavg_2);
+    
+    % Apply calibartions to convert voltage to pressure
+    mic_output_V_2 = Vavg_2 / (DR_onesided * mic_gain);
+    output_Pa_2 = mic_output_V_2/mic_sens;
+    outut_Pa_20uPa_per_Vpp_2 = output_Pa_2 / P_ref; % unit: 20 uPa / Vpeak
+    
+    calib.CavRespH_2(:,m) =  outut_Pa_20uPa_per_Vpp_2 ./ Vo; %save for later
     
     % Check for button push
     % either ABORT or RESTART needs to break loop immediately,
@@ -95,65 +161,25 @@ for m = 1: calib.CavNumb
         break;
     end
     
-    drop = [120, 120]; 
-    drop(driver) = calib.Attenuation; 
-    
-    for n = 1:(calib.Averages + calib.ThrowAway)
-        vin = PlayCaptureNEL(card, buffdata, drop(1), drop(2), 1); 
-        
-          % Save data
-        if (n > calib.ThrowAway)
-            vins(m,n-calib.ThrowAway,:) = vin;
-        end
-    end
-    
-        %compute the average
-    
-    if calib.doFilt
-        % High pass at 100 Hz using IIR filter
-        [b, a] = butter(4, 100 * 2 * 1e-3/calib.SamplingRate, 'high');
-        vins(m, :, :) = filtfilt(b, a, squeeze(vins(m, :, :))')';
-    end
-    
-    vins(m, :, :) = demean(squeeze(vins(m, :, :)), 2);
-    energy = squeeze(sum(vins(m, :, :).^2, 3));
-    good = energy < median(energy) + 2*mad(energy);
-    vavg = squeeze(mean(vins(m, good, :), 2));
-    calib.vavg(m, :) = vavg;
-    Vavg = rfft(vavg);
-    
-    % Apply calibartions to convert voltage to pressure
-    % For ER-10X, this is approximate
-    mic_sens = 50e-3; % mV/Pa. TO DO: change after calibration
-    mic_gain = db2mag(gain); % +6 for balanced cable
-    P_ref = 20e-6;
-    DR_onesided = 1;
-    mic_output_V = Vavg / (DR_onesided * mic_gain);
-    output_Pa = mic_output_V/mic_sens;
-    outut_Pa_20uPa_per_Vpp = output_Pa / P_ref; % unit: 20 uPa / Vpeak
-    
-    freq = 1000*linspace(0,calib.SamplingRate/2,length(Vavg))';
-    calib.freq = freq;
-    
-    % CARD MAT2VOLTS = 5.0
-    Vo = rfft(calib.vo)*5*db2mag(-1 * calib.Attenuation);
-    calib.CavRespH(:,m) =  outut_Pa_20uPa_per_Vpp ./ Vo; %save for later
-    
     if m+1 <= calib.CavNumb
         fprintf('Move to next tube! \n');
         % Tell user to make sure calibrator is set correctly
         uiwait(warndlg('MOVE TO THE NEXT SMALLEST TUBE','SET TUBE WARNING','modal'));
     end
     
+    
 end
 
 %% Plot data
-figure; 
+figure;
 ax(1) = subplot(2, 1, 1);
-semilogx(calib.freq, db(abs(calib.CavRespH)) + 20, 'linew', 2);
+semilogx(calib.freq, db(abs(calib.CavRespH_1)) + 20, 'linew', 2);
+hold on; 
+semilogx(calib.freq, db(abs(calib.CavRespH_2)) + 20, 'linew', 2);
 ylabel('Response (dB re: 20 \mu Pa / V_{peak})', 'FontSize', 16);
 ax(2) = subplot(2, 1, 2);
-semilogx(calib.freq, unwrap(angle(calib.CavRespH), [], 1), 'linew', 2);
+semilogx(calib.freq, unwrap(angle(calib.CavRespH_1), [], 1), 'linew', 2);
+semilogx(calib.freq, unwrap(angle(calib.CavRespH_2), [], 1), 'linew', 2);
 xlabel('Frequency (Hz)', 'FontSize', 16);
 ylabel('Phase (rad)', 'FontSize', 16);
 linkaxes(ax, 'x');
@@ -162,15 +188,16 @@ xlim([20, 24e3]);
 
 %% Compute Thevenin Equivalent Pressure and Impedance
 
+% Driver 1
 %set up some variables
 irr = 1; %ideal cavity reflection
 
 %  calc the cavity length
-calib.CavLength = cavlen(calib.SamplingRate,calib.CavRespH, calib.CavTemp);
+calib.CavLength_1 = cavlen(calib.SamplingRate,calib.CavRespH_1, calib.CavTemp);
 if (irr)
-    la = [calib.CavLength 1]; %the one is reflection fo perfect cavit
+    la_1 = [calib.CavLength_1 1]; %the one is reflection fo perfect cavit
 else
-    la = calib.CavLength; %#ok<UNRCH>
+    la_1 = calib.CavLength_1; %#ok<UNRCH>
 end
 
 df=freq(2)-freq(1);
@@ -178,34 +205,73 @@ jef1=1+round(calib.f_err(1)*1000/df);
 jef2=1+round(calib.f_err(2)*1000/df);
 ej=jef1:jef2; %limit freq range for error calc
 
-calib.Zc = cavimp(freq, la, irr, calib.CavDiam, calib.CavTemp); %calc cavity impedances
+calib.Zc_1 = cavimp(freq, la_1, irr, calib.CavDiam, calib.CavTemp); %calc cavity impedances
+
+% Driver 2
+
+%  calc the cavity length
+calib.CavLength_2 = cavlen(calib.SamplingRate,calib.CavRespH_2, calib.CavTemp);
+if (irr)
+    la_2 = [calib.CavLength_2 1]; %the one is reflection of perfect cavity
+else
+    la_2 = calib.CavLength_2; %#ok<UNRCH>
+end
+
+df=freq(2)-freq(1);
+jef1=1+round(calib.f_err(1)*1000/df);
+jef2=1+round(calib.f_err(2)*1000/df);
+ej=jef1:jef2; %limit freq range for error calc
+
+calib.Zc_2 = cavimp(freq, la_2, irr, calib.CavDiam, calib.CavTemp); %calc cavity impedances
 
 %% Plot impedances
 % It's best to have the set of half-wave resonant peaks (combined across
 % all cavities and including all harmonics) distributed as uniformly as
 % possible across the frequency range of interest.
 figure(2)
-plot(calib.freq/1000,dB(calib.Zc)); hold on
+plot(calib.freq/1000,dB(calib.Zc_1)); hold on
 xlabel('Frequency kHz')
 ylabel('Impedance dB')
 %
-pcav = calib.CavRespH;
+pcav_1 = calib.CavRespH_1;
 options = optimset('TolFun', 1e-12, 'MaxIter', 1e5, 'MaxFunEvals', 1e5);
-la=fminsearch(@ (la) thverr(la,ej, freq, pcav, irr, calib.CavDiam, calib.CavTemp),la, options);
-calib.Error = thverr(la, ej, freq, pcav, irr, calib.CavDiam, calib.CavTemp);
+la_1=fminsearch(@ (la_1) thverr(la_1,ej, freq, pcav_1, irr, calib.CavDiam, calib.CavTemp),la_1, options);
+calib.Error_1 = thverr(la_1, ej, freq, pcav_1, irr, calib.CavDiam, calib.CavTemp);
 
-calib.Zc=cavimp(freq,la, irr, calib.CavDiam, calib.CavTemp);  % calculate cavity impedances
-[calib.Zs,calib.Ps]=thvsrc(calib.Zc,pcav); % estimate zs & ps
+calib.Zc_1=cavimp(freq,la_1, irr, calib.CavDiam, calib.CavTemp);  % calculate cavity impedances
+[calib.Zs_1,calib.Ps_1]=thvsrc(calib.Zc_1,pcav_1); % estimate zs & ps
 
-plot(freq/1000,dB(calib.Zc),'--'); %plot estimated Zc
+plot(freq/1000,dB(calib.Zc_1),'--'); %plot estimated Zc
 
-calib.CavLength = la;
+calib.CavLength_1 = la_1;
 
-if ~(calib.Error >= 0 && calib.Error <=1)
+if ~(calib.Error_1 >= 0 && calib.Error_1 <=1)
     h = warndlg ('Calibration error out of range!');
     waitfor(h);
 end
 
+% Again for driver 2
+figure(3)
+plot(calib.freq/1000,dB(calib.Zc_2)); hold on
+xlabel('Frequency kHz')
+ylabel('Impedance dB')
+%
+pcav_2 = calib.CavRespH_2;
+options = optimset('TolFun', 1e-12, 'MaxIter', 1e5, 'MaxFunEvals', 1e5);
+la_2=fminsearch(@ (la_2) thverr(la_2,ej, freq, pcav_2, irr, calib.CavDiam, calib.CavTemp),la_2, options);
+calib.Error_2 = thverr(la_2, ej, freq, pcav_2, irr, calib.CavDiam, calib.CavTemp);
+
+calib.Zc_2=cavimp(freq,la_2, irr, calib.CavDiam, calib.CavTemp);  % calculate cavity impedances
+[calib.Zs_2,calib.Ps_2]=thvsrc(calib.Zc_2,pcav_2); % estimate zs & ps
+
+plot(freq/1000,dB(calib.Zc_2),'--'); %plot estimated Zc
+
+calib.CavLength_2 = la_2;
+
+if ~(calib.Error_2 >= 0 && calib.Error_2 <=1)
+    h = warndlg ('Calibration error out of range!');
+    waitfor(h);
+end
 
 %% Shut off buttons once out of data collection loop
 % until we put STOP functionality in, all roads mean we're done here
@@ -256,7 +322,7 @@ switch NelData.FPL.rc
         stim.comment = comment;
         
         %% NEL based data saving script
-        make_sweptdpoae_text_file;
+        make_FPLprobe_text_file;
         
         %% remind user to turn of microphone
         h = msgbox('Please remember to turn off the microphone');
