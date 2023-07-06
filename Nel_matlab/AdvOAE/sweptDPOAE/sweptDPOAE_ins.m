@@ -52,3 +52,11 @@ stim.y1 = scaleSound(rampsound(cos(2 * pi * phi1_inst), stim.Fs, 0.005));
 stim.y2 = scaleSound(rampsound(cos(2 * pi * phi2_inst), stim.Fs, 0.005));
 stim.phi1_inst = phi1_inst;
 stim.phi2_inst = phi2_inst;
+
+%% Other useful info to struct
+mic_sens = 50e-3; % mV/Pa
+mic_gain = db2mag(40); % +6 for balanced cable
+P_ref = 20e-6;
+DR_onesided = 1;
+stim.VoltageToPascal = 1 / (DR_onesided * mic_gain * mic_sens);
+stim.PascalToLinearSPL = 1 /  P_ref;

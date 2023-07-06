@@ -213,7 +213,7 @@ plot(freq_f2/1000, db(abs(noise_complex).*res.multiplier), '--', 'linew', 1.5);
 %plot(freq_f2/1000, db(abs(noise_complex2).*res.multiplier));
 %plot(freq_f2/1000, db(abs(complex(a_f2,b_f2)).*res.multiplier));
 %plot(freq_f1/1000, db(abs(complex(a_f1, b_f1)).*res.multiplier));
-title(sprintf('DPOAE Subj: %s, Ear: %s', string(subj), string(ear)))
+title(sprintf('DPOAE Subj: %s, Ear: %s', string(stim.subj), string(stim.ear)))
 set(gca, 'XScale', 'log', 'FontSize', 14)
 xlim([.5, 16])
 ylim([-40, 40])
@@ -243,8 +243,8 @@ res.a.n = a_n; % subtraction method
 res.b.n = b_n;
 res.tau.dp = tau_dp;
 res.stim = stim;
-res.subj = subj;
-res.ear = ear;
+res.subj = stim.subj;
+res.ear = stim.ear;
 res.complex.oae = oae_complex; 
 res.complex.nf = noise_complex; 
 res.complex.nf2 = noise_complex2; 

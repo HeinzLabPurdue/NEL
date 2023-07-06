@@ -51,7 +51,7 @@ else
     subj=NelData.AdvOAE.subj;
     ear=NelData.AdvOAE.ear;
     
-    disp(sprintf('RESTARTING: \n   Subj: %s;\n   Ear: %s',subj,ear))
+    fprintf('RESTARTING: \n   Subj: %s;\n   Ear: %s\n',subj,ear)
     uiwait(warndlg(sprintf('RESTARTING: \n   Subj: %s;\n   Ear: %s',subj,ear),'modal'));
 end
 
@@ -69,16 +69,21 @@ end
 
 %% Initializing SFOAE variables for running and live analysis
 sweptDPOAE_ins;
-disp('Starting stimulation...');
+
+stim.subj = subj; 
+stim.ear = ear; 
+
 
 %% Running Script
 
 % Set stims in buffdata:
 buffdata = [stim.y1; stim.y2];
+
 % Check for clipping and load to buffer
 if(any(abs(buffdata(:)) > 1))
     error('What did you do!? Sound is clipping!! Cannot Continue!!\n');
 end
+
 
 %% Set attenuation and play
 drop_f1 = stim.drop_f1;
@@ -91,14 +96,6 @@ maxTrials = stim.maxTrials;
 minTrials = stim.minTrials;
 doneWithTrials = 0;
 snr_fig = figure;
-
-%% Add useful info to structure
-mic_sens = 50e-3; % mV/Pa
-mic_gain = db2mag(40); % +6 for balanced cable
-P_ref = 20e-6;
-DR_onesided = 1;
-stim.VoltageToPascal = 1 / (DR_onesided * mic_gain * mic_sens);
-stim.PascalToLinearSPL = 1 /  P_ref;
 
 resp = zeros(maxTrials, size(buffdata,2));
 
@@ -122,7 +119,7 @@ else
     t_freq = (testfreq-f1)/stim.speed + stim.buffdur;
 end
 
-
+disp('Starting stimulation...');
 while doneWithTrials == 0
     k = k + 1;
     
@@ -213,7 +210,7 @@ while doneWithTrials == 0
     % either ABORT or RESTART needs to break loop immediately,
     % saveNquit will complete current LEVEL sweep
     ud_status = get(h_push_stop,'Userdata');  % only call this once - ACT on 1st button push
-    if strcmp(ud_status,'abort') || strcmp(ud_status,'restart')
+    if ~isempty(ud_status)
         break;
     end
     

@@ -197,7 +197,7 @@ figure;
 plot(testfreq/1000, db(abs(oae_complex).*res.multiplier), 'linew', 1.75);
 hold on;
 plot(testfreq/1000, db(abs(noise_complex).*res.multiplier), '--', 'linew', 1.5);
-title(sprintf('SFOAE Subj: %s, Ear: %s', string(subj), string(ear)))
+title(sprintf('SFOAE Subj: %s, Ear: %s', string(stim.subj), string(stim.ear)))
 set(gca, 'XScale', 'log', 'FontSize', 14)
 xlim([.5, 16])
 xticks([.5, 1, 2, 4, 8, 16])
@@ -220,8 +220,8 @@ res.b_n = b_n;
 res.stim = stim;
 res.tau = tau;
 res.phasor = phasor; 
-res.subj = subj;
-res.ear = ear;
+res.subj = stim.subj;
+res.ear = stim.ear;
 res.multiplier = stim.VoltageToPascal.* stim.PascalToLinearSPL;
 res.complex.oae = oae_complex; 
 res.complex.nf = noise_complex; 

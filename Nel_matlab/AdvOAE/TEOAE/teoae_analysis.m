@@ -7,7 +7,7 @@ resp = res.resp_win;
 if click.doFilt
     % High pass at 200 Hz using IIR filter
     [b, a] = butter(4, 200 * 2 * 1e-3/click.SamplingRate, 'high');
-    resp = filtfilt(b, a, res.resp')';
+    resp = filtfilt(b, a, res.resp_win')';
 end
 
 vavg_odd = trimmean(resp(1:2:end, :), 20, 1);
@@ -34,5 +34,8 @@ res.freq = 1000*linspace(0,click.SamplingRate/2,length(Vavg))';
 
 res.Resp =  output_Pa_per_20uPa;
 res.NoiseFloor = noise_Pa_per_20uPa;
+
+%% Plot the result somewhere too 
+
 
 end

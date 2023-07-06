@@ -25,6 +25,7 @@ coefFileNum = NaN;
 %% Enter subject information
 if ~isfield(NelData,'AdvOAE') % First time through, need to ask all this.
     subj = input('Please subject ID:', 's');    % NelData.sweptSFOAE.subj,earflag
+    stim.subj = subj; 
     
     earflag = 1;
     while earflag == 1
@@ -34,6 +35,7 @@ if ~isfield(NelData,'AdvOAE') % First time through, need to ask all this.
                     'LEFT', 'RIGHT'}
                 earname = strcat(ear, 'Ear');
                 earflag = 0;
+                stim.ear = ear; 
             otherwise
                 fprintf(2, 'Unrecognized ear type! Try again!');
         end
@@ -69,7 +71,6 @@ end
 
 %% Initializing SFOAE variables for running and live analysis
 teoae_ins;
-disp('Starting stimulation...');
 
 %% Running Script
 
@@ -86,13 +87,8 @@ drops(click.driver) = click.Attenuation;
 % Make arrays to store measured mic outputs
 resp = zeros(click.Averages, size(buffdata,2));
 
+disp('Starting stimulation...');\
 for k = 1:(click.Averages + click.ThrowAway)
-    
-    % Check for abort or restart:
-    ud_status = get(h_push_stop,'Userdata');  % only call this once - ACT on 1st button push
-    if strcmp(ud_status,'abort') || strcmp(ud_status,'restart')
-        break; % abort or restart button push breaks loop
-    end
     
     vin = PlayCaptureNEL(card, buffdata, drops(1), drops(2), 1);
     
@@ -103,16 +99,15 @@ for k = 1:(click.Averages + click.ThrowAway)
     
     fprintf(1, 'Done with trial %d / %d\n', k,...
         (click.ThrowAway + click.Averages));
+    % Check for abort or restart:
+    ud_status = get(h_push_stop,'Userdata');  % only call this once - ACT on 1st button push
+    if strcmp(ud_status,'abort') || strcmp(ud_status,'restart')
+        break; % abort or restart button push breaks loop
+    end
     
 end
 
-click.resp = resp(:, (click.StimWin+1):(click.StimWin + click.RespDur)); % Remove stimulus by windowing
-
-%other things to save
-click.mic_sens = 50e-3; % mV/Pa. TO DO: change after calibration
-click.mic_gain = db2mag(40);
-click.P_ref = 20e-6;
-click.DR_onesided = 1;
+click.resp = resp; % full response -- gets windowed in analysis. 
 
 %% Shut off buttons once out of data collection loop
 % until we put STOP functionality in, all roads mean we're done here

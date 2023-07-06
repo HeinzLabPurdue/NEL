@@ -17,3 +17,9 @@ initbuff =  2;
 y = zeros(1, click.BufferSize + click.StimWin);
 y(initbuff + (1:nsampsclick)) = 0.95;
 click.y = y(:); % Just in case
+
+%% Other things to save
+click.mic_sens = 50e-3; % mV/Pa. TO DO: change after calibration
+click.mic_gain = db2mag(40);
+click.P_ref = 20e-6;
+click.DR_onesided = 1;

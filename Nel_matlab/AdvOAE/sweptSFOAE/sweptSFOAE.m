@@ -9,32 +9,23 @@ host = host(~isspace(host));
 
 %Insert NEL/GUI Parameters here...none for WBMEMR
 
-%% Calibration
+%% Initialize TDT
+card = initialize_card;
 
-%default WBMEMR calib...needs improvement  (based on NO invCalib so far -
-%FIX later
-mic_sens = 0.05; % V / Pa-RMS
-mic_gain = db2mag(40);
-P_ref = 20e-6; % Pa-RMS
-DR_onesided = 1;
-stim.VoltageToPascal = 1 / (DR_onesided * mic_gain * mic_sens);
-stim.PascalToLinearSPL = 1 /  P_ref;
+%% Inverse Calibration
+%NEEDS TO BE CLEANED UP ASAP.
+% 1. run_invCalib needs cleaned up...currently clunky
+% 2. Need calibration to be correct for MEMR (currently all pass, w/o calib)
+[~, calibPicNum, ~] = run_invCalib(false);   % skipping INV calib for now since based on 94 dB SPL benig highest value, bot the 105 dB SPL from inv Calib.
+[coefFileNum, ~, ~] = run_invCalib(-2);
 
-%% Meat and Potatoes of the external app you made
-
-%TDT initialization params
-fig_num=99;
-GB_ch=2; % SH?: my default is GB_ch=1;
-FS_tag = 3;
-Fs = 48828.125;
-
-%TODO: Make this a conditional to handle NEL1 vs NEL2 ??
-[f1RP,RP,~]=load_play_circuit_Nel1(FS_tag,fig_num,GB_ch);
-disp('circuit loaded');
+stim.CalibPICnum2use = calibPicNum;  % save this so we know what calib file to use right from data file
+coefFileNum = NaN;
 
 %% Enter subject information
 if ~isfield(NelData,'AdvOAE') % First time through, need to ask all this.
     subj = input('Please subject ID:', 's');    % NelData.sweptSFOAE.subj,earflag
+    stim.subj = subj;
     
     earflag = 1;
     while earflag == 1
@@ -44,6 +35,7 @@ if ~isfield(NelData,'AdvOAE') % First time through, need to ask all this.
                     'LEFT', 'RIGHT'}
                 earname = strcat(ear, 'Ear');
                 earflag = 0;
+                stim.ear = ear;
             otherwise
                 fprintf(2, 'Unrecognized ear type! Try again!');
         end
@@ -80,7 +72,13 @@ end
 %% Initializing SFOAE variables for running and live analysis
 sweptSFOAE_ins;
 
-doneWithTrials = 0;
+%% Additional info
+mic_sens = 0.05; % V / Pa-RMS
+mic_gain = db2mag(40);
+P_ref = 20e-6; % Pa-RMS
+DR_onesided = 1;
+stim.VoltageToPascal = 1 / (DR_onesided * mic_gain * mic_sens);
+stim.PascalToLinearSPL = 1 /  P_ref;
 
 % SH?: Change figure name, give handle?
 snr_fig = figure;
@@ -92,7 +90,8 @@ BothBuffs = zeros(stim.maxTrials, numel(stim.yProbe));
 flip = -1;
 
 % variable for live analysis
-k = 1;
+k = 0;
+doneWithTrials = 0;
 t = stim.t;
 testfreq = [.75, 1, 1.5, 2, 3, 4, 6, 8, 12].* 1000;
 
@@ -110,27 +109,11 @@ else
     t_freq = (testfreq-f1)/stim.speed + stim.buffdur;
 end
 
-%% Inverse Calibration
-%NEEDS TO BE CLEANED UP ASAP.
-% 1. run_invCalib needs cleaned up...currently clunky
-% 2. Need calibration to be correct for MEMR (currently all pass, w/o calib)
-[~, calibPicNum, ~] = run_invCalib(false);   % skipping INV calib for now since based on 94 dB SPL benig highest value, bot the 105 dB SPL from inv Calib.
-[coefFileNum, ~, ~] = run_invCalib(-2);
-
-stim.CalibPICnum2use = calibPicNum;  % save this so we know what calib file to use right from data file
-coefFileNum = NaN;
-
 %% Data Collection Loop
-
-%Set the delay of the sound
-invoke(RP, 'SetTagVal', 'onsetdel',0); % onset delay is in ms
-playrecTrigger = 1;
-RZ6ADdelay = 97; % Samples
-
 disp('Starting stimulation...');
 
 while doneWithTrials == 0
-    
+    k = k + 1;
     % alternate phase of the suppressor
     flip = flip .* -1;
     
@@ -140,46 +123,14 @@ while doneWithTrials == 0
     buffdata = zeros(2, numel(stim.yProbe));
     buffdata(1, :) = stim.yProbe;
     
-    resplength = size(buffdata,2) + RZ6ADdelay;
-    
-    % Set attenuations
-    rc = PAset([0, 0, dropProbe, dropSupp]);
-    invoke(RP, 'SetTagVal', 'nsamps', resplength);
-    
-    % SH?: filter data (FPL)
-    % buffdata = filter(stim.b.Ph1, 1, buffdata, [], 1);
-    
-    % Check for clipping
-    if(any(abs(buffdata(1,:)) > 1) || any(abs(buffdata(2,:)) > 1))
-        error('What did you do!? Sound is clipping!! Cannot Continue!!\n');
-    end
-    
-    % Load the 2ch variable data:
-    invoke(RP, 'WriteTagVEX', 'datainL', 0, 'F32', buffdata(1, :));
-    invoke(RP, 'WriteTagVEX', 'datainR', 0, 'F32', buffdata(2, :));
-    
-    %Start playing from the buffer:
-    invoke(RP, 'SoftTrg', playrecTrigger);
-    currindex = invoke(RP, 'GetTagVal', 'indexin');
-    
-    while(currindex < resplength)
-        currindex=invoke(RP, 'GetTagVal', 'indexin');
-    end
-    
-    vin = invoke(RP, 'ReadTagVex', 'dataout', 0, resplength,...
-        'F32','F64',1);
+    vins = PlayCaptureNEL(card, buffdata, dropProbe, dropSupp, delayComp);
     
     % Save data
     if k > stim.ThrowAway
-        ProbeBuffs(k - stim.ThrowAway,  :) = vin((RZ6ADdelay + 1):end);
+        ProbeBuffs(k - stim.ThrowAway,  :) = vins;
     end
     
-    % Get ready for next trial
-    invoke(RP, 'SoftTrg', 8); % Stop and clear "OAE" buffer
-    %Reset the play index to zero:
-    invoke(RP, 'SoftTrg', 5); %Reset Trigger
-    
-    pause(0.5);
+    pause(0.15);
     
     % Do suppressor only
     dropProbe = 120;
@@ -187,46 +138,14 @@ while doneWithTrials == 0
     buffdata = zeros(2, numel(stim.ySupp));
     buffdata(2, :) = flip.*stim.ySupp;
     
-    resplength = size(buffdata,2) + RZ6ADdelay;
-    
-    % Set attenuations
-    rc = PAset([0, 0, dropProbe, dropSupp]);
-    invoke(RP, 'SetTagVal', 'nsamps', resplength);
-    
-    % SH?: filter data (FPL)
-    % buffdata = filter(stim.b.Ph2, 1, buffdata, [], 1);
-    
-    % Check for clipping
-    if(any(abs(buffdata(1,:)) > 1) || any(abs(buffdata(2,:)) > 1))
-        error('What did you do!? Sound is clipping!! Cannot Continue!!\n');
-    end
-    
-    % Load the 2ch variable data:
-    invoke(RP, 'WriteTagVEX', 'datainL', 0, 'F32', buffdata(1, :));
-    invoke(RP, 'WriteTagVEX', 'datainR', 0, 'F32', buffdata(2, :));
-    
-    %Start playing from the buffer:
-    invoke(RP, 'SoftTrg', playrecTrigger);
-    currindex = invoke(RP, 'GetTagVal', 'indexin');
-    
-    while(currindex < resplength)
-        currindex=invoke(RP, 'GetTagVal', 'indexin');
-    end
-    
-    vin = invoke(RP, 'ReadTagVex', 'dataout', 0, resplength,...
-        'F32','F64',1);
+    vins = PlayCaptureNEL(card, buffdata, dropProbe, dropSupp, delayComp);
     
     % Save data
     if k > stim.ThrowAway
-        SuppBuffs(k - stim.ThrowAway,  :) = vin((RZ6ADdelay + 1):end);
+        SuppBuffs(k - stim.ThrowAway,  :) = vins;
     end
     
-    % Get ready for next trial
-    invoke(RP, 'SoftTrg', 8); % Stop and clear "OAE" buffer
-    %Reset the play index to zero:
-    invoke(RP, 'SoftTrg', 5); %Reset Trigger
-    
-    pause(0.5);
+    pause(0.15);
     
     % Do both
     dropProbe = stim.drop_Probe;
@@ -235,47 +154,14 @@ while doneWithTrials == 0
     buffdata(1, :) = stim.yProbe;
     buffdata(2, :) = flip.*stim.ySupp;
     
-    resplength = size(buffdata,2) + RZ6ADdelay;
-    
-    % Set attenuations
-    rc = PAset([0, 0, dropProbe, dropSupp]);
-    invoke(RP, 'SetTagVal', 'nsamps', resplength);
-    
-    % SH?: filter data (FPL)
-    % buffdata(1,:) = filter(stim.b.Ph1, 1, buffdata(1,:), [], 1);
-    % buffdata(2,:) = filter(stim.b.Ph2, 1, buffdata(2,:), [], 1);
-    
-    % Check for clipping
-    if(any(abs(buffdata(1,:)) > 1) || any(abs(buffdata(2,:)) > 1))
-        error('What did you do!? Sound is clipping!! Cannot Continue!!\n');
-    end
-    
-    % Load the 2ch variable data:
-    invoke(RP, 'WriteTagVEX', 'datainL', 0, 'F32', buffdata(1, :));
-    invoke(RP, 'WriteTagVEX', 'datainR', 0, 'F32', buffdata(2, :));
-    
-    %Start playing from the buffer:
-    invoke(RP, 'SoftTrg', playrecTrigger);
-    currindex = invoke(RP, 'GetTagVal', 'indexin');
-    
-    while(currindex < resplength)
-        currindex=invoke(RP, 'GetTagVal', 'indexin');
-    end
-    
-    vin = invoke(RP, 'ReadTagVex', 'dataout', 0, resplength,...
-        'F32','F64',1);
+    vins = PlayCaptureNEL(card, buffdata, dropProbe, dropSupp, delayComp);
     
     % Save data
     if k > stim.ThrowAway
-        BothBuffs(k - stim.ThrowAway,  :) = vin((RZ6ADdelay + 1):end);
+        BothBuffs(k - stim.ThrowAway,  :) = vins;
     end
     
-    % Get ready for next trial
-    invoke(RP, 'SoftTrg', 8); % Stop and clear "OAE" buffer
-    %Reset the play index to zero:
-    invoke(RP, 'SoftTrg', 5); %Reset Trigger
-    
-    pause(0.5);
+    pause(0.15);
     
     fprintf(1, 'Done with trial %d \n', k);
     
@@ -306,12 +192,12 @@ while doneWithTrials == 0
             
             model_noise = [cos(2*pi*nearfreqs(1)*phiProbe_inst(win)) .* taper;
                 -sin(2*pi*nearfreqs(1)*phiProbe_inst(win)) .* taper;
-                cos(2*pi*nearfreqs(1)*phiProbe_inst(win)) .* taper;
-                -sin(2*pi*nearfreqs(1)*phiProbe_inst(win)) .* taper;
-                cos(2*pi*nearfreqs(1)*phiProbe_inst(win)) .* taper;
-                -sin(2*pi*nearfreqs(1)*phiProbe_inst(win)) .* taper;
-                cos(2*pi*nearfreqs(1)*phiProbe_inst(win)) .* taper;
-                -sin(2*pi*nearfreqs(1)*phiProbe_inst(win)) .* taper];
+                cos(2*pi*nearfreqs(2)*phiProbe_inst(win)) .* taper;
+                -sin(2*pi*nearfreqs(2)*phiProbe_inst(win)) .* taper;
+                cos(2*pi*nearfreqs(3)*phiProbe_inst(win)) .* taper;
+                -sin(2*pi*nearfreqs(3)*phiProbe_inst(win)) .* taper;
+                cos(2*pi*nearfreqs(4)*phiProbe_inst(win)) .* taper;
+                -sin(2*pi*nearfreqs(4)*phiProbe_inst(win)) .* taper];
             
             coeffs_temp(m,:) = model_sf' \ resp';
             coeffs_noise(m,:) = model_noise' \ resp';
@@ -349,22 +235,18 @@ while doneWithTrials == 0
         
     end
     
-    k = k + 1;
-    
-    % Check for button push
-    % either ABORT or RESTART needs to break loop immediately,
-    % saveNquit will complete current LEVEL sweep
-    % SH?: May want to do this after every sweep
+    % Check for button push to abort/restart/saveNquit
     ud_status = get(h_push_stop,'Userdata');  % only call this once - ACT on 1st button push
-    if strcmp(ud_status,'abort') || strcmp(ud_status,'restart')
+    if ~isempty(ud_status)
         break;
     end
     
 end % End of Trials
 
-stim.ProbeBuffs = ProbeBuffs(1:k-1,:);
-stim.SuppBuffs = SuppBuffs(1:k-1,:);
-stim.BothBuffs = BothBuffs(1:k-1,:);
+% Only save what was filled - initialized matixes are size maxTrials x resplength
+stim.ProbeBuffs = ProbeBuffs(1:k - stim.ThrowAway,:);
+stim.SuppBuffs = SuppBuffs(1:k - stim.ThrowAway,:);
+stim.BothBuffs = BothBuffs(1:k - stim.ThrowAway,:);
 
 
 %% Shut off buttons once out of data collection loop
@@ -374,7 +256,7 @@ set(h_push_restart,'Enable','off');
 set(h_push_abort,'Enable','off');
 set(h_push_saveNquit,'Enable','off');
 
-stim.NUMtrials_Completed = k-1;  % save how many trials completed
+stim.NUMtrials_Completed = k;  % save how many trials completed
 
 %store last button command, or that it ended all reps
 if ~isempty(ud_status)
@@ -386,7 +268,7 @@ else
 end
 
 %% Shut Down TDT, no matter what button pushed, or if ended naturally
-close_play_circuit(f1RP, RP);
+close_play_circuit(card.f1RP, card.RP);
 rc = PAset(120.0*ones(1,4)); % need to use PAset, since it saves current value in PA, which is assumed way in NEL (causes problems when PAset is used to set attens later)
 run_invCalib(false);
 
@@ -426,7 +308,7 @@ switch NelData.AdvOAE.rc
         if ~isempty(TEMPans)
             comment=TEMPans{1};
         end
-        stim.comment = comment; 
+        stim.comment = comment;
         
         %% NEL based data saving script
         make_sfoae_text_file;
