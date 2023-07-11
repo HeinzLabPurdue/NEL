@@ -66,6 +66,7 @@ calib.vavg_2 = zeros(calib.CavNumb, calib.BufferSize);
 
 for m = 1: calib.CavNumb
     
+    fprintf('Playing for cavity %d \n', m)
     % Do driver 1 first:
     driver = 1;
     buffdata(driver, :) = vo; % The other source plays nothing
@@ -105,7 +106,7 @@ for m = 1: calib.CavNumb
     DR_onesided = 1;
     mic_output_V_1 = Vavg_1 / (DR_onesided * mic_gain);
     output_Pa_1 = mic_output_V_1/mic_sens;
-    outut_Pa_20uPa_per_Vpp = output_Pa_1 / P_ref; % unit: 20 uPa / Vpeak
+    outut_Pa_20uPa_per_Vpp_1 = output_Pa_1 / P_ref; % unit: 20 uPa / Vpeak
     
     freq = 1000*linspace(0,calib.SamplingRate/2,length(Vavg_1))';
     calib.freq = freq;

@@ -79,6 +79,7 @@ P_ref = 20e-6; % Pa-RMS
 DR_onesided = 1;
 stim.VoltageToPascal = 1 / (DR_onesided * mic_gain * mic_sens);
 stim.PascalToLinearSPL = 1 /  P_ref;
+delayComp = 1; 
 
 % SH?: Change figure name, give handle?
 snr_fig = figure;
