@@ -257,6 +257,8 @@ if (calib.Yphase_lf_1 < 44) || (calib.Yphase_lf_2 < 44)
     waitfor(h);
 end
 
+ud_status = get(h_push_stop,'Userdata');  % only call this once - ACT on 1st button push
+
 %% Plot Ear Absorbance
 figure(12);
 hold on; 
@@ -275,6 +277,15 @@ set(h_push_restart,'Enable','off');
 set(h_push_abort,'Enable','off');
 set(h_push_saveNquit,'Enable','off');
 
+
+%store last button command, or that it ended all reps
+if ~isempty(ud_status)
+    NelData.FPL.rc = ud_status;  % button was pushed
+    calib.ALLtrials_Completed=0;
+else
+    NelData.FPL.rc = 'saveNquit';  % ended all REPS - saveNquit
+    calib.ALLtrials_Completed=1;
+end
 
 %% Shut Down TDT, no matter what button pushed, or if ended naturally
 close_play_circuit(card.f1RP, card.RP);
