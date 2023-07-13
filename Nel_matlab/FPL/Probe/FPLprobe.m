@@ -19,7 +19,7 @@ card = initialize_card;
 [~, calibPicNum, ~] = run_invCalib(false);   % skipping INV calib for now since based on 94 dB SPL benig highest value, bot the 105 dB SPL from inv Calib.
 [coefFileNum, ~, ~] = run_invCalib(-2);
 
-stim.CalibPICnum2use = calibPicNum;  % save this so we know what calib file to use right from data file
+calib.CalibPICnum2use = calibPicNum;  % save this so we know what calib file to use right from data file
 coefFileNum = NaN;
 
 %% Enter subject information
@@ -57,7 +57,7 @@ disp('Starting stimulation...');
 Fs = calib.SamplingRate * 1000; % to Hz
 
 vo = calib.y;
-buffdata = zeros(2, numel(vo));
+
 calib.vo = vo;
 vins_1 = zeros(calib.CavNumb, calib.Averages, calib.BufferSize);
 vins_2 = zeros(calib.CavNumb, calib.Averages, calib.BufferSize);
@@ -69,6 +69,7 @@ for m = 1: calib.CavNumb
     fprintf('Playing for cavity %d \n', m)
     % Do driver 1 first:
     driver = 1;
+    buffdata = zeros(2, numel(vo));
     buffdata(driver, :) = vo; % The other source plays nothing
     
     drop = [120, 120];
@@ -118,6 +119,7 @@ for m = 1: calib.CavNumb
     
     %% Do driver 2 next:
     driver = 2;
+    buffdata = zeros(2, numel(vo));
     buffdata(driver, :) = vo; % The other source plays nothing
     
     drop = [120, 120];
@@ -229,7 +231,8 @@ calib.Zc_2 = cavimp(freq, la_2, irr, calib.CavDiam, calib.CavTemp); %calc cavity
 % It's best to have the set of half-wave resonant peaks (combined across
 % all cavities and including all harmonics) distributed as uniformly as
 % possible across the frequency range of interest.
-figure(2)
+figure(64)
+hold on; 
 plot(calib.freq/1000,dB(calib.Zc_1)); hold on
 xlabel('Frequency kHz')
 ylabel('Impedance dB')
@@ -250,9 +253,11 @@ if ~(calib.Error_1 >= 0 && calib.Error_1 <=1)
     h = warndlg ('Calibration error out of range!');
     waitfor(h);
 end
-
+ hold off; 
+ 
 % Again for driver 2
-figure(3)
+figure(65)
+hold on; 
 plot(calib.freq/1000,dB(calib.Zc_2)); hold on
 xlabel('Frequency kHz')
 ylabel('Impedance dB')
@@ -281,15 +286,15 @@ set(h_push_restart,'Enable','off');
 set(h_push_abort,'Enable','off');
 set(h_push_saveNquit,'Enable','off');
 
-stim.NUMtrials_Completed = m;  % save how many trials completed
+calib.NUMtrials_Completed = m;  % save how many trials completed
 
 %store last button command, or that it ended all reps
 if ~isempty(ud_status)
     NelData.FPL.rc = ud_status;  % button was pushed
-    stim.ALLtrials_Completed=0;
+    calib.ALLtrials_Completed=0;
 else
     NelData.FPL.rc = 'saveNquit';  % ended all REPS - saveNquit
-    stim.ALLtrials_Completed=1;
+    calib.ALLtrials_Completed=1;
 end
 
 %% Shut Down TDT, no matter what button pushed, or if ended naturally
@@ -303,7 +308,7 @@ if strcmp(NelData.FPL.rc,'abort') || strcmp(NelData.FPL.rc,'restart')
 end
 
 %% Set up data structure to save
-stim.date = datestr(clock);
+calib.date = datestr(clock);
 
 warning('off');  % ??
 
@@ -320,7 +325,7 @@ switch NelData.FPL.rc
         if ~isempty(TEMPans)
             comment=TEMPans{1};
         end
-        stim.comment = comment;
+        calib.comment = comment;
         
         %% NEL based data saving script
         make_FPLprobe_text_file;

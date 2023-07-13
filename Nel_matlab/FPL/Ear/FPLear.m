@@ -11,11 +11,12 @@ host = host(~isspace(host));
 
 %% Get Probe File
 % Setting up for now as in SNAPlab
-[FileName,PathName,FilterIndex] = uigetfile(strcat('./Probe/ProbeCal_Data/FPLprobe*', date, '*.mat'),...
+[FileName,PathName,FilterIndex] = uigetfile(strcat('C:\NEL\Nel_matlab\FPL\Probe\ProbeCal_Data\FPLprobe*', date, '*.mat'),...
     'Please pick DRIVE PROBE CALIBRATION file to use');
 probefile = fullfile(PathName, FileName);
 load(probefile);
 
+calib = x.FPLprobeData.calib; 
 %% Initialize TDT
 card = initialize_card;
 
@@ -26,7 +27,7 @@ card = initialize_card;
 [~, calibPicNum, ~] = run_invCalib(false);   % skipping INV calib for now since based on 94 dB SPL benig highest value, bot the 105 dB SPL from inv Calib.
 [coefFileNum, ~, ~] = run_invCalib(-2);
 
-stim.CalibPICnum2use = calibPicNum;  % save this so we know what calib file to use right from data file
+calib.CalibPICnum2use = calibPicNum;  % save this so we know what calib file to use right from data file
 coefFileNum = NaN;
 
 %% Enter subject information
@@ -88,12 +89,7 @@ Fs = calib.SamplingRate * 1000;
 y = zeros(1, calib.BufferSize);
 y(2 + (1)) = 0.95;
 vo = y(:); % Just in case
-buffdata = zeros(2, numel(vo));
 
-% Check for clipping and load to buffer
-if(any(abs(buffdata(driver, :)) > 1))
-    error('What did you do!? Sound is clipping!! Cannot Continue!!\n');
-end
 
 disp('Starting stimulation...');
 
@@ -101,6 +97,7 @@ disp('Starting stimulation...');
 
 % Do driver 1 first:
 driver = 1;
+buffdata = zeros(2, numel(vo));
 buffdata(driver, :) = vo; % The other source plays nothing
 
 drop = [120, 120];
@@ -136,7 +133,7 @@ P_ref = 20e-6;
 DR_onesided = 1;
 mic_output_V_1 = Vavg_1 / (DR_onesided * mic_gain);
 output_Pa_1 = mic_output_V_1/mic_sens;
-outut_Pa_20uPa_per_Vpp = output_Pa_1 / P_ref; % unit: 20 uPa / Vpeak
+outut_Pa_20uPa_per_Vpp_1 = output_Pa_1 / P_ref; % unit: 20 uPa / Vpeak
 
 freq = 1000*linspace(0,calib.SamplingRate/2,length(Vavg_1))';
 
@@ -146,6 +143,7 @@ calib.EarRespH_1 =  outut_Pa_20uPa_per_Vpp_1 ./ Vo; %save for later
 
 %% Do driver 2 next:
 driver = 2;
+buffdata = zeros(2, numel(vo));
 buffdata(driver, :) = vo; % The other source plays nothing
 
 drop = [120, 120];
@@ -172,7 +170,7 @@ vins_ear_2 = demean(vins_ear_2, 2);
 energy = squeeze(sum(vins_ear_2.^2, 2));
 good = energy < median(energy) + 2*mad(energy);
 vavg_2 = squeeze(mean(vins_ear_2(good, :), 1));
-Vavg_2 = rfft(varg_2'); 
+Vavg_2 = rfft(vavg_2'); 
 calib.vavg_ear_2 = vavg_2;
 
 % Apply calibartions to convert voltage to pressure
@@ -289,7 +287,7 @@ if strcmp(NelData.FPL.rc,'abort') || strcmp(NelData.FPL.rc,'restart')
 end
 
 %% Set up data structure to save
-stim.date = datestr(clock);
+calib.date = datestr(clock);
 
 warning('off');  % ??
 
@@ -306,7 +304,7 @@ switch NelData.FPL.rc
         if ~isempty(TEMPans)
             comment=TEMPans{1};
         end
-        stim.comment = comment;
+        calib.comment = comment;
         
         %% NEL based data saving script
         make_FPLear_text_file;

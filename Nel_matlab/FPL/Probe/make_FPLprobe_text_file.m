@@ -13,21 +13,24 @@ x.General.time          = datestr(now,13);
 x.General.spike_res     = 1e-5;
 x.General.spike_unit    = 'sec';
 x.General.timing_unit   = 'ms';
-x.General.comment       = stim.comment;
+x.General.comment       = calib.comment;
 
 x.Stimuli = [];  % general NEL structures - NOT used here, but keep for generality 
 x.Line    = [];
 x.User = [];
 x.Hardware.NELmaxvolts_V   = VOLTS;   % max volts in NEL circuit design
-x.Hardware.CalibPICnum2use = stim.CalibPICnum2use;  % Save Calib file to use for these data - based on how hardware is setup (run-invCalib)
+x.Hardware.CalibPICnum2use = calib.CalibPICnum2use;  % Save Calib file to use for these data - based on how hardware is setup (run-invCalib)
 
 %% saving specific MEMR data
 x.FPLprobeData.calib = calib;
 
 % Save to ProbeCal_Data folder for use later since general for that day
-generalfname = ['./ProbeCal_Data/FPLprobe_' date];  
+curdir = pwd; 
+cd('C:\NEL\Nel_matlab\FPL\Probe\ProbeCal_Data')
+generalfname = ['FPLprobe_' date];  
 save(generalfname,'x');  % std mat file
 fprintf('%s %s.mat\n','Saved data file to general folder: ',generalfname);
+cd(curdir); 
 
 %% Save data file
 MfileSAVE=0;

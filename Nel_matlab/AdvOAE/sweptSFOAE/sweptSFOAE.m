@@ -185,7 +185,7 @@ while doneWithTrials == 0
             model_sf = [cos(2*pi*phiProbe_inst(win)) .* taper;
                 -sin(2*pi*phiProbe_inst(win)) .* taper];
             
-            if stim.speed > 0
+            if stim.speed < 0
                 nearfreqs = [1.10, 1.12, 1.14, 1.16];
             else
                 nearfreqs = [.90, .88, .86, .84];
@@ -282,7 +282,7 @@ end
 stim.date = datestr(clock);
 
 answer = questdlg('Would you like to analyze this data?'...
-    ,'Analyze?','Yes','No');
+    ,'Analyze?','Yes','No', 'No');
 %Handle response
 switch answer
     case {'Yes'}
