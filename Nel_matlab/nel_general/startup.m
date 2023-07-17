@@ -28,13 +28,10 @@ addpath([root_dir  'DPOAE']);
 % addpath([root_dir  'CAP']);
 addpath([root_dir  'AEP']);
 addpath([root_dir  'WBMEMR']);
-<<<<<<< HEAD
 addpath([root_dir 'AdvOAE']); 
 addpath([root_dir 'FPL']); 
 addpath(genpath([root_dir  'FFR']));
-=======
 % addpath(genpath([root_dir  'FFR']));
->>>>>>> master
 addpath([root_dir  'NELanalysis_Mfiles']);
 % addpath([root_dir  'wiring_test']);   %LQ 10/29/04
 
