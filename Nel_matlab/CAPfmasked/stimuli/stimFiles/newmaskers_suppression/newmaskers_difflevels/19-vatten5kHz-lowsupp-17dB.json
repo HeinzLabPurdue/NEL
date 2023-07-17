@@ -1,0 +1,33 @@
+{
+    "type":"noise-bands", 
+    "comment":"created with noiseBandMaskerDesigner.m 23-Oct-2022", 
+    "n_bands":5, 
+    "bands":[
+        {
+            "amplitude":0.02512, 
+            "fc_low":900, 
+            "fc_high":2600
+        }, 
+        {
+            "amplitude":0.01259, 
+            "fc_low":2600, 
+            "fc_high":3200
+        }, 
+        {
+            "amplitude":0.003162, 
+            "fc_low":3200, 
+            "fc_high":4200
+        }, 
+        {
+            "amplitude":0.1413, 
+            "fc_low":4200, 
+            "fc_high":5800
+        }, 
+        {
+            "amplitude":0.1, 
+            "fc_low":5800, 
+            "fc_high":12000
+        }
+    ], 
+    "name":"19-vatten5kHz-lowsupp-17dB"
+}

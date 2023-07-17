@@ -1,0 +1,24 @@
+{
+    "type":"noise-bands", 
+    "comment":"created with noiseBandMaskerDesigner.m 21-Jan-2021", 
+    "n_bands":3, 
+    "bands":[
+        {
+            "amplitude":0.1, 
+            "fc_low":200, 
+            "fc_high":2950
+        }, 
+        {
+            "amplitude":0, 
+            "fc_low":2950, 
+            "fc_high":3650
+        }, 
+        {
+            "amplitude":0.1, 
+            "fc_low":3650, 
+            "fc_high":12000
+        }
+    ], 
+    "name":"3-notch3300_bw700", 
+    "extra_atten_dB":0
+}

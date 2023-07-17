@@ -1,0 +1,18 @@
+{
+    "type":"noise-bands", 
+    "comment":"created with noiseBandMaskerDesigner.m 23-Oct-2022", 
+    "n_bands":2, 
+    "bands":[
+        {
+            "amplitude":0.1, 
+            "fc_low":900, 
+            "fc_high":3700
+        }, 
+        {
+            "amplitude":0.1, 
+            "fc_low":5300, 
+            "fc_high":12000
+        }
+    ], 
+    "name":"3-vnotch_bw1600_fc4500"
+}
