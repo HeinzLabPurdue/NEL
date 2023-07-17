@@ -65,9 +65,9 @@ end
 
 FFR_set_attns(Stimuli.atten_dB,-120,Stimuli.channel,Stimuli.KHosc,RP1,RP2);
 
-FFRnpts=ceil(FFR_Gating.FFRlength_ms/1000*Stimuli.RPsamprate_Hz);
+FFRnpts=floor(FFR_Gating.FFRlength_ms/1000*Stimuli.RPsamprate_Hz); %Changed from ceil to floor based on ABR_loop,VMA (7/17/23)
 if Stimuli.FFRmem_reps>0
-    FFR_memFact=exp(-2/Stimuli.FFRmem_reps);
+    FFR_memFact=exp(-2/Stimuli.FFRmem_reps); 
 else
     FFR_memFact=0;
 end
@@ -82,8 +82,8 @@ veryfirstSTIM=1;  ... % The very first FFRdata when program starts is all zeros,
 set(FIG.ax.line,'xdata',[],'y1data',[]); drawnow;
 
 % alternating polarities in different matricies zz 04nov11
-FFRdataAvg_freerun_np = 0;
-FFRdataAvg_freerun_po = 0;
+FFRdataAvg_freerun_np = [0];
+FFRdataAvg_freerun_po = [0]; 
 
 while isempty(get(FIG.push.close,'Userdata'))
     if (ishandle(FIG.ax.axis))
@@ -260,10 +260,11 @@ while isempty(get(FIG.push.close,'Userdata'))
                     FFR_set_attns(Stimuli.atten_dB,-120,Stimuli.channel,Stimuli.KHosc,RP1,RP2);
                     % debug deal with later Khite
                     
-                    FFRnpts=ceil(FFR_Gating.FFRlength_ms/1000*Stimuli.RPsamprate_Hz);
+                    FFRnpts=floor(FFR_Gating.FFRlength_ms/1000*Stimuli.RPsamprate_Hz); %Changed from ceil to floor acc to ABR script VMA (7/17/23)
                     if Stimuli.FFRmem_reps>0
                         FFR_memFact=exp(-2/Stimuli.FFRmem_reps);...
-                            % changed from 1 to 2 to reflect num pairs zz 03nov2011
+                            % changed from 1 to 2 to reflect num pairs zz
+                            % 03nov2011
                     else
                         FFR_memFact=0;
                     end

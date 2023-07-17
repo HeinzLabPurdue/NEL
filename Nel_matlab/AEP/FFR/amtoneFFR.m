@@ -53,7 +53,7 @@ ramp = [ramp_up ones(1,a(1)-2*b(1)) ramp_down];
 % NEEDS TO BE CHANGEd WHEN MOVING INTO NEL from NEL_DEBUG
 name_org=sprintf('AM_%d_%d_%g_%g_org.wav',fc,fm,dur*1000,mod*100);
 name_inv=sprintf('AM_%d_%d_%g_%g_inv.wav',fc,fm,dur*1000,mod*100);
-filename=fullfile(NelData.General.RootDir,'Nel_matlab','FFR','signals',name_org);
+filename=fullfile(NelData.General.RootDir,'Nel_matlab','AEP','FFR','signals',name_org);
 
 
 %RMS=sqrt(mean(y.^2));
@@ -77,10 +77,10 @@ audiowrite(filename,samtone,round(fs));
 % if signal needs to be polarized, creates the inverse signal
 % otherwise, creates the same signal with the name inv zz 20oct11
 if(pol)
-    filename_inv=fullfile(NelData.General.RootDir,'Nel_matlab','FFR','Signals',name_inv);
+    filename_inv=fullfile(NelData.General.RootDir,'Nel_matlab','AEP','FFR','Signals',name_inv);
     samtone = -1 * samtone;
     audiowrite(filename_inv,samtone,round(fs));
 else
-    filename_inv=fullfile(NelData.General.RootDir,'Nel_matlab','FFR','Signals',name_inv);
+    filename_inv=fullfile(NelData.General.RootDir,'Nel_matlab','AEP','FFR','Signals',name_inv);
     audiowrite(filename_inv,samtone,round(fs));
 end

@@ -5,7 +5,7 @@ function h_fig = FFR(command_str)
 global PROG FIG Stimuli FFR_Gating root_dir prog_dir NelData devices_names_vector Display
 global data_dir 
 % global fc fm pol dur
-prog_dir = [root_dir 'FFR\'];
+prog_dir = [root_dir 'AEP\FFR\']; %Changed from FFR to AEP\FFR, VMA (7/17/23)
 
 % fm = 200;
 % fc = 20;
@@ -128,8 +128,8 @@ elseif strcmp(command_str,'amtone')
    % 12/7/11: MH&KH: changed to pass Sampling rate as param - defined once in FFR_ins - needs to match RPvds code
    [Stimuli.filename, fn_inv] = amtoneFFR(Stimuli.fc,Stimuli.fm,FFR_Gating.duration_ms/1000,Stimuli.pol,Stimuli.mod,Stimuli.RPsamprate_Hz);
    set(FIG.wavfile.func,'string',Stimuli.filename);
-   copyfile(Stimuli.filename, [NelData.General.RootDir 'Nel_matlab\FFR\Signals\tone_org.wav'],'f');
-   copyfile(fn_inv, [NelData.General.RootDir 'Nel_matlab\FFR\Signals\tone_inv.wav'],'f');
+   copyfile(Stimuli.filename, [NelData.General.RootDir 'Nel_matlab\AEP\FFR\Signals\tone_org.wav'],'f');
+   copyfile(fn_inv, [NelData.General.RootDir 'Nel_matlab\AEP\FFR\Signals\tone_inv.wav'],'f');
 
 
 % WAV file loader, copies file from original location to default locaton

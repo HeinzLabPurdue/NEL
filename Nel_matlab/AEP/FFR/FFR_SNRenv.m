@@ -345,9 +345,12 @@ elseif strcmp(command_str,'invCalib')
     [sig, fs] =audioread([Stimuli.UPDdir Stimuli.filename]);
     curDir= pwd;
     cdd; 
+    %xx= Stimuli.calibPicNum();
     xx= loadpic(Stimuli.calibPicNum);
+    class(xx);
     cd(curDir);
-    calibdata= xx.CalibData;
+    %calibdata = struct; 
+    calibdata= xx.CalibData();
     Stimuli.calib_dBSPLout= get_SPL_from_calib(sig, fs, calibdata, false);
     set(FIG.asldr.SPL,'string',sprintf('%.1f dB SPL',Stimuli.calib_dBSPLout-abs(str2double(get(FIG.asldr.val, 'string')))));
     
