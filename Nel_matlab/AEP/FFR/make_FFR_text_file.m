@@ -17,17 +17,21 @@ for i=1:length(FFRdataAvg_NP)
    if (RunLevels_params.decimateFact~=1)
       FFRdataAvg_NP{i} = decimate(FFRdataAvg_NP{i}, RunLevels_params.decimateFact);
       FFRdataAvg_PO{i} = decimate(FFRdataAvg_PO{i}, RunLevels_params.decimateFact);
-      if strcmp(interface_type = 'SPIKES')
-            FFRdataStore{i} = decimate(FFRdataStore{i}, RunLevels_params.decimateFact);
+      if strcmp(interface_type,'SPIKES')
+            FFRdataStoreNP{i} = decimate(FFRdataStoreNP{i}, RunLevels_params.decimateFact);
+            FFRdataStorePO{i} = decimate(FFRdataStorePO{i}, RunLevels_params.decimateFact);
       end
-%           FFRdataReps_dec{i} = zeros(2*RunLevels_params.nPairs,length(FFRdataAvg{i}));
-      % MH 18Nov2003: Add code to save all Reps
-      % zz 04nov2011: removed code for all reps
-%           for j=1:2*RunLevels_params.nPairs
-%              FFRdataReps_dec{i}(j,:) = decimate(FFRdataReps{i}(j,:), RunLevels_params.decimateFact);
-%           end     
-%        else
-%           FFRdataReps_dec{i} = FFRdataReps{i};
+      
+%       
+%       FFRdataReps_dec{i} = zeros(2*RunLevels_params.nPairs,length(FFRdataAvg{i}));
+%       %       MH 18Nov2003: Add code to save all Reps
+%       %       zz 04nov2011: removed code for all reps
+%       for j=1:2*RunLevels_params.nPairs
+%           FFRdataReps_dec{i}(j,:) = decimate(FFRdataReps{i}(j,:), RunLevels_params.decimateFact);
+%       end     
+%   else
+%       FFRdataReps_dec{i} = FFRdataReps{i};
+%       
    end
 end
 %    for i=1:length(FFRdataAvg)
@@ -42,13 +46,18 @@ end
 %           FFRdataReps_dec{i} = FFRdataReps{i};
 %        end
 % 	  end
+save_all_reps=1; % change to 0 to only save averages.
 
-% 	x.AD_Data.AD_All_V = FFRdataReps_dec; % modified by GE 26Apr2004. Removed zz 04nov2011
-% 	x.AD_Data.AD_Avg_V = FFRdataAvg;
+if save_all_reps==1
+	x.AD_Data.AD_All_V = FFRdataReps; % _dec removed from end of FFRdataReps % modified by GE 26Apr2004. Removed zz 04nov2011. Added DA 7/25/13
+end
+    % 	x.AD_Data.AD_Avg_V = FFRdataAvg;
 x.AD_Data.AD_Avg_NP_V = FFRdataAvg_NP;
 x.AD_Data.AD_Avg_PO_V = FFRdataAvg_PO;
-if
-x.AD_Data.AD_Store_V = FFRdataStore;
+if strcmp(interface_type,'SPIKES')
+    x.AD_Data.AD_StoreNP_V = FFRdataStoreNP;
+    x.AD_Data.AD_StorePO_V = FFRdataStorePO;
+end
 
 make_FFR_text_file_subfunc2;
 	
