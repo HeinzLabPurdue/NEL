@@ -29,40 +29,29 @@ if NelData.General.RP2_3and4 && (~NelData.General.RX8) % NEL1 with RP2 #3 & #4
 elseif (~NelData.General.RP2_3and4) && (~NelData.General.RX8) % NEL1 without (RP2 #3 & #4), and not NEL2 because no RX8
     invoke(RP1,'ClearCOF');
     invoke(RP1,'LoadCOF', stimRCXfName);
-    
-    %     RP2=actxcontrol('RPco.x',[0 0 1 1]);
-    %     invoke(RP2,'ConnectRP2',NelData.General.TDTcommMode,2);
     invoke(RP2,'ClearCOF');
     invoke(RP2,'LoadCOF',[prog_dir '\object\FFR_right2.rcx']);
     invoke(RP2,'SetTagVal','ADdur', FFR_Gating.FFRlength_ms);
     invoke(RP2,'Run');
-    %     RP3= RP2;
-    
+
 elseif NelData.General.RX8  %NEL2 with RX8
     invoke(RP1,'ClearCOF');
     invoke(RP1,'LoadCOF', stimRCXfName);
     
     %% For bit-select
-    %     RP2=actxcontrol('RPco.x',[0 0 1 1]);
-    %     invoke(RP2,'ConnectRP2',NelData.General.TDTcommMode,2);
     invoke(RP2,'ClearCOF');
     invoke(RP2,'LoadCOF',[prog_dir '\object\FFR_BitSet.rcx']);
     invoke(RP2,'Run');
     
     %% For ADC (data in)
-    %     RP3=actxcontrol('RPco.x',[0 0 1 1]);
-    %     invoke(RP3,'ConnectRP2',NelData.General.TDTcommMode,3);
     RP3= connect_tdt('RX8', 1);
     [~, ~, b_invCalib_coef]= run_invCalib(-2);
     
     invoke(RP3,'ClearCOF');
-    % invoke(RP2,'LoadCOF',[prog_dir '\object\FFR_right.rco']); % MH/KH Dec 8 2011
-    % invoke(RP3,'LoadCOF',[prog_dir '\object\FFR_RX8_ADC_invCalib.rcx']);
     invoke(RP3,'LoadCOF',[prog_dir '\object\FFR_RX8_ADC_invCalib_2chan.rcx']); %2 channel JMR Sept 21
     e_invCalib_status= RP3.WriteTagV('FIR_Coefs', 0, b_invCalib_coef);
     invoke(RP3,'SetTagVal','ADdur', FFR_Gating.FFRlength_ms);
-    invoke(RP3,'Run');
-    
+    invoke(RP3,'Run'); 
 end
 % Avoiding using set_RP_tagvals: somehow set_RP_tagvals doesn't let FFR
 % loops run as expected.
@@ -70,7 +59,7 @@ end
 
 FFR_set_attns(Stimuli.atten_dB,-120,Stimuli.channel,Stimuli.KHosc,RP1,RP2);
 
-FFRnpts=ceil(FFR_Gating.FFRlength_ms/1000*Stimuli.RPsamprate_Hz);
+FFRnpts=floor(FFR_Gating.FFRlength_ms/1000*Stimuli.RPsamprate_Hz); %Changed from ceil to floor based on ABR, VMA, SH (7/18/23)
 if Stimuli.FFRmem_reps>0
     FFR_memFact=exp(-2/Stimuli.FFRmem_reps);
 else
@@ -106,7 +95,7 @@ while isempty(get(FIG.push.close,'Userdata'))
     set(FIG.ax.line(1),'MarkerSize',2,'Color','b');    
     set(FIG.ax.line(2),'MarkerSize',2,'Color',[0.9 .1 1]);
     
-    %set(FIG.ax.line2,'MarkerSize',2,'Color','r');
+    %set(FIG.ax.line2,'MarkerSize',2,'Color','r'); %% had been commented out 
     
     xlim([FFR_Gating.XstartPlot_ms/1000 FFR_Gating.XendPlot_ms/1000]);
     ylim([-Display.YLim Display.YLim]);  % ge debug: set large enough for A/D input range
@@ -196,7 +185,7 @@ while isempty(get(FIG.push.close,'Userdata'))
                     end
                     
                 else
-                    if ~mod(misc.n,2)
+                    if mod(misc.n,2)
                         FFRdataAvg_freerun_np1 = FFRdata1; % chan 1
                         FFRdataAvg_freerun_np2 = FFRdata2; % chan 2
                         if demean_flag
@@ -219,21 +208,38 @@ while isempty(get(FIG.push.close,'Userdata'))
                 end
                 
                 b=mod(misc.n,2);
+                
+                %for plotting, ensure xdata and ydata are same size
+                data_x = 0:(1/Stimuli.RPsamprate_Hz):FFR_Gating.FFRlength_ms/1000;
+                newlen = min([length(data_x),length(FFRdataAvg_freerun_np1),length(FFRdataAvg_freerun_np2), length(FFRdataAvg_freerun_po1),length(FFRdataAvg_freerun_po2)]);
+                data_x = data_x(1:newlen);
+                
                 if mod(misc.n,2)
-                    set(FIG.ax.line(1),'xdata',(0:(1/Stimuli.RPsamprate_Hz):FFR_Gating.FFRlength_ms/1000)...
-                        ,'ydata',FFRdataAvg_freerun_np2*Display.PlotFactor);
-                    set(FIG.ax.line(3),'xdata',(0:(1/Stimuli.RPsamprate_Hz):FFR_Gating.FFRlength_ms/1000)...
-                        ,'ydata',FFRdataAvg_freerun_np1*Display.PlotFactor);
-
+                    data_y1 = zeros(1,newlen); 
+                    data_y1(1:newlen) = FFRdataAvg_freerun_np1(1:newlen);
+                 
+                    data_y2 = zeros(1,newlen); 
+                    data_y2(1:newlen) = FFRdataAvg_freerun_np2(1:newlen);
                     
+                    set(FIG.ax.line(1),'xdata', data_x, ...
+                        'ydata',data_y2*Display.PlotFactor);
+                    set(FIG.ax.line(3),'xdata',data_x, ...
+                        'ydata',data_y1*Display.PlotFactor);
+ 
                 else
-                    set(FIG.ax.line(2),'xdata',(0:(1/Stimuli.RPsamprate_Hz):FFR_Gating.FFRlength_ms/1000)...
-                        ,'ydata',FFRdataAvg_freerun_po2*Display.PlotFactor);
-                    set(FIG.ax.line(4),'xdata',(0:(1/Stimuli.RPsamprate_Hz):FFR_Gating.FFRlength_ms/1000)...
-                        ,'ydata',FFRdataAvg_freerun_po1*Display.PlotFactor);
+                    data_y3 = zeros(1,newlen); 
+                    data_y3(1:newlen) = FFRdataAvg_freerun_np1(1:newlen);
+                    
+                    data_y4 = zeros(1,newlen); 
+                    data_y4(1:newlen) = FFRdataAvg_freerun_np2(1:newlen);
+                    
+                    set(FIG.ax.line(2),'xdata',data_x,...
+                        'ydata',data_y4*Display.PlotFactor);
+                    set(FIG.ax.line(4),'xdata',data_x,...
+                        'ydata',data_y3*Display.PlotFactor);
 
                 end
-                
+               
                 drawnow;
             else
                 veryfirstSTIM=0;
@@ -292,10 +298,9 @@ while isempty(get(FIG.push.close,'Userdata'))
                     FFR_set_attns(att_run,-120,Stimuli.channel,Stimuli.KHosc,RP1,RP2);
                     % debug deal with later Khite
                     
-                    FFRnpts=ceil(FFR_Gating.FFRlength_ms/1000*Stimuli.RPsamprate_Hz);
+                    FFRnpts=floor(FFR_Gating.FFRlength_ms/1000*Stimuli.RPsamprate_Hz); %Changed from ceil to floor based on ABR, VMA, SH (7/18/23)
                     if Stimuli.FFRmem_reps>0
-                        FFR_memFact=exp(-2/Stimuli.FFRmem_reps);...
-                            % changed from 1 to 2 to reflect num pairs zz 03nov2011
+                        FFR_memFact=exp(-2/Stimuli.FFRmem_reps);... % changed from 1 to 2 to reflect num pairs zz 03nov2011
                     else
                         FFR_memFact=0;
                     end
