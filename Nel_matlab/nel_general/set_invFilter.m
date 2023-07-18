@@ -103,11 +103,11 @@ switch filttype{1}
     case 'allpass'
         %needs valid calib file
         b_chan1 = [1 zeros(1, 255)];
-        fprintf('Channel 1 | allpass loaded successfully.');
+        fprintf('\n Channel 1 | allpass set.');
     case 'allstop'
         %doesn't need anything
         b_chan1 = zeros(1, 256);
-        fprintf('Channel 1 | allstop loaded successfully.');
+        fprintf('\n Channel 1 | allstop set.');
     case 'inversefilt'
         %need 2 checks
         % inverse and coeffs
@@ -118,7 +118,7 @@ switch filttype{1}
         %DISCLAIMER RIGHT NOW SENDING SAME COEFFS TO BOTH CHANS!!!!!FIX
         %BEFORE DEPLOYING
         b_chan1 = temp.b(:)';
-        fprintf('Channel 1 | invFIR Coefs loaded successfully from %s \n', coef_str);
+        fprintf('\n Channel 1 | invFIR Coefs set successfully from %s \n', coef_str);
     otherwise
         warndlg('Invalid filter type specified in set_invFilter()...defaulting to allstop','WARNING!!!','modal')
         errorFlag = true;
@@ -133,11 +133,11 @@ switch filttype{2}
     case 'allpass'
         %needs valid calib file
         b_chan2 = [1 zeros(1, 255)];
-        fprintf('Channel 2 | allpass loaded successfully.');
+        fprintf('\n Channel 2 | allpass set.');
     case 'allstop'
         %doesn't need anything
         b_chan2 = zeros(1, 256);
-        fprintf('Channel 2 | allstop loaded successfully.');
+        fprintf('\n Channel 2 | allstop set.');
     case 'inversefilt'
         %need 2 checks
         % inverse and coeffs
@@ -147,7 +147,7 @@ switch filttype{2}
         %DISCLAIMER RIGHT NOW SENDING SAME COEFFS TO BOTH CHANS!!!!!FIX
         %BEFORE DEPLOYING
         b_chan2 = temp.b(:)';
-        fprintf('Channel 2 | invFIR Coefs loaded successfully from %s \n', coef_str);
+        fprintf('\n Channel 2 | invFIR Coefs set successfully from %s \n', coef_str);
     otherwise
         warndlg('Invalid filter type specified in set_invFilter()...defaulting to allstop','WARNING!!!','modal')
         errorFlag = true;
@@ -181,12 +181,14 @@ if status_rp2
     e1= COMM.handle.RP2_4.WriteTagV('FIR_Coefs1', 0, b_chan1);
     e2= COMM.handle.RP2_4.WriteTagV('FIR_Coefs2', 0, b_chan2);
     invoke(COMM.handle.RP2_4,'Run');
-    
+    fprintf('\n RP2-4 | Coefficients sucessfully loaded to TDT \n');
+
 elseif status_rx8 % Most call for run_invCalib are from NEL1. For NEL2 (with RX8), only needed for calibrate and dpoae.
     invoke(COMM.handle.RX8,'LoadCof',[object_dir '\calib_invFIR_twoChan_RX8.rcx']);
     e1= COMM.handle.RX8.WriteTagV('FIR_Coefs1', 0, b_chan1);
     e2= COMM.handle.RX8.WriteTagV('FIR_Coefs2', 0, b_chan2);
     invoke(COMM.handle.RX8,'Run');
+    fprintf('\n RX8 | Coefficients sucessfully loaded to TDT \n');
 else
     fprintf('Could not connect to RP2/RX8 or load FIR_Coefs (%s). Check zbus \n', datestr(datetime));
     e1 = false;
