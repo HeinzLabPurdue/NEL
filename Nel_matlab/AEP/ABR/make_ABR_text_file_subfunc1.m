@@ -25,6 +25,7 @@ x.Stimuli=Stimuli;
 x.Stimuli.RunLevels_params = RunLevels_params;
 x.Stimuli.CAP_Gating = CAP_Gating;
 x.Line.freq_Hz = Stimuli.freq_hz;
+x.invfilterdata = invfilterdata; 
 
 x.AD_Data.Gain=Display.Gain;
 x.AD_Data.SampleRate= Stimuli.RPsamprate_Hz/RunLevels_params.decimateFact;

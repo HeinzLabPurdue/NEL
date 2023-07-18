@@ -21,6 +21,8 @@
 %TODO:
 % - make sure to send b and b2 coefficients (only sending one to both
 % chans)
+% - check defaults for initial calibration when no file
+
 function invfilterdata = set_invFilter(filttype, RawCalibPicNum)
 
 %% Error Checking
@@ -32,8 +34,6 @@ errorFlag = false;
 coefFileNum = RawCalibPicNum;
 
 cdd;
-
-
 %calib file is needed
 if ~prod(strcmp(filttype,{'allstop','allstop'})) 
     %if Pic num not provided  
@@ -118,9 +118,9 @@ switch filttype{1}
         %DISCLAIMER RIGHT NOW SENDING SAME COEFFS TO BOTH CHANS!!!!!FIX
         %BEFORE DEPLOYING
         b_chan1 = temp.b(:)';
-        fprintf('\n Channel 1 | invFIR Coefs set successfully from %s \n', coef_str);
+        fprintf('\n Channel 1 | invFIR Coefs set successfully from %s', coef_str);
     otherwise
-        warndlg('Invalid filter type specified in set_invFilter()...defaulting to allstop','WARNING!!!','modal')
+        warndlg('\n Invalid filter type specified in set_invFilter()...defaulting to allstop','WARNING!!!','modal')
         errorFlag = true;
         RawCalibPicNum = NaN;
         coefFileNum = NaN;
@@ -147,7 +147,7 @@ switch filttype{2}
         %DISCLAIMER RIGHT NOW SENDING SAME COEFFS TO BOTH CHANS!!!!!FIX
         %BEFORE DEPLOYING
         b_chan2 = temp.b(:)';
-        fprintf('\n Channel 2 | invFIR Coefs set successfully from %s \n', coef_str);
+        fprintf('\n Channel 2 | invFIR Coefs set successfully from %s', coef_str);
     otherwise
         warndlg('Invalid filter type specified in set_invFilter()...defaulting to allstop','WARNING!!!','modal')
         errorFlag = true;

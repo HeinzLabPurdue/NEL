@@ -2,7 +2,7 @@
 % Changing all CAP to ABR - Done
 
 FIG.checkbox.fixedPhase = uicontrol(FIG.handle, 'callback', 'ABR(''fixedPhase'');','style','checkbox','Enable','on','Units','normalized','position',[.125 .375 .09 .03],'string','fixedPhase','fontsize',12,'BackgroundColor','w','value',Stimuli.fixedPhase);
-FIG.radio.invCalib      = uicontrol(FIG.handle,'callback','ABR(''invCalib'');','style','radio','Enable','on','Units','normalized','position',[.125 .345 .08 .03],'string','invCalib','fontsize',12,'BackgroundColor','w','value',1);
+FIG.radio.invCalib      = uicontrol(FIG.handle,'callback','ABR(''calibInit'');','style','radio','Enable','on','Units','normalized','position',[.125 .345 .08 .03],'string','invCalib','fontsize',12,'BackgroundColor','w','value',1);
 FIG.radio.fast   = uicontrol(FIG.handle,'callback','ABR(''fast'');','style','radio','Enable','on','Units','normalized','position',[.125 .305 .08 .03],'string','Fast','fontsize',12,'BackgroundColor','w','value',1);
 FIG.radio.slow   = uicontrol(FIG.handle,'callback','ABR(''slow'');','style','radio','Enable','on','Units','normalized','position',[.125 .275 .08 .03],'string','Slow','fontsize',12,'BackgroundColor','w');
 

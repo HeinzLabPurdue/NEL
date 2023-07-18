@@ -10,8 +10,8 @@ function [f1,RP,FS]=load_play_circuit_Nel1(FS_tag,fig_num,GB_ch)
 %------------
 warning('off'); 
 
-global NelData
-CIR_PATH='C:\NEL\Nel_matlab\WBMEMR\BasicPlay_OAE_Nel1.rcx'; %The *.rco circuit used to play the files
+global NelData root_dir
+CIR_PATH=[root_dir 'WBMEMR\BasicPlay_OAE_Nel1.rcx']; %The *.rco circuit used to play the files
 
 % DPOAE - Build config structures [1st number is LEFT channel; 2nd number is RIGHT channel in TDT]
 % RP2-1-out1 is NOT USED
