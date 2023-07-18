@@ -9,23 +9,161 @@
 %Change input to string
 % 'allpass' = allpass
 % 'allstop' = allstop
-% 'inversefilt' = inverse calib based on specfied 
+% 'inversefilt' = inverse calib based on specfied
 
 %inversefilterdata:
 % 1. CalibPICnum2use
 % 2. filttype (cell array dim 2)
-% 3. coefFileNum 
+% 3. coefFileNum
 % 4. b (cell array dim 2)
 
+
+%TODO:
+% - make sure to send b and b2 coefficients (only sending one to both
+% chans)
 function invfilterdata = set_invFilter(filttype, RawCalibPicNum)
 
-if ~exist('RawCalibPicNum','var') && ~strcmp(filttype,{'allstop','allstop'})
-    warndlg('Missing Calibration File Number. Running allstop.','WARNING!!!','modal');
-    filttype = {'allstop','allstop'};
-    RawCalibPicNum = NaN;
+%% Error Checking
+%check for 3 files
+% -RawCalib for num passed
+% -Coeffs
+% -Inverse filter
+errorFlag = false;
+coefFileNum = RawCalibPicNum;
+
+cdd;
+
+
+%calib file is needed
+if ~prod(strcmp(filttype,{'allstop','allstop'})) 
+    %if Pic num not provided  
+    if ~exist('RawCalibPicNum','var')
+        warndlg('Missing Calibration File Number in set_invFilter. Running allstop.','WARNING!!!','modal');
+        errorFlag = true;
+    else
+        %Checking for valid raw calib file in data directory
+        pic_str = sprintf('p%04d_%s',RawCalibPicNum,'calib_raw*');
+        fname = dir(pic_str);
+        
+        if isempty(fname)
+            warndlg('Invalid Raw Calibration File Number in set_invFilter. Running allstop.','WARNING!!!','modal');
+            errorFlag = true;
+        else
+            coefFileNum = RawCalibPicNum;
+        end
+        
+        %if need an inverse calib
+        if sum(strcmp('inversefilt',filttype)) 
+            %check for missing coeff file
+            CalibPICnum2use = findPics(sprintf('inv%d',coefFileNum));
+            pic_str = sprintf('coef_%04d_%s',coefFileNum,'calib*');
+            fname = dir(pic_str);
+            if isempty(fname)
+                warndlg('Invalid Coefficient File Number in set_invFilter. Running allstop.','WARNING!!!','modal');
+                errorFlag = true;
+            end
+
+            %check for missing inv file
+            pic_str = sprintf('p*inv%d*',coefFileNum);
+            fname = dir(pic_str);
+            
+            if isempty(fname)
+                warndlg('Invalid Inverse Calib File Number in set_invFilter. Running allstop.','WARNING!!!','modal');
+                errorFlag = true;
+            end
+        else 
+            CalibPICnum2use = RawCalibPicNum;
+        end
+    end
+else
+    CalibPICnum2use = NaN;
     coefFileNum = NaN;
 end
 
+
+if errorFlag
+    RawCalibPicNum = NaN;
+    coefFileNum = NaN;
+    CalibPICnum2use = NaN;
+    filttype = {'allstop','allstop'};
+end
+
+%Inverse filter in one channel cannot be combined with allpass in the
+%other. BOTH must be inversefilter, or one must be allstop
+
+if sum(strcmp(filttype,{'inversefilt','allpass'}))== 2 || sum(strcmp(filttype,{'allpass','inversefilt'}))== 2
+    warndlg('Needed to convert channel to inversefilter. Cannot pass inverse filter in one channel and allpass in the other!','WARNING!!!','modal');
+    filttype = {'inversefilt','inversefilt'};
+end 
+
+%% Setting Coefficients
+
+%channel 1
+switch filttype{1}
+    case 'allpass'
+        %needs valid calib file
+        b_chan1 = [1 zeros(1, 255)];
+        fprintf('Channel 1 | allpass loaded successfully.');
+    case 'allstop'
+        %doesn't need anything
+        b_chan1 = zeros(1, 256);
+        fprintf('Channel 1 | allstop loaded successfully.');
+    case 'inversefilt'
+        %need 2 checks
+        % inverse and coeffs
+        coef_str = sprintf('coef_%04d_%s',coefFileNum,'calib.mat');       
+        temp = load(coef_str);
+        
+        
+        %DISCLAIMER RIGHT NOW SENDING SAME COEFFS TO BOTH CHANS!!!!!FIX
+        %BEFORE DEPLOYING
+        b_chan1 = temp.b(:)';
+        fprintf('Channel 1 | invFIR Coefs loaded successfully from %s \n', coef_str);
+    otherwise
+        warndlg('Invalid filter type specified in set_invFilter()...defaulting to allstop','WARNING!!!','modal')
+        errorFlag = true;
+        RawCalibPicNum = NaN;
+        coefFileNum = NaN;
+        b_chan1 = zeros(1, 256);
+        filttype = {'allstop','allstop'};
+end
+
+%channel 2
+switch filttype{2}
+    case 'allpass'
+        %needs valid calib file
+        b_chan2 = [1 zeros(1, 255)];
+        fprintf('Channel 2 | allpass loaded successfully.');
+    case 'allstop'
+        %doesn't need anything
+        b_chan2 = zeros(1, 256);
+        fprintf('Channel 2 | allstop loaded successfully.');
+    case 'inversefilt'
+        %need 2 checks
+        % inverse and coeffs
+        coef_str = sprintf('coef_%04d_%s',coefFileNum,'calib.mat');       
+        temp = load(coef_str);
+        
+        %DISCLAIMER RIGHT NOW SENDING SAME COEFFS TO BOTH CHANS!!!!!FIX
+        %BEFORE DEPLOYING
+        b_chan2 = temp.b(:)';
+        fprintf('Channel 2 | invFIR Coefs loaded successfully from %s \n', coef_str);
+    otherwise
+        warndlg('Invalid filter type specified in set_invFilter()...defaulting to allstop','WARNING!!!','modal')
+        errorFlag = true;
+        RawCalibPicNum = NaN;
+        coefFileNum = NaN;
+        b_chan2 = zeros(1, 256);
+        filttype = {'allstop','allstop'};
+end
+
+
+%For exporting and saving in data file
+invfilterdata.CalibPICnum2use = CalibPICnum2use;
+invfilterdata.filttype = filttype;
+invfilterdata.coefFileNum = coefFileNum;
+
+%temporary for debugging
 %% Connecting to TDT modules
 global COMM root_dir
 object_dir = [root_dir 'calibration\object'];
@@ -37,147 +175,25 @@ if status_rp2 && status_rx8
     error('How are RP2#4 and RX8 both in the circuit?');
 end
 
-
 %Always setting something
 if status_rp2
-    invoke(COMM.handle.RP2_4,'LoadCof',[object_dir '\calib_invFIR_right.rcx']);
-elseif status_rx8 % Most call for run_invCalib are from NEL1. For NEL2 (with RX8), only needed for calibrate and dpoae.
-    invoke(COMM.handle.RX8,'LoadCof',[object_dir '\calib_invFIR_right_RX8.rcx']);
-end
-
-curDir= pwd;
-cdd;
-
-pic_str = sprintf('p%04d_%s',RawCalibPicNum,'calib_raw*');
-fname = dir(pic_str);
-
-if isempty(fname)
-    warndlg('Invalid Calibration File. Running allstop.');
-    RawCalibPicNum = NaN;
-    coefFileNum = NaN;
-    filttype = {'allstop','allstop'};
-else
-    coefFileNum = RawCalibPicNum;
-end
-
-% all_calib_picNums= cell2mat(cellfun(@(x) getPicNum(x), {all_Calib_files.name}', 'UniformOutput', false));
-
-%check for missing coeff file and missing inv file
-
-switch filttype{1}
-    case 'allpass'
-        %needs valid calib file
-        b_chan1 = [1 zeros(1, 255)];        
-    case 'allstop'
-        %doesn't need anything
-        b_chan1 = zeros(1, 256);
-    case 'inversefilt'
-        %need 2 checks
-        % inverse and coeffs
-        
-        
-    otherwise 
-        warning('Invalid filter type specified in set_invFilter()...defaulting to ALLPASS')        
-end
-
-%% Define appropriate b for invCalib or allPass
-curDir= pwd;
-cdd;
-all_Calib_files= dir('p*calib*raw*');
-all_calib_picNums= cell2mat(cellfun(@(x) getPicNum(x), {all_Calib_files.name}', 'UniformOutput', false));
-
-if doInvCalib==1
-    all_Coefs_Files= dir('coef*');
-    all_Coefs_picNums= cell2mat(cellfun(@(x) sscanf(x, 'coef_%04f_calib*'), {all_Coefs_Files.name}', 'UniformOutput', false));
-    
-    % Check if last calib file is the same as last coef file
-    if max(all_calib_picNums)~=max(all_Coefs_picNums)
-        %         warning('Last Calib file does not match last coef-file. Rerunning invCalib?');
-        warning('All raw-files should have corresponding coef files?? Something wrong???');
-    end
-    [coefFileNum, max_ind] = max(all_Coefs_picNums); % Output#1
-    allINVcalFiles= dir(['p*' num2str(coefFileNum) '*calib*']);
-    
-    if ~isempty(allINVcalFiles) % There's both rawCalib and invCalib
-        all_invCal_picNums= cell2mat(cellfun(@(x) sscanf(x, 'p%04f_calib*'), {allINVcalFiles.name}', 'UniformOutput', false));
-        calibPicNum= max(all_invCal_picNums); % Output#2
-        
-        temp = load(all_Coefs_Files(max_ind).name);
-        b= temp.b(:)';
-        doINVcheck= true;
-    else % There's rawCalib but no invCalib
-        % Output #1-2
-        doINVcheck= false;
-        coefFileNum= nan;
-        calibPicNum= max(all_calib_picNums);
-        b= [1 zeros(1, 255)];
-    end
-elseif doInvCalib==0
-    % Output #1-2
-    coefFileNum= nan;
-    calibPicNum= max(all_calib_picNums);
-    b= [1 zeros(1, 255)];
-elseif doInvCalib==-1
-    warning('Work in progress- does''t work after delete(FIG.handle) is evaluated');
-    % Output #1-2
-    coefFileNum= nan;
-    calibPicNum= nan;
-    coef_stored= COMM.handle.RP2_4.ReadTagV('FIR_Coefs', 0, 256);
-    b= coef_stored;
-    if max(abs((coef_stored-[1 zeros(1, 255)])))<1e-6 % if within quantization error, then equal
-        fprintf('Using Allpass Coefs (%s) \n', datestr(datetime));
-    else
-        fprintf('Using invFIR Coefs (%s) \n', datestr(datetime));
-    end
-    cd(curDir);
-    return;
-elseif doInvCalib== -2 % return
-    all_Coefs_Files= dir('coef*');
-    all_Coefs_picNums= cell2mat(cellfun(@(x) sscanf(x, 'coef_%04f_calib*'), {all_Coefs_Files.name}', 'UniformOutput', false));
-    
-    % Check if last calib file is the same as last coef file
-    if max(all_calib_picNums)~=max(all_Coefs_picNums)
-        %         warning('Last Calib file does not match last coef-file. Rerunning invCalib?');
-        warning('All raw-files should have corresponding coef files?? Something wrong???');
-    end
-    [coefFileNum, max_ind] = max(all_Coefs_picNums); % Output#1
-    allINVcalFiles= dir(['p*calib*' num2str(coefFileNum) '*']);
-    
-    if ~isempty(allINVcalFiles) % There's both rawCalib and invCalib
-        all_invCal_picNums= cell2mat(cellfun(@(x) sscanf(x, 'p%04f_calib*'), {allINVcalFiles.name}', 'UniformOutput', false));
-        calibPicNum= max(all_invCal_picNums); % Output#2
-        
-        temp = load(all_Coefs_Files(max_ind).name);
-        b= temp.b(:)';
-    else
-        b= nan;
-    end
-end
-cd(curDir);
-
-%% Run the circuit
-if status_rp2
-    e1= COMM.handle.RP2_4.WriteTagV('FIR_Coefs', 0, b);
+    invoke(COMM.handle.RP2_4,'LoadCof',[object_dir '\calib_invFIR_twoChan_RP2.rcx']);
+    e1= COMM.handle.RP2_4.WriteTagV('FIR_Coefs1', 0, b_chan1);
+    e2= COMM.handle.RP2_4.WriteTagV('FIR_Coefs2', 0, b_chan2);
     invoke(COMM.handle.RP2_4,'Run');
-elseif status_rx8
-    e1= COMM.handle.RX8.WriteTagV('FIR_Coefs', 0, b);
+    
+elseif status_rx8 % Most call for run_invCalib are from NEL1. For NEL2 (with RX8), only needed for calibrate and dpoae.
+    invoke(COMM.handle.RX8,'LoadCof',[object_dir '\calib_invFIR_twoChan_RX8.rcx']);
+    e1= COMM.handle.RX8.WriteTagV('FIR_Coefs1', 0, b_chan1);
+    e2= COMM.handle.RX8.WriteTagV('FIR_Coefs2', 0, b_chan2);
     invoke(COMM.handle.RX8,'Run');
-else 
-    e1= false;
-end
-if e1
-    if doInvCalib==1
-        if doINVcheck
-            fprintf('most recent invFIR Coefs loaded successfully (%s) \n', datestr(datetime));
-        else
-            fprintf('Running allpass as no invCalib. allpass Coefs loaded successfully (%s) \n', datestr(datetime));
-            warn_handle= warndlg('Running allpass as no invCalib', 'Run invCalib maybe?');
-            uiwait(warn_handle);
-        end
-    elseif doInvCalib==0
-        fprintf('Allpass Coefs loaded successfully (%s) \n', datestr(datetime));
-    end
-elseif (~e1) && (doInvCalib ~= -2)
-    fprintf('Could not connect to RP2/RX8 or load FIR_Coefs (%s) \n', datestr(datetime));
+else
+    fprintf('Could not connect to RP2/RX8 or load FIR_Coefs (%s). Check zbus \n', datestr(datetime));
+    e1 = false;
+    e2 = false;
+    invfilterdata.CalibPICnum2use = NaN;
+    invfilterdata.filttype = {'ERROR','ERROR'};
+    invfilterdata.coefFileNum = NaN;
 end
 
+rdd;
