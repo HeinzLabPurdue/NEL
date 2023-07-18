@@ -28,9 +28,9 @@ if nargin < 1
     PROG = struct('name','FFR(v1.ge_mh.1).m');  % modified by GE 26Apr2004.
     [FIG, h_fig]=get_FIG_ffr_srnenv(); % Initialize FIG
     
-    if strcmp(usr,'JMR')
-        addpath([NelData.General.RootDir 'Users\JMR\FFR']);
-    end
+%     if strcmp(usr,'JMR')
+%         addpath([NelData.General.RootDir 'Users\JMR\FFR']);
+%     end
     [misc, Stimuli, RunLevels_params, Display, interface_type]=FFR_SNRenv_ins(NelData); ...
         %#ok<ASGLU> % should already be populated by CAP_ins
     

@@ -28,9 +28,9 @@ if nargin < 1
     PROG = struct('name','FFR(v1.ge_mh.1).m');  % modified by GE 26Apr2004.
     [FIG, h_fig]=get_FIG_ffr_srnenv(); % Initialize FIG
     
-    if strcmp(usr,'JMR')
-        addpath([NelData.General.RootDir 'Users\',usr,'\FFR']);
-    end
+%     if strcmp(usr,'JMR')
+%         addpath([NelData.General.RootDir 'Users\',usr,'\FFR']);
+%     end
     [misc, Stimuli, RunLevels_params, Display, interface_type]=FFR_SNRenv_ins(NelData); ...
         %#ok<ASGLU> % should already be populated by CAP_ins
     
@@ -204,6 +204,36 @@ elseif strcmp(command_str,'both')
         set(FIG.radio.right,'value',0);
     else
         set(FIG.radio.both,'value',1);
+    end
+
+elseif strcmp(command_str,'chan_1')
+    if get(FIG.radio.chan_1, 'value') == 1
+        FIG.NewStim = 18;
+        Stimuli.rec_channel = 1;
+        set(FIG.radio.chan_2,'value',0);
+        set(FIG.radio.Simultaneous,'value',0);
+    else
+        set(FIG.radio.chan_1,'value',1);
+    end
+    
+elseif strcmp(command_str,'chan_2')
+    if get(FIG.radio.chan_2, 'value') == 1
+        FIG.NewStim = 18;
+        Stimuli.rec_channel = 2;
+        set(FIG.radio.chan_1,'value',0);
+        set(FIG.radio.Simultaneous,'value',0);
+    else
+        set(FIG.radio.chan_2,'value',1);
+    end
+    
+elseif strcmp(command_str,'Simultaneous')
+    if get(FIG.radio.Simultaneous, 'value') == 1
+        FIG.NewStim = 18;
+        Stimuli.rec_channel = 3;
+        set(FIG.radio.chan_1,'value',0);
+        set(FIG.radio.chan_2,'value',0);
+    else
+        set(FIG.radio.Simultaneous,'value',1);
     end
     
 elseif strcmp(command_str,'slide_atten')

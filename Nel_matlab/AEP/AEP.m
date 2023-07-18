@@ -62,7 +62,7 @@ if nargin < 1
                     %JMR, but now should default to the AEP/FFR directory.
                     %JMR paradigm now only used if running under JMR. 
                     if strcmp(usr,'JMR')
-                        addpath([NelData.General.RootDir 'Users\JMR', filesep 'FFR']);
+                        %addpath([NelData.General.RootDir 'Users\JMR', filesep 'FFR']);
                         h_fig = FFR_SNRenv_2chan();
                     else
                         %this is single channel and dir is SP
@@ -76,9 +76,7 @@ if nargin < 1
                     h_fig = EFR_Harm_Cmplx;
             end
     end
-
-   
-    
+  
     
 % 
 

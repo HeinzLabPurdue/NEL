@@ -5,7 +5,7 @@ function h_fig = FFR_SNRenv_2chan(command_str,eventdata)
 global RP PROG FIG Stimuli FFR_Gating root_dir prog_dir Display NelData
 %Stimuli.OLDDir
 % global fc fm pol dur
-prog_dir = [root_dir 'FFR\'];
+prog_dir = [root_dir 'AEP\FFR\'];
 usr = NelData.General.User; % current nel user
 
 % if strcmp(NelData.General.WindowsHostName, '1353lyl303501d') % means NEL1
@@ -28,9 +28,9 @@ if nargin < 1
     PROG = struct('name','FFR(v1.ge_mh.1).m');  % modified by GE 26Apr2004.
     [FIG, h_fig]=get_FIG_ffr_srnenv(); % Initialize FIG
     
-    if strcmp(usr,'JMR')
-        addpath([NelData.General.RootDir 'Users\JMR\FFR']);
-    end
+%     if strcmp(usr,'JMR')
+%         addpath([NelData.General.RootDir 'Users\JMR\FFR']);
+%     end
     [misc, Stimuli, RunLevels_params, Display, interface_type]=FFR_SNRenv_ins(NelData); ...
         %#ok<ASGLU> % should already be populated by CAP_ins
     
@@ -329,7 +329,7 @@ elseif strcmp(command_str,'invCalib')
         cdd;
         allCalibFiles= dir('*calib*raw*');
         Stimuli.calibPicNum= getPicNum(allCalibFiles(end).name);
-        Stimuli.calibPicNum= str2double(inputdlg('Enter Calibration File Number','Load Calib File', 1,{num2str(Stimuli.calibPicNum)}));
+        Stimuli.calibPicNum= str2double(inputdlg('Enter RAW Calibration File Number','Load Calib File', 1,{num2str(Stimuli.calibPicNum)}));
         rdd;
     end
     [sig, fs] =audioread([Stimuli.UPDdir Stimuli.filename]);

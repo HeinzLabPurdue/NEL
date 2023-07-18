@@ -8,7 +8,7 @@ gray_dark=[1 1 1];
 gray_light=[1 1 1];
 % gray_dark=[1 1 1]/1.5;
 
-%% 
+%%
 FIG.radio.invCalib = uicontrol(FIG.handle,'callback','FFR_SNRenv(''invCalib'');','style','radio','Enable','on','Units','normalized','position',[.125 .355 .08 .03],'string','invCalib','fontsize',12,'BackgroundColor','w','value',1); %added by KH 06Jan2012
 
 FIG.radio.fast   = uicontrol(FIG.handle,'callback','FFR_SNRenv(''fast'');','style','radio','Enable','on','Units','normalized','position',[.125 .315 .08 .03],'string','Fast','fontsize',12,'BackgroundColor','w','value',1);
@@ -16,7 +16,7 @@ FIG.radio.slow   = uicontrol(FIG.handle,'callback','FFR_SNRenv(''slow'');','styl
 
 FIG.push.close   = uicontrol(FIG.handle,'callback','FFR_SNRenv(''close'');','style','pushbutton','Units','normalized','position',[.1 .6 .125 .09],'string','Close','fontsize',12,'fontangle','normal','fontweight','normal');
 
-%% Stimulus menu 
+%% Stimulus menu
 FIG.popup.stims = uicontrol(FIG.handle,'callback', 'FFR_SNRenv(''update_stim'',''newStim'');','style','popup','Units','normalized','Userdata',Stimuli.filename,'position',[.4 .175 .425 .04],'string',struct2cell(fName),'fontsize',12);
 FIG.push.prev_stim = uicontrol(FIG.handle,'callback','FFR_SNRenv(''update_stim'',''prevStim'');','style','pushbutton','Units','normalized','position',[.35 .175 .05 .04],'string','<<','fontsize',12,'fontangle','normal','fontweight','normal');
 FIG.push.next_stim = uicontrol(FIG.handle,'callback','FFR_SNRenv(''update_stim'',''nextStim'');','style','pushbutton','Units','normalized','position',[.825 .175 .05 .04],'string','>>','fontsize',12,'fontangle','normal','fontweight','normal');
@@ -66,8 +66,15 @@ FIG.radio.left   = uicontrol(FIG.handle,'callback','FFR_SNRenv(''left'');', 'sty
 FIG.radio.right  = uicontrol(FIG.handle,'callback','FFR_SNRenv(''right'');','style','radio','Enable','on','Units','normalized','position',[.125 .205 .08 .03],'string','Right Ear','fontsize',12,'BackgroundColor','w','value',0);
 FIG.radio.both   = uicontrol(FIG.handle,'callback','FFR_SNRenv(''both'');', 'style','radio','Enable','on','Units','normalized','position',[.125 .175 .08 .03],'string','Both Ears','fontsize',12,'BackgroundColor','w','value',1);
 
+%%Setting 2 channel vs 1 channel
+if FIG.TwoChan == 1
+    FIG.radio.chan_1 = uicontrol(FIG.handle,'callback','FFR_SNRenv(''chan_1'');', 'style','radio','Enable','on','Units','normalized','position',[.125*2 .235 .08 .03],'string','Chan 1','fontsize',12,'BackgroundColor','w','value',0);
+    FIG.radio.chan_2 = uicontrol(FIG.handle,'callback','FFR_SNRenv(''chan_2'');', 'style','radio','Enable','on','Units','normalized','position',[.125*2 .205 .08 .03],'string','Chan 2','fontsize',12,'BackgroundColor','w','value',0);
+    FIG.radio.Simultaneous = uicontrol(FIG.handle,'callback','FFR_SNRenv(''Simultaneous'');', 'style','radio','Enable','on','Units','normalized','position',[.125*2 .175 .08 .03],'string','Simultaneous','fontsize',12,'BackgroundColor','w','value',1);
+end
+
 % zz 07nov11 added save now function
-% FIG.push.save_now   = 
+% FIG.push.save_now   =
 FIG.push.run_levels = uicontrol(FIG.handle,'callback','FFR_SNRenv(''run_levels'');','style','pushbutton','Units','normalized','position',[.1 .726 .125 .09],'string','Run levels...','fontsize',12,'fontangle','normal','fontweight','normal');
 FIG.push.forget_now = uicontrol(FIG.handle,'callback','FFR_SNRenv(''forget_now'');','style','pushbutton','Units','normalized','position',[.07 .43 .125 .05],'string','Forget NOW','fontsize',12,'fontangle','normal','fontweight','normal','Userdata','');
 
@@ -87,7 +94,7 @@ FIG.edit.yscale     = uicontrol(FIG.handle,'callback','FFR_SNRenv(''YLim'');','s
 % end
 if (FFR_set_attns(0,0,1,0) == 0)
     set(FIG.radio.left,'Enable','off');
-end    
+end
 if (FFR_set_attns(0,0,2,0) == 0)
     set(FIG.radio.right,'Enable','off');
 end
@@ -96,18 +103,18 @@ set(FIG.handle,'Visible','on');
 
 % Init Gating
 if get(FIG.radio.fast, 'value') == 1
-   FFR_Gating=Stimuli.fast;
+    FFR_Gating=Stimuli.fast;
 else
-   FFR_Gating=Stimuli.slow;
-end   
+    FFR_Gating=Stimuli.slow;
+end
 
 % Init Voltage_Display_Factor
 if strcmp(Display.Voltage,'atELEC')
-   Display.PlotFactor=1/Display.Gain;
-   Display.YLim=Display.YLim_atAD/Display.Gain;
+    Display.PlotFactor=1/Display.Gain;
+    Display.YLim=Display.YLim_atAD/Display.Gain;
 else
-   Display.PlotFactor=1;
-   Display.YLim=Display.YLim_atAD;
-end   
+    Display.PlotFactor=1;
+    Display.YLim=Display.YLim_atAD;
+end
 
 drawnow;

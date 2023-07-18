@@ -2,6 +2,7 @@ function [FIG, h_fig]=get_FIG_ffr_srnenv()
 
 push = cell2struct(cell(1,5),{'forget_now', 'run_levels', 'Close', 'prev_stim', 'next_stim'},2);
 radio = cell2struct(cell(1,7),{'fast', 'slow', 'left', 'right', 'both', 'atAD', 'atELEC'},2);
+%radio = cell2struct(cell(1,8),{'fast','slow','left','right','both','chan_1','chan_2','Simultaneous','atAD', 'atELEC'},2);
 statText  = cell2struct(cell(1,5),{'memReps', 'status', 'threshV', 'gain', 'voltDisplay'},2);
 bg  = cell2struct(cell(1,3),{'spl','stim','nt'},2);
 edit= cell2struct(cell(1,4),{'threshV','memReps','gain', 'yscale'},2);
