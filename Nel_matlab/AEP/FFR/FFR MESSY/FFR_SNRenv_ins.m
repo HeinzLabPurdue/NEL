@@ -1,16 +1,18 @@
 % FFR Instruction Block
-function [misc,Stimuli, RunLevels_params, Display, interface_type]=FFR_SNRenv_ins(NelData)
+function [misc,Stimuli, RunLevels_params, Display, interface_type]=FFRwav_ins(NelData)
 
 % SNRenvStimDir='C:\NEL2\Users\SP\SNRenv_stimuli\stimSetStationary\'; %
 % This was the data dir for pilot data before DTU. (Q313 and Q314).
 % This is new. Defaults stim directory to JMR 
 
 usr = NelData.General.User;
-if strcmp(usr,'SP') || strcmp(usr,'JMR') || strcmp(usr,'AS')
-    SNRenvStimDir=[NelData.General.RootDir 'Users\',usr,'\SNRenv_stimuli\FFRSNRenv_short_stationary_org\'];
+
+if exist([NelData.General.RootDir 'Users\' usr filesep '\FFR\FFRwav\'],'dir')
+    FFRwavStimDir=[NelData.General.RootDir 'Users\',usr,'\FFR\FFRwav\'];
 else
-    SNRenvStimDir=[NelData.General.RootDir 'Users\JMR\SNRenv_stimuli\FFRSNRenv_short_stationary_org\'];
+    FFRStimDir=[NelData.General.RootDir 'Users\AS\FFR\FFRwavs\'];
 end
+
 
 % This is new.
 
@@ -26,7 +28,7 @@ switch interface_type
             );
         
         %         fName=load([fileparts(SNRenvStimDir(1:end-1)) filesep 'SNRenv_stimlist14.mat']); % for Pilot SFR
-        fName=load([fileparts(SNRenvStimDir(1:end-1)) filesep 'SNRenv_stimlist_short.mat']);
+        fName=load([fileparts(FFRStimDir(1:end-1)) filesep 'SNRenv_stimlist_short.mat']);
         fName=fName.SNRenv_stimlist;
         fName= fName(end:-1:1);
         
@@ -42,7 +44,7 @@ switch interface_type
             'maxSPL', 90, ...
             'STIMfile', [NelData.General.RootDir 'Nel_matlab\AEP\FFR\Signals\tone_org.wav'], ...
             'UPDdir', [NelData.General.RootDir 'Nel_matlab\AEP\FFR\FFRSNRenv_short_stationary_run\'], ... (copy resampled files here)
-            'OLDDir', SNRenvStimDir, ... (from here)
+            'OLDDir', FFRStimDir, ... (from here)
             ...
             ...
             'fast', struct( ...

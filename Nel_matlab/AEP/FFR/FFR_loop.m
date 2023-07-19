@@ -108,6 +108,7 @@ while isempty(get(FIG.push.close,'Userdata'))
     set(FIG.ax.axis,'YTickMode','auto');
     %    ylim('auto');
     xlabel('Time (sec)','fontsize',12,'FontWeight','Bold');
+    legend('Neg Pol', 'Pos Pol'); 
     if strcmp(Display.Voltage,'atELEC')
         FIG.ax.ylabel=ylabel('Voltage at Electrode (V)','fontsize',12,'FontWeight','Bold');
     else
@@ -306,8 +307,10 @@ while isempty(get(FIG.push.close,'Userdata'))
                     FFR_set_attns(Stimuli.atten_dB,(Stimuli.noiseLevel*(1-Stimuli.noNoise)...
                         +(Stimuli.noNoise)*(Stimuli.atten_dB-120)),Stimuli.channel,Stimuli.KHosc,RP1,RP2);
                 case 14
+                    % FFR_set_attns(Stimuli.atten_dB,(Stimuli.noiseLevel*(1-Stimuli.noNoise)...
+                    % +(Stimuli.noNoise)*(Stimuli.atten_dB-120)),Stimuli.channel,Stimuli.KHosc,RP1,RP2);
                     FFR_set_attns(Stimuli.atten_dB,(Stimuli.noiseLevel*(1-Stimuli.noNoise)...
-                        +(Stimuli.noNoise)*(Stimuli.atten_dB-120)),Stimuli.channel,Stimuli.KHosc,RP1,RP2);
+                        +(Stimuli.noNoise)*(120)),Stimuli.channel,Stimuli.KHosc,RP1,RP2);
             end
             FIG.NewStim = 0;
         end

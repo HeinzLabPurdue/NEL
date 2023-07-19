@@ -1,12 +1,7 @@
 % UNIT = sprintf('%1d.%02d', NelData.File_Manager.track.No, NelData.File_Manager.unit.No);
 
-% FIG.radio.noise  = uicontrol(FIG.handle,'callback','FFR(''noise'');','style','radio','Enable','on','Units','normalized','position',[.125 .425 .08 .03],'string','Noise','fontsize',12,'BackgroundColor','w','value',1);
-% FIG.radio.tone   = uicontrol(FIG.handle,'callback','FFR(''tone'');','style','radio','Enable','on','Units','normalized','position',[.125 .395 .08 .03],'string','Tone','fontsize',12,'BackgroundColor','w','value',1);
-% FIG.radio.khite  = uicontrol(FIG.handle,'callback','FFR(''khite'');','style','radio','Enable','on','Units','normalized','position',[.125 .365 .08 .03],'string','KH Osc','fontsize',12,'BackgroundColor','w');
 FIG.radio.fast   = uicontrol(FIG.handle,'callback','FFR(''fast'');','style','radio','Enable','on','Units','normalized','position',[.125 .315 .08 .03],'string','Fast','fontsize',12,'BackgroundColor','w','value',1);
 FIG.radio.slow   = uicontrol(FIG.handle,'callback','FFR(''slow'');','style','radio','Enable','on','Units','normalized','position',[.125 .285 .08 .03],'string','Slow','fontsize',12,'BackgroundColor','w','value',0);
-% removed fixed phase for FFR, coded into AM Tone generator - zz 31nov11
-% FIG.checkbox.fixedPhase = uicontrol(FIG.handle, 'callback', 'FFR(''fixedPhase'');','style','checkbox','Enable','on','Units','normalized','position',[.125 .365 .09 .03],'string','fixedPhase','fontsize',12,'BackgroundColor','w','value',Stimuli.fixedPhase);
 FIG.push.close   = uicontrol(FIG.handle,'callback','FFR(''close'');','style','pushbutton','Units','normalized','position',[.1 .6 .125 .09],'string','Close','fontsize',12,'fontangle','normal','fontweight','normal');
 
 % WAV file loader and AM Tone generator - zz 31oct11
@@ -15,16 +10,11 @@ FIG.push.amtone = uicontrol(FIG.handle,'callback','FFR(''amtone'');','style','pu
 FIG.push.logSwept_amtone = uicontrol(FIG.handle,'callback','FFR(''logSwept_amtone'');','style','pushbutton','Units','normalized','position',[.68 .125 .12 .04],'string','Lg-swpt AM Tone','fontsize',12,'fontangle','normal','fontweight','normal');
 FIG.push.fmtone = uicontrol(FIG.handle,'callback','FFR(''fmtone'');','style','pushbutton','Units','normalized','position',[.4825 .125 .06 .04],'string','FM Tone','fontsize',12,'fontangle','normal','fontweight','normal');
 
-
-% Frequency slider removed, replaced with AM Tone generator and WAV function loader
-% removed by zz 31oct11
-
-% FIG.fsldr.slider = uicontrol(FIG.handle,'callback','FFR(''slide_freq'');','style','slider','SliderStep',[0.001 0.01],'Enable','on','min',100,'max',1000,'Units','normalized','position',[.35 .175 .525 .04],'Value',Stimuli.freq_hz/Stimuli.fmult);
-% FIG.fsldr.min    = uicontrol(FIG.handle,'style','text','string',num2str(get(FIG.fsldr.slider,'min')),'backgroundcolor',[1 1 1],'Units','normalized','position',[.33 .14 .05 .03],'fontsize',10);
-% FIG.fsldr.max    = uicontrol(FIG.handle,'style','text','string',num2str(get(FIG.fsldr.slider,'max')),'backgroundcolor',[1 1 1],'Units','normalized','position',[.835 .14 .05 .03],'fontsize',10,'horizontalalignment','right');
-% LQ 01/31/05 add callback
-% FIG.fsldr.val    = uicontrol(FIG.handle,'style','edit','Units','normalized','position',[.5825 .175 .06 .04],'string',num2str(Stimuli.freq_hz),'fontsize',12);
-% FIG.fsldr.val    = uicontrol(FIG.handle,'style','edit','Units','normalized','position',[.5825 .175 .06 .04],'string',num2str(Stimuli.freq_hz),'fontsize',12,'callback', 'FFR(''slide_freq_text'');');
+% FIG.radio.noise  = uicontrol(FIG.handle,'callback','FFR(''noise'');','style','radio','Enable','on','Units','normalized','position',[.125 .425 .08 .03],'string','Noise','fontsize',12,'BackgroundColor','w','value',1);
+% FIG.radio.tone   = uicontrol(FIG.handle,'callback','FFR(''tone'');','style','radio','Enable','on','Units','normalized','position',[.125 .395 .08 .03],'string','Tone','fontsize',12,'BackgroundColor','w','value',1);
+% FIG.radio.khite  = uicontrol(FIG.handle,'callback','FFR(''khite'');','style','radio','Enable','on','Units','normalized','position',[.125 .365 .08 .03],'string','KH Osc','fontsize',12,'BackgroundColor','w');
+% removed fixed phase for FFR, coded into AM Tone generator - zz 31nov11
+% FIG.checkbox.fixedPhase = uicontrol(FIG.handle, 'callback', 'FFR(''fixedPhase'');','style','checkbox','Enable','on','Units','normalized','position',[.125 .365 .09 .03],'string','fixedPhase','fontsize',12,'BackgroundColor','w','value',Stimuli.fixedPhase);
 
 % zz 7feb12
 % noise slider
@@ -35,21 +25,23 @@ FIG.nsldr.val    = uicontrol(FIG.handle,'style','edit','Units','normalized','Use
 FIG.checkbox.noNoise = uicontrol(FIG.handle, 'callback', 'FFR(''noNoise'');','style','checkbox','Enable','on','Units','normalized','position',[.125 .365 .09 .03],'string','No noise','fontsize',12,'BackgroundColor','w','Value',Stimuli.noNoise);
 
 FIG.asldr.slider = uicontrol(FIG.handle,'callback','FFR(''slide_atten'');','style','slider','SliderStep',[1/120 5/120],'Enable','on','min',-120,'max',0,'Units','normalized','position',[.35 .075 .525 .04],'Value',-Stimuli.atten_dB);
+
 FIG.asldr.min    = uicontrol(FIG.handle,'style','text','string',num2str(get(FIG.asldr.slider,'min')),'backgroundcolor',[1 1 1],'Units','normalized','position',[.33 .04 .05 .03],'fontsize',10);
 FIG.asldr.max    = uicontrol(FIG.handle,'style','text','string',num2str(get(FIG.asldr.slider,'max')),'backgroundcolor',[1 1 1],'Units','normalized','position',[.825 .04 .05 .03],'fontsize',10,'horizontalalignment','right');
 % LQ 01/31/05 add callback
 %FIG.asldr.val    = uicontrol(FIG.handle,'style','edit','Units','normalized','Userdata',Stimuli.atten_dB,'position',[.5825 .075 .06 .04],'string',num2str(-Stimuli.atten_dB),'fontsize',12);
 FIG.asldr.val    = uicontrol(FIG.handle,'style','edit','Units','normalized','Userdata',Stimuli.atten_dB,'position',[.5825 .075 .06 .04],'string',num2str(-Stimuli.atten_dB),'fontsize',12,'callback', 'FFR(''slide_atten_text'');');
+
+% Will want once we apply the calibration
+% FIG.asldr.SPL    = uicontrol(FIG.handle,'style','text','string',sprintf('%.1f dB SPL',120+get(FIG.asldr.slider,'val')),...
+%     'backgroundcolor',[1 1 1],'Units','normalized','position',[.9 .06 .1 .03],'fontsize',10,'horizontalalignment','right');
+
 % FIG.edit         = uicontrol(FIG.handle,'Visible','off','style','edit','Units','normalized','position',[.12 .75 .1 .04],'string',num2str(UNIT),'fontsize',14);
 FIG.statText.memReps =  uicontrol(FIG.handle, 'callback', '', 'style', 'text','Units','normalized', 'position', [.05 .49 .12 .03], 'string', 'Forget Time (reps):','fontsize',12,'BackgroundColor','w');   % added by GE 17Jan2003.
 FIG.statText.threshV =  uicontrol(FIG.handle, 'callback', '', 'style', 'text','Units','normalized', 'position', [.05 .54 .12 .03], 'string', 'Reject thresh (V):','fontsize',12,'BackgroundColor','w');   % added by khZZ 2011 Nov 4
 FIG.edit.threshV = uicontrol(FIG.handle,'callback','FFR(''threshV'');','style','edit','Units','normalized','position',[.18 .54 .04 .04],'string',Stimuli.threshV,'fontsize',12); % KHZZ 2011 Nov 4
 FIG.edit.memReps = uicontrol(FIG.handle,'callback','FFR(''memReps'');','style','edit','Units','normalized','position',[.18 .49 .04 .04],'string',Stimuli.FFRmem_reps,'fontsize',12);
-FIG.statText.status =  uicontrol(FIG.handle, 'callback', '', 'style', 'text','Units','normalized', 'position', [.05 .9 .25 .03], 'string', ['STATUS (' interface_type '): free running...'],'fontsize',12,'BackgroundColor','w','horizontalalignment','left');   % added by GE 17Jan2003.
-
-% FIG.push.x1      = uicontrol(FIG.handle,'callback','FFR(''mult_1x'');','style','pushbutton','Enable','on','Units','normalized','position',[.5 .23 .05 .037],'string','1X','fontsize',12,'fontangle','normal','fontweight','normal','foregroundcolor',[0 0 0]);
-% FIG.push.x10     = uicontrol(FIG.handle,'callback','FFR(''mult_10x'');','style','pushbutton','Enable','on','Units','normalized','position',[.585 .23 .05 .037],'string','10X','fontsize',12,'fontangle','normal','fontweight','normal','foregroundcolor',[1 1 1]);
-% FIG.push.x100    = uicontrol(FIG.handle,'callback','FFR(''mult_100x'');','style','pushbutton','Enable','on','Units','normalized','position',[.67 .23 .05 .037],'string','100X','fontsize',12,'fontangle','normal','fontweight','normal','foregroundcolor',[0 0 0]);
+FIG.statText.status =  uicontrol(FIG.handle, 'callback', '', 'style', 'text','Units','normalized', 'position', [.05 .9 .25 .03], 'string', 'STATUS (FFR): free running...','fontsize',12,'BackgroundColor','w','horizontalalignment','left');   % added by GE 17Jan2003.
 
 FIG.radio.left   = uicontrol(FIG.handle,'callback','FFR(''left'');', 'style','radio','Enable','on','Units','normalized','position',[.125 .235 .08 .03],'string','Left Ear', 'fontsize',12,'BackgroundColor','w','value',0);
 FIG.radio.right  = uicontrol(FIG.handle,'callback','FFR(''right'');','style','radio','Enable','on','Units','normalized','position',[.125 .205 .08 .03],'string','Right Ear','fontsize',12,'BackgroundColor','w','value',1);

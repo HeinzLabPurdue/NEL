@@ -18,16 +18,6 @@ if nargin < 1
     
     PROG = struct('name','AEP(v1.ge_mh.1).m');  % modified by GE 26Apr2004.% modified by SH/VMA 7/29/22
 
-%     push  = cell2struct(cell(1,6),{'run_levels','close','x1','x10','x100', 'forget_now'},2);
-%     radio = cell2struct(cell(1,5),{'fast','slow','left','right','both'},2);
-%     checkbox = cell2struct(cell(1,1), {'fixedPhase'},2);
-%     statText  = cell2struct(cell(1,2),{'memReps','status'},2);
-%     fsldr = cell2struct(cell(1,4),{'slider','min','max','val'},2);
-%     asldr = cell2struct(cell(1,4),{'slider','min','max','val'},2);
-%     ax = cell2struct(cell(1,2),{'axis','line'},2);
-%     
-%     FIG   = struct('handle',[],'edit',[],'push',push,'radio',radio,'checkbox',checkbox,'statText', statText, 'fsldr',fsldr,'asldr',asldr,'NewStim',0,'ax',ax);
-
     %AEP_ins; %sending here to choose AEP measure 
     
     % Ask the question of ABR/CAP/FFR
@@ -51,7 +41,7 @@ if nargin < 1
         case 'CAP'
             h_fig = CAP; 
         case 'FFR' 
-            FFR_interface_type=questdlg('Which FFR:','','FFR','SFR','SFR_pink','SFR');
+            FFR_interface_type=questdlg('Which FFR:','','FFR','SFR','SFR');
             switch FFR_interface_type
                 case 'FFR'
                     h_fig = FFR();
@@ -61,68 +51,24 @@ if nargin < 1
                     %AS | VMA/SH previously (NEL Sprint 22) set default to
                     %JMR, but now should default to the AEP/FFR directory.
                     %JMR paradigm now only used if running under JMR. 
-                    if strcmp(usr,'JMR')
-                        %addpath([NelData.General.RootDir 'Users\JMR', filesep 'FFR']);
-                        h_fig = FFR_SNRenv_2chan();
-                    else
+%                     if strcmp(usr,'JMR') 
+%                         %addpath([NelData.General.RootDir 'Users\JMR', filesep 'FFR']);
+%                         h_fig = FFR_SNRenv_2chan();
+%                     else                                     #Making FFR
+%                     similar to ABR, no 2 chan if JMR selected, making it
+%                     a toggle button (VMA, SH 7/19/2023) 
                         %this is single channel and dir is SP
                         h_fig = FFR_SNRenv();
-                    end
-                case 'SFR-mask'
-                    h_fig = SFR_pink_mask_SNRenv;
-                case 'SFR_pink'
-                    h_fig = SFR_pink_mask_tdt;
-                case 'EFR_HrmCpx'
-                    h_fig = EFR_Harm_Cmplx;
+%                     end
+%                 case 'SFR-mask'
+%                     h_fig = SFR_pink_mask_SNRenv;
+%                 case 'SFR_pink'
+%                     h_fig = SFR_pink_mask_tdt;
+%                 case 'EFR_HrmCpx'
+%                     h_fig = EFR_Harm_Cmplx;
             end
     end
-  
     
-% 
-
-%      
-%    if strcmp(interface_type, 'FFR')
-%         interface_type=questdlg('Which FFR:','','FFR','SFR','SFR_pink','SFR');
-%         
-%         FIG.handle = figure('NumberTitle','off','Name','CAP Interface','Units','normalized','position',[0.045  0.013  0.9502  0.7474],'Visible','off','MenuBar','none','Tag','AEP_Main_Fig');
-%         set(FIG.handle,'CloseRequestFcn','CAP(''close'');')
-%         colordef none;
-%         whitebg('w');
-%         
-%             if ishandle(h_fig)
-%                 delete(h_fig);
-%             end
-%             
-%             if strcmp(interface_type, 'FFR')
-%                 h_fig = FFR();
-%             elseif strcmp(interface_type, 'SFR')
-%                 usr = NelData.General.User;
-%                 % Work around hack for JMR Sept 21
-%                 if strcmp(usr,'JMR')
-%                     addpath([NelData.General.RootDir 'Users\',usr filesep 'FFR']);
-%                     h_fig = FFR_SNRenv_2chan();
-%                 else
-%                     h_fig = FFR_SNRenv();
-%                 end
-%             elseif strcmp(interface_type, 'SFR-mask')
-%                 h_fig = SFR_pink_mask_SNRenv;
-%             elseif strcmp(interface_type, 'SFR_pink')
-%                 h_fig = SFR_pink_mask_tdt;
-%             elseif strcmp(interface_type, 'EFR_HrmCpx')
-%                 h_fig = EFR_Harm_Cmplx;
-%             end
-% 
-%     elseif strcmp(interface_type, 'ABR') 
-%        
-%         % Open ABR stuff and Run: 
-%         h_fig = ABR; 
-%         
-%     elseif strcmp(interface_type, 'CAP')
-%         % What to do for CAP
-%         h_fig=CAP; 
-% 
-%    end
-
     %% Clean up and exit gracefully: 
     if ishandle(h_fig)
         delete(h_fig); 
@@ -256,7 +202,7 @@ elseif strcmp(command_str, 'slide_atten_text')
         set(FIG.asldr.val,'string', new_atten);
     end
     new_atten = str2num(new_atten);
-    if new_atten < get(FIG.asldr.slider,'min') | new_atten > get(FIG.asldr.slider,'max')
+    if new_atten < get(FIG.asldr.slider,'min') || new_atten > get(FIG.asldr.slider,'max')
         set( FIG.asldr.val, 'string', num2str(-Stimuli.atten_dB));
     else
         Stimuli.atten_dB = -new_atten;

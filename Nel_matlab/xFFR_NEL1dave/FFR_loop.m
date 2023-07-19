@@ -7,7 +7,6 @@ invoke(RP1,'ClearCOF');
 % invoke(RP1,'LoadCOF',[prog_dir '\object\FFR_wav.rcx']);
 %FOLLOWING LINE FOR TEST USE zz10.21.11
 
-
 invoke(RP1,'LoadCOF',[prog_dir '\object\FFR_wav_polIN.rcx']);
 
 invoke(RP1,'SetTagVal','StmOn',FFR_Gating.duration_ms);
@@ -26,11 +25,7 @@ invoke(RP1,'Run');
 
 %use a filename
 % invoke(RP1,'SetTagVal','filename',[Stimuli.filename]);
-
-
-
 % invoke(RP1,'SoftTrg',1);
-
 
 RP2=actxcontrol('RPco.x',[0 0 1 1]);
 invoke(RP2,'ConnectRP2','USB',2);

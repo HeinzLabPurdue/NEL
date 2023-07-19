@@ -199,6 +199,7 @@ while isempty(get(FIG.push.close,'Userdata'))
                 %                     'ydata',CAPdataAvg_freerun*Display.PlotFactor);
                 %set(FIG.ax.line(2),'xdata',(1:length(CAPdataAvg_freerun))/Stimuli.RPsamprate_Hz, ...
                 %    'ydata',CAPdataAvg_freerun*Display.PlotFactor);
+                
                 if Stimuli.rec_channel>2
                 set(FIG.ax.line(1),'xdata',(1:length(CAPdataAvg_freerun))/Stimuli.RPsamprate_Hz, ...
                     'ydata',CAPdataAvg_freerun*Display.PlotFactor);
@@ -209,9 +210,9 @@ while isempty(get(FIG.push.close,'Userdata'))
                 set(FIG.ax.line(4),'xdata',[], ...
                     'ydata',[]);   
                 
-                
                 set(FIG.ax.line2(1),'ydata',CAPobs-demean_flag*mean(CAPobs)); %KH 10Jan2012 % added demean SP (Aug 21 2018)
                 set(FIG.ax.line2(3),'ydata',CAPobs2-demean_flag*mean(CAPobs2));
+                
                 elseif Stimuli.rec_channel==2 % only channel 2
                     set(FIG.ax.line(1),'xdata',(1:length(CAPdataAvg_freerun2))/Stimuli.RPsamprate_Hz, ...
                         'ydata',CAPdataAvg_freerun2*Display.PlotFactor);
@@ -222,9 +223,9 @@ while isempty(get(FIG.push.close,'Userdata'))
                     set(FIG.ax.line(4),'xdata',[], ...
                         'ydata',[]);
                     
-                    
                     set(FIG.ax.line2(1),'ydata',CAPobs2-demean_flag*mean(CAPobs2)); %KH 10Jan2012 % added demean SP (Aug 21 2018)
                     %set(FIG.ax.line2(3),'ydata',CAPobs2-demean_flag*mean(CAPobs2));
+                    
                 else  % only channel 1
                     set(FIG.ax.line(1),'xdata',(1:length(CAPdataAvg_freerun))/Stimuli.RPsamprate_Hz, ...
                         'ydata',CAPdataAvg_freerun*Display.PlotFactor);

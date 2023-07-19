@@ -3,8 +3,8 @@
 %modified by zz on 10.20.11 for FFR use
 
 
-function [filename, filename_inv] = logSwept_amtoneFFR(fc,fm,dur,pol,mod,fs)
-
+function [filename, filename_inv] = make_amtoneFFR(fc,fm,dur,pol,mod,fs)
+global NelData
 %x=(1+Msin 2pifmt)cos 2pifct
 
 
@@ -20,19 +20,10 @@ wm=2*pi*fm;
 %y=C*(1+M*sin (wm*t)).*cos (wc*t);
 % y=(1+M*sin (wm*t)).*sin (wc*t);
 
-maxmod=min([fc/2 2000]);
+
 % MODULATION zz 17nov11
-% k=exp((log(maxmod/2/fm)/dur));
-k = (maxmod/fm)^(1/dur);
 M = (1-mod)/(1+mod);
-
-% original %zz 17 jan 2012
-y = ((M)+(1-M)*(0.5-0.5*cos(wm* ((k.^t-1)/log(k)) ))).*(sin(wc*t));
-
-% unmodulated log sweep %zz 17 jan 2012
-% k is from 1k-4khz
-% k=exp((log(4)/dur));
-% y = cos(2*pi*1000* ((k.^t-1)/log(k)))
+y = ((M)+(1-M)*(0.5-0.5*cos(wm*t))).*(sin(wc*t));
 
 % RAMP zz 17nov11
 % This should be the cosine-squared ramp
@@ -45,15 +36,7 @@ a= size(t);
 b= size(t_ramp');
 ramp = [ramp_up ones(1,a(1)-2*b(1)) ramp_down];
 
-
-
-
-
-
-
-
 %Y=C*cos(wc*t)+(M/2)*(sin((wc+wm)*t)+sin((wm-wc)*t));
-
 
 % x=sin(2*pi*fm*t);
 % y = modulate(x,fc,fs,'am');
@@ -62,9 +45,9 @@ ramp = [ramp_up ones(1,a(1)-2*b(1)) ramp_down];
 
 % OUTPUT FILENAME zz 20oct11
 % NEEDS TO BE CHANGEd WHEN MOVING INTO NEL from NEL_DEBUG
-name_org=sprintf('LS_%d_%d_%g_%g_org.wav',fc,fm,dur*1000,mod*100);
-name_inv=sprintf('LS_%d_%d_%g_%g_inv.wav',fc,fm,dur*1000,mod*100);
-filename=fullfile('C:','NEL1_2','Nel_matlab','FFR','Signals',name_org);
+name_org=sprintf('AM_%d_%d_%g_%g_org.wav',fc,fm,dur*1000,mod*100);
+name_inv=sprintf('AM_%d_%d_%g_%g_inv.wav',fc,fm,dur*1000,mod*100);
+filename=fullfile(NelData.General.RootDir,'Nel_matlab','AEP','FFR','Signals', 'AMwav',name_org);
 
 
 %RMS=sqrt(mean(y.^2));
@@ -88,10 +71,10 @@ audiowrite(filename,samtone,round(fs));
 % if signal needs to be polarized, creates the inverse signal
 % otherwise, creates the same signal with the name inv zz 20oct11
 if(pol)
-    filename_inv=fullfile('C:','NEL1_2','Nel_matlab','FFR','Signals',name_inv);
+    filename_inv=fullfile(NelData.General.RootDir,'Nel_matlab','AEP','FFR','Signals', 'AMwav',name_inv);
     samtone = -1 * samtone;
     audiowrite(filename_inv,samtone,round(fs));
 else
-    filename_inv=fullfile('C:','NEL1_2','Nel_matlab','FFR','Signals',name_inv);
+    filename_inv=fullfile(NelData.General.RootDir,'Nel_matlab','AEP','FFR','Signals', 'AMwav',name_inv);
     audiowrite(filename_inv,samtone,round(fs));
 end

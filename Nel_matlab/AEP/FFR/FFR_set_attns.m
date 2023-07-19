@@ -24,22 +24,31 @@ if ((kh_flag==2) && ~isempty(strmatch('KH-oscillator', devices_names_vector,'exa
 else
    devices = nel_devices_vector('1.1');
 end
-attens_devices = repmat(NaN,length(devices),2);
-if (bitget(ear,1)) % Left
+attens_devices = NaN(length(devices),2);
+if (bitget(ear,1)) % Right
    attens_devices(:,2) = devices;
 end
-if (bitget(ear,2)) % Right
+if (bitget(ear,2)) % Left
    attens_devices(:,1) = devices;
 end
 attens_devices = attn * attens_devices;
 attens_devices = [[NaN NaN NaN NaN NaN NaN NaN NaN NaN]' [NaN NaN NaN NaN NaN attn attn-noiseLevel NaN NaN]'];  %KHZZ
 [select,connect,PAattns] = find_mix_settings(attens_devices);
+
+% From AEP_set_attns
+if(~bitget(ear,1)) %Right
+    %set left PA5-3 to 120 attn
+    PAattns(4) = 120;
+end
+if(~bitget(ear,2)) %Left
+    PAattns(3) = 120;
+end
+
 if (isempty(select))
    % nelerror('FFR: can''t find proper select/connect configuration');
    rc = 0;
    return;
 end
-
 
 %connect=[1 0];
 %select=[1 7];

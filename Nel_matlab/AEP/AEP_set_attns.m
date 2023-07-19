@@ -1,4 +1,4 @@
-function rc = CAP_set_attns(attn,ear,kh_flag,RPco1,RPco2)
+function rc = AEP_set_attns(attn,ear,kh_flag,RPco1,RPco2)
 % CAP_set_attns - temporary patch for the CAP program to set the select, connect
 %                    and attenuations.
 
