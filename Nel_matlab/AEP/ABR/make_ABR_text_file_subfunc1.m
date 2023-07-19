@@ -25,7 +25,9 @@ x.Stimuli=Stimuli;
 x.Stimuli.RunLevels_params = RunLevels_params;
 x.Stimuli.CAP_Gating = CAP_Gating;
 x.Line.freq_Hz = Stimuli.freq_hz;
-x.invfilterdata = invfilterdata; 
+
+invfiltdata = get(FIG.radio.invCalib,'UserData'); 
+x.invfilterdata = invfiltdata; 
 
 x.AD_Data.Gain=Display.Gain;
 x.AD_Data.SampleRate= Stimuli.RPsamprate_Hz/RunLevels_params.decimateFact;

@@ -51,16 +51,17 @@ if NelData.General.RP2_3and4 && (~NelData.General.RX8) % NEL1 with RP2 #3 & #4
     %     invoke(RP3,'ConnectRP2',NelData.General.TDTcommMode,3);
     RP3= connect_tdt('RP2', 3);
     invoke(RP3,'ClearCOF');
-    invoke(RP3,'LoadCOF',[prog_dir '\object\ABR_right.rcx']);
+%     invoke(RP3,'LoadCOF',[prog_dir '\object\ABR_right.rcx']);
+    invoke(RP3, 'LoadCOF',[prog_dir '\object\RP2_3_2chan_phys.rcx']);
 
-elseif ~(NelData.General.RP2_3and4) && (~NelData.General.RX8) % NEL1 without (RP2 #3 & #4), and not NEL2 because no RX8
-    %     RP2=actxcontrol('RPco.x',[0 0 1 1]);
-    %     invoke(RP2,'ConnectRP2',NelData.General.TDTcommMode,2);
-    RP2= connect_tdt('RP2', 2);
-    
-    RP3= RP2;
-    invoke(RP3,'ClearCOF');
-    invoke(RP3,'LoadCOF',[prog_dir '\object\CAP_right.rcx']);
+% elseif ~(NelData.General.RP2_3and4) && (~NelData.General.RX8) % NEL1 without (RP2 #3 & #4), and not NEL2 because no RX8
+%     %     RP2=actxcontrol('RPco.x',[0 0 1 1]);
+%     %     invoke(RP2,'ConnectRP2',NelData.General.TDTcommMode,2);
+%     RP2= connect_tdt('RP2', 2);
+%     
+%     RP3= RP2;
+%     invoke(RP3,'ClearCOF');
+%     invoke(RP3,'LoadCOF',[prog_dir '\object\CAP_right.rcx']);
 
 elseif NelData.General.RX8  %NEL2 with RX8
     %     RP2=actxcontrol('RPco.x',[0 0 1 1]);
@@ -74,8 +75,8 @@ elseif NelData.General.RX8  %NEL2 with RX8
     %invoke(RP3,'LoadCOF',[prog_dir '\object\ABR_RX8_ADC_invCalib.rcx']);
     invoke(RP3,'LoadCOF',[prog_dir '\object\ABR_RX8_ADC_invCalib_2chan.rcx']); %JMR 2 channel setup
     %     [~, ~, b_invCalib_coef]= run_invCalib(-2);
-    b_invCalib_coef= [1 zeros(1, 255)];
-    e_invCalib_status= RP3.WriteTagV('FIR_Coefs', 0, b_invCalib_coef);
+%     b_invCalib_coef= [1 zeros(1, 255)];
+%     e_invCalib_status= RP3.WriteTagV('FIR_Coefs', 0, b_invCalib_coef);
 else
     nelerror('Cannot figure out whether NEL1 or NEL2')
 end
@@ -106,10 +107,13 @@ while isempty(get(FIG.push.close,'Userdata'))
         set(FIG.ax.line(3),'MarkerSize',2,'Color','b');
         set(FIG.ax.line(4),'MarkerSize',2,'Color',[0.9 .1 1]);
     else % standard 1 channel recording
-        FIG.ax.line = plot(0,0,'-',0,0,'-'); %ADDING INVERSE LINE + ECochG: JMR 2021
+        FIG.ax.line = plot(0,0,'-',0,0,'-',0,0,'-',0,0,'-'); 
         set(FIG.ax.line(1),'MarkerSize',2,'Color','k');
         set(FIG.ax.line(2),'MarkerSize',2,'Color',[0.6 0.6 0.6]);
-        clear FIG.ax.line(3) FIG.ax.line(4)
+        
+        %make line 3 and 4 invisible
+        set(FIG.ax.line(3),'MarkerSize',2,'Color',[0.6 0.6 0.6 0]);
+        set(FIG.ax.line(4),'MarkerSize',2,'Color',[0.6 0.6 0.6 0]);
         %set(FIG.ax.line(3),'MarkerSize',2,'Color','b');
         %set(FIG.ax.line(4),'MarkerSize',2,'Color',[0.9 .1 1]);
     end
@@ -145,7 +149,7 @@ while isempty(get(FIG.push.close,'Userdata'))
         FIG.ax.line2 = plot(0.4,0,'r*',[0 1],[Stimuli.threshV Stimuli.threshV],':r',0.6,0,'b*',[0 1],[Stimuli.threshV2 Stimuli.threshV2],':b');
     else
         FIG.ax.line2 = plot(0.5,0,'r*',[0 1],[Stimuli.threshV Stimuli.threshV],':r');
-        clear FIG.ax.line2(3) FIG.ax.line2(4)
+%         clear FIG.ax.line2(3) FIG.ax.line2(4)
     end
     xlim([0 1]); ylim([0 10]);
     set(FIG.ax.axis2,'XTickMode','auto');
@@ -210,6 +214,8 @@ while isempty(get(FIG.push.close,'Userdata'))
                     data_y(1:newlen) = CAPdataAvg_freerun(1:newlen);
                     data_y2(1:newlen) = CAPdataAvg_freerun2(1:newlen);
                     
+                    set(FIG.ax.line(3),'MarkerSize',2,'Color','b');
+                    set(FIG.ax.line(4),'MarkerSize',2,'Color',[0.9 .1 1]);
                     set(FIG.ax.line(1),'xdata',t,'ydata',data_y*Display.PlotFactor);
                     set(FIG.ax.line(3),'xdata',t,'ydata',data_y2*Display.PlotFactor);
                     set(FIG.ax.line(2),'xdata',[], ...
@@ -219,6 +225,8 @@ while isempty(get(FIG.push.close,'Userdata'))
                     
                     set(FIG.ax.line2(1),'ydata',CAPobs-demean_flag*mean(CAPobs)); %KH 10Jan2012 % added demean SP (Aug 21 2018)
                     set(FIG.ax.line2(3),'ydata',CAPobs2-demean_flag*mean(CAPobs2));
+                    
+                    
                 elseif Stimuli.rec_channel==2 % only channel 2
                     newlen = min([length(t),length(CAPdataAvg_freerun2)]);
                     t = t(1:newlen);
@@ -231,14 +239,15 @@ while isempty(get(FIG.push.close,'Userdata'))
                         'ydata',[]);
                     set(FIG.ax.line(4),'xdata',[], ...
                         'ydata',[]);
-                    
+%                     
                     
                     set(FIG.ax.line2(1),'ydata',CAPobs2-demean_flag*mean(CAPobs2)); %KH 10Jan2012 % added demean SP (Aug 21 2018)
                     %set(FIG.ax.line2(3),'ydata',CAPobs2-demean_flag*mean(CAPobs2));
+                    
                 else  % only channel 1
                     newlen = min([length(t),length(CAPdataAvg_freerun)]);
                     t = t(1:newlen);
-                    data_y(1:newlen) = CAPdataAvg_freerun2(1:newlen);
+                    data_y(1:newlen) = CAPdataAvg_freerun(1:newlen);
                     
                     set(FIG.ax.line(1),'xdata',t,'ydata',data_y*Display.PlotFactor);
                     set(FIG.ax.line(3),'xdata',[], ...
@@ -255,11 +264,14 @@ while isempty(get(FIG.push.close,'Userdata'))
                 end
                 % legend update
                 if Stimuli.rec_channel>2
-                    legend(FIG.ax.line,'Chan 1','Chan 1 invert','Chan 2','Chan 2 invert','location','northeast');
+                    legend(FIG.ax.line,'Chan 1 ENV','Chan 1 TFS','Chan 2 ENV','Chan 2 TFS','location','northeast');
                 elseif Stimuli.rec_channel==2
-                    legend(FIG.ax.line,'Chan 2','Chan 2 invert','location','northeast');
+                    legend(FIG.ax.line,'Chan 2 ENV','Chan 2 TFS','location','northeast');
+                    warning('off','MATLAB:legend:IgnoringExtraEntries');
+
                 else
-                    legend(FIG.ax.line,'Chan 1','Chan 1 invert','location','northeast');
+                    legend(FIG.ax.line,'Chan 1 ENV','Chan 1 TFS','location','northeast');
+                    warning('off','MATLAB:legend:IgnoringExtraEntries');
                 end
                 
                 drawnow;
@@ -342,10 +354,10 @@ while isempty(get(FIG.push.close,'Userdata'))
                     elseif Stimuli.rec_channel==2
                         set(FIG.ax.line2(1),'xdata',0.5)
                         set(FIG.ax.line2(2),'ydata',[Stimuli.threshV2 Stimuli.threshV2]);
-                        set(FIG.ax.line2(4),'xdata',[],'ydata',[]);
+%                         set(FIG.ax.line2(4),'xdata',[],'ydata',[]);
                     else
                         set(FIG.ax.line2(2),'ydata',[Stimuli.threshV Stimuli.threshV]);
-                        set(FIG.ax.line2(4),'xdata',[],'ydata',[]);   
+%                         set(FIG.ax.line2(4),'xdata',[],'ydata',[]);   
                     end
                     drawnow;
                     

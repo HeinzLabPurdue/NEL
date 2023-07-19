@@ -35,9 +35,9 @@ FIG.push.x100    = uicontrol(FIG.handle,'callback','ABR(''mult_100x'');','style'
 FIG.radio.left   = uicontrol(FIG.handle,'callback','ABR(''left'');', 'style','radio','Enable','on','Units','normalized','position',[.125 .235 .08 .03],'string','Left Ear', 'fontsize',12,'BackgroundColor','w','value',0);
 FIG.radio.right  = uicontrol(FIG.handle,'callback','ABR(''right'');','style','radio','Enable','on','Units','normalized','position',[.125 .205 .08 .03],'string','Right Ear','fontsize',12,'BackgroundColor','w','value',1);
 FIG.radio.both   = uicontrol(FIG.handle,'callback','ABR(''both'');', 'style','radio','Enable','on','Units','normalized','position',[.125 .175 .08 .03],'string','Both Ears','fontsize',12,'BackgroundColor','w','value',0);
-FIG.radio.chan_1 = uicontrol(FIG.handle,'callback','ABR(''chan_1'');', 'style','radio','Enable','on','Units','normalized','position',[.125*2 .235 .08 .03],'string','Chan 1','fontsize',12,'BackgroundColor','w','value',0);
-FIG.radio.chan_2 = uicontrol(FIG.handle,'callback','ABR(''chan_2'');', 'style','radio','Enable','on','Units','normalized','position',[.125*2 .205 .08 .03],'string','Chan 2','fontsize',12,'BackgroundColor','w','value',0);
-FIG.radio.Simultaneous = uicontrol(FIG.handle,'callback','ABR(''Simultaneous'');', 'style','radio','Enable','on','Units','normalized','position',[.125*2 .175 .08 .03],'string','Simultaneous','fontsize',12,'BackgroundColor','w','value',1);
+FIG.radio.chan_1 = uicontrol(FIG.handle,'callback','ABR(''chan_1'');', 'style','radio','Enable','on','Units','normalized','position',[.125*2 .235 .08 .03],'string','Chan 1 | ABR','fontsize',12,'BackgroundColor','w','value',1);
+FIG.radio.chan_2 = uicontrol(FIG.handle,'callback','ABR(''chan_2'');', 'style','radio','Enable','on','Units','normalized','position',[.125*2 .205 .08 .03],'string','Chan 2 | ECochG','fontsize',12,'BackgroundColor','w','value',0);
+FIG.radio.Simultaneous = uicontrol(FIG.handle,'callback','ABR(''Simultaneous'');', 'style','radio','Enable','on','Units','normalized','position',[.125*2 .175 .08 .03],'string','Simultaneous','fontsize',12,'BackgroundColor','w','value',0);
 
 FIG.push.run_levels = uicontrol(FIG.handle,'callback','ABR(''run_levels'');','style','pushbutton','Units','normalized',...
     'position',[.06 .726 .09 .09],'string','Run levels...','fontsize',12,'fontangle','normal','fontweight','normal');
