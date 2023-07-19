@@ -98,13 +98,11 @@ elseif strcmp(command_str,'fmtone') %%% added by Dave Axe 9/7/16
     %    FFR_Gating.duration_ms = str2num(cell2str(answer(4)));
     Stimuli.mod = str2num(cell2str(answer(4)));
     
-    
     [Stimuli.filename, fn_inv]=make_FM_tone(Stimuli.fc,Stimuli.RPsamprate_Hz,FFR_Gating.duration_ms/1000,5e-3,60,Stimuli.fm,Stimuli.mod,Stimuli.pol);
     %    [Stimuli.filename, fn_inv] = amtoneFFR(Stimuli.fc,Stimuli.fm,FFR_Gating.duration_ms/1000,Stimuli.pol,Stimuli.mod,Stimuli.RPsamprate_Hz);
     set(FIG.wavfile.func,'string',Stimuli.filename);
-    copyfile(Stimuli.filename, [NelData.General.RootDir 'Nel_matlab\AEP\FFR\Signals\AMwav\tone_org.wav'],'f');
-    copyfile(fn_inv, [NelData.General.RootDir 'Nel_matlab\AEP\FFR\Signals\AMwav\tone_inv.wav'],'f');
-    
+    copyfile(Stimuli.filename, [NelData.General.RootDir 'Nel_matlab\AEP\FFR\Signals\tone_org.wav'],'f');
+    copyfile(fn_inv, [NelData.General.RootDir 'Nel_matlab\AEP\FFR\Signals\tone_inv.wav'],'f');
     
     % WAV file loader, copies file from original location to default locaton
     % zz 31oct11
@@ -131,8 +129,8 @@ elseif strcmp(command_str,'amtone')
     % 12/7/11: MH&KH: changed to pass Sampling rate as param - defined once in FFR_ins - needs to match RPvds code
     [Stimuli.filename, fn_inv] = make_amtoneFFR(Stimuli.fc,Stimuli.fm,FFR_Gating.duration_ms/1000,Stimuli.pol,Stimuli.mod,Stimuli.RPsamprate_Hz);
     set(FIG.wavfile.func,'string',Stimuli.filename);
-    copyfile(Stimuli.filename, [NelData.General.RootDir 'Nel_matlab\AEP\FFR\Signals\AMwav\tone_org.wav'],'f');
-    copyfile(fn_inv, [NelData.General.RootDir 'Nel_matlab\AEP\FFR\Signals\AMwav\tone_inv.wav'],'f');
+    copyfile(Stimuli.filename, [NelData.General.RootDir 'Nel_matlab\AEP\FFR\Signals\tone_org.wav'],'f');
+    copyfile(fn_inv, [NelData.General.RootDir 'Nel_matlab\AEP\FFR\Signals\tone_inv.wav'],'f');
     
     
     % WAV file loader, copies file from original location to default locaton
@@ -159,8 +157,8 @@ elseif strcmp(command_str,'logSwept_amtone')
     % 12/7/11: MH&KH: changed to pass Sampling rate as param - defined once in FFR_ins - needs to match RPvds code
     [Stimuli.filename, fn_inv] = make_logSwept_amtoneFFR(Stimuli.fc,Stimuli.fm,FFR_Gating.duration_ms/1000,Stimuli.pol,Stimuli.mod,Stimuli.RPsamprate_Hz);
     set(FIG.wavfile.func,'string',Stimuli.filename);
-    copyfile(Stimuli.filename, [NelData.General.RootDir 'Nel_matlab\AEP\FFR\Signals\AMwav\tone_org.wav'],'f');
-    copyfile(fn_inv,[NelData.General.RootDir 'Nel_matlab\AEP\FFR\Signals\AMwav\tone_inv.wav'],'f');
+    copyfile(Stimuli.filename, [NelData.General.RootDir 'Nel_matlab\AEP\FFR\Signals\tone_org.wav'],'f');
+    copyfile(fn_inv,[NelData.General.RootDir 'Nel_matlab\AEP\FFR\Signals\tone_inv.wav'],'f');
     
     
     % WAV file loader, copies file from original location to default locaton
@@ -173,8 +171,8 @@ elseif strcmp(command_str,'wavfile')
     Stimuli.filename = cell2str(cellname);
     
     % copies file to both "original" and "polarized" locations
-    copyfile(Stimuli.filename, [NelData.General.RootDir 'Nel_matlab\AEP\FFR\Signals\AMwav\tone_org.wav'],'f');
-    copyfile(Stimuli.filename, [NelData.General.RootDir 'Nel_matlab\AEP\FFR\Signals\AMwav\tone_inv.wav'],'f');
+    copyfile(Stimuli.filename, [NelData.General.RootDir 'Nel_matlab\AEP\FFR\Signals\tone_org.wav'],'f');
+    copyfile(Stimuli.filename, [NelData.General.RootDir 'Nel_matlab\AEP\FFR\Signals\tone_inv.wav'],'f');
     
     
 elseif strcmp(command_str,'fast')
@@ -242,7 +240,7 @@ elseif strcmp(command_str, 'slide_atten_text')
         set(FIG.asldr.val,'string', new_atten);
     end
     new_atten = str2num(new_atten);
-    if new_atten < get(FIG.asldr.slider,'min') | new_atten > get(FIG.asldr.slider,'max')
+    if new_atten < get(FIG.asldr.slider,'min') || new_atten > get(FIG.asldr.slider,'max')
         set( FIG.asldr.val, 'string', num2str(-Stimuli.atten_dB));
     else
         Stimuli.atten_dB = -new_atten;
@@ -252,8 +250,8 @@ elseif strcmp(command_str, 'slide_atten_text')
     % zz 7feb12
 elseif strcmp(command_str,'noise_atten')
     FIG.NewStim = 13;
-    Stimuli.noiseLevel = floor(get(FIG.nsldr.slider,'value'));
-    set(FIG.nsldr.val,'string',num2str(-Stimuli.noiseLevel));
+    Stimuli.noise_rel_attn = floor(get(FIG.nsldr.slider,'value'));
+    set(FIG.nsldr.val,'string',num2str(Stimuli.noise_rel_attn));
     
     % zz 7feb12
 elseif strcmp(command_str, 'noise_atten_text')
@@ -265,9 +263,9 @@ elseif strcmp(command_str, 'noise_atten_text')
     end
     new_atten = str2num(new_atten);
     if new_atten < get(FIG.nsldr.slider,'min') || new_atten > get(FIG.nsldr.slider,'max')
-        set( FIG.nsldr.val, 'string', num2str(-Stimuli.noiseLevel));
+        set( FIG.nsldr.val, 'string', num2str(Stimuli.noise_rel_attn));
     else
-        Stimuli.noiseLevel = new_atten;
+        Stimuli.noise_rel_attn = new_atten;
         set(FIG.nsldr.slider, 'value', new_atten);
     end
     

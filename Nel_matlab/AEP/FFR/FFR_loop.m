@@ -66,9 +66,7 @@ elseif NelData.General.RX8  %NEL2 with RX8
     invoke(RP3,'SetTagVal','ADdur', FFR_Gating.FFRlength_ms);
     invoke(RP3,'Run');
 end
-
-
-FFR_set_attns(Stimuli.atten_dB,(Stimuli.noiseLevel*(1-Stimuli.noNoise)...
+FFR_set_attns(Stimuli.atten_dB,(Stimuli.noise_rel_attn*(1-Stimuli.noNoise)...
     +(Stimuli.noNoise)*(Stimuli.atten_dB-120)),Stimuli.channel,Stimuli.KHosc,RP1,RP2); %% debug deal with later Khite
 
 FFRnpts=ceil(FFR_Gating.FFRlength_ms/1000*Stimuli.RPsamprate_Hz);
@@ -114,8 +112,8 @@ while isempty(get(FIG.push.close,'Userdata'))
     else
         FIG.ax.ylabel=ylabel('Voltage at AD (V)','fontsize',12,'FontWeight','Bold');
     end
-    text(FFR_Gating.period_ms/2000,-33,'Frequency (Hz)','fontsize',12,'horizontalalignment','center');
-    text(FFR_Gating.period_ms/2000,-49,'Attenuation (dB)','fontsize',12,'horizontalalignment','center');
+    text(FFR_Gating.period_ms/2000,2,'Frequency (Hz)','fontsize',12,'horizontalalignment','center');
+    text(FFR_Gating.period_ms/2000,2,'Attenuation (dB)','fontsize',12,'horizontalalignment','center');
     box on;
     
     %New axes for showing maximum of each input waveform - KHZZ 2011 Nov 4
@@ -211,14 +209,14 @@ while isempty(get(FIG.push.close,'Userdata'))
                 case 1
                     invoke(RP1,'SetTagVal','freq',Stimuli.freq_hz);
                     invoke(RP1,'SetTagVal','tone',1);
-                    FFR_set_attns(Stimuli.atten_dB,(Stimuli.noiseLevel*(1-Stimuli.noNoise)...
+                    FFR_set_attns(Stimuli.atten_dB,(-Stimuli.noise_rel_attn*(1-Stimuli.noNoise)...
                         +(Stimuli.noNoise)*(Stimuli.atten_dB-120)),Stimuli.channel,Stimuli.KHosc,RP1,RP2);
                 case 2
                     invoke(RP1,'SetTagVal','tone',0);
-                    FFR_set_attns(Stimuli.atten_dB,(Stimuli.noiseLevel*(1-Stimuli.noNoise)...
+                    FFR_set_attns(Stimuli.atten_dB,(-Stimuli.noise_rel_attn*(1-Stimuli.noNoise)...
                         +(Stimuli.noNoise)*(Stimuli.atten_dB-120)),Stimuli.channel,Stimuli.KHosc,RP1,RP2);
                 case 3
-                    FFR_set_attns(Stimuli.atten_dB,(Stimuli.noiseLevel*(1-Stimuli.noNoise)...
+                    FFR_set_attns(Stimuli.atten_dB,(-Stimuli.noise_rel_attn*(1-Stimuli.noNoise)...
                         +(Stimuli.noNoise)*(Stimuli.atten_dB-120)),Stimuli.channel,Stimuli.KHosc,RP1,RP2);
                 case 4
                     invoke(RP1,'SetTagVal','StmOn',FFR_Gating.duration_ms);
@@ -234,7 +232,7 @@ while isempty(get(FIG.push.close,'Userdata'))
                     FIG.NewStim = 0;
                     break
                 case 5
-                    FFR_set_attns(Stimuli.atten_dB,(Stimuli.noiseLevel*(1-Stimuli.noNoise)...
+                    FFR_set_attns(Stimuli.atten_dB,(-Stimuli.noise_rel_attn*(1-Stimuli.noNoise)...
                         +(Stimuli.noNoise)*(Stimuli.atten_dB-120)),Stimuli.channel,Stimuli.KHosc,RP1,RP2);
                 case 6
                     % upon moving the created AM Tone, or a specific WAV file,
@@ -250,7 +248,7 @@ while isempty(get(FIG.push.close,'Userdata'))
                     invoke(RP1,'SetTagVal','RiseFall',FFR_Gating.rftime_ms);
                     invoke(RP1,'Run');
                     
-                    FFR_set_attns(Stimuli.atten_dB,(Stimuli.noiseLevel*(1-Stimuli.noNoise)...
+                    FFR_set_attns(Stimuli.atten_dB,(-Stimuli.noise_rel_attn*(1-Stimuli.noNoise)...
                         +(Stimuli.noNoise)*(Stimuli.atten_dB-120)),Stimuli.channel,Stimuli.KHosc,RP1,RP2);
                     
                     % debug deal with later Khite
@@ -271,7 +269,7 @@ while isempty(get(FIG.push.close,'Userdata'))
                     
                     invoke(RP1,'SoftTrg',1);
                 case 7
-                    FFR_set_attns(Stimuli.atten_dB,(Stimuli.noiseLevel*(1-Stimuli.noNoise)...
+                    FFR_set_attns(Stimuli.atten_dB,(Stimuli.noise_rel_attn*(1-Stimuli.noNoise)...
                         +(Stimuli.noNoise)*(Stimuli.atten_dB-120)),Stimuli.channel,Stimuli.KHosc,RP1,RP2);
                 case 8
                     invoke(RP1,'SetTagVal','FixedPhase',Stimuli.fixedPhase);
@@ -304,13 +302,14 @@ while isempty(get(FIG.push.close,'Userdata'))
                     end
                     set(FIG.ax.axis,'Ylim',[-Display.YLim Display.YLim])
                 case 13
-                    FFR_set_attns(Stimuli.atten_dB,(Stimuli.noiseLevel*(1-Stimuli.noNoise)...
+                    FFR_set_attns(Stimuli.atten_dB,(Stimuli.noise_rel_attn*(1-Stimuli.noNoise)...
                         +(Stimuli.noNoise)*(Stimuli.atten_dB-120)),Stimuli.channel,Stimuli.KHosc,RP1,RP2);
                 case 14
-                    % FFR_set_attns(Stimuli.atten_dB,(Stimuli.noiseLevel*(1-Stimuli.noNoise)...
-                    % +(Stimuli.noNoise)*(Stimuli.atten_dB-120)),Stimuli.channel,Stimuli.KHosc,RP1,RP2);
-                    FFR_set_attns(Stimuli.atten_dB,(Stimuli.noiseLevel*(1-Stimuli.noNoise)...
-                        +(Stimuli.noNoise)*(120)),Stimuli.channel,Stimuli.KHosc,RP1,RP2);
+                    FFR_set_attns(Stimuli.atten_dB,(Stimuli.noise_rel_attn*(1-Stimuli.noNoise)...
+                    +(Stimuli.noNoise)*(Stimuli.atten_dB-120)),Stimuli.channel,Stimuli.KHosc,RP1,RP2);
+                    
+%                     FFR_set_attns(Stimuli.atten_dB,(Stimuli.noise_rel_attn*(1-Stimuli.noNoise)...
+%                         +(Stimuli.noNoise)*(120)),Stimuli.channel,Stimuli.KHosc,RP1,RP2);
             end
             FIG.NewStim = 0;
         end

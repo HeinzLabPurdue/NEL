@@ -18,13 +18,15 @@ FIG.push.fmtone = uicontrol(FIG.handle,'callback','FFR(''fmtone'');','style','pu
 
 % zz 7feb12
 % noise slider
-FIG.nsldr.slider = uicontrol(FIG.handle,'callback','FFR(''noise_atten'');','style','slider','SliderStep',[1/100 5/100],'Enable','on','min',-50,'max',50,'Units','normalized','position',[.35 .225 .525 .04],'Value',Stimuli.noiseLevel);
+FIG.nsldr.title = uicontrol(FIG.handle, 'Style', 'text','backgroundcolor',[1 1 1],'Units','normalized','position',[.51 .215 .2 .03],'fontsize',10, 'string', 'Noise Relative Attenuation'); 
+FIG.nsldr.slider = uicontrol(FIG.handle,'callback','FFR(''noise_atten'');','style','slider','SliderStep',[1/100 5/100],'Enable','on','min',-50,'max',50,'Units','normalized','position',[.35 .175 .525 .04],'Value',Stimuli.noise_rel_attn);
 FIG.nsldr.min    = uicontrol(FIG.handle,'style','text','string',num2str(get(FIG.nsldr.slider,'min')),'backgroundcolor',[1 1 1],'Units','normalized','position',[.33 .14 .05 .03],'fontsize',10);
 FIG.nsldr.max    = uicontrol(FIG.handle,'style','text','string',num2str(get(FIG.nsldr.slider,'max')),'backgroundcolor',[1 1 1],'Units','normalized','position',[.825 .14 .05 .03],'fontsize',10,'horizontalalignment','right');
-FIG.nsldr.val    = uicontrol(FIG.handle,'style','edit','Units','normalized','Userdata',Stimuli.noiseLevel,'position',[.5825 .225 .06 .04],'string',num2str(-Stimuli.noiseLevel),'fontsize',12,'callback', 'FFR(''noise_atten_text'');');
-FIG.checkbox.noNoise = uicontrol(FIG.handle, 'callback', 'FFR(''noNoise'');','style','checkbox','Enable','on','Units','normalized','position',[.125 .365 .09 .03],'string','No noise','fontsize',12,'BackgroundColor','w','Value',Stimuli.noNoise);
+FIG.nsldr.val    = uicontrol(FIG.handle,'style','edit','Units','normalized','Userdata',Stimuli.noise_rel_attn,'position',[.5825 .175 .06 .04],'string',num2str(Stimuli.noise_rel_attn),'fontsize',12,'callback', 'FFR(''noise_atten_text'');');
+FIG.checkbox.noNoise = uicontrol(FIG.handle, 'callback', 'FFR(''noNoise'');','style','checkbox','Enable','on','Units','normalized','position',[.125 .375 .09 .03],'string','No noise','fontsize',12,'BackgroundColor','w','Value',Stimuli.noNoise);
 
 FIG.asldr.slider = uicontrol(FIG.handle,'callback','FFR(''slide_atten'');','style','slider','SliderStep',[1/120 5/120],'Enable','on','min',-120,'max',0,'Units','normalized','position',[.35 .075 .525 .04],'Value',-Stimuli.atten_dB);
+FIG.asldr.title = uicontrol(FIG.handle, 'Style', 'text','backgroundcolor',[1 1 1],'Units','normalized','position',[.513 .04 .2 .03],'fontsize',10, 'string', 'Signal Attenuation', 'horizontalalignment','center'); 
 
 FIG.asldr.min    = uicontrol(FIG.handle,'style','text','string',num2str(get(FIG.asldr.slider,'min')),'backgroundcolor',[1 1 1],'Units','normalized','position',[.33 .04 .05 .03],'fontsize',10);
 FIG.asldr.max    = uicontrol(FIG.handle,'style','text','string',num2str(get(FIG.asldr.slider,'max')),'backgroundcolor',[1 1 1],'Units','normalized','position',[.825 .04 .05 .03],'fontsize',10,'horizontalalignment','right');

@@ -35,14 +35,14 @@ attens_devices = attn * attens_devices;
 attens_devices = [[NaN NaN NaN NaN NaN NaN NaN NaN NaN]' [NaN NaN NaN NaN NaN attn attn-noiseLevel NaN NaN]'];  %KHZZ
 [select,connect,PAattns] = find_mix_settings(attens_devices);
 
-% From AEP_set_attns
-if(~bitget(ear,1)) %Right
-    %set left PA5-3 to 120 attn
-    PAattns(4) = 120;
-end
-if(~bitget(ear,2)) %Left
-    PAattns(3) = 120;
-end
+% % From AEP_set_attns
+% if(~bitget(ear,1)) %Right
+%     %set left PA5-3 to 120 attn
+%     PAattns(4) = 120;
+% end
+% if(~bitget(ear,2)) %Left
+%     PAattns(3) = 120;
+% end
 
 if (isempty(select))
    % nelerror('FFR: can''t find proper select/connect configuration');
