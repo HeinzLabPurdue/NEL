@@ -20,7 +20,28 @@ if (NelData.General.RP2_3and4 || NelData.General.RX8)
     end
     rdd;
     doInvCalib= ~newCalib; % if not new (means old => coef-file exists), then run inverse calibration
-    coefFileNum= run_invCalib(doInvCalib);
+%     coefFileNum= run_invCalib(doInvCalib);
+    
+
+    
+    if doInvCalib %already has a raw
+        filttype = {'inversefilt','inversefilt'};
+        cdd;
+        all_raw = findPics('raw*');
+        RawCalibPicNum = max(all_raw);
+        
+        %prompt user for RAW calib
+        RawCalibPicNum = inputdlg('Please confirm the RAW calibration file to use (default = last raw calib): ', 'Calibration!',...
+            1,{num2str(RawCalibPicNum)});
+        RawCalibPicNum = str2double(RawCalibPicNum{1});
+        rdd;
+    else %first time calib
+        filttype = {'allpass','allpass'};
+        RawCalibPicNum = NaN;
+    end
+    
+    invfilterdata = set_invFilter(filttype, RawCalibPicNum, true);
+    coefFileNum = invfilterdata.coefFileNum;
 else
     newCalib= true;
 end

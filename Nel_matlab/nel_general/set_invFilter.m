@@ -23,7 +23,12 @@
 % chans)
 % - check defaults for initial calibration when no file
 
-function invfilterdata = set_invFilter(filttype, RawCalibPicNum)
+function invfilterdata = set_invFilter(filttype, RawCalibPicNum, firstCalibFlag)
+
+%handle no firstCalibFlag
+if ~exist('firstCalibFlag','var')
+    firstCalibFlag = false;
+end
 
 %% Error Checking
 %check for 3 files
@@ -35,51 +40,54 @@ coefFileNum = RawCalibPicNum;
 
 cdd;
 %calib file is needed
-if ~prod(strcmp(filttype,{'allstop','allstop'})) 
-    %if Pic num not provided  
-    if ~exist('RawCalibPicNum','var')
-        warndlg('Missing Calibration File Number in set_invFilter. Running allstop.','WARNING!!!','modal');
-        errorFlag = true;
-    else
-        %Checking for valid raw calib file in data directory
-        pic_str = sprintf('p%04d_%s',RawCalibPicNum,'calib_raw*');
-        fname = dir(pic_str);
-        
-        if isempty(fname)
-            warndlg('Invalid Raw Calibration File Number in set_invFilter. Running allstop.','WARNING!!!','modal');
+if ~firstCalibFlag
+    if ~prod(strcmp(filttype,{'allstop','allstop'}))
+        %if Pic num not provided
+        if ~exist('RawCalibPicNum','var')
+            warndlg('Missing Calibration File Number in set_invFilter. Running allstop.','WARNING!!!','modal');
             errorFlag = true;
         else
-            coefFileNum = RawCalibPicNum;
-        end
-        
-        %if need an inverse calib
-        if sum(strcmp('inversefilt',filttype)) 
-            %check for missing coeff file
-            CalibPICnum2use = findPics(sprintf('inv%d',coefFileNum));
-            pic_str = sprintf('coef_%04d_%s',coefFileNum,'calib*');
-            fname = dir(pic_str);
-            if isempty(fname)
-                warndlg('Invalid Coefficient File Number in set_invFilter. Running allstop.','WARNING!!!','modal');
-                errorFlag = true;
-            end
-
-            %check for missing inv file
-            pic_str = sprintf('p*inv%d*',coefFileNum);
+            %Checking for valid raw calib file in data directory
+            pic_str = sprintf('p%04d_%s',RawCalibPicNum,'calib_raw*');
             fname = dir(pic_str);
             
             if isempty(fname)
-                warndlg('Invalid Inverse Calib File Number in set_invFilter. Running allstop.','WARNING!!!','modal');
+                warndlg('Invalid Raw Calibration File Number in set_invFilter. Running allstop.','WARNING!!!','modal');
                 errorFlag = true;
+            else
+                coefFileNum = RawCalibPicNum;
             end
-        else 
-            CalibPICnum2use = RawCalibPicNum;
+            
+            %if need an inverse calib
+            if sum(strcmp('inversefilt',filttype))
+                %check for missing coeff file
+                CalibPICnum2use = findPics(sprintf('inv%d',coefFileNum));
+                pic_str = sprintf('coef_%04d_%s',coefFileNum,'calib*');
+                fname = dir(pic_str);
+                if isempty(fname)
+                    warndlg('Invalid Coefficient File Number in set_invFilter. Running allstop.','WARNING!!!','modal');
+                    errorFlag = true;
+                end
+                
+                %check for missing inv file
+                pic_str = sprintf('p*inv%d*',coefFileNum);
+                fname = dir(pic_str);
+                
+                if isempty(fname)
+                    warndlg('Invalid Inverse Calib File Number in set_invFilter. Running allstop.','WARNING!!!','modal');
+                    errorFlag = true;
+                end
+            else
+                CalibPICnum2use = RawCalibPicNum;
+            end
         end
+    else
+        CalibPICnum2use = NaN;
+        coefFileNum = NaN;
     end
 else
     CalibPICnum2use = NaN;
-    coefFileNum = NaN;
 end
-
 
 if errorFlag
     RawCalibPicNum = NaN;
