@@ -90,6 +90,7 @@ elseif strcmp(command_str,'calibrate')
     set(FIG.push.stop,'Userdata',[]);
     set(FIG.push.close,'Userdata',DDATA);
     set(FIG.ax1.line1,'XData',DDATA(:,1),'YData',DDATA(:,2));
+        
     % Print Title and description.
     set(FIG.ax2.ProgMess,'String','Configuring calibration system...');
     drawnow;
@@ -121,93 +122,114 @@ elseif strcmp(command_str,'calibrate')
     %%%%%%%%%%%%%%%%%%%%%%%%%%
     
     %% Main data collection Loop
-    while ~error && isempty(get(FIG.push.stop,'userdata'))
-        %Set up TDT system for next stimulus:
-        [error] = setlab;
-        FREQS.isinit = 0;
+    
+    ears = [1,2];
+    %1 = left, 2 = right;
+    
+    for e = 1:length(ears)
+        Stimuli.ear = ears(e);
         
-        %       %Set proper gain in lock-in (max gain without overload)
-        %       if ~error & ~length(get(FIG.push.stop,'userdata'))
-        %          [error] = srgain;
-        %       end
-        
-        % Read amplitude of response
-        if ~error && isempty(get(FIG.push.stop,'userdata'))
-            %             tic;
-            [error,converge, ~] = TDTdaq;
-            %             temp_calib_time=toc;
+        if Stimuli.ear == 1
+            ear_name = 'Left';
+        elseif Stimuli.ear ==2
+            ear_name = 'Right';
         end
-        % Correct for probe microphone calibration IF a calibration file was
-        % loaded
-        %   If error in CALSPL, current point must be deleted, since it cannot
-        %   be calibrated for some reason.  If this is the first point in the
-        %   frequency range, must crash.  ndpnts decremented to delete this
-        %   point, ndad incremented to go on to next frequency (see SETLAB()
-        %   and COMFRQ().
-        if ~error && isempty(get(FIG.push.stop,'userdata'))
+        
+        %calib loop
+        while ~error && isempty(get(FIG.push.stop,'userdata')) || e<max(ears)
+            %Set up TDT system for next stimulus:
+            [error] = setlab;
+            FREQS.isinit = 0;
             
-            % Track number of completed data points.
-            FREQS.ndpnts = FREQS.ndpnts + 1;
+            %       %Set proper gain in lock-in (max gain without overload)
+            %       if ~error & ~length(get(FIG.push.stop,'userdata'))
+            %          [error] = srgain;
+            %       end
             
-            % Save data in buffer arrays.
-            DDATA(FREQS.ndpnts,1) = FREQS.freq;  % current frequency in kHz
-            if isfinite(COMM.SRdata.rmag)
-                DDATA(FREQS.ndpnts,2) = 20 * log10(max(COMM.SRdata.rmag,1.0e-09)) + FREQS.atnn; % COMM.SRdata.rmag corrected to 0 dB system atten
-            else
-                DDATA(FREQS.ndpnts,2) = NaN;
+            % Read amplitude of response
+            if ~error && isempty(get(FIG.push.stop,'userdata')) || e<max(ears)
+                %             tic;
+                [error,converge, ~] = TDTdaq;
+                %             temp_calib_time=toc;
             end
-            DDATA(FREQS.ndpnts,3) = COMM.SRdata.rph / pi;								  % is phase re pi radians
-            DDATA(FREQS.ndpnts,4) = COMM.SRdata.sem;                                     % error of COMM.SRdata.rmag sample
-            if FREQS.ndpnts == 1, iseq = 1; end
-            if Stimuli.cal
-                [error] = calspl(iseq);
-                if ~isempty(COMM.SRdata.dbspl)
-                    DDATA(FREQS.ndpnts,2) = COMM.SRdata.dbspl;
+            % Correct for probe microphone calibration IF a calibration file was
+            % loaded
+            %   If error in CALSPL, current point must be deleted, since it cannot
+            %   be calibrated for some reason.  If this is the first point in the
+            %   frequency range, must crash.  ndpnts decremented to delete this
+            %   point, ndad incremented to go on to next frequency (see SETLAB()
+            %   and COMFRQ().
+            if ~error && isempty(get(FIG.push.stop,'userdata')) || e<max(ears)
+                
+                % Track number of completed data points.
+                FREQS.ndpnts = FREQS.ndpnts + 1;
+                
+                % Save data in buffer arrays.
+                DDATA(FREQS.ndpnts,1) = FREQS.freq;  % current frequency in kHz
+                if isfinite(COMM.SRdata.rmag)
+                    DDATA(FREQS.ndpnts,2) = 20 * log10(max(COMM.SRdata.rmag,1.0e-09)) + FREQS.atnn; % COMM.SRdata.rmag corrected to 0 dB system atten
                 else
                     DDATA(FREQS.ndpnts,2) = NaN;
                 end
-                if isempty(COMM.SRdata.ophs)
-                    DDATA(FREQS.ndpnts,3) = COMM.SRdata.ophs;
+                DDATA(FREQS.ndpnts,3) = COMM.SRdata.rph / pi;								  % is phase re pi radians
+                DDATA(FREQS.ndpnts,4) = COMM.SRdata.sem;                                     % error of COMM.SRdata.rmag sample
+                if FREQS.ndpnts == 1, iseq = 1; end
+                if Stimuli.cal
+                    [error] = calspl(iseq);
+                    if ~isempty(COMM.SRdata.dbspl)
+                        DDATA(FREQS.ndpnts,2) = COMM.SRdata.dbspl;
+                    else
+                        DDATA(FREQS.ndpnts,2) = NaN;
+                    end
+                    if isempty(COMM.SRdata.ophs)
+                        DDATA(FREQS.ndpnts,3) = COMM.SRdata.ophs;
+                    else
+                        DDATA(FREQS.ndpnts,3) = NaN;
+                    end
+                    if error
+                        FREQS.ndpnts = FREQS.ndpnts - 1;
+                        FREQS.ndad = FREQS.ndad + 1;
+                        if FREQS.ndpnts <= 0, break, end
+                        error = 0;
+                    end
+                end
+                
+                %predicted gain is same as last gain
+                FREQS.gprd = FREQS.gain;
+                FREQS.frqlst = FREQS.freq;
+                
+                low_lim = floor(min(DDATA(1:FREQS.ndpnts,2))/20)*20;
+                up_lim  = ceil(max(DDATA(1:FREQS.ndpnts,2))/20)*20;
+                if low_lim < up_lim
+                    set(FIG.ax1.axes,'YLim',[low_lim up_lim]);
+                end
+                set(FIG.ax1.line1,'XData',DDATA(:,1),'YData',DDATA(:,2));
+                
+                %does this ever not converge?
+                if ~converge
+                    set(FIG.ax1.line2,'XData',DDATA(FREQS.ndpnts,1),'YData',DDATA(FREQS.ndpnts,2),'visible','on');
+                end
+                
+                if Stimuli.cal
+                    display_message = sprintf('%s%6.3f%s\n%s%6.2f%s\n\n%s%2d%s','Frequency:',DDATA(FREQS.ndpnts,1),' kHz','SPL:',DDATA(FREQS.ndpnts,2),' dB','Criterion reached in ',COMM.SRdata.ndata,' tries.');
                 else
-                    DDATA(FREQS.ndpnts,3) = NaN;
+                    display_message = sprintf('%s%6.3f%s\n%s%6.2f%s\n\n%s%2d%s','Frequency:',DDATA(FREQS.ndpnts,1),' kHz','Signal:',DDATA(FREQS.ndpnts,2),' RMS V, dB re 1V','Criterion reached in ',COMM.SRdata.ndata,' tries.');
                 end
-                if error
-                    FREQS.ndpnts = FREQS.ndpnts - 1;
-                    FREQS.ndad = FREQS.ndad + 1;
-                    if FREQS.ndpnts <= 0, break, end
-                    error = 0;
-                end
+                
+                set(FIG.ax2.ProgMess,'String',display_message);
+                drawnow;
             end
             
-            %predicted gain is same as last gain
-            FREQS.gprd = FREQS.gain;
-            FREQS.frqlst = FREQS.freq;
-            
-            low_lim = floor(min(DDATA(1:FREQS.ndpnts,2))/20)*20;
-            up_lim  = ceil(max(DDATA(1:FREQS.ndpnts,2))/20)*20;
-            if low_lim < up_lim
-                set(FIG.ax1.axes,'YLim',[low_lim up_lim]);
+            if ~isempty(get(FIG.push.stop,'userdata'))
+                set(FIG.ax2.ProgMess,'String','Program stopped...');
+                set(FIG.push.close,'Userdata',DDATA);
             end
-            set(FIG.ax1.line1,'XData',DDATA(:,1),'YData',DDATA(:,2));
-            if ~converge
-                set(FIG.ax1.line2,'XData',DDATA(FREQS.ndpnts,1),'YData',DDATA(FREQS.ndpnts,2),'visible','on');
-            end
-            if Stimuli.cal
-                display_message = sprintf('%s%6.3f%s\n%s%6.2f%s\n\n%s%2d%s','Frequency:',DDATA(FREQS.ndpnts,1),' kHz','SPL:',DDATA(FREQS.ndpnts,2),' dB','Criterion reached in ',COMM.SRdata.ndata,' tries.');
-            else
-                display_message = sprintf('%s%6.3f%s\n%s%6.2f%s\n\n%s%2d%s','Frequency:',DDATA(FREQS.ndpnts,1),' kHz','Signal:',DDATA(FREQS.ndpnts,2),' RMS V, dB re 1V','Criterion reached in ',COMM.SRdata.ndata,' tries.');
-            end
-            set(FIG.ax2.ProgMess,'String',display_message);
-            drawnow;
         end
-        
-        if ~isempty(get(FIG.push.stop,'userdata'))
-            set(FIG.ax2.ProgMess,'String','Program stopped...');
-            set(FIG.push.close,'Userdata',DDATA);
-        end
+        % end data collection
+        ddata_struct{e} = DDATA;
+        ddata_struct_ear{e} = ear_name;
     end
-    % end data collection
-  
+    
     %%
     for i = 1:4
         attenuator(i,120);
@@ -244,7 +266,7 @@ elseif strcmp(command_str,'calibrate')
             fname= sprintf('%s_inv%d', fname, coefFileNum);
         end
         
-        NelData=make_calib_text_file(fname, NelData, Stimuli, comment, PROG, DDATA, SRdata);
+        NelData=make_calib_text_file(fname, NelData, Stimuli, comment, PROG, ddata_struct, ddata_struct_ear, SRdata);
         %update_params;
         %         filename = current_data_file('calib'); %strcat(FILEPREFIX,num2str(FNUM),'.m');
         uiresume; % Allow Nel's main window to update the Title

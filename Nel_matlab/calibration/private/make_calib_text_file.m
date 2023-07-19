@@ -1,4 +1,4 @@
-function NelData=make_calib_text_file(fname, NelData, Stimuli, comment, PROG, DDATA, SRdata)
+function NelData=make_calib_text_file(fname, NelData, Stimuli, comment, PROG, ddata_struct, ddata_stuct_ear, SRdata)
 
 
 x.General.program_name   = PROG;
@@ -36,8 +36,20 @@ x.Line    = [];
 %store the data in three columns (freq SPL phase)
 % DDATA = DDATA(1:min(find(DDATA(:,1)<=0))-1,1:3);
 
-DDATA = DDATA(1:find(DDATA(:,1)<=0, 1)-1,:);
-x.CalibData = DDATA;
+% DDATA = DDATA(1:find(DDATA(:,1)<=0, 1)-1,:);
+% ddata_struct{1} =
+% ddata_struct{2}
+for i = 1:length(ddata_struct)
+    ddata_struct{i} = ddata_struct{i}(1:find(ddata_struct{i}(:,1)<=0, 1)-1,:)
+end
+
+%get MH insight.....
+%we don't know whether better to be backwards compatible or link left
+%calib??
+x.CalibData = ddata_struct{1};
+x.CalibData2 = ddata_struct{2};
+x.ear_ord = ddata_stuct_ear;
+
 x.User = [];
 
 x.Hardware.mic        = Stimuli.nmic;
