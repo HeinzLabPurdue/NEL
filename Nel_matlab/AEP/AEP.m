@@ -41,31 +41,20 @@ if nargin < 1
         case 'CAP'
             h_fig = CAP; 
         case 'FFR' 
-            FFR_interface_type=questdlg('Which FFR:','','FFR','SFR','SFR');
+            FFR_interface_type=questdlg('Which FFR stimulus type?:','','AM/FM','Custom .WAV File','AM/FM');
             switch FFR_interface_type
-                case 'FFR'
+                case 'AM/FM'
                     h_fig = FFR();
-                case 'SFR'
-                    %usr = NelData.General.User;
-                    % Work around hack for JMR Sept 21
-                    %AS | VMA/SH previously (NEL Sprint 22) set default to
-                    %JMR, but now should default to the AEP/FFR directory.
-                    %JMR paradigm now only used if running under JMR. 
-%                     if strcmp(usr,'JMR') 
-%                         %addpath([NelData.General.RootDir 'Users\JMR', filesep 'FFR']);
-%                         h_fig = FFR_SNRenv_2chan();
-%                     else                                     #Making FFR
-%                     similar to ABR, no 2 chan if JMR selected, making it
-%                     a toggle button (VMA, SH 7/19/2023) 
-                        %this is single channel and dir is SP
-                        h_fig = FFR_SNRenv();
-%                     end
-%                 case 'SFR-mask'
-%                     h_fig = SFR_pink_mask_SNRenv;
-%                 case 'SFR_pink'
-%                     h_fig = SFR_pink_mask_tdt;
-%                 case 'EFR_HrmCpx'
-%                     h_fig = EFR_Harm_Cmplx;
+                case 'Custom .WAV File'
+                    h_fig = FFRwav();
+
+%               case 'SFR-mask'
+%                   h_fig = SFR_pink_mask_SNRenv;
+%               case 'SFR_pink'
+%                   h_fig = SFR_pink_mask_tdt;
+%               case 'EFR_HrmCpx'
+%                   h_fig = EFR_Harm_Cmplx;
+
             end
     end
     

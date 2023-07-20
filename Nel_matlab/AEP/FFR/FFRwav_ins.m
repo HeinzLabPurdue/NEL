@@ -1,36 +1,34 @@
 % FFR Instruction Block
 function [misc,Stimuli, RunLevels_params, Display, interface_type]=FFRwav_ins(NelData)
 
-% SNRenvStimDir='C:\NEL2\Users\SP\SNRenv_stimuli\stimSetStationary\'; %
-% This was the data dir for pilot data before DTU. (Q313 and Q314).
-% This is new. Defaults stim directory to JMR 
-
 usr = NelData.General.User;
 
-if exist([NelData.General.RootDir 'Users\' usr filesep '\FFR\FFRwav\'],'dir')
-    FFRwavStimDir=[NelData.General.RootDir 'Users\',usr,'\FFR\FFRwav\'];
+if exist([NelData.General.RootDir 'Signals\' usr filesep '\FFR\'],'dir')
+    FFRwavStimDir=[NelData.General.RootDir 'Signals\',usr,'\FFR\'];
 else
-    FFRwavStimDir=[NelData.General.RootDir '\Nel_matlab\AEP\FFR\FFRwav\'];
+    FFRwavStimDir=[NelData.General.RootDir '\Nel_matlab\AEP\FFR\Signals\FFRwav\'];
 end
 
+interface_type = 'FFRwav'; 
 
-% This is new.
-
-
-interface_type = 'FFR_SNRenv'; % ge debug ABR
 % interface_type = 'SPIKES';
 %            'filename','C:\NEL_debug\Nel_matlab\FFR\object\tone.wav',...
+
 switch interface_type
-    case 'FFR_SNRenv'
+    case 'FFRwav'
         misc = struct( ...
-            'fileExtension', 'FFR_SNRenv', ...
+            'fileExtension', 'FFRwav', ...
             'n',0 ...%zz oct2011
             );
         
-        %         fName=load([fileparts(SNRenvStimDir(1:end-1)) filesep 'SNRenv_stimlist14.mat']); % for Pilot SFR
-        fName=load([fileparts(FFRwavStimDir(1:end-1)) filesep 'SNRenv_stimlist_short.mat']);
-        fName=fName.SNRenv_stimlist;
-        fName= fName(end:-1:1);
+        % What's the point of this part??
+%         fName=load([fileparts(FFRwavStimDir(1:end-1)) filesep 'SNRenv_stimlist_short.mat']);
+%         fName=fName.SNRenv_stimlist;
+%         fName= fName(end:-1:1);
+
+
+        fName=dir(FFRwavStimDir);
+        fName=cell2struct({fName(3:end).name},'name'); 
         
         Stimuli = struct( ...
             'pol',1,...%zz 31oct2011
@@ -43,7 +41,7 @@ switch interface_type
             'NoiseType',0,... % 0 for stationary, 1 for fluctuating
             'maxSPL', 90, ...
             'STIMfile', [NelData.General.RootDir 'Nel_matlab\AEP\FFR\Signals\tone_org.wav'], ...
-            'UPDdir', [NelData.General.RootDir 'Nel_matlab\AEP\FFR\FFRSNRenv_short_stationary_run\'], ... (copy resampled files here)
+            'UPDdir', [NelData.General.RootDir 'Nel_matlab\AEP\FFR\Signals\FFRwav_resamp\'], ... (copy resampled files here)
             'OLDDir', FFRwavStimDir, ... (from here)
             ...
             ...
@@ -77,7 +75,7 @@ switch interface_type
             );
         
         RunLevels_params = struct( ...
-            'nPairs', 100, ... %Temporary change by VMA 7/17/23
+            'nPairs', 100, ...
             'nPairs_actual', 1, ...
             'doneStims', zeros(length(fName),1), ...
             'stepdB', 0, ...
@@ -105,7 +103,7 @@ switch interface_type
             ...%'dur',1,...%zz 31oct2011
             'pol',1,...%zz 31oct2011
             'mod',1,...
-            'filename', [NelData.General.RootDir 'Nel_matlab\AEP\FFR\object\tone_org.wav'],...%zz 31oct2011
+            'filename', [NelData.General.RootDir 'Nel_matlab\AEP\FFR\Signals\tone_org.wav'],...%zz 31oct2011
             ...%'freq_hz',2000, ...
             'atten_dB', 40, ...
             'noNoise', 1, ...
@@ -152,8 +150,6 @@ switch interface_type
             'PlotFactor', 1 ...
             );
 end
-% Stimuli.RPsamprate_Hz=12207.03125*4;
-% Stimuli.RPsamprate_Hz=12207.03125;  % Hard coded for now, eventually get from RP
-
 
 Stimuli.RPsamprate_Hz=50e6/1024; %48828.125  % Hard coded for now, eventually get from RP
+

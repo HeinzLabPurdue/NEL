@@ -5,7 +5,7 @@ FIG.radio.slow   = uicontrol(FIG.handle,'callback','FFR(''slow'');','style','rad
 FIG.push.close   = uicontrol(FIG.handle,'callback','FFR(''close'');','style','pushbutton','Units','normalized','position',[.1 .6 .125 .09],'string','Close','fontsize',12,'fontangle','normal','fontweight','normal');
 
 % WAV file loader and AM Tone generator - zz 31oct11
-FIG.wavfile.func = uicontrol(FIG.handle,'style','edit','Units','normalized','Userdata',Stimuli.filename,'position',[.35 .175 .525 .04],'string',Stimuli.filename,'fontsize',12,'callback', 'FFR(''wavfile'');');
+FIG.wavfile.func = uicontrol(FIG.handle,'style','edit','Units','normalized','Userdata',Stimuli.filename,'position',[.35 .245 .525 .03],'string',Stimuli.filename,'fontsize',11,'callback', 'FFR(''wavfile'');');
 FIG.push.amtone = uicontrol(FIG.handle,'callback','FFR(''amtone'');','style','pushbutton','Units','normalized','position',[.5825 .125 .06 .04],'string','AM Tone','fontsize',12,'fontangle','normal','fontweight','normal');
 FIG.push.logSwept_amtone = uicontrol(FIG.handle,'callback','FFR(''logSwept_amtone'');','style','pushbutton','Units','normalized','position',[.68 .125 .12 .04],'string','Lg-swpt AM Tone','fontsize',12,'fontangle','normal','fontweight','normal');
 FIG.push.fmtone = uicontrol(FIG.handle,'callback','FFR(''fmtone'');','style','pushbutton','Units','normalized','position',[.4825 .125 .06 .04],'string','FM Tone','fontsize',12,'fontangle','normal','fontweight','normal');

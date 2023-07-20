@@ -1,7 +1,7 @@
 %% For stimulus
 % RP1=actxcontrol('RPco.x',[0 0 1 1]);
 % invoke(RP1,'ConnectRP2',NelData.General.TDTcommMode,1);
-stimRCXfName= [prog_dir '\object\FFR_wav_polIN.rcx'];
+stimRCXfName= [prog_dir '\object\FFR_AM_polIN.rcx'];
 
 if NelData.General.RP2_3and4 && (~NelData.General.RX8) % NEL1 with RP2 #3 & #4
     %% For bit-select
@@ -112,8 +112,8 @@ while isempty(get(FIG.push.close,'Userdata'))
     else
         FIG.ax.ylabel=ylabel('Voltage at AD (V)','fontsize',12,'FontWeight','Bold');
     end
-    text(FFR_Gating.period_ms/2000,2,'Frequency (Hz)','fontsize',12,'horizontalalignment','center');
-    text(FFR_Gating.period_ms/2000,2,'Attenuation (dB)','fontsize',12,'horizontalalignment','center');
+%     text(FFR_Gating.period_ms/2000,2,'Frequency (Hz)','fontsize',12,'horizontalalignment','center');
+%     text(FFR_Gating.period_ms/2000,2,'Attenuation (dB)','fontsize',12,'horizontalalignment','center');
     box on;
     
     %New axes for showing maximum of each input waveform - KHZZ 2011 Nov 4
@@ -308,8 +308,6 @@ while isempty(get(FIG.push.close,'Userdata'))
                     FFR_set_attns(Stimuli.atten_dB,(Stimuli.noise_rel_attn*(1-Stimuli.noNoise)...
                     +(Stimuli.noNoise)*(Stimuli.atten_dB-120)),Stimuli.channel,Stimuli.KHosc,RP1,RP2);
                     
-%                     FFR_set_attns(Stimuli.atten_dB,(Stimuli.noise_rel_attn*(1-Stimuli.noNoise)...
-%                         +(Stimuli.noNoise)*(120)),Stimuli.channel,Stimuli.KHosc,RP1,RP2);
             end
             FIG.NewStim = 0;
         end
