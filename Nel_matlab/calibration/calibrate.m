@@ -66,7 +66,7 @@ elseif strcmp(command_str,'return from parameter change')
     
     %perform calibration, plot results
 elseif strcmp(command_str,'calibrate')
-    [FREQS, COMM, ~]= ReturnCal(FIG, Stimuli);
+%     [FREQS, COMM, ~]= ReturnCal(FIG, Stimuli);
     set(FIG.ax3.axes,'XTick',-50:50:50,'YTick',-50:50:50);
     set(FIG.ax3.axes,'XLim',[-50 50],'YLim',[-50 50]);
     set(FIG.ax3.ParamHead1,'Visible','off');
@@ -128,15 +128,19 @@ elseif strcmp(command_str,'calibrate')
     
     for e = 1:length(ears)
         Stimuli.ear = ears(e);
-        
+        [FREQS, COMM, ~]= ReturnCal(FIG, Stimuli);
+        DDATA = zeros(1000,5);
+
         if Stimuli.ear == 1
             ear_name = 'Left';
         elseif Stimuli.ear ==2
             ear_name = 'Right';
         end
+        set(FIG.push.stop,'Userdata',[]); 
         
+        error = 0;
         %calib loop
-        while ~error && isempty(get(FIG.push.stop,'userdata')) || e<max(ears)
+        while ~error && isempty(get(FIG.push.stop,'userdata'))
             %Set up TDT system for next stimulus:
             [error] = setlab;
             FREQS.isinit = 0;
@@ -147,7 +151,7 @@ elseif strcmp(command_str,'calibrate')
             %       end
             
             % Read amplitude of response
-            if ~error && isempty(get(FIG.push.stop,'userdata')) || e<max(ears)
+            if ~error && isempty(get(FIG.push.stop,'userdata'))
                 %             tic;
                 [error,converge, ~] = TDTdaq;
                 %             temp_calib_time=toc;
@@ -159,7 +163,7 @@ elseif strcmp(command_str,'calibrate')
             %   frequency range, must crash.  ndpnts decremented to delete this
             %   point, ndad incremented to go on to next frequency (see SETLAB()
             %   and COMFRQ().
-            if ~error && isempty(get(FIG.push.stop,'userdata')) || e<max(ears)
+            if ~error && isempty(get(FIG.push.stop,'userdata'))
                 
                 % Track number of completed data points.
                 FREQS.ndpnts = FREQS.ndpnts + 1;
@@ -205,7 +209,7 @@ elseif strcmp(command_str,'calibrate')
                 end
                 set(FIG.ax1.line1,'XData',DDATA(:,1),'YData',DDATA(:,2));
                 
-                %does this ever not converge?
+                %AS does this ever not converge?
                 if ~converge
                     set(FIG.ax1.line2,'XData',DDATA(FREQS.ndpnts,1),'YData',DDATA(FREQS.ndpnts,2),'visible','on');
                 end
@@ -224,10 +228,12 @@ elseif strcmp(command_str,'calibrate')
                 set(FIG.ax2.ProgMess,'String','Program stopped...');
                 set(FIG.push.close,'Userdata',DDATA);
             end
+            
         end
         % end data collection
         ddata_struct{e} = DDATA;
         ddata_struct_ear{e} = ear_name;
+
     end
     
     %%
@@ -317,7 +323,12 @@ elseif strcmp(command_str,'recall')
     
 elseif strcmp(command_str,'close')
     if NelData.General.RP2_3and4 || NelData.General.RX8
-        coefFileNum= run_invCalib(false);
+%         coefFileNum= run_invCalib(false);
+        %set back to allpass
+        filttype = {'allpass','allpass'};
+        RawCalibPicNum = NaN;
+        invfilterdata = set_invFilter(filttype, RawCalibPicNum, true);
     end
+    
     delete(FIG.handle);
 end

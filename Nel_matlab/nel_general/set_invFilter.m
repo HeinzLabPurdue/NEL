@@ -122,9 +122,6 @@ switch filttype{1}
         coef_str = sprintf('coef_%04d_%s',coefFileNum,'calib.mat');       
         temp = load(coef_str);
         
-        
-        %DISCLAIMER RIGHT NOW SENDING SAME COEFFS TO BOTH CHANS!!!!!FIX
-        %BEFORE DEPLOYING
         b_chan1 = temp.b(:)';
         fprintf('\n Channel 1 | invFIR Coefs set successfully from %s', coef_str);
     otherwise
@@ -151,10 +148,7 @@ switch filttype{2}
         % inverse and coeffs
         coef_str = sprintf('coef_%04d_%s',coefFileNum,'calib.mat');       
         temp = load(coef_str);
-        
-        %DISCLAIMER RIGHT NOW SENDING SAME COEFFS TO BOTH CHANS!!!!!FIX
-        %BEFORE DEPLOYING
-        b_chan2 = temp.b(:)';
+        b_chan2 = temp.b2(:)';
         fprintf('\n Channel 2 | invFIR Coefs set successfully from %s', coef_str);
     otherwise
         warndlg('Invalid filter type specified in set_invFilter()...defaulting to allstop','WARNING!!!','modal')
