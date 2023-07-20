@@ -40,14 +40,18 @@ x.Line    = [];
 % ddata_struct{1} =
 % ddata_struct{2}
 for i = 1:length(ddata_struct)
-    ddata_struct{i} = ddata_struct{i}(1:find(ddata_struct{i}(:,1)<=0, 1)-1,:)
+    ddata_struct{i} = ddata_struct{i}(1:find(ddata_struct{i}(:,1)<=0, 1)-1,:);
 end
 
 %get MH insight.....
 %we don't know whether better to be backwards compatible or link left
 %calib??
 x.CalibData = ddata_struct{1};
-x.CalibData2 = ddata_struct{2};
+if length(ddata_struct)>1
+    x.CalibData2 = ddata_struct{2};
+else
+    x.CalibData2 = [];
+end 
 x.ear_ord = ddata_stuct_ear;
 
 x.User = [];

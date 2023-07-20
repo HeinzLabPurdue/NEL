@@ -1,6 +1,6 @@
 function [error] = make_tone()
 
-global object_dir COMM FIG Stimuli newCalib coefFileNum NelData
+global object_dir COMM FIG Stimuli newCalib doInvCalib coefFileNum NelData
 
 error = 0;
 
@@ -8,21 +8,26 @@ error = 0;
 if (NelData.General.RP2_3and4 || NelData.General.RX8)
     cdd;
     all_Calib_files= dir('p*calib*');
-    if isempty(all_Calib_files)
-        newCalib= true;
-    else
+    
+    if isempty(all_Calib_files) 
+            newCalib= true;
+            doInvCalib = false;
+    elseif ~Stimuli.completeRun
+    else 
         inStr= questdlg('Calib files already exists - run new calib or use latest FIR coeffs?', 'New or Rerun?', 'New Calib', 'FIR Calib', 'FIR Calib');
         if strcmp(inStr, 'New Calib')
             newCalib= true;
+            doInvCalib = false;
         elseif strcmp(inStr, 'FIR Calib')
             newCalib= false;
+            doInvCalib = true;
         end
     end
     rdd;
-    doInvCalib= ~newCalib; % if not new (means old => coef-file exists), then run inverse calibration
-%     coefFileNum= run_invCalib(doInvCalib);
     
-
+    
+%      doInvCalib= ~newCalib; % if not new (means old => coef-file exists), then run inverse calibration
+%     coefFileNum= run_invCalib(doInvCalib);
     
     if doInvCalib %already has a raw
         filttype = {'inversefilt','inversefilt'};

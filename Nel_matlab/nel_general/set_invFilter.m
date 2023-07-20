@@ -148,6 +148,15 @@ switch filttype{2}
         % inverse and coeffs
         coef_str = sprintf('coef_%04d_%s',coefFileNum,'calib.mat');       
         temp = load(coef_str);
+        
+        %sets b2 to be occupied in the case a single side calibration is done,
+        %since we default to saving b first regardless of channel.
+        
+        if isempty(temp.b2)
+            temp.b2 = temp.b;
+            warning('\n ***Single sided calibration, but using chan 2. b2 is set to b for inverse filtering*** \n')
+        end
+        
         b_chan2 = temp.b2(:)';
         fprintf('\n Channel 2 | invFIR Coefs set successfully from %s', coef_str);
     otherwise

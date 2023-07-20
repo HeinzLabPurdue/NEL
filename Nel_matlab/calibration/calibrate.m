@@ -6,7 +6,7 @@ function h_fig = calibrate(command_str)
 %
 % THIS IS THE MAIN PROGRAM FOR THE TDT-RP2 based Calibration
 
-global root_dir newCalib coefFileNum func_dir object_dir PROG FIG Stimuli SRdata DDATA FREQS COMM NelData
+global root_dir newCalib doInvCalib coefFileNum func_dir object_dir PROG FIG Stimuli SRdata DDATA FREQS COMM NelData
 
 if nargin < 1
     func_dir = cd([root_dir 'calibration\private']);
@@ -125,11 +125,45 @@ elseif strcmp(command_str,'calibrate')
     
     %% Main data collection Loop
     
-    ears = [1,2];
-    %1 = left, 2 = right;
+    ears=[];
     
+    cdd;
+    calibs = findPics('*raw');
+    lastfile = max(calibs);
+    if ~isempty(lastfile)
+        p = loadpic(lastfile);
+        default = p.ear_ord;
+        if length(default)==2
+            default = 'Both L/R';
+        else
+            default = p.ear_ord{1};
+        end
+    else
+        default = 'Both L/R';
+    end
+    rdd;
+    
+    %written by MH himself
+    ee = questdlg('Select ear?', ...
+	'Ear menu', ...
+	'Both L/R','Left ','Right ', default);
+    switch(ee)
+        case 'Left ' 
+            ears = 1;
+        case 'Right '
+            ears = 2;
+        case 'Both L/R'
+            ears = [1,2];
+    end
+    
+    
+    %ears = [1,2];
+    %1 = left, 2 = right; %ALWAYS START WITH 1
+    
+    Stimuli.completeRun = 1; %used by make_tone() to check completeness of two channel.
     for e = 1:length(ears)
         Stimuli.ear = ears(e);
+        
         [FREQS, COMM, ~]= ReturnCal(FIG, Stimuli);
         DDATA = zeros(1000,5);
 
@@ -138,6 +172,8 @@ elseif strcmp(command_str,'calibrate')
         elseif Stimuli.ear ==2
             ear_name = 'Right';
         end
+        update_params;
+        
         set(FIG.push.stop,'Userdata',[]); 
         
         error = 0;
@@ -243,8 +279,13 @@ elseif strcmp(command_str,'calibrate')
         % end data collection
         ddata_struct{e} = DDATA;
         ddata_struct_ear{e} = ear_name;
-
+        
+        Stimuli.completeRun = floor(e/length(ears)); %used by make_tone() to check completeness of two channel.
     end
+    
+    %set up for next calib to be run
+    Stimuli.completeRun = 0;
+    doInvCalib = false;
     
     %%
     for i = 1:4
