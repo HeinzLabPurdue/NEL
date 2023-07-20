@@ -90,7 +90,9 @@ elseif strcmp(command_str,'calibrate')
     set(FIG.push.stop,'Userdata',[]);
     set(FIG.push.close,'Userdata',DDATA);
     set(FIG.ax1.line1,'XData',DDATA(:,1),'YData',DDATA(:,2));
-        
+    set(FIG.ax1.line2,'XData',DDATA(:,1),'YData',DDATA(:,2));
+
+    
     % Print Title and description.
     set(FIG.ax2.ProgMess,'String','Configuring calibration system...');
     drawnow;
@@ -207,12 +209,20 @@ elseif strcmp(command_str,'calibrate')
                 if low_lim < up_lim
                     set(FIG.ax1.axes,'YLim',[low_lim up_lim]);
                 end
-                set(FIG.ax1.line1,'XData',DDATA(:,1),'YData',DDATA(:,2));
+                
+                
+                switch Stimuli.ear
+                    case 1 %left
+                        set(FIG.ax1.line1,'XData',DDATA(:,1),'YData',DDATA(:,2));
+                    case 2 %right
+                        set(FIG.ax1.line2,'XData',DDATA(:,1),'YData',DDATA(:,2));
+                end
+                
                 
                 %AS does this ever not converge?
-                if ~converge
-                    set(FIG.ax1.line2,'XData',DDATA(FREQS.ndpnts,1),'YData',DDATA(FREQS.ndpnts,2),'visible','on');
-                end
+%                 if ~converge
+%                     set(FIG.ax1.line2,'XData',DDATA(FREQS.ndpnts,1),'YData',DDATA(FREQS.ndpnts,2),'visible','on');
+%                 end
                 
                 if Stimuli.cal
                     display_message = sprintf('%s%6.3f%s\n%s%6.2f%s\n\n%s%2d%s','Frequency:',DDATA(FREQS.ndpnts,1),' kHz','SPL:',DDATA(FREQS.ndpnts,2),' dB','Criterion reached in ',COMM.SRdata.ndata,' tries.');
