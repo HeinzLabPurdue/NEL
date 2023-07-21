@@ -173,7 +173,9 @@ end
 invfilterdata.CalibPICnum2use = CalibPICnum2use;
 invfilterdata.filttype = filttype;
 invfilterdata.coefFileNum = coefFileNum;
-
+invfilterdata.b_chan1 = b_chan1;
+invfilterdata.b_chan2 = b_chan2;
+    
 %temporary for debugging
 %% Connecting to TDT modules
 global COMM root_dir
@@ -208,5 +210,6 @@ else
     invfilterdata.filttype = {'ERROR','ERROR'};
     invfilterdata.coefFileNum = NaN;
 end
+
 
 rdd;

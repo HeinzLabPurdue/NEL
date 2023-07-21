@@ -1,4 +1,5 @@
 %global root_dir NelData
+global Stimuli
 
 if Stimuli.clickYes==1  %KH 06Jan2012
     clickAmp=5; toneAmp=0;
@@ -76,7 +77,11 @@ elseif NelData.General.RX8  %NEL2 with RX8
     invoke(RP3,'LoadCOF',[prog_dir '\object\ABR_RX8_ADC_invCalib_2chan.rcx']); %JMR 2 channel setup
     %     [~, ~, b_invCalib_coef]= run_invCalib(-2);
 %     b_invCalib_coef= [1 zeros(1, 255)];
-%     e_invCalib_status= RP3.WriteTagV('FIR_Coefs', 0, b_invCalib_coef);
+    filttype = {'inversefilt','inversefilt'};
+    invfilterdata = set_invFilter(filttype, Stimuli.calibPicNum);
+    
+    e1 = RP3.WriteTagV('FIR_Coefs1', 0, invfilterdata.b_chan1);
+    e2 = RP3.WriteTagV('FIR_Coefs2', 0, invfilterdata.b_chan2);
 else
     nelerror('Cannot figure out whether NEL1 or NEL2')
 end
