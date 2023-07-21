@@ -1,4 +1,4 @@
-% Edited by SP
+% Sets naming structure for file and relevant stimuli metadata
 
 function [x, aux_fname, fname]=make_FFRwav_text_file_subfunc1 ...
     (misc, Stimuli, PROG, NelData, comment, RunLevels_params, FFR_Gating, Display, FFRattens)
