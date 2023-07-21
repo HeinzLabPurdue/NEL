@@ -82,6 +82,8 @@ elseif strcmp(command_str,'left')
         set(FIG.radio.left,'value',1);
     end
     
+    ABR('calibInit');
+    
 elseif strcmp(command_str,'right')
     if get(FIG.radio.right, 'value') == 1
         FIG.NewStim = 5;
@@ -92,6 +94,8 @@ elseif strcmp(command_str,'right')
     else
         set(FIG.radio.right,'value',1);
     end
+    ABR('calibInit');
+
     
 elseif strcmp(command_str,'both')
     if get(FIG.radio.both, 'value') == 1
@@ -103,6 +107,8 @@ elseif strcmp(command_str,'both')
     else
         set(FIG.radio.both,'value',1);
     end
+    ABR('calibInit');
+
     
 elseif strcmp(command_str,'chan_1')
     if get(FIG.radio.chan_1, 'value') == 1
@@ -350,14 +356,64 @@ elseif strcmp(command_str,'calibInit')
     
 %     [~, Stimuli.calibPicNum]= run_invCalib(get(FIG.radio.invCalib,'value'));
     Stimuli.invCalib=get(FIG.radio.invCalib,'value');
-    
+%     filttype = {'inversefilt','inversefilt'};
     if get(FIG.radio.invCalib,'value')
-        filttype = {'inversefilt','inversefilt'};
+        if get(FIG.radio.right,'value') == 1
+            filttype = {'allstop','inversefilt'};
+        elseif get(FIG.radio.left,'value') == 1
+            filttype = {'inversefilt','allstop'};
+        elseif get(FIG.radio.both,'value') == 1
+            filttype = {'inversefilt','inversefilt'};
+        end
     else
         filttype = {'allpass','allpass'};
     end
     
     invfiltdata = set_invFilter(filttype,Stimuli.calibPicNum);
+    cdd;
+    cal = loadpic(invfiltdata.CalibPICnum2use);  % use INVERSE calib to compute MAX dB SPL
+    rdd;
+    
+    ears_calib = cal.ear_ord;
+    r_present = sum(strcmp(ears_calib,'Right '));
+    l_present = sum(strcmp(ears_calib,'Left '));
+    
+    %probably better way to do this..
+    
+    if ~r_present && ~l_present
+        warndlg('No calibs present!','No calibs!')
+        ABR('close');
+    end
+    
+    if r_present && ~l_present
+        FIG.NewStim = 5;
+        Stimuli.channel = 1;
+        Stimuli.ear='right';
+        set(FIG.radio.right,'value',1);
+        set(FIG.radio.left,'value',0);
+        set(FIG.radio.both,'value',0);
+        
+    elseif l_present && ~r_present
+        FIG.NewStim = 5;
+        Stimuli.channel = 2;
+        Stimuli.ear='left';
+        set(FIG.radio.left,'value',1);
+        set(FIG.radio.right,'value',0);
+        set(FIG.radio.both,'value',0);
+    end
+    
+    if ~r_present
+        set(FIG.radio.right,'Enable','off');
+    end
+    
+    if ~l_present
+        set(FIG.radio.left,'Enable','off')
+    end
+    
+    if ~(l_present && r_present)
+        set(FIG.radio.both,'Enable','off')
+    end
+    
     set(FIG.radio.invCalib,'UserData',invfiltdata); 
     ABR('attenCalib');
     

@@ -154,7 +154,7 @@ switch filttype{2}
         
         if isempty(temp.b2)
             temp.b2 = temp.b;
-            warning('\n ***Single sided calibration, but using chan 2. b2 is set to b for inverse filtering*** \n')
+            warning("\n \n ***Single sided calibration, but using chan 2. b2 is set to b for inverse filtering*** \n \n",[],[]);
         end
         
         b_chan2 = temp.b2(:)';
