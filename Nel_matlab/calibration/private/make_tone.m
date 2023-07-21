@@ -57,14 +57,14 @@ if Stimuli.ear == 1 %left ear
     %     COMM.handle.RP2_1 = actxcontrol('RPco.x',[0 0 5 5]);
     %     status1 = invoke(COMM.handle.RP2_1, 'ConnectRP2', NelData.General.TDTcommMode, 1);
     [COMM.handle.RP2_1, status1]=connect_tdt('RP2', 1);
-    invoke(COMM.handle.RP2_1,'LoadCof',[object_dir '\make_tone_left.rco']);
+    invoke(COMM.handle.RP2_1,'LoadCof',[object_dir '\make_tone_left.rcx']);
     invoke(COMM.handle.RP2_1,'SetTagVal','Select',160);
     invoke(COMM.handle.RP2_1,'Run');
     
     %     COMM.handle.RP2_2 = actxcontrol('RPco.x',[0 0 5 5]);
     %     status2 = invoke(COMM.handle.RP2_2, 'ConnectRP2', NelData.General.TDTcommMode, 2);
     [COMM.handle.RP2_2, status2 ]=connect_tdt('RP2', 2);
-    invoke(COMM.handle.RP2_2,'LoadCof',[object_dir '\make_tone_right_PU.rco']);
+    invoke(COMM.handle.RP2_2,'LoadCof',[object_dir '\make_tone_right_PU.rcx']);
     invoke(COMM.handle.RP2_2,'SetTagVal','Select', 56);
     invoke(COMM.handle.RP2_2,'Run');
 else
@@ -72,14 +72,14 @@ else
     %     COMM.handle.RP2_1 = actxcontrol('RPco.x',[0 0 5 5]);
     %     status1 = invoke(COMM.handle.RP2_1, 'ConnectRP2', NelData.General.TDTcommMode, 1);
     [COMM.handle.RP2_1, status1]=connect_tdt('RP2', 1);
-    invoke(COMM.handle.RP2_1,'LoadCof',[object_dir '\make_tone_left.rco']);
+    invoke(COMM.handle.RP2_1,'LoadCof',[object_dir '\make_tone_left.rcx']);
     invoke(COMM.handle.RP2_1,'SetTagVal','Select',56);
     invoke(COMM.handle.RP2_1,'Run');
     
     %     COMM.handle.RP2_2 = actxcontrol('RPco.x',[0 0 5 5]);
     %     status2 = invoke(COMM.handle.RP2_2, 'ConnectRP2', NelData.General.TDTcommMode, 2);
     [COMM.handle.RP2_2, status2]=connect_tdt('RP2', 2);
-    invoke(COMM.handle.RP2_2,'LoadCof',[object_dir '\make_tone_right_PU.rco']);
+    invoke(COMM.handle.RP2_2,'LoadCof',[object_dir '\make_tone_right_PU.rcx']);
     invoke(COMM.handle.RP2_2,'SetTagVal','Select',64);
     invoke(COMM.handle.RP2_2,'Run');
 end
