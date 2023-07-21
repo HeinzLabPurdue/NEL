@@ -202,6 +202,8 @@ elseif strcmp(command_str,'chan_1')
         Stimuli.rec_channel = 1;
         set(FIG.radio.chan_2,'value',0);
         set(FIG.radio.Simultaneous,'value',0);
+        set(FIG.edit.threshV, 'Enable', 'on')
+        set(FIG.edit.threshV2, 'Enable', 'off')
     else
         set(FIG.radio.chan_1,'value',1);
     end
@@ -212,6 +214,9 @@ elseif strcmp(command_str,'chan_2')
         Stimuli.rec_channel = 2;
         set(FIG.radio.chan_1,'value',0);
         set(FIG.radio.Simultaneous,'value',0);
+        set(FIG.edit.threshV2, 'Enable', 'on')
+        set(FIG.edit.threshV, 'Enable', 'off')
+        set(FIG.edit.threshV2, 'Enable', 'on')
     else
         set(FIG.radio.chan_2,'value',1);
     end
@@ -222,6 +227,8 @@ elseif strcmp(command_str,'Simultaneous')
         Stimuli.rec_channel = 3;
         set(FIG.radio.chan_1,'value',0);
         set(FIG.radio.chan_2,'value',0);
+        set(FIG.edit.threshV, 'Enable', 'on')
+        set(FIG.edit.threshV2, 'Enable', 'on')
     else
         set(FIG.radio.Simultaneous,'value',1);
     end
@@ -276,7 +283,28 @@ elseif strcmp(command_str,'threshV')
         Stimuli.threshV = oldThreshV;
     end
     set(FIG.edit.threshV,'string', num2str(Stimuli.threshV));
-    set(FIG.ax.line4,'YData',[Stimuli.threshV Stimuli.threshV]);
+    if Stimuli.rec_channel > 2 
+        set(FIG.ax.line2(2),'YData',[Stimuli.threshV Stimuli.threshV]);
+    elseif Stimuli.rec_channel == 1
+        set(FIG.ax.line2(2),'YData',[Stimuli.threshV Stimuli.threshV]);
+    % else, ie Ch2...don't set anything different
+    end
+    
+elseif strcmp(command_str,'threshV2')   %JMR nov 21 for artifact rejection channel 2
+    FIG.NewStim = 0;
+    oldThreshV2 = Stimuli.threshV2;
+    Stimuli.threshV2 = str2double(get(FIG.edit.threshV2,'string'));
+    if (isempty(Stimuli.threshV2))  % check is empty
+        Stimuli.threshV2 = oldThreshV2;
+    elseif ( Stimuli.threshV<0 )  % check range
+        Stimuli.threshV2 = oldThreshV2;
+    end
+    set(FIG.edit.threshV2,'string', num2str(Stimuli.threshV2));
+    if Stimuli.rec_channel > 2 
+        set(FIG.ax.line2(4),'YData',[Stimuli.threshV2 Stimuli.threshV2]);
+    elseif Stimuli.rec_channel == 2
+        set(FIG.ax.line2(2),'YData',[Stimuli.threshV2 Stimuli.threshV2]);
+    end
     
 elseif strcmp(command_str,'run_levels')
     FIG.NewStim = 4;

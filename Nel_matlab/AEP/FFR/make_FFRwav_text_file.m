@@ -15,7 +15,7 @@ function NelData= make_FFRwav_text_file(misc, Stimuli, PROG, NelData, comment, .
     FFRdataStorePO1,FFRdataStorePO2,...
     Display, FFRattens, FFRdataReps1,FFRdataReps2, interface_type)
 
-[x, aux_fname, fname]=make_FFRwave_text_file_subfunc1 ...
+[x, aux_fname, fname]=make_FFRwav_text_file_subfunc1 ...
     (misc, Stimuli, PROG, NelData, comment, RunLevels_params, FFR_Gating, Display, FFRattens);
 
 % 	FFRdataReps_dec=cell(size(RunLevels_params.attenMask));  % All Reps
@@ -43,19 +43,39 @@ for i=1:length(FFRdataAvg_NP2)
 end
 
 save_all_reps=1; % change to 0 to only save averages.
-x.AD_Data.Label{1} = {'Channel 1'};
-x.AD_Data.Label{2} = {'Channel 2'};
-if save_all_reps==1
-    x.AD_Data.AD_All_V{1} = FFRdataReps1; 
-    x.AD_Data.AD_All_V{2} = FFRdataReps2;     
-    % _dec removed from end of FFRdataReps % modified by GE 26Apr2004. 
-    %  Removed zz 04nov2011. Added DA 7/25/13
-end
-% 	x.AD_Data.AD_Avg_V = FFRdataAvg;
-x.AD_Data.AD_Avg_NP_V{1} = FFRdataAvg_NP1;
-x.AD_Data.AD_Avg_PO_V{1} = FFRdataAvg_PO1;
-x.AD_Data.AD_Avg_NP_V{2} = FFRdataAvg_NP2;
-x.AD_Data.AD_Avg_PO_V{2} = FFRdataAvg_PO2;
 
+
+if save_all_reps==1
+    if Stimuli.rec_channel > 2
+        x.AD_Data.Label{1} = 'Channel 1';
+        x.AD_Data.Label{2} = 'Channel 2';
+        x.AD_Data.AD_All_V{1} = FFRdataReps1;
+        x.AD_Data.AD_All_V{2} = FFRdataReps2;
+    elseif Stimuli.rec_channel == 2
+        x.AD_Data.Label{1} = ['Channel ' num2str(Stimuli.rec_channel)];
+        x.AD_Data.AD_All_V{1} = FFRdataReps2;
+    else % Ch 1 ONLY 
+        x.AD_Data.Label{1} = ['Channel ' num2str(Stimuli.rec_channel)];
+        x.AD_Data.AD_All_V{1} = FFRdataReps1; 
+    end
+end
+
+if Stimuli.rec_channel > 2
+    x.AD_Data.Label{1} = 'Channel 1';
+    x.AD_Data.Label{2} = 'Channel 2';
+    x.AD_Data.AD_Avg_NP_V{1} = FFRdataAvg_NP1;
+    x.AD_Data.AD_Avg_PO_V{1} = FFRdataAvg_PO1;
+    x.AD_Data.AD_Avg_NP_V{2} = FFRdataAvg_NP2;
+    x.AD_Data.AD_Avg_PO_V{2} = FFRdataAvg_PO2;
+elseif Stimuli.rec_channel == 2
+    x.AD_Data.Label{1} = ['Channel ' num2str(Stimuli.rec_channel)];
+    x.AD_Data.AD_Avg_NP_V{1} = FFRdataAvg_NP2;
+    x.AD_Data.AD_Avg_PO_V{1} = FFRdataAvg_PO2;
+else
+    x.AD_Data.Label{1} = ['Channel ' num2str(Stimuli.rec_channel)];
+    x.AD_Data.AD_Avg_NP_V{1} = FFRdataAvg_NP1;
+    x.AD_Data.AD_Avg_PO_V{1} = FFRdataAvg_PO1;
+
+end
 
 NelData= make_FFRwav_text_file_subfunc2(fname, x, aux_fname, NelData);

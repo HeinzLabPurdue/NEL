@@ -42,6 +42,8 @@ FIG.asldr.val    = uicontrol(FIG.handle,'style','edit','Units','normalized','Use
 FIG.statText.memReps =  uicontrol(FIG.handle, 'callback', '', 'style', 'text','Units','normalized', 'position', [.05 .49 .12 .03], 'string', 'Forget Time (reps):','fontsize',12,'BackgroundColor','w');   % added by GE 17Jan2003.
 FIG.statText.threshV =  uicontrol(FIG.handle, 'callback', '', 'style', 'text','Units','normalized', 'position', [.05 .54 .12 .03], 'string', 'Reject thresh (V):','fontsize',12,'BackgroundColor','w');   % added by khZZ 2011 Nov 4
 FIG.edit.threshV = uicontrol(FIG.handle,'callback','FFR(''threshV'');','style','edit','Units','normalized','position',[.18 .54 .04 .04],'string',Stimuli.threshV,'fontsize',12); % KHZZ 2011 Nov 4
+
+
 FIG.edit.memReps = uicontrol(FIG.handle,'callback','FFR(''memReps'');','style','edit','Units','normalized','position',[.18 .49 .04 .04],'string',Stimuli.FFRmem_reps,'fontsize',12);
 FIG.statText.status =  uicontrol(FIG.handle, 'callback', '', 'style', 'text','Units','normalized', 'position', [.05 .9 .25 .03], 'string', 'STATUS (FFR): free running...','fontsize',12,'BackgroundColor','w','horizontalalignment','left');   % added by GE 17Jan2003.
 

@@ -49,22 +49,25 @@ FIG.asldr.val    = uicontrol(FIG.handle,'style','edit','Units','normalized','Use
 FIG.asldr.SPL    = uicontrol(FIG.handle,'style','text','string',sprintf('%.1f dB SPL',0), 'backgroundcolor',[1 1 1],'Units','normalized','position',[.92 .06 .075 .03],'fontsize',10,'horizontalalignment','left');
 
 %% LQ 01/31/05 add callback
-FIG.statText.memReps =  uicontrol(FIG.handle, 'style', 'text','Units','normalized', 'position', [.05 .49 .12 .03], 'string', 'Forget Time (reps):','fontsize',12,'BackgroundColor','w');   % added by GE 17Jan2003.
-FIG.statText.threshV =  uicontrol(FIG.handle, 'style', 'text','Units','normalized', 'position', [.05 .54 .12 .03], 'string', 'Reject thresh (V):','fontsize',12,'BackgroundColor','w');   % added by khZZ 2011 Nov 4
-FIG.edit.threshV = uicontrol(FIG.handle,'callback','FFRwav(''threshV'');','style','edit','Units','normalized','position',[.18 .54 .04 .04],'string',Stimuli.threshV,'fontsize',12); % KHZZ 2011 Nov 4
-FIG.edit.memReps = uicontrol(FIG.handle,'callback','FFRwav(''memReps'');','style','edit','Units','normalized','position',[.18 .49 .04 .04],'string',Stimuli.FFRmem_reps,'fontsize',12);
+FIG.statText.memReps = uicontrol(FIG.handle, 'style', 'text','Units','normalized', 'position', [.05 .49 .12 .03], 'string', 'Forget Time (reps):','fontsize',12,'BackgroundColor','w');   % added by GE 17Jan2003.
+FIG.statText.threshV = uicontrol(FIG.handle, 'style', 'text','Units','normalized', 'position', [.05 .54 .12 .03], 'string', 'Reject thresh (V):','fontsize',12,'BackgroundColor','w');   % added by khZZ 2011 Nov 4
+FIG.edit.threshV     = uicontrol(FIG.handle,'callback','FFRwav(''threshV'');','style','edit','Units','normalized','position',[.18 .54 .04 .04],'string',Stimuli.threshV,'fontsize',12); % KHZZ 2011 Nov 4
+FIG.edit.threshV2    = uicontrol(FIG.handle,'callback','FFRwav(''threshV2'');','style','edit','Units','normalized','position',[.18+.05 .54 .04 .04],'string',Stimuli.threshV2,'fontsize',12); % channel 2 threshold JMR nov 21
+FIG.edit.memReps     = uicontrol(FIG.handle,'callback','FFRwav(''memReps'');','style','edit','Units','normalized','position',[.18 .49 .04 .04],'string',Stimuli.FFRmem_reps,'fontsize',12);
 
 FIG.statText.status =  uicontrol(FIG.handle, 'style', 'text','Units','normalized', 'position', [.05 .9 .25 .03], 'string', ['STATUS (' interface_type '): free running...'],'fontsize',12,'BackgroundColor','w','horizontalalignment','left');   % added by GE 17Jan2003.
 
 %% Speakers
+FIG.statText.EarLabel = uicontrol(FIG.handle, 'callback', '', 'style', 'text','Units','normalized', 'position', [.1 .24 .1 .05], 'string', 'Audio Output:','fontsize',12,'BackgroundColor','w','FontWeight','Bold');
 FIG.radio.left   = uicontrol(FIG.handle,'callback','FFRwav(''left'');', 'style','radio','Enable','on','Units','normalized','position',[.125 .235 .08 .03],'string','Left Ear', 'fontsize',12,'BackgroundColor','w','value',0);
-FIG.radio.right  = uicontrol(FIG.handle,'callback','FFRwav(''right'');','style','radio','Enable','on','Units','normalized','position',[.125 .205 .08 .03],'string','Right Ear','fontsize',12,'BackgroundColor','w','value',0);
-FIG.radio.both   = uicontrol(FIG.handle,'callback','FFRwav(''both'');', 'style','radio','Enable','on','Units','normalized','position',[.125 .175 .08 .03],'string','Both Ears','fontsize',12,'BackgroundColor','w','value',1);
+FIG.radio.right  = uicontrol(FIG.handle,'callback','FFRwav(''right'');','style','radio','Enable','on','Units','normalized','position',[.125 .205 .08 .03],'string','Right Ear','fontsize',12,'BackgroundColor','w','value',1);
+FIG.radio.both   = uicontrol(FIG.handle,'callback','FFRwav(''both'');', 'style','radio','Enable','on','Units','normalized','position',[.125 .175 .08 .03],'string','Both Ears','fontsize',12,'BackgroundColor','w','value',0);
 
 %% Setting 2 channel vs 1 channel
-FIG.radio.chan_1 = uicontrol(FIG.handle,'callback','FFRwav(''chan_1'');', 'style','radio','Enable','on','Units','normalized','position',[.125*2 .235 .08 .03],'string','Chan 1','fontsize',12,'BackgroundColor','w','value',0);
+FIG.statText.ChanLabel = uicontrol(FIG.handle, 'callback', '', 'style', 'text','Units','normalized', 'position', [.22 .24 .1 .05], 'string', 'Physiological Signal:','fontsize',12,'BackgroundColor','w','FontWeight','Bold');
+FIG.radio.chan_1 = uicontrol(FIG.handle,'callback','FFRwav(''chan_1'');', 'style','radio','Enable','on','Units','normalized','position',[.125*2 .235 .08 .03],'string','Chan 1','fontsize',12,'BackgroundColor','w','value',1);
 FIG.radio.chan_2 = uicontrol(FIG.handle,'callback','FFRwav(''chan_2'');', 'style','radio','Enable','on','Units','normalized','position',[.125*2 .205 .08 .03],'string','Chan 2','fontsize',12,'BackgroundColor','w','value',0);
-FIG.radio.Simultaneous = uicontrol(FIG.handle,'callback','FFRwav(''Simultaneous'');', 'style','radio','Enable','on','Units','normalized','position',[.125*2 .175 .08 .03],'string','Simultaneous','fontsize',12,'BackgroundColor','w','value',1);
+FIG.radio.Simultaneous = uicontrol(FIG.handle,'callback','FFRwav(''Simultaneous'');', 'style','radio','Enable','on','Units','normalized','position',[.125*2 .175 .08 .03],'string','Simultaneous','fontsize',12,'BackgroundColor','w','value',0);
 
 %% 28Apr2004 M.Heinz - Add Gain field, and Voltage-display choice
 FIG.statText.gain = uicontrol(FIG.handle, 'style', 'text','Units','normalized', 'position', [.02 .11 .15 .03], 'string', 'Gain (Electode to AD):','fontsize',12,'BackgroundColor','w');

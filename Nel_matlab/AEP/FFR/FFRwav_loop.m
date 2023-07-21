@@ -24,7 +24,7 @@ if NelData.General.RP2_3and4 && (~NelData.General.RX8) % NEL1 with RP2 #3 & #4
     
     %% For ADC (data in)
     invoke(RP3,'ClearCOF');
-    invoke(RP3,'LoadCOF',[prog_dir '\object\FFR_ADC.rcx']);
+    invoke(RP3,'LoadCOF',[prog_dir '\object\FFR_ADC_2chan.rcx']);
     invoke(RP3,'SetTagVal','ADdur', FFR_Gating.FFRlength_ms);
     invoke(RP3,'Run');
 elseif (~NelData.General.RP2_3and4) && (~NelData.General.RX8) % NEL1 without (RP2 #3 & #4), and not NEL2 because no RX8
@@ -421,6 +421,7 @@ while isempty(get(FIG.push.close,'Userdata'))
                         set(FIG.ax.line(3),'xdata',[],'ydata',[]);
                         set(FIG.ax.line(4),'xdata',[],'ydata',[]);
                         set(FIG.ax.line2(3),'ydata',[]);
+                        set(FIG.ax.line2(4),'ydata',[]);
                     end
                     
                     drawnow;  % clear the plot.
@@ -442,18 +443,18 @@ while isempty(get(FIG.push.close,'Userdata'))
                     
                     % Clear/Reset for artifact rejection / max recorded box
                     if Stimuli.rec_channel>2
-                        set(FIG.ax.line2(1), 'xdata', 0, 'ydata', 0.4, 'Color', 'r')
+                        set(FIG.ax.line2(1), 'xdata', 0.4, 'ydata', 0, 'Color', 'r')
                         set(FIG.ax.line2(2), 'xdata', [0 1], 'ydata', [Stimuli.threshV Stimuli.threshV], 'Color', 'r')
-                        set(FIG.ax.line2(3), 'xdata', 0, 'ydata', 0.6, 'Color', 'b')
+                        set(FIG.ax.line2(3), 'xdata', 0.6, 'ydata', 0, 'Color', 'b')
                         set(FIG.ax.line2(4), 'xdata', [0 1], 'ydata', [Stimuli.threshV2 Stimuli.threshV2], 'Color', 'b')
 
                     elseif Stimuli.rec_channel==2
-                        set(FIG.ax.line2(1), 'xdata', 0, 'ydata', 0.5, 'Color', 'b')
+                        set(FIG.ax.line2(1), 'xdata', .5, 'ydata', 0, 'Color', 'b')
                         set(FIG.ax.line2(2), 'xdata', [0 1], 'ydata', [Stimuli.threshV2 Stimuli.threshV2], 'Color', 'b')
                         set(FIG.ax.line2(3), 'xdata', [], 'ydata', [], 'Color', 'b')
                         set(FIG.ax.line2(4), 'xdata', [], 'ydata', [], 'Color', 'b')
                     else
-                        set(FIG.ax.line2(1), 'xdata', 0, 'ydata', 0.5, 'Color', 'r')
+                        set(FIG.ax.line2(1), 'xdata', 0.5, 'ydata', 0, 'Color', 'r')
                         set(FIG.ax.line2(2), 'xdata', [0 1], 'ydata', [Stimuli.threshV Stimuli.threshV], 'Color', 'r')
                         set(FIG.ax.line2(3), 'xdata', [], 'ydata', [], 'Color', 'b')
                         set(FIG.ax.line2(4), 'xdata', [], 'ydata', [], 'Color', 'b')

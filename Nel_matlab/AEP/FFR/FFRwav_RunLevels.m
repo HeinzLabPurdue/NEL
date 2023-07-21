@@ -205,12 +205,16 @@ for attenIND = 1
                     'ydata',(data_NP2+data_PO2)*Display.PlotFactor/2, 'DisplayName', 'Ch2 ENV');
                 set(FIG.ax.line(2),'xdata',data_x, ...
                     'ydata',(data_NP2-data_PO2)*Display.PlotFactor/2, 'DisplayName', 'Ch2 TFS');
+                set(FIG.ax.line(3), 'DisplayName', ''); 
+                set(FIG.ax.line(4), 'DisplayName', ''); 
                 set(FIG.ax.line2(1),'ydata',maxFFRobs2);
             else % Ch1 only
                 set(FIG.ax.line(1),'xdata',data_x, ...
                     'ydata',(data_NP1+data_PO1)*Display.PlotFactor/2, 'DisplayName', 'Ch1 ENV');
                 set(FIG.ax.line(2),'xdata',data_x, ...
                     'ydata',(data_NP1-data_PO1)*Display.PlotFactor/2, 'DisplayName', 'Ch1 TFS');
+                set(FIG.ax.line(3), 'DisplayName', ''); 
+                set(FIG.ax.line(4), 'DisplayName', '');
                 set(FIG.ax.line2(1),'ydata',maxFFRobs1);
             end
             drawnow;

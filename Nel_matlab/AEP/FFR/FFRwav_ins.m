@@ -3,11 +3,22 @@ function [misc,Stimuli, RunLevels_params, Display, interface_type]=FFRwav_ins(Ne
 
 usr = NelData.General.User;
 
-if exist([NelData.General.RootDir 'Signals\' usr filesep '\FFR\'],'dir')
+if exist([NelData.General.RootDir 'Signals\' usr filesep '\FFR\'],'dir') 
     FFRwavStimDir=[NelData.General.RootDir 'Signals\',usr,'\FFR\'];
+    fName=dir(FFRwavStimDir);
+    
+    if size(fName.name) < 3
+        FFRwavStimDir=[NelData.General.RootDir '\Nel_matlab\AEP\FFR\Signals\FFRwav\'];
+        fName=dir(FFRwavStimDir);
+    end
+    
 else
     FFRwavStimDir=[NelData.General.RootDir '\Nel_matlab\AEP\FFR\Signals\FFRwav\'];
+    fName=dir(FFRwavStimDir);
+    
 end
+
+fName=cell2struct({fName(3:end).name},'name'); 
 
 interface_type = 'FFRwav'; 
 
@@ -17,18 +28,9 @@ interface_type = 'FFRwav';
 switch interface_type
     case 'FFRwav'
         misc = struct( ...
-            'fileExtension', 'FFRwav', ...
+            'fileExtension', 'FFR_', ...
             'n',0 ...%zz oct2011
             );
-        
-        % What's the point of this part??
-%         fName=load([fileparts(FFRwavStimDir(1:end-1)) filesep 'SNRenv_stimlist_short.mat']);
-%         fName=fName.SNRenv_stimlist;
-%         fName= fName(end:-1:1);
-
-
-        fName=dir(FFRwavStimDir);
-        fName=cell2struct({fName(3:end).name},'name'); 
         
         Stimuli = struct( ...
             'pol',1,...%zz 31oct2011
@@ -77,7 +79,7 @@ switch interface_type
             );
         
         RunLevels_params = struct( ...
-            'nPairs', 100, ...
+            'nPairs', 5, ...
             'nPairs_actual', 1, ...
             'doneStims', zeros(length(fName),1), ...
             'stepdB', 0, ...
