@@ -1,10 +1,10 @@
 % UNIT = sprintf('%1d.%02d', NelData.File_Manager.track.No, NelData.File_Manager.unit.No);
 % Changing all CAP to ABR - Done
 
-FIG.checkbox.fixedPhase = uicontrol(FIG.handle, 'callback', 'ABR(''fixedPhase'');','style','checkbox','Enable','on','Units','normalized','position',[.125 .375 .09 .03],'string','fixedPhase','fontsize',12,'BackgroundColor','w','value',Stimuli.fixedPhase);
-FIG.radio.invCalib      = uicontrol(FIG.handle,'callback','ABR(''calibInit'');','style','radio','Enable','on','Units','normalized','position',[.125 .345 .08 .03],'string','invCalib','fontsize',12,'BackgroundColor','w','value',1);
-FIG.radio.fast   = uicontrol(FIG.handle,'callback','ABR(''fast'');','style','radio','Enable','on','Units','normalized','position',[.125 .305 .08 .03],'string','Fast','fontsize',12,'BackgroundColor','w','value',1);
-FIG.radio.slow   = uicontrol(FIG.handle,'callback','ABR(''slow'');','style','radio','Enable','on','Units','normalized','position',[.125 .275 .08 .03],'string','Slow','fontsize',12,'BackgroundColor','w');
+FIG.checkbox.fixedPhase = uicontrol(FIG.handle, 'callback', 'ABR(''fixedPhase'');','style','checkbox','Enable','on','Units','normalized','position',[.125 .4 .09 .03],'string','fixedPhase','fontsize',12,'BackgroundColor','w','value',Stimuli.fixedPhase);
+FIG.radio.invCalib      = uicontrol(FIG.handle,'callback','ABR(''calibInit'');','style','radio','Enable','on','Units','normalized','position',[.125 .37 .21 .03],'string','invCalib','fontsize',12,'BackgroundColor','w','value',1);
+FIG.radio.fast   = uicontrol(FIG.handle,'callback','ABR(''fast'');','style','radio','Enable','on','Units','normalized','position',[.125 .33 .08 .03],'string','Fast','fontsize',12,'BackgroundColor','w','value',1);
+FIG.radio.slow   = uicontrol(FIG.handle,'callback','ABR(''slow'');','style','radio','Enable','on','Units','normalized','position',[.125 .30 .08 .03],'string','Slow','fontsize',12,'BackgroundColor','w');
 
 FIG.fsldr.slider = uicontrol(FIG.handle,'callback','ABR(''slide_freq'');','style','slider','SliderStep',[0.001 0.01],'Enable','on','min',100,'max',1000,'Units','normalized','position',[.35 .175 .525 .04],'Value',Stimuli.freq_hz/Stimuli.fmult);
 
@@ -32,12 +32,14 @@ FIG.push.x1      = uicontrol(FIG.handle,'callback','ABR(''mult_1x'');','style','
 FIG.push.x10     = uicontrol(FIG.handle,'callback','ABR(''mult_10x'');','style','pushbutton','Enable','on','Units','normalized','position',[.585 .23 .05 .037],'string','10X','fontsize',12,'fontangle','normal','fontweight','normal','foregroundcolor',[1 1 1]);
 FIG.push.x100    = uicontrol(FIG.handle,'callback','ABR(''mult_100x'');','style','pushbutton','Enable','on','Units','normalized','position',[.67 .23 .05 .037],'string','100X','fontsize',12,'fontangle','normal','fontweight','normal','foregroundcolor',[0 0 0]);
 
-FIG.radio.left   = uicontrol(FIG.handle,'callback','ABR(''left'');', 'style','radio','Enable','on','Units','normalized','position',[.125 .235 .08 .03],'string','Left Ear', 'fontsize',12,'BackgroundColor','w','value',0);
-FIG.radio.right  = uicontrol(FIG.handle,'callback','ABR(''right'');','style','radio','Enable','on','Units','normalized','position',[.125 .205 .08 .03],'string','Right Ear','fontsize',12,'BackgroundColor','w','value',1);
-FIG.radio.both   = uicontrol(FIG.handle,'callback','ABR(''both'');', 'style','radio','Enable','on','Units','normalized','position',[.125 .175 .08 .03],'string','Both Ears','fontsize',12,'BackgroundColor','w','value',0);
-FIG.radio.chan_1 = uicontrol(FIG.handle,'callback','ABR(''chan_1'');', 'style','radio','Enable','on','Units','normalized','position',[.125*2 .235 .08 .03],'string','Chan 1 | ABR','fontsize',12,'BackgroundColor','w','value',1);
-FIG.radio.chan_2 = uicontrol(FIG.handle,'callback','ABR(''chan_2'');', 'style','radio','Enable','on','Units','normalized','position',[.125*2 .205 .08 .03],'string','Chan 2 | ECochG','fontsize',12,'BackgroundColor','w','value',0);
-FIG.radio.Simultaneous = uicontrol(FIG.handle,'callback','ABR(''Simultaneous'');', 'style','radio','Enable','on','Units','normalized','position',[.125*2 .175 .08 .03],'string','Simultaneous','fontsize',12,'BackgroundColor','w','value',0);
+FIG.statText.EarLabel = uicontrol(FIG.handle, 'callback', '', 'style', 'text','Units','normalized', 'position', [.1 .24 .1 .05], 'string', 'Audio Output Side:','fontsize',12,'BackgroundColor','w','FontWeight','Bold');
+FIG.radio.left   = uicontrol(FIG.handle,'callback','ABR(''left'');', 'style','radio','Enable','on','Units','normalized','position',[.125 .22 .08 .03],'string','Left Ear', 'fontsize',12,'BackgroundColor','w','value',0);
+FIG.radio.right  = uicontrol(FIG.handle,'callback','ABR(''right'');','style','radio','Enable','on','Units','normalized','position',[.125 .19 .08 .03],'string','Right Ear','fontsize',12,'BackgroundColor','w','value',1);
+FIG.radio.both   = uicontrol(FIG.handle,'callback','ABR(''both'');', 'style','radio','Enable','on','Units','normalized','position',[.125 .16 .08 .03],'string','Both Ears','fontsize',12,'BackgroundColor','w','value',0);
+FIG.statText.ChanLabel = uicontrol(FIG.handle, 'callback', '', 'style', 'text','Units','normalized', 'position', [.22 .24 .1 .05], 'string', 'Physiological Signal:','fontsize',12,'BackgroundColor','w','FontWeight','Bold');
+FIG.radio.chan_1 = uicontrol(FIG.handle,'callback','ABR(''chan_1'');', 'style','radio','Enable','on','Units','normalized','position',[.125*2 .22 .08 .03],'string','Chan 1 | ABR','fontsize',12,'BackgroundColor','w','value',1);
+FIG.radio.chan_2 = uicontrol(FIG.handle,'callback','ABR(''chan_2'');', 'style','radio','Enable','on','Units','normalized','position',[.125*2 .19 .08 .03],'string','Chan 2 | ECochG','fontsize',12,'BackgroundColor','w','value',0);
+FIG.radio.Simultaneous = uicontrol(FIG.handle,'callback','ABR(''Simultaneous'');', 'style','radio','Enable','on','Units','normalized','position',[.125*2 .16 .08 .03],'string','Simultaneous','fontsize',12,'BackgroundColor','w','value',0);
 
 FIG.push.run_levels = uicontrol(FIG.handle,'callback','ABR(''run_levels'');','style','pushbutton','Units','normalized',...
     'position',[.06 .726 .09 .09],'string','Run levels...','fontsize',12,'fontangle','normal','fontweight','normal');
