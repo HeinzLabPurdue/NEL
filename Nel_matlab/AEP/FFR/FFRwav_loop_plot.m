@@ -52,7 +52,7 @@ FIG.asldr.SPL    = uicontrol(FIG.handle,'style','text','string',sprintf('%.1f dB
 FIG.statText.memReps = uicontrol(FIG.handle, 'style', 'text','Units','normalized', 'position', [.05 .49 .12 .03], 'string', 'Forget Time (reps):','fontsize',12,'BackgroundColor','w');   % added by GE 17Jan2003.
 FIG.statText.threshV = uicontrol(FIG.handle, 'style', 'text','Units','normalized', 'position', [.05 .54 .12 .03], 'string', 'Reject thresh (V):','fontsize',12,'BackgroundColor','w');   % added by khZZ 2011 Nov 4
 FIG.edit.threshV     = uicontrol(FIG.handle,'callback','FFRwav(''threshV'');','style','edit','Units','normalized','position',[.18 .54 .04 .04],'string',Stimuli.threshV,'fontsize',12); % KHZZ 2011 Nov 4
-FIG.edit.threshV2    = uicontrol(FIG.handle,'callback','FFRwav(''threshV2'');','style','edit','Units','normalized','position',[.18+.05 .54 .04 .04],'string',Stimuli.threshV2,'fontsize',12); % channel 2 threshold JMR nov 21
+FIG.edit.threshV2    = uicontrol(FIG.handle,'callback','FFRwav(''threshV2'');','style','edit','Units','normalized','position',[.18+.05 .54 .04 .04],'string',Stimuli.threshV2,'fontsize',12, 'Enable', 'off'); % channel 2 threshold JMR nov 21
 FIG.edit.memReps     = uicontrol(FIG.handle,'callback','FFRwav(''memReps'');','style','edit','Units','normalized','position',[.18 .49 .04 .04],'string',Stimuli.FFRmem_reps,'fontsize',12);
 
 FIG.statText.status =  uicontrol(FIG.handle, 'style', 'text','Units','normalized', 'position', [.05 .9 .25 .03], 'string', ['STATUS (' interface_type '): free running...'],'fontsize',12,'BackgroundColor','w','horizontalalignment','left');   % added by GE 17Jan2003.

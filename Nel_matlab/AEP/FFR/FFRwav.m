@@ -274,7 +274,7 @@ elseif strcmp(command_str,'memReps')
     
     %KHZZ 2011 Nov 4
 elseif strcmp(command_str,'threshV')
-    FIG.NewStim = 0;
+    FIG.NewStim = 7;
     oldThreshV = Stimuli.threshV;
     Stimuli.threshV = str2double(get(FIG.edit.threshV,'string'));
     if (isempty(Stimuli.threshV))  % check is empty
@@ -283,28 +283,17 @@ elseif strcmp(command_str,'threshV')
         Stimuli.threshV = oldThreshV;
     end
     set(FIG.edit.threshV,'string', num2str(Stimuli.threshV));
-    if Stimuli.rec_channel > 2 
-        set(FIG.ax.line2(2),'YData',[Stimuli.threshV Stimuli.threshV]);
-    elseif Stimuli.rec_channel == 1
-        set(FIG.ax.line2(2),'YData',[Stimuli.threshV Stimuli.threshV]);
-    % else, ie Ch2...don't set anything different
-    end
     
 elseif strcmp(command_str,'threshV2')   %JMR nov 21 for artifact rejection channel 2
-    FIG.NewStim = 0;
+    FIG.NewStim = 7;
     oldThreshV2 = Stimuli.threshV2;
     Stimuli.threshV2 = str2double(get(FIG.edit.threshV2,'string'));
     if (isempty(Stimuli.threshV2))  % check is empty
         Stimuli.threshV2 = oldThreshV2;
-    elseif ( Stimuli.threshV<0 )  % check range
+    elseif ( Stimuli.threshV < 0 )  % check range
         Stimuli.threshV2 = oldThreshV2;
     end
     set(FIG.edit.threshV2,'string', num2str(Stimuli.threshV2));
-    if Stimuli.rec_channel > 2 
-        set(FIG.ax.line2(4),'YData',[Stimuli.threshV2 Stimuli.threshV2]);
-    elseif Stimuli.rec_channel == 2
-        set(FIG.ax.line2(2),'YData',[Stimuli.threshV2 Stimuli.threshV2]);
-    end
     
 elseif strcmp(command_str,'run_levels')
     FIG.NewStim = 4;

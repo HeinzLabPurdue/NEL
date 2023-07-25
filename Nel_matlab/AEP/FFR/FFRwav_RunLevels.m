@@ -14,11 +14,11 @@ function [firstSTIM, NelData]=FFRwav_RunLevels(FIG,Stimuli,RunLevels_params, mis
 % Modified zz 04nov2011
 % warning off;
 critVal=Stimuli.threshV;  %for artifact rejection KHZZ 2011 Nov 4
+critVal2 = Stimuli.threshV2; 
 
 % adding demean flag (JMR 2021)
 demean_flag = 1;
-% Artefact threshold for chan 2 :JMR Sept 21
-art_factor = 15;
+
 
 %% RunLevels_params.nPairs = Stimuli.FFRmem_reps;
 % Setup panel for acquire/write mode:
@@ -28,15 +28,20 @@ bAbort = 0;
 save = 0;
 
 % Clear out all plots
-set(FIG.ax.line(1),'xdata',[],'ydata',[]);
-set(FIG.ax.line(2),'xdata',[],'ydata',[]);
-set(FIG.ax.line(3),'xdata',[],'ydata',[]);
-set(FIG.ax.line(4),'xdata',[],'ydata',[]);
+set(FIG.ax.line(1),'xdata',[],'ydata',[], 'DisplayName', 'Ch 1 ENV');
+set(FIG.ax.line(2),'xdata',[],'ydata',[], 'DisplayName', 'Ch 1 TFS');
+set(FIG.ax.line(3),'xdata',[],'ydata',[], 'DisplayName', 'Ch 2 ENV');
+set(FIG.ax.line(4),'xdata',[],'ydata',[], 'DisplayName', 'Ch 2 TFS');
 
-set(FIG.ax.line2(1),'ydata',[]);
 if Stimuli.rec_channel > 2
+    set(FIG.ax.line2(1),'ydata',[]);
     set(FIG.ax.line2(3),'ydata',[]);
+elseif Stimuli.rec_channel == 2
+    set(FIG.ax.line2(3),'ydata',[]);
+else
+    set(FIG.ax.line2(1),'ydata',[]);
 end
+
 drawnow;  
 
 
@@ -124,7 +129,7 @@ for attenIND = 1
                 % fixing the function to make sure the polarity matches, starts with 1,
                 % which must match with 1 for original
                 
-                if  invoke(RP1,'GetTagVal','ORG') == mod(currStim,2) && maxFFRobs1 <= critVal && maxFFRobs2<= critVal*art_factor
+                if  invoke(RP1,'GetTagVal','ORG') == mod(currStim,2) && maxFFRobs1 <= critVal && maxFFRobs2<= critVal2
                     %                     if  invoke(RP1,'GetTagVal','ORG')
                     bNoSampleObtained = 0;
                     % Need to skip 1st pair, which is from last stimulus
@@ -161,7 +166,7 @@ for attenIND = 1
                         FFRdataReps2{currStim}=FFRdata2;
                     end
                     
-                elseif maxFFRobs1 > critVal || maxFFRobs2> critVal*art_factor
+                elseif maxFFRobs1 > critVal || maxFFRobs2> critVal2
                     %             else
                     rejections=rejections+1;
                 end %End for artifact rejection KH 2011 June 08
@@ -191,30 +196,26 @@ for attenIND = 1
             
             if Stimuli.rec_channel > 2
                 set(FIG.ax.line(1),'xdata',data_x, ...
-                    'ydata',(data_NP1+data_PO1)*Display.PlotFactor/2, 'DisplayName', 'Ch1 ENV');
+                    'ydata',(data_NP1+data_PO1)*Display.PlotFactor/2);
                 set(FIG.ax.line(3),'xdata',data_x, ...
-                    'ydata',(data_NP2+data_PO2)*Display.PlotFactor/2, 'DisplayName', 'Ch2 ENV');
+                    'ydata',(data_NP2+data_PO2)*Display.PlotFactor/2');
                 set(FIG.ax.line(2),'xdata',data_x, ...
-                    'ydata',(data_NP1-data_PO1)*Display.PlotFactor/2, 'DisplayName', 'Ch1 TFS');
+                    'ydata',(data_NP1-data_PO1)*Display.PlotFactor/2);
                 set(FIG.ax.line(4),'xdata',data_x, ...
-                    'ydata',(data_NP2-data_PO2)*Display.PlotFactor/2, 'DisplayName', 'Ch2 TFS');
+                    'ydata',(data_NP2-data_PO2)*Display.PlotFactor/2);
                 set(FIG.ax.line2(1),'ydata',maxFFRobs1);
                 set(FIG.ax.line2(3),'ydata',maxFFRobs2);
             elseif Stimuli.rec_channel == 2 % Ch2 only 
-                set(FIG.ax.line(1),'xdata',data_x, ...
-                    'ydata',(data_NP2+data_PO2)*Display.PlotFactor/2, 'DisplayName', 'Ch2 ENV');
-                set(FIG.ax.line(2),'xdata',data_x, ...
-                    'ydata',(data_NP2-data_PO2)*Display.PlotFactor/2, 'DisplayName', 'Ch2 TFS');
-                set(FIG.ax.line(3), 'DisplayName', ''); 
-                set(FIG.ax.line(4), 'DisplayName', ''); 
-                set(FIG.ax.line2(1),'ydata',maxFFRobs2);
+                set(FIG.ax.line(3),'xdata',data_x, ...
+                    'ydata',(data_NP2+data_PO2)*Display.PlotFactor/2);
+                set(FIG.ax.line(4),'xdata',data_x, ...
+                    'ydata',(data_NP2-data_PO2)*Display.PlotFactor/2);
+                set(FIG.ax.line2(3),'ydata',maxFFRobs2);
             else % Ch1 only
                 set(FIG.ax.line(1),'xdata',data_x, ...
-                    'ydata',(data_NP1+data_PO1)*Display.PlotFactor/2, 'DisplayName', 'Ch1 ENV');
+                    'ydata',(data_NP1+data_PO1)*Display.PlotFactor/2);
                 set(FIG.ax.line(2),'xdata',data_x, ...
-                    'ydata',(data_NP1-data_PO1)*Display.PlotFactor/2, 'DisplayName', 'Ch1 TFS');
-                set(FIG.ax.line(3), 'DisplayName', ''); 
-                set(FIG.ax.line(4), 'DisplayName', '');
+                    'ydata',(data_NP1-data_PO1)*Display.PlotFactor/2);
                 set(FIG.ax.line2(1),'ydata',maxFFRobs1);
             end
             drawnow;

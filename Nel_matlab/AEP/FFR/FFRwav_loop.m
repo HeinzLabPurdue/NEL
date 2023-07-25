@@ -7,8 +7,6 @@ global prog_dir PROG data_dir NelData
 % adding demean_flag (JMR 2021)
 demean_flag=1;
 
-% Artefact threshold for chan 2 :JMR Sept 21
-art_factor = 15;
 
 %% For stimulus
 stimRCXfName= [prog_dir '\object\FFRwav_polIN.rcx'];
@@ -74,7 +72,7 @@ firstSTIM=or(pair1,pair2);
 
 veryfirstSTIM=1;  ... % The very first FFRdata when program starts is all zeros, so skip this,
     %debug later MH 18Nov2003
-set(FIG.ax.line,'xdata',[],'ydata',[]); drawnow;
+%set(FIG.ax.line,'xdata',[],'ydata',[]); drawnow;
 
 % alternating polarities in different matricies zz 04nov11
 FFRdataAvg_freerun_np1 = 0;
@@ -83,35 +81,14 @@ FFRdataAvg_freerun_np2 = 0;
 FFRdataAvg_freerun_po2 = 0;
 
 while isempty(get(FIG.push.close,'Userdata'))
+    
     if (ishandle(FIG.ax.axis))
         delete(FIG.ax.axis);
     end
+    
+    %% Plotting for Response
     FIG.ax.axis = axes('position',[.35 .34 .525 .62]);
-    
-    if Stimuli.rec_channel > 2
-        FIG.ax.line = plot(0,0,'-',0,0,'-',0,0,'-',0,0,'-'); hold on;
-        % chan 1
-        set(FIG.ax.line(1),'MarkerSize',2,'Color','k'); % Ch1 neg.
-        set(FIG.ax.line(2),'MarkerSize',2,'Color',[0.6 0.6 0.6]); % Ch1 pos
-        % chan 2
-        set(FIG.ax.line(3),'MarkerSize',2,'Color','b'); % Ch2 neg
-        set(FIG.ax.line(4),'MarkerSize',2,'Color',[0.9 .1 1]); % Ch2 pos
-        legend('Chan 1 Neg','Chan 1 Pos','Chan 2 Neg','Chan 2 Pos','location','northeast');
-    elseif Stimuli.rec_channel == 1 % standard 1 channel recording
-        FIG.ax.line = plot(0,0,'-',0,0,'-');
-        set(FIG.ax.line(1),'MarkerSize',2,'Color','k');
-        set(FIG.ax.line(2),'MarkerSize',2,'Color',[0.6 0.6 0.6]);
-        clear FIG.ax.line(3) FIG.ax.line(4)
-        legend('Chan 2 Neg','Chan 2 Pos','location','northeast');
-        
-    else % Ch 2 only
-        FIG.ax.line = plot(0,0,'-',0,0,'-');
-        set(FIG.ax.line(1),'MarkerSize',2,'Color','b');
-        set(FIG.ax.line(2),'MarkerSize',2,'Color',[0.9 .1 1]);
-        clear FIG.ax.line(3) FIG.ax.line(4)
-        legend('Chan 1 Neg','Chan 1 Pos','location','northeast');
-    end
-    
+    FIG.ax.line = plot(0,0,'-',0,0,'-',0,0,'-',0,0,'-'); hold on;
     xlim([FFR_Gating.XstartPlot_ms/1000 FFR_Gating.XendPlot_ms/1000]);
     ylim([-Display.YLim Display.YLim]);
     
@@ -119,6 +96,31 @@ while isempty(get(FIG.push.close,'Userdata'))
     set(FIG.ax.axis,'YTickMode','auto');
     
     xlabel('Time (sec)','fontsize',12,'FontWeight','Bold');
+    % chan 1
+    set(FIG.ax.line(1),'MarkerSize',2,'Color','k'); % Ch1 neg.
+    set(FIG.ax.line(2),'MarkerSize',2,'Color',[0.6 0.6 0.6]); % Ch1 pos
+    % chan 2
+    set(FIG.ax.line(3),'MarkerSize',2,'Color','b'); % Ch2 neg
+    set(FIG.ax.line(4),'MarkerSize',2,'Color',[0.9 .1 1]); % Ch2 pos
+    legend('Chan 1 Neg','Chan 1 Pos','Chan 2 Neg','Chan 2 Pos','location','northeast');
+    
+    if Stimuli.rec_channel > 2
+        set(FIG.ax.line(1),'xdata',[],'ydata',[], 'Visible', 'on')
+        set(FIG.ax.line(2),'xdata',[],'ydata',[], 'Visible', 'on')
+        set(FIG.ax.line(3),'xdata',[],'ydata',[], 'Visible', 'on')
+        set(FIG.ax.line(4),'xdata',[],'ydata',[], 'Visible', 'on')
+    elseif Stimuli.rec_channel == 2
+        set(FIG.ax.line(1),'xdata',[],'ydata',[], 'Visible', 'off')
+        set(FIG.ax.line(2),'xdata',[],'ydata',[], 'Visible', 'off')
+        set(FIG.ax.line(3),'xdata',[],'ydata',[], 'Visible', 'on')
+        set(FIG.ax.line(4),'xdata',[],'ydata',[], 'Visible', 'on')   
+    else
+        set(FIG.ax.line(1),'xdata',[],'ydata',[], 'Visible', 'on')
+        set(FIG.ax.line(2),'xdata',[],'ydata',[], 'Visible', 'on')
+        set(FIG.ax.line(3),'xdata',[],'ydata',[], 'Visible', 'off')
+        set(FIG.ax.line(4),'xdata',[],'ydata',[], 'Visible', 'off')
+    end
+    
     
     if strcmp(Display.Voltage,'atELEC')
         FIG.ax.ylabel=ylabel('Voltage at Electrode (V)','fontsize',12,'FontWeight','Bold');
@@ -127,25 +129,36 @@ while isempty(get(FIG.push.close,'Userdata'))
     end
     box on;
     
-    %New axes for showing maximum of each input waveform - KHZZ 2011 Nov 4
+    %% Plotting for showing maximum of each input waveform (Artifact rejection) - KHZZ 2011 Nov 4
     FIG.ax.axis2 = axes('position',[.925 .34 .025 .62]);
+    
+    FIG.ax.line2 = plot(0.25,0,'r*',[0 1],[0 0],':r',0.75,0,'b*',[0 1],[0 0],':b');
     if Stimuli.rec_channel>2 % simultaneous
-        FIG.ax.line2 = plot(0.4,0,'r*',[0 1],[Stimuli.threshV Stimuli.threshV],':r',0.6,0,'b*',[0 1],[Stimuli.threshV2 Stimuli.threshV2],':b');
+        set(FIG.ax.line2(1),'xdata',.25,'ydata',0, 'Visible', 'on')
+        set(FIG.ax.line2(2),'xdata',[0 1],'ydata',[Stimuli.threshV Stimuli.threshV], 'Visible', 'on')
+        set(FIG.ax.line2(3),'xdata',.75,'ydata',0, 'Visible', 'on')
+        set(FIG.ax.line2(4),'xdata',[0 1],'ydata',[Stimuli.threshV2 Stimuli.threshV2], 'Visible', 'on')
     elseif Stimuli.rec_channel == 2
-        FIG.ax.line2 = plot(0.5,0,'b*',[0 1],[Stimuli.threshV2 Stimuli.threshV2],':b');
-        clear FIG.ax.line2(3) FIG.ax.line2(4)
+        set(FIG.ax.line2(1), 'Visible', 'off')
+        set(FIG.ax.line2(2), 'Visible', 'off')
+        set(FIG.ax.line2(3),'xdata',.5,'ydata',0, 'Visible', 'on')
+        set(FIG.ax.line2(4),'xdata',[0 1],'ydata',[Stimuli.threshV2 Stimuli.threshV2], 'Visible', 'on')
     else % Channel 1 only
-        FIG.ax.line2 = plot(0.5,0,'r*',[0 1],[Stimuli.threshV Stimuli.threshV],':r');
-        clear FIG.ax.line2(3) FIG.ax.line2(4)
+        set(FIG.ax.line2(1),'xdata',.5,'ydata',0, 'Visible', 'on')
+        set(FIG.ax.line2(2),'xdata',[0 1],'ydata',[Stimuli.threshV Stimuli.threshV], 'Visible', 'on')
+        set(FIG.ax.line2(3), 'Visible', 'off')
+        set(FIG.ax.line2(4), 'Visible', 'off')
     end
     
+    maxThresh = max([Stimuli.threshV, Stimuli.threshV2]); 
     xlim([0 1]);
-    ylim([0 10]);
+    ylim([0 (maxThresh+1)]);
     set(FIG.ax.axis2,'XTickMode','auto');
     set(FIG.ax.axis2,'YTickMode','auto');
     ylabel('Max AD Voltage (1 rep)','fontsize',12,'FontWeight','Bold');
     box on;
     
+    %% Start Running
     invoke(RP1,'SoftTrg',1);
     
     while(1)  % loop until "close" request
@@ -164,7 +177,7 @@ while isempty(get(FIG.push.close,'Userdata'))
                         set(FIG.ax.line2(1),'ydata',FFRobs1);
                         set(FIG.ax.line2(3),'ydata',FFRobs2);
                     elseif Stimuli.rec_channel == 2 % Chan 2
-                        set(FIG.ax.line2(1),'ydata',FFRobs2);
+                        set(FIG.ax.line2(3),'ydata',FFRobs2);
                     else
                         set(FIG.ax.line2(1),'ydata',FFRobs1);
                     end
@@ -172,7 +185,7 @@ while isempty(get(FIG.push.close,'Userdata'))
                     stim_inv_pol = invoke(RP1,'GetTagVal','ORG');
                     mod(misc.n,2);
                     
-                    if ((FFRobs1 <= Stimuli.threshV) && (FFRobs2 <= Stimuli.threshV*art_factor)) %&& (stim_inv_pol == mod(misc.n,2))) %artefact and polarity
+                    if ((FFRobs1 <= Stimuli.threshV) && (FFRobs2 <= Stimuli.threshV2)) %&& (stim_inv_pol == mod(misc.n,2))) %artefact and polarity
                         misc.n = mod(misc.n + 1,100);    % counter for stimuli for polarity zz 31oct11
                         if mod(misc.n,2) % NegPol trials
                             % chan 1
@@ -252,7 +265,7 @@ while isempty(get(FIG.push.close,'Userdata'))
                             'ydata',data_np2*Display.PlotFactor);
                         
                     elseif Stimuli.rec_channel==2
-                        set(FIG.ax.line(1),'xdata', data_x, ... % ch 2
+                        set(FIG.ax.line(3),'xdata', data_x, ... % ch 2
                             'ydata',data_np2*Display.PlotFactor);
                         
                     else % ch1 only
@@ -277,21 +290,14 @@ while isempty(get(FIG.push.close,'Userdata'))
                             'ydata',data_po2*Display.PlotFactor);
                         
                     elseif Stimuli.rec_channel==2
-                        set(FIG.ax.line(2),'xdata', data_x, ... % ch 2
+                        set(FIG.ax.line(4),'xdata', data_x, ... % ch 2
                             'ydata',data_po2*Display.PlotFactor);
                         
                     else % ch1 only
                         set(FIG.ax.line(2),'xdata', data_x, ... % ch 1
                             'ydata',data_po1*Display.PlotFactor);
                     end
-                    %                 % do math to calculate inverting here
-                    %                 data_ch1 = data_np1 + data_po1 / 2;
-                    %                 data_ch2 = data_np2 + data_po2 / 2;
-                    %                 dat_ch1_inv = data_np1 - data_po1 / 2;
-                    %                 data_ch2_inv = data_np2 - data_po2 / 2;
-                    
 
-                    
                 end
                 drawnow;
             else
@@ -320,14 +326,19 @@ while isempty(get(FIG.push.close,'Userdata'))
                     pair2 = 1;
                     firstSTIM=or(pair1,pair2);
                     
-                    set(FIG.ax.line(1),'xdata',[],'ydata',[]);
-                    set(FIG.ax.line(2),'xdata',[],'ydata',[]);
-                    set(FIG.ax.line2(1),'ydata',[]);
+                    % Clear all data
+                    set(FIG.ax.line(1),'ydata',[]);
+                    set(FIG.ax.line(2),'ydata',[]);
+                    set(FIG.ax.line(3),'ydata',[]);
+                    set(FIG.ax.line(4),'ydata',[]);
                     
                     if Stimuli.rec_channel > 2 %if more than 1 chan is plotted, clear the other as well
-                        set(FIG.ax.line(3),'xdata',[],'ydata',[]);
-                        set(FIG.ax.line(4),'xdata',[],'ydata',[]);
-                        set(FIG.ax.line2(3),'ydata',[]);
+                        set(FIG.ax.line2(1),'ydata',0);
+                        set(FIG.ax.line2(3),'ydata',0);
+                    elseif Stimuli.rec_channel == 2
+                        set(FIG.ax.line2(3),'ydata',0);
+                    else
+                        set(FIG.ax.line2(1),'ydata',0);
                     end
                     
                     drawnow;  % clear the plot.
@@ -335,13 +346,12 @@ while isempty(get(FIG.push.close,'Userdata'))
                     break
                     
                 case 2 % case: updated wav-file
-                    %                     RP1= connect_tdt('RP2', 1);
+                    % RP1= connect_tdt('RP2', 1);
                     invoke(RP1,'Halt');
-                    %% SP: Is it necessary to clear COF?
-                    invoke(RP1,'ClearCOF');
-                    invoke(RP1,'LoadCOF', stimRCXfName);
                     
-                    % set_RP_tagvals(RP1, RP2, FFR_Gating, Stimuli);
+%                     %% SP: Is it necessary to clear COF?
+%                     invoke(RP1,'ClearCOF');
+%                     invoke(RP1,'LoadCOF', stimRCXfName);
                     
                     %%
                     invoke(RP1, 'SetTagVal', 'StmOn', FFR_Gating.duration_ms);
@@ -363,9 +373,6 @@ while isempty(get(FIG.push.close,'Userdata'))
                     FFR_memFact=0;
                     end
                     
-                    % Because a new wav-file, stimulus duration may be
-                    % different. Need to
-                    
                     %% SP on 12Oct19: Different wav-file means ADdur maybe different
                     % For ADC (data in)
                     invoke(RP3,'Halt');
@@ -379,13 +386,18 @@ while isempty(get(FIG.push.close,'Userdata'))
                     
                     set(FIG.ax.line(1),'xdata',[],'ydata',[]);
                     set(FIG.ax.line(2),'xdata',[],'ydata',[]);
-                    set(FIG.ax.line2(1),'ydata',[]);
+                    set(FIG.ax.line(3),'xdata',[],'ydata',[]);
+                    set(FIG.ax.line(4),'xdata',[],'ydata',[]);
                     
                     if Stimuli.rec_channel > 2 %if more than 1 chan is plotted, clear the other as well
-                        set(FIG.ax.line(3),'xdata',[],'ydata',[]);
-                        set(FIG.ax.line(4),'xdata',[],'ydata',[]);
-                        set(FIG.ax.line2(3),'ydata',[]);
+                        set(FIG.ax.line2(1),'ydata',0);
+                        set(FIG.ax.line2(3),'ydata',0);
+                    elseif Stimuli.rec_channel == 2
+                        set(FIG.ax.line2(3),'ydata',0);
+                    else
+                        set(FIG.ax.line2(1),'ydata',0);
                     end
+                    
                     drawnow;  % clear the plot.
                     
                     veryfirstSTIM=1;  ... % The very first FFRdata when program starts is all zeros,
@@ -394,34 +406,37 @@ while isempty(get(FIG.push.close,'Userdata'))
                     invoke(RP1,'SoftTrg',1);
                     
                 case 3
-                    if Stimuli.FFRmem_reps>0
+                    if Stimuli.FFRmem_reps > 0
                         FFR_memFact=exp(-2/Stimuli.FFRmem_reps); ...
                             % changed from 1 to 2 to reflect num pairs zz 03nov2011
                     else
                         FFR_memFact=0;
-                    end
-                case 4   % Run Levels
+                    end 
                     
+                case 4   % Run Levels
                     [firstSTIM, NelData]=FFRwav_RunLevels(FIG,Stimuli,RunLevels_params, misc, FFR_Gating, ...
                         FFRnpts,interface_type, Display, NelData, data_dir, RP1, RP3, PROG);
                     veryfirstSTIM=1; ...
                         % misc.n = int(~(invoke(RP1,'GetTagVal','ORG')));
                     
-                case 5 ...
-                        % Make "free-run" forget previous averages.
+                case 5 % Make "free-run" forget previous averages.
                     pair1 = 1;
                     pair2 = 1;
                     firstSTIM=or(pair1,pair2);
                     
-                    set(FIG.ax.line(1),'xdata',[],'ydata',[]);
-                    set(FIG.ax.line(2),'xdata',[],'ydata',[]);
-                    set(FIG.ax.line2(1),'ydata',[]);
+                    % Clear all data
+                    set(FIG.ax.line(1),'ydata',[]);
+                    set(FIG.ax.line(2),'ydata',[]);
+                    set(FIG.ax.line(3),'ydata',[]);
+                    set(FIG.ax.line(4),'ydata',[]);
                     
-                    if Stimuli.rec_channel > 2 %if more than 1 chan is plotted, clear the other as well
-                        set(FIG.ax.line(3),'xdata',[],'ydata',[]);
-                        set(FIG.ax.line(4),'xdata',[],'ydata',[]);
-                        set(FIG.ax.line2(3),'ydata',[]);
-                        set(FIG.ax.line2(4),'ydata',[]);
+                    if Stimuli.rec_channel > 2 %if more than 1 chan is plotted, clear the other as well   
+                        set(FIG.ax.line2(1),'ydata',0);
+                        set(FIG.ax.line2(3),'ydata',0);
+                    elseif Stimuli.rec_channel == 2
+                        set(FIG.ax.line2(3),'ydata',0);
+                    else
+                        set(FIG.ax.line2(1),'ydata',0);
                     end
                     
                     drawnow;  % clear the plot.
@@ -439,55 +454,51 @@ while isempty(get(FIG.push.close,'Userdata'))
                     end
                     set(FIG.ax.axis,'Ylim',[-Display.YLim Display.YLim])
                     
+                case 7 % Change ThreshV or ThreshV2
+                    if Stimuli.rec_channel > 2
+                        set(FIG.ax.line2(2),'YData',[Stimuli.threshV Stimuli.threshV]);
+                        set(FIG.ax.line2(4),'YData',[Stimuli.threshV2 Stimuli.threshV2]);
+                    elseif Stimuli.rec_channel == 2
+                        set(FIG.ax.line2(4),'YData',[Stimuli.threshV2 Stimuli.threshV2]);
+                    else
+                        set(FIG.ax.line2(2),'YData',[Stimuli.threshV Stimuli.threshV]);
+                    end
+                    maxThresh = max([Stimuli.threshV, Stimuli.threshV2]); 
+                    set(FIG.ax.axis2, 'Ylim', [0, maxThresh+1]); 
+
                 case 18 % changing number of recording channels
                     
-                    % Clear/Reset for artifact rejection / max recorded box
                     if Stimuli.rec_channel>2
-                        set(FIG.ax.line2(1), 'xdata', 0.4, 'ydata', 0, 'Color', 'r')
-                        set(FIG.ax.line2(2), 'xdata', [0 1], 'ydata', [Stimuli.threshV Stimuli.threshV], 'Color', 'r')
-                        set(FIG.ax.line2(3), 'xdata', 0.6, 'ydata', 0, 'Color', 'b')
-                        set(FIG.ax.line2(4), 'xdata', [0 1], 'ydata', [Stimuli.threshV2 Stimuli.threshV2], 'Color', 'b')
-
+                        set(FIG.ax.line(1),'xdata',[],'ydata',[], 'Visible', 'on')
+                        set(FIG.ax.line(2),'xdata',[],'ydata',[], 'Visible', 'on')
+                        set(FIG.ax.line(3),'xdata',[],'ydata',[], 'Visible', 'on')
+                        set(FIG.ax.line(4),'xdata',[],'ydata',[], 'Visible', 'on')
+                        
+                        set(FIG.ax.line2(1), 'xdata', 0.25, 'ydata', 0, 'Color', 'r', 'Visible', 'on')
+                        set(FIG.ax.line2(2), 'xdata', [0 1], 'ydata', [Stimuli.threshV Stimuli.threshV], 'Color', 'r', 'Visible', 'on')
+                        set(FIG.ax.line2(3), 'xdata', 0.75, 'ydata', 0, 'Color', 'b', 'Visible', 'on')
+                        set(FIG.ax.line2(4), 'xdata', [0 1], 'ydata', [Stimuli.threshV2 Stimuli.threshV2], 'Color', 'b', 'Visible', 'on')
+                        
                     elseif Stimuli.rec_channel==2
-                        set(FIG.ax.line2(1), 'xdata', .5, 'ydata', 0, 'Color', 'b')
-                        set(FIG.ax.line2(2), 'xdata', [0 1], 'ydata', [Stimuli.threshV2 Stimuli.threshV2], 'Color', 'b')
-                        set(FIG.ax.line2(3), 'xdata', [], 'ydata', [], 'Color', 'b')
-                        set(FIG.ax.line2(4), 'xdata', [], 'ydata', [], 'Color', 'b')
+                        set(FIG.ax.line(1),'xdata',[],'ydata',[], 'Visible', 'off')
+                        set(FIG.ax.line(2),'xdata',[],'ydata',[], 'Visible', 'off')
+                        set(FIG.ax.line(3),'xdata',[],'ydata',[], 'Visible', 'on')
+                        set(FIG.ax.line(4),'xdata',[],'ydata',[], 'Visible', 'on')
+                        set(FIG.ax.line2(1), 'Visible', 'off')
+                        set(FIG.ax.line2(2), 'Visible', 'off')
+                        set(FIG.ax.line2(3), 'xdata', 0.5, 'ydata', 0, 'Color', 'b', 'Visible', 'on')
+                        set(FIG.ax.line2(4), 'xdata', [0 1], 'ydata', [Stimuli.threshV2 Stimuli.threshV2], 'Color', 'b', 'Visible', 'on')
                     else
-                        set(FIG.ax.line2(1), 'xdata', 0.5, 'ydata', 0, 'Color', 'r')
-                        set(FIG.ax.line2(2), 'xdata', [0 1], 'ydata', [Stimuli.threshV Stimuli.threshV], 'Color', 'r')
-                        set(FIG.ax.line2(3), 'xdata', [], 'ydata', [], 'Color', 'b')
-                        set(FIG.ax.line2(4), 'xdata', [], 'ydata', [], 'Color', 'b')
+                        set(FIG.ax.line(1),'xdata',[],'ydata',[], 'Visible', 'on')
+                        set(FIG.ax.line(2),'xdata',[],'ydata',[], 'Visible', 'on')
+                        set(FIG.ax.line(3),'xdata',[],'ydata',[], 'Visible', 'off')
+                        set(FIG.ax.line(4),'xdata',[],'ydata',[], 'Visible', 'off')
+                        set(FIG.ax.line2(1), 'xdata', 0.5, 'ydata', 0, 'Color', 'r','Visible', 'on')
+                        set(FIG.ax.line2(2), 'xdata', [0 1], 'ydata', [Stimuli.threshV Stimuli.threshV], 'Color', 'r', 'Visible', 'on')
+                        set(FIG.ax.line2(3), 'Visible', 'off')
+                        set(FIG.ax.line2(4), 'Visible', 'off')
                     end
 
-                    % Clear/reset for full FFR plot
-                    if Stimuli.rec_channel > 2
-                        % chan 1
-                        set(FIG.ax.line(1),'MarkerSize',2,'Color','k'); % Ch1 neg.
-                        set(FIG.ax.line(2),'MarkerSize',2,'Color',[0.6 0.6 0.6]); % Ch1 pos
-                        set(FIG.ax.line(1),'xdata',[],'ydata',[])
-                        set(FIG.ax.line(2),'xdata',[],'ydata',[])
-                        % chan 2
-                        set(FIG.ax.line(3),'MarkerSize',2,'Color','b'); % Ch2 neg
-                        set(FIG.ax.line(4),'MarkerSize',2,'Color',[0.9 .1 1]); % Ch2 pos
-                        set(FIG.ax.line(3),'xdata',[],'ydata',[])
-                        set(FIG.ax.line(4),'xdata',[],'ydata',[])
-                    elseif Stimuli.rec_channel == 1 % standard 1 channel recording
-                        set(FIG.ax.line(1),'MarkerSize',2,'Color','k');
-                        set(FIG.ax.line(2),'MarkerSize',2,'Color',[0.6 0.6 0.6]);
-                        set(FIG.ax.line(1),'xdata',[],'ydata',[])
-                        set(FIG.ax.line(2),'xdata',[],'ydata',[])
-                        set(FIG.ax.line(3),'xdata',[],'ydata',[])
-                        set(FIG.ax.line(4),'xdata',[],'ydata',[])
-                    else % Ch 2 only
-                        set(FIG.ax.line(1),'MarkerSize',2,'Color','b');
-                        set(FIG.ax.line(2),'MarkerSize',2,'Color',[0.9 .1 1]);
-                        set(FIG.ax.line(1),'xdata',[],'ydata',[])
-                        set(FIG.ax.line(2),'xdata',[],'ydata',[])
-                        set(FIG.ax.line(3),'xdata',[],'ydata',[])
-                        set(FIG.ax.line(4),'xdata',[],'ydata',[])
-                    end
-                   
                     drawnow;
                    
                 case 101 ...
