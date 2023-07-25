@@ -197,7 +197,9 @@ if status_rp2
     fprintf('\n RP2-4 | Coefficients sucessfully loaded to TDT \n');
 
 elseif status_rx8 % Most call for run_invCalib are from NEL1. For NEL2 (with RX8), only needed for calibrate and dpoae.
-    invoke(COMM.handle.RX8,'LoadCof',[object_dir '\calib_invFIR_twoChan_RX8.rcx']);
+%     invoke(COMM.handle.RX8,'LoadCof',[object_dir '\calib_invFIR_twoChan_RX8.rcx']);
+    invoke(COMM.handle.RX8,'LoadCof',[object_dir '\ABR_RX8_ADC_invCalib_2chan.rcx']);
+
     e1= COMM.handle.RX8.WriteTagV('FIR_Coefs1', 0, b_chan1);
     e2= COMM.handle.RX8.WriteTagV('FIR_Coefs2', 0, b_chan2);
     invoke(COMM.handle.RX8,'Run');

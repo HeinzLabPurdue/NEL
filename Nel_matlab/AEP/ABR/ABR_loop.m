@@ -1,5 +1,5 @@
 %global root_dir NelData
-global Stimuli
+global Stimuli COMM
 
 if Stimuli.clickYes==1  %KH 06Jan2012
     clickAmp=5; toneAmp=0;
@@ -65,23 +65,21 @@ if NelData.General.RP2_3and4 && (~NelData.General.RX8) % NEL1 with RP2 #3 & #4
 %     invoke(RP3,'LoadCOF',[prog_dir '\object\CAP_right.rcx']);
 
 elseif NelData.General.RX8  %NEL2 with RX8
-    %     RP2=actxcontrol('RPco.x',[0 0 1 1]);
-    %     invoke(RP2,'ConnectRP2',NelData.General.TDTcommMode,2);
+    
+    %RP2, connect as usual
+    
     RP2= connect_tdt('RP2', 2);
     invoke(RP2,'LoadCOF',[prog_dir '\object\CAP_BitSet.rcx']);
     invoke(RP2,'Run');
     
-    RP3= connect_tdt('RX8', 1);
+    %RP3, use the global RX8 variable, which has loaded both inverse
+    %calibration AND ephys channels in set_invFilter. 
+    
+    RP3 = COMM.handle.RX8;
     invoke(RP3,'ClearCOF');
-    %invoke(RP3,'LoadCOF',[prog_dir '\object\ABR_RX8_ADC_invCalib.rcx']);
-    invoke(RP3,'LoadCOF',[prog_dir '\object\ABR_RX8_ADC_invCalib_2chan.rcx']); %JMR 2 channel setup
-    %     [~, ~, b_invCalib_coef]= run_invCalib(-2);
-%     b_invCalib_coef= [1 zeros(1, 255)];
     filttype = {'inversefilt','inversefilt'};
     invfilterdata = set_invFilter(filttype, Stimuli.calibPicNum);
-    
-    e1 = RP3.WriteTagV('FIR_Coefs1', 0, invfilterdata.b_chan1);
-    e2 = RP3.WriteTagV('FIR_Coefs2', 0, invfilterdata.b_chan2);
+
 else
     nelerror('Cannot figure out whether NEL1 or NEL2')
 end
