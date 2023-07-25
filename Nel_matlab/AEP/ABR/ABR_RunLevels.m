@@ -92,6 +92,16 @@ for zfrequency = frequencies %New outer loop, KH 10Jan2012
                         CAPobs1=max(abs(CAPdata1(1:end-2)-mean(CAPdata1(1:end-2)))); %KH Jun2011
                         CAPobs2=max(abs(CAPdata2(1:end-2)-mean(CAPdata2(1:end-2)))); %KH Jun2011
                         
+                        
+                        %AS/MP - handle single channel case appropriately.
+                        %Not the smartest way...but should work.
+                        switch Stimuli.rec_channel
+                            case 1
+                                CAPobs2 = -inf;
+                            case 2
+                                CAPobs1 = -inf;
+                        end
+                            
                         if CAPobs1 <= critVal && CAPobs2 <= critVal2 % Double artefact criteria JMR Sept 21
                             bNoSampleObtained = 0;
                             % Need to skip 1st pair, which is from last stimulus
@@ -126,6 +136,17 @@ for zfrequency = frequencies %New outer loop, KH 10Jan2012
                         CAPdata22 = invoke(RP3,'ReadTagV','ADbuf2',0,CAPnpts); %ECochG
                         CAPobs12=max(abs(CAPdata12(1:end-2)-mean(CAPdata12(1:end-2)))); %KH Jun2011
                         CAPobs22=max(abs(CAPdata22(1:end-2)-mean(CAPdata22(1:end-2)))); %KH Jun2011
+                        
+                        %AS/MP - handle single channel case appropriately.
+                        %Not the smartest way...but should work.
+                        switch Stimuli.rec_channel
+                            case 1
+                                CAPobs22 = -inf;
+                            case 2
+                                CAPobs12 = -inf;
+                        end
+                            
+                        
                         if CAPobs12 <= critVal && CAPobs22 <= critVal2 %double artefact criteria JM Sept 21
                             bNoSampleObtained = 0;
                             if currPair

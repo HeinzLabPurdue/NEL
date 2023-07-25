@@ -46,6 +46,7 @@ no_ref = 0;
 no_lock = 0;
 
 if FREQS.isinit == 1
+   
    getatn;
    [error] = make_tone;
    attenuator(Stimuli.ear,0);
