@@ -34,21 +34,21 @@ if yesplot
     plot(t,pin)
     
     sound([pin/max(pin) zeros(1,length(pin)/2)],Fs)
-end;
+end
 
 name_org=sprintf('FM_%d_%d_%g_%g_org.wav',F0,fm_freq,T*1000,fm_range);
 name_inv=sprintf('FM_%d_%d_%g_%g_inv.wav',F0,fm_freq,T*1000,fm_range);
-filename=fullfile('C:','NEL1_2','Nel_matlab','FFR','signals',name_org);
+filename=fullfile('C:','NEL','Nel_matlab','AEP', 'FFR','Signals','AMwav',name_org);
 
 audiowrite(filename, pin, round(fs));
 
 % if signal needs to be polarized, creates the inverse signal
 % otherwise, creates the same signal with the name inv zz 20oct11
 if(pol)
-    filename_inv=fullfile('C:','NEL1_2','Nel_matlab','FFR','Signals',name_inv);
+    filename_inv=fullfile('C:','NEL','Nel_matlab','AEP', 'FFR','Signals','AMwav',name_inv);
     pin = -1 * pin;
     audiowrite(filename_inv, pin, round(fs));
 else
-    filename_inv=fullfile('C:','NEL1_2','Nel_matlab','FFR','Signals',name_inv);
+    filename_inv=fullfile('C:','NEL','Nel_matlab','AEP', 'FFR','Signals','AMwav',name_inv);
     audiowrite(filename_inv, pin, round(fs));
 end
