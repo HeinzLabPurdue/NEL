@@ -15,7 +15,7 @@ FIG.radio.fast   = uicontrol(FIG.handle,'callback','FFRwav(''fast'');','style','
 FIG.radio.slow   = uicontrol(FIG.handle,'callback','FFRwav(''slow'');','style','radio','Enable','on','Units','normalized','position',[.125 .285 .08 .03],'string','Slow','fontsize',12,'BackgroundColor','w','value',0);
 
 %% Stimulus menu
-FIG.popup.stims = uicontrol(FIG.handle,'callback', 'FFRwav(''update_stim'',''newStim'');','style','popup','Units','normalized','Userdata',Stimuli.filename,'position',[.4 .175 .425 .04],'string',struct2cell(fName),'fontsize',12);
+FIG.popup.stims = uicontrol(FIG.handle,'callback', 'FFRwav(''update_stim'',''newStim'');','style','popup','Units','normalized','Userdata',Stimuli.filename,'position',[.4 .175 .425 .04],'string',{fName.name},'fontsize',12);
 FIG.push.prev_stim = uicontrol(FIG.handle,'callback','FFRwav(''update_stim'',''prevStim'');','style','pushbutton','Units','normalized','position',[.35 .175 .05 .04],'string','<<','fontsize',12,'fontangle','normal','fontweight','normal');
 FIG.push.next_stim = uicontrol(FIG.handle,'callback','FFRwav(''update_stim'',''nextStim'');','style','pushbutton','Units','normalized','position',[.825 .175 .05 .04],'string','>>','fontsize',12,'fontangle','normal','fontweight','normal');
 

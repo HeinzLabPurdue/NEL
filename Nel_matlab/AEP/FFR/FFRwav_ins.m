@@ -3,7 +3,7 @@ function [misc,Stimuli, RunLevels_params, Display, interface_type]=FFRwav_ins(Ne
 
 usr = NelData.General.User;
 
-if exist([NelData.General.RootDir 'Signals\' usr filesep 'FFR\*.wav'],'dir') >= 1
+if exist([NelData.General.RootDir 'Signals\' usr filesep 'FFR\'],'dir') >= 1
     FFRwavStimDir=[NelData.General.RootDir 'Signals\',usr,'\FFR\'];
     fName=dir([FFRwavStimDir '*.wav']);
     
