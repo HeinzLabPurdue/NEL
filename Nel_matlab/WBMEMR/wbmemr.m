@@ -84,14 +84,37 @@ stim.resp = zeros(stim.nLevels, stim.Averages, stim.nreps, resplength);
 AR = 0; %0=No Artifact rejection, 1=Do Artifact rejection
 
 %% Inverse Calibration 
+
+%OLD 
+
 %NEEDS TO BE CLEANED UP ASAP.
 % 1. run_invCalib needs cleaned up...currently clunky
 % 2. Need calibration to be correct for MEMR (currently all pass, w/o calib)
-[~, calibPicNum, ~] = run_invCalib(false);   % skipping INV calib for now since based on 94 dB SPL benig highest value, bot the 105 dB SPL from inv Calib.
-[coefFileNum, ~, ~] = run_invCalib(-2);
+% [~, calibPicNum, ~] = run_invCalib(false);   % skipping INV calib for now since based on 94 dB SPL benig highest value, bot the 105 dB SPL from inv Calib.
+% [coefFileNum, ~, ~] = run_invCalib(-2);
 
-stim.CalibPICnum2use = calibPicNum;  % save this so we know what calib file to use right from data file
-coefFileNum = NaN;
+% stim.CalibPICnum2use = calibPicNum;  % save this so we know what calib file to use right from data file
+% coefFileNum = NaN;
+
+%NEW
+%get user-specified Raw calib
+cdd;
+filttype = {'allpass','allpass'};
+% filttype = {'allstop','allstop'};
+all_raw = findPics('raw*');
+RawCalibPicNum = max(all_raw);
+
+%prompt user for RAW calib
+RawCalibPicNum = inputdlg('Please enter the RAW calibration file to use (default = last raw calib): ', 'Calibration!',...
+    1,{num2str(RawCalibPicNum)});
+RawCalibPicNum = str2double(RawCalibPicNum{1});
+rdd;
+
+
+%TODO: WHAT CALIBRATION TO USE?????
+invfilterdata = set_invFilter(filttype,RawCalibPicNum); %gets appended in make_memr_text_file
+calibPicNum = invfilterdata.CalibPICnum2use;
+coefFileNum = invfilterdata.coefFileNum;
 
 %% Data Collection Loop
 for nTRIALS = 1: (stim.Averages + stim.ThrowAway)
@@ -193,8 +216,9 @@ end
 %% Shut Down TDT, no matter what button pushed, or if ended naturally
 close_play_circuit(f1RP, RP);
 rc = PAset(120.0*ones(1,4)); % need to use PAset, since it saves current value in PA, which is assumed way in NEL (causes problems when PAset is used to set attens later)
-run_invCalib(false);
 
+%set to all pass??? necessary only if inv calibrating
+dummy = set_invFilter({'allpass','allpass'},RawCalibPicNum);
 %% Return to GUI script, unless need to save
 if strcmp(NelData.WBMEMR.rc,'abort') || strcmp(NelData.WBMEMR.rc,'restart')
     return;  % don't need to save
@@ -240,11 +264,11 @@ switch NelData.WBMEMR.rc
         
         %% NEL based data saving script
         make_memr_text_file;     
-    
+        
         %% remind user to turn of microphone
         h = msgbox('Please remember to turn off the microphone');
         uiwait(h);
        
 end
-
+rdd;
 

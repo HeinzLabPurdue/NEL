@@ -46,18 +46,18 @@ if ~(AutoLevel_params.bMultiOutputFiles)  % added by GE 26Apr2004.
         end
     end
     if Stimuli.rec_channel>2
-        x.AD_Data.Label{1} = 'Channel 1';
-        x.AD_Data.Label{2} = 'Channel 2';
+        x.AD_Data.Label{1} = 'ABR/Brainstem/Chan1';
+        x.AD_Data.Label{2} = 'ECochG/Cochlea/Chan2';
         x.AD_Data.AD_All_V{1} = CAPdataReps_dec;  % modified by GE 26Apr2004.
         x.AD_Data.AD_Avg_V{1} = CAPdataAvg; 
         x.AD_Data.AD_All_V{2} = CAPdataReps_dec2;
         x.AD_Data.AD_Avg_V{2} = CAPdataAvg2;
     elseif Stimuli.rec_channel==2
-        x.AD_Data.Label{1} = ['Channel ' num2str(Stimuli.rec_channel)];
+        x.AD_Data.Label{1} = 'ECochG/Cochlea/Chan2';
         x.AD_Data.AD_All_V{1} = CAPdataReps_dec2;
         x.AD_Data.AD_Avg_V{1} = CAPdataAvg2;
     else
-        x.AD_Data.Label{1} = ['Channel ' num2str(Stimuli.rec_channel)];
+        x.AD_Data.Label{1} = 'ABR/Brainstem/Chan1';
         x.AD_Data.AD_All_V{1} = CAPdataReps_dec;
         x.AD_Data.AD_Avg_V{1} = CAPdataAvg;
     end
