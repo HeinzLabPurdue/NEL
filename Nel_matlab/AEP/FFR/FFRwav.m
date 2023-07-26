@@ -93,8 +93,10 @@ elseif strcmp(command_str,'update_stim')
             %             Stimuli.filename=Stimuli.list(StimInd).name;
             %             set(FIG.popup.stims, 'value', StimInd);
             
-        case {'newStim',0}
+        case 'newStim'
             FIG.NewStim = 2;
+%             fName.FFRwav_stimlist=dir([Stimuli.OLDDir '*.wav']);
+%             Stimuli.list=fName.FFRwav_stimlist;
             StimInd= get(FIG.popup.stims, 'value');
             Stimuli.filename=Stimuli.list(StimInd).name;
             

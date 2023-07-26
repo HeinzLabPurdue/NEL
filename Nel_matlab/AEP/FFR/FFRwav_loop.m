@@ -349,9 +349,9 @@ while isempty(get(FIG.push.close,'Userdata'))
                     % RP1= connect_tdt('RP2', 1);
                     invoke(RP1,'Halt');
                     
-%                     %% SP: Is it necessary to clear COF?
-%                     invoke(RP1,'ClearCOF');
-%                     invoke(RP1,'LoadCOF', stimRCXfName);
+                    %% SP: Is it necessary to clear COF?
+                    invoke(RP1,'ClearCOF');
+                    invoke(RP1,'LoadCOF', stimRCXfName);
                     
                     %%
                     invoke(RP1, 'SetTagVal', 'StmOn', FFR_Gating.duration_ms);
