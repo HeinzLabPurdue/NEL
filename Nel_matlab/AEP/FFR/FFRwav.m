@@ -1,7 +1,8 @@
 function h_fig = FFRwav(command_str,eventdata)
 
-global RP PROG FIG Stimuli FFR_Gating root_dir prog_dir Display NelData
+global RP PROG FIG Stimuli FFR_Gating root_dir prog_dir Display NelData PROTOCOL
 
+PROTOCOL = 'FFRwav';
 prog_dir = [root_dir 'AEP\FFR\'];
 usr = NelData.General.User; % current nel user
 

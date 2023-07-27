@@ -5,10 +5,11 @@ function h_fig = FFR(command_str)
 %% Calib not happening in this FFR script 7/19/23
 
 global PROG FIG Stimuli FFR_Gating root_dir prog_dir NelData devices_names_vector Display
-global data_dir
+global data_dir PROTOCOL
+
 % global fc fm pol dur
 prog_dir = [root_dir 'AEP\FFR\']; %Changed from FFR to AEP\FFR, VMA (7/17/23)
-
+PROTOCOL = 'FFR';
 % fm = 200;
 % fc = 20;
 % dur = 1;

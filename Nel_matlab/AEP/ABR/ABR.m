@@ -3,9 +3,10 @@ function h_fig = ABR(command_str)
 % ge debug ABR 26Apr2004: replace "CAP" with more generalized nomenclature, throughout entire system.
 
 global PROG FIG Stimuli CAP_Gating root_dir prog_dir NelData devices_names_vector Display interface_type
-global data_dir picstoSEND_deBUG picstoSEND dBSPLlist picNUMlist FLAG_RERUN_FOR_ABR_ANALYSIS CalibFileNum  CalibFileRefresh
+global data_dir picstoSEND_deBUG picstoSEND dBSPLlist picNUMlist FLAG_RERUN_FOR_ABR_ANALYSIS CalibFileNum  CalibFileRefresh PROTOCOL
 FLAG_RERUN_FOR_ABR_ANALYSIS=0;
 
+PROTOCOL = 'ABR';
 
 if nargin < 1
     prog_dir = [root_dir 'AEP\'];

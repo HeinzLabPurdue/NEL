@@ -178,7 +178,7 @@ invfilterdata.b_chan2 = b_chan2;
     
 %temporary for debugging
 %% Connecting to TDT modules
-global COMM root_dir
+global COMM root_dir PROTOCOL
 object_dir = [root_dir 'calibration\object'];
 
 [COMM.handle.RP2_4, status_rp2]= connect_tdt('RP2', 4);
@@ -198,8 +198,19 @@ if status_rp2
 
 elseif status_rx8 % Most call for run_invCalib are from NEL1. For NEL2 (with RX8), only needed for calibrate and dpoae.
 %     invoke(COMM.handle.RX8,'LoadCof',[object_dir '\calib_invFIR_twoChan_RX8.rcx']);
-    invoke(COMM.handle.RX8,'LoadCof',[object_dir '\ABR_RX8_ADC_invCalib_2chan.rcx']);
 
+    %Need to load a different circuit file based on the protocol...
+
+    switch PROTOCOL
+        case 'ABR'
+            invoke(COMM.handle.RX8,'LoadCof',[object_dir '\ABR_RX8_ADC_invCalib_2chan.rcx']);
+        case 'FFR'
+            invoke(COMM.handle.RX8,'LoadCof',[object_dir '\FFR_RX8_ADC_invCalib_2chan.rcx']);
+            
+        case 'FFRwav'
+            invoke(COMM.handle.RX8,'LoadCof',[object_dir '\FFR_RX8_ADC_invCalib_2chan.rcx']);
+    end
+    
     e1= COMM.handle.RX8.WriteTagV('FIR_Coefs1', 0, b_chan1);
     e2= COMM.handle.RX8.WriteTagV('FIR_Coefs2', 0, b_chan2);
     invoke(COMM.handle.RX8,'Run');
