@@ -1,4 +1,4 @@
-global prog_dir PROG data_dir NelData
+global COMM prog_dir PROG data_dir NelData Stimuli
 
 % if ~(double(invoke(RP1,'GetTagVal', 'Stage')) == 2)
 %     FFR_set_attns(-120,-120,Stimuli.channel,Stimuli.KHosc,RP1,RP2); %% Check with MH
@@ -43,12 +43,15 @@ elseif NelData.General.RX8  %NEL2 with RX8
     invoke(RP2,'Run');
     
     %% For ADC (data in)
-    RP3= connect_tdt('RX8', 1);
-    [~, ~, b_invCalib_coef]= run_invCalib(-2);
-    
+    RP3= COMM.handle.RX8;
     invoke(RP3,'ClearCOF');
-    invoke(RP3,'LoadCOF',[prog_dir '\object\FFR_RX8_ADC_invCalib_2chan.rcx']); %2 channel JMR Sept 21
-    e_invCalib_status= RP3.WriteTagV('FIR_Coefs', 0, b_invCalib_coef);
+    filttype = {'inversefilt','inversefilt'};
+    invfilterdata = set_invFilter(filttype, Stimuli.calibPicNum);
+%     [~, ~, b_invCalib_coef]= run_invCalib(-2);
+    
+%     invoke(RP3,'ClearCOF');
+%     invoke(RP3,'LoadCOF',[prog_dir '\object\FFR_RX8_ADC_invCalib_2chan.rcx']); %2 channel JMR Sept 21
+%     e_invCalib_status= RP3.WriteTagV('FIR_Coefs', 0, b_invCalib_coef);
     invoke(RP3,'SetTagVal','ADdur', FFR_Gating.FFRlength_ms);
     invoke(RP3,'Run');
 end

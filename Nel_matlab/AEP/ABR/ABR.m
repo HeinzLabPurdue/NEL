@@ -439,11 +439,11 @@ elseif strcmp(command_str,'attenCalib') %AS/MH/MP | Sprint 2023 Update
     
     
 elseif strcmp(command_str,'close')
-    if NelData.General.RP2_3and4 && (~NelData.General.RX8)
+%     if NelData.General.RP2_3and4 && (~NelData.General.RX8)
 %         run_invCalib(false); % Initialize with allpass RP2_3
         filttype = {'allpass','allpass'};
         dummy = set_invFilter(filttype,Stimuli.calibPicNum);
-    end
+%     end
     
     pathCell= regexp(path, pathsep, 'split');
     if any(strcmpi([NelData.General.RootDir 'Users\SP\SP_nel_gui\'], pathCell))
