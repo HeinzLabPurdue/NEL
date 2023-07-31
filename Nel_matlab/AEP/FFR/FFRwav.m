@@ -10,13 +10,17 @@ usr = NelData.General.User; % current nel user
 % if strcmp(NelData.General.WindowsHostName, '1353lyl303501d') % means NEL1
 RP1= connect_tdt('RP2', 1);
 RP2= connect_tdt('RP2', 2);
-if NelData.General.RP2_3and4 && (~NelData.General.RX8)
-    RP3= connect_tdt('RP2', 3);  %#ok<*NASGU>
-elseif (~NelData.General.RP2_3and4) && (~NelData.General.RX8)
-    RP3= RP2;
-elseif NelData.General.RX8
-    RP3= connect_tdt('RX8', 1);
-end
+
+%RP3 is now connected in set_invFilter!
+
+% if NelData.General.RP2_3and4 && (~NelData.General.RX8)
+%     RP3= connect_tdt('RP2', 3);  %#ok<*NASGU>
+% elseif (~NelData.General.RP2_3and4) && (~NelData.General.RX8)
+%     RP3= RP2;
+% elseif NelData.General.RX8
+% %     RP3= connect_tdt('RX8', 1);
+%       
+% end
 
 
 %%
@@ -75,7 +79,7 @@ elseif strcmp(command_str,'update_stim')
                 %             FIG.popup.stims = uicontrol(FIG.handle,'callback', 'FFRwav(''update_stim'',0);','style', ...
                 %                 'popup','Units' ,'normalized', 'Userdata',Stimuli.filename,'position',[.4 .175 .425 .04], ...
                 %                 'string',({fName.FFRwav_stimlist.name}),'fontsize',12);
-                %             update_gating_flag= true;
+                update_gating_flag= true;
             end
             
         case 'noise_type' % not functional -- remove??
@@ -177,6 +181,10 @@ elseif strcmp(command_str,'left')
         set(FIG.radio.left,'value',1);
     end
     
+    FFRwav('update_stim', 'spl');
+    FFRwav('calibInit');
+    
+    
 elseif strcmp(command_str,'right')
     if get(FIG.radio.right, 'value') == 1
         FIG.NewStim = 0;
@@ -188,6 +196,9 @@ elseif strcmp(command_str,'right')
         set(FIG.radio.right,'value',1);
     end
     
+    FFRwav('update_stim', 'spl');
+    FFRwav('calibInit');
+    
 elseif strcmp(command_str,'both')
     if get(FIG.radio.both, 'value') == 1
         FIG.NewStim = 0;
@@ -198,6 +209,9 @@ elseif strcmp(command_str,'both')
     else
         set(FIG.radio.both,'value',1);
     end
+    
+    FFRwav('update_stim', 'spl');
+    FFRwav('calibInit');
     
 elseif strcmp(command_str,'chan_1')
     if get(FIG.radio.chan_1, 'value') == 1
@@ -243,6 +257,7 @@ elseif strcmp(command_str,'slide_atten')
     %     set_RP_tagvals(RP1, RP2, FFR_SNRenv_Gating, Stimuli);
     FFR_set_attns(Stimuli.atten_dB,-120,Stimuli.channel,Stimuli.KHosc,RP1,RP2);
     set(FIG.asldr.SPL,'string',sprintf('%.1f dB SPL',Stimuli.calib_dBSPLout-abs(get(FIG.asldr.slider,'val'))));
+    FFRwav('attenCalib');
     
     % LQ 01/31/05
 elseif strcmp(command_str, 'slide_atten_text')
@@ -262,6 +277,7 @@ elseif strcmp(command_str, 'slide_atten_text')
     FFR_set_attns(Stimuli.atten_dB,-120,Stimuli.channel,Stimuli.KHosc,RP1,RP2);
     %     set_RP_tagvals(RP1, RP2, FFR_SNRenv_Gating, Stimuli);
     set(FIG.asldr.SPL,'string',sprintf('%.1f dB SPL',Stimuli.calib_dBSPLout-abs(get(FIG.asldr.slider,'val'))));
+    FFRwav('attenCalib');
     
 elseif strcmp(command_str,'memReps')
     FIG.NewStim = 3;
@@ -396,7 +412,7 @@ elseif strcmp(command_str,'calibInit')
     
     if ~r_present && ~l_present
         warndlg('No calibs present!','No calibs!')
-        ABR('close');
+        FFRwav('close');
     end
     
     if r_present && ~l_present

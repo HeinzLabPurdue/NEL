@@ -202,6 +202,8 @@ elseif status_rx8 % Most call for run_invCalib are from NEL1. For NEL2 (with RX8
     %Need to load a different circuit file based on the protocol...
 
     switch PROTOCOL
+        case 'calib'
+            invoke(COMM.handle.RX8,'LoadCof',[object_dir '\ABR_RX8_ADC_invCalib_2chan.rcx']);
         case 'ABR'
             invoke(COMM.handle.RX8,'LoadCof',[object_dir '\ABR_RX8_ADC_invCalib_2chan.rcx']);
         case 'FFR'

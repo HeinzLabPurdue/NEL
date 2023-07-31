@@ -1,4 +1,4 @@
-global COMM prog_dir PROG data_dir NelData Stimuli
+global COMM prog_dir PROG data_dir NelData Stimuli 
 
 % if ~(double(invoke(RP1,'GetTagVal', 'Stage')) == 2)
 %     FFR_set_attns(-120,-120,Stimuli.channel,Stimuli.KHosc,RP1,RP2); %% Check with MH
@@ -22,7 +22,7 @@ if NelData.General.RP2_3and4 && (~NelData.General.RX8) % NEL1 with RP2 #3 & #4
     
     %% For ADC (data in)
     invoke(RP3,'ClearCOF');
-    invoke(RP3,'LoadCOF',[prog_dir '\object\FFR_ADC_2chan.rcx']);
+    invoke(RP3,'LoadCOF',[prog_dir '\object\FFR_ADC_2chan.rcx']); %AS should check params work with NEL1 phys circuit then implement.
     invoke(RP3,'SetTagVal','ADdur', FFR_Gating.FFRlength_ms);
     invoke(RP3,'Run');
 elseif (~NelData.General.RP2_3and4) && (~NelData.General.RX8) % NEL1 without (RP2 #3 & #4), and not NEL2 because no RX8
@@ -59,7 +59,8 @@ end
 % loops run as expected.
 % set_RP_tagvals(RP1, RP2, FFR_Gating, Stimuli);
 
-FFR_set_attns(Stimuli.atten_dB,-120,Stimuli.channel,Stimuli.KHosc,RP1,RP2);
+% FFR_set_attns(Stimuli.atten_dB,-120,Stimuli.channel,Stimuli.KHosc,RP1,RP2);
+AEP_set_attns(Stimuli.atten_dB,Stimuli.channel,Stimuli.KHosc,RP1,RP2);  %% debug deal with later Khite
 
 FFRnpts=floor(FFR_Gating.FFRlength_ms/1000*Stimuli.RPsamprate_Hz); %Changed from ceil to floor based on ABR, VMA, SH (7/18/23)
 if Stimuli.FFRmem_reps>0
@@ -316,8 +317,9 @@ while isempty(get(FIG.push.close,'Userdata'))
             switch FIG.NewStim
                 
                 case 0 % Do nothing (SP)
-                    FFR_set_attns(Stimuli.atten_dB,-120,Stimuli.channel,Stimuli.KHosc,RP1,RP2);
-   
+%                     FFR_set_attns(Stimuli.atten_dB,-120,Stimuli.channel,Stimuli.KHosc,RP1,RP2);
+                      AEP_set_attns(Stimuli.atten_dB,Stimuli.channel,Stimuli.KHosc,RP1,RP2);
+                      
                 case 1 % case: fast or slow
                     % set_RP_tagvals(RP1, RP2, FFR_Gating, Stimuli);
                     invoke(RP1, 'SetTagVal', 'StmOn', FFR_Gating.duration_ms);
@@ -366,7 +368,10 @@ while isempty(get(FIG.push.close,'Userdata'))
                     att_run = floor(Stimuli.maxSPL-Stimuli.atten_dB-20);
                     
                     %FFR_set_attns(Stimuli.atten_dB,-120,Stimuli.channel,Stimuli.KHosc,RP1,RP2);
-                    FFR_set_attns(att_run,-120,Stimuli.channel,Stimuli.KHosc,RP1,RP2);
+%                     FFR_set_attns(att_run,-120,Stimuli.channel,Stimuli.KHosc,RP1,RP2);
+                    
+                    AEP_set_attns(att_run,Stimuli.channel,Stimuli.KHosc,RP1,RP2);
+                    
                     % debug deal with later Khite
                     
                     FFRnpts=floor(FFR_Gating.FFRlength_ms/1000*Stimuli.RPsamprate_Hz); %Changed from ceil to floor based on ABR, VMA, SH (7/18/23)
@@ -514,6 +519,7 @@ end
 
 Stimuli.KHosc = 0;    % added by GE/MH, 17Jan2003.  To force Krohn-Hite to disconnect.
 % FFR_set_attns(-120,-120, Stimuli.channel, Stimuli.KHosc, RP1, RP2);
+AEP_set_attns(120,Stimuli.channel,Stimuli.KHosc,RP1,RP2);
 rc = PAset([120;120;120;120]); % added by GE/MH, 17Jan2003.  To force all attens to 120
 
 invoke(RP1,'Halt');

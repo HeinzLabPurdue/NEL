@@ -6,7 +6,9 @@ function h_fig = calibrate(command_str)
 %
 % THIS IS THE MAIN PROGRAM FOR THE TDT-RP2 based Calibration
 
-global root_dir newCalib doInvCalib coefFileNum func_dir object_dir PROG FIG Stimuli SRdata DDATA FREQS COMM NelData
+global root_dir newCalib doInvCalib coefFileNum func_dir object_dir PROG FIG Stimuli SRdata DDATA FREQS COMM NelData PROTOCOL
+
+PROTOCOL = 'calib'
 
 if nargin < 1
     func_dir = cd([root_dir 'calibration\private']);
