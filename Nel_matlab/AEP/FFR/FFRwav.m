@@ -38,18 +38,23 @@ if nargin < 1
     %     end
     
     FFRwav('calibInit'); % Initialize RP2_4 with InvFilter
+    FFRwav('right'); %default to right ear first
     FFRwav('update_stim', 'spl');
     FFRwav_loop; % Working
     
 elseif strcmp(command_str,'update_stim')
     update_gating_flag= false;
+    resetAttn = false;
+    
     switch eventdata
         case 'spl'
             FIG.NewStim = 2;
             if get(FIG.bg.spl.dB65, 'value')
-                Stimuli.atten_dB = Stimuli.maxSPL-65;
-            elseif get(FIG.bg.spl.dB85, 'value')
-                Stimuli.atten_dB = Stimuli.maxSPL-85;
+                Stimuli.atten_dB = Stimuli.calib_dBSPLout-65;
+                Stimuli.atten_dB = round(Stimuli.atten_dB,1);
+            elseif get(FIG.bg.spl.dB80, 'value')
+                Stimuli.atten_dB = Stimuli.calib_dBSPLout-80;
+                Stimuli.atten_dB = round(Stimuli.atten_dB,1);
             end
             set(FIG.asldr.val,'string',num2str(-Stimuli.atten_dB));
             %             set_RP_tagvals(RP1, RP2, FFR_SNRenv_Gating, Stimuli);
@@ -105,6 +110,7 @@ elseif strcmp(command_str,'update_stim')
 %             Stimuli.list=fName.FFRwav_stimlist;
             StimInd= get(FIG.popup.stims, 'value');
             Stimuli.filename=Stimuli.list(StimInd).name;
+            resetAttn = true;
             
         case 'prevStim'
             FIG.NewStim = 2;
@@ -130,6 +136,12 @@ elseif strcmp(command_str,'update_stim')
     audiowrite([Stimuli.UPDdir Stimuli.filename], xpr, round(Stimuli.RPsamprate_Hz));
     copyfile([Stimuli.UPDdir Stimuli.filename],Stimuli.STIMfile,'f');
     FFRwav('attenCalib'); % Initialize RP2_4 with InvFilter
+    
+    %default new stim to 80 dB unless changed by user
+    if resetAttn
+        set(FIG.bg.spl.dB80, 'value',1);
+        FFRwav('update_stim','spl');
+    end
     
     if update_gating_flag % right now, this will update only for dir based, later for all stims
         Stimuli.fast.duration_ms= round(length(xp)/fsp*1e3);
@@ -253,6 +265,10 @@ elseif strcmp(command_str,'Simultaneous')
     
 elseif strcmp(command_str,'slide_atten')
     FIG.NewStim = 2;
+    
+    set(FIG.bg.spl.dB65, 'value',0);
+    set(FIG.bg.spl.dB80, 'value',0);
+    
     Stimuli.atten_dB = floor(-get(FIG.asldr.slider,'value'));
     set(FIG.asldr.val,'string',num2str(-Stimuli.atten_dB));
     %     set_RP_tagvals(RP1, RP2, FFR_SNRenv_Gating, Stimuli);
@@ -263,6 +279,10 @@ elseif strcmp(command_str,'slide_atten')
     % LQ 01/31/05
 elseif strcmp(command_str, 'slide_atten_text')
     FIG.NewStim = 2;
+    
+    set(FIG.bg.spl.dB65, 'value',0);
+    set(FIG.bg.spl.dB80, 'value',0);
+    
     new_atten = get(FIG.asldr.val, 'string');
     if new_atten(1) ~= '-'
         new_atten = ['-' new_atten];
@@ -390,13 +410,23 @@ elseif strcmp(command_str,'calibInit')
     Stimuli.invCalib=get(FIG.radio.invCalib,'value');
 %     filttype = {'inversefilt','inversefilt'};
     if get(FIG.radio.invCalib,'value')
-        if get(FIG.radio.right,'value') == 1
-            filttype = {'allstop','inversefilt'};
-        elseif get(FIG.radio.left,'value') == 1
-            filttype = {'inversefilt','allstop'};
-        elseif get(FIG.radio.both,'value') == 1
-            filttype = {'inversefilt','inversefilt'};
+%         if Stimuli.channel == 1
+%             filttype = {'allstop','inversefilt'};
+%         elseif get(FIG.radio.left,'value') == 1
+%             filttype = {'inversefilt','allstop'};
+%         elseif get(FIG.radio.both,'value') == 1
+%             filttype = {'inversefilt','inversefilt'};
+%         end
+%         
+        switch Stimuli.channel
+            case 1 %right side
+                filttype = {'allstop','inversefilt'};
+            case 2 %left side
+                filttype = {'inversefilt','allstop'};       
+            case 3 %both sides
+                filttype = {'inversefilt','inversefilt'};
         end
+        
     else
         filttype = {'allpass','allpass'};
     end
@@ -474,6 +504,9 @@ elseif strcmp(command_str,'calibInit')
 
     cd(curDir);
     %calibdata = struct;
+    
+    
+    %RIGHT NOW ONLY USING ONE CALIB CURVE TO CALIBRATE OTHER.....
     calibdata= cal.CalibData();
     Stimuli.calib_dBSPLout= get_SPL_from_calib(sig, fs, calibdata, false);
     set(FIG.asldr.SPL,'string',sprintf('%.1f dB SPL',Stimuli.calib_dBSPLout-abs(str2double(get(FIG.asldr.val, 'string')))));
