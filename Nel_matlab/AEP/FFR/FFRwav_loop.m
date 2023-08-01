@@ -365,12 +365,12 @@ while isempty(get(FIG.push.close,'Userdata'))
                     invoke(RP1,'Run');
                     
                     % round attenuation
-                    att_run = floor(Stimuli.maxSPL-Stimuli.atten_dB-20);
+%                     att_run = floor(Stimuli.maxSPL-Stimuli.atten_dB-20);
                     
                     %FFR_set_attns(Stimuli.atten_dB,-120,Stimuli.channel,Stimuli.KHosc,RP1,RP2);
 %                     FFR_set_attns(att_run,-120,Stimuli.channel,Stimuli.KHosc,RP1,RP2);
                     
-                    AEP_set_attns(att_run,Stimuli.channel,Stimuli.KHosc,RP1,RP2);
+                    AEP_set_attns(Stimuli.atten_dB,Stimuli.channel,Stimuli.KHosc,RP1,RP2);
                     
                     % debug deal with later Khite
                     

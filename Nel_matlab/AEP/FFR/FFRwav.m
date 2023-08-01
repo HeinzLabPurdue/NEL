@@ -11,10 +11,11 @@ usr = NelData.General.User; % current nel user
 RP1= connect_tdt('RP2', 1);
 RP2= connect_tdt('RP2', 2);
 
-%RP3 is now connected in set_invFilter!
+%RP3 is now connected in set_invFilter for NEL2!
 
-% if NelData.General.RP2_3and4 && (~NelData.General.RX8)
-%     RP3= connect_tdt('RP2', 3);  %#ok<*NASGU>
+if NelData.General.RP2_3and4 && (~NelData.General.RX8)
+    RP3= connect_tdt('RP2', 3);  %#ok<*NASGU>
+end
 % elseif (~NelData.General.RP2_3and4) && (~NelData.General.RX8)
 %     RP3= RP2;
 % elseif NelData.General.RX8
@@ -251,17 +252,17 @@ elseif strcmp(command_str,'Simultaneous')
     end
     
 elseif strcmp(command_str,'slide_atten')
-    FIG.NewStim = 0;
+    FIG.NewStim = 2;
     Stimuli.atten_dB = floor(-get(FIG.asldr.slider,'value'));
     set(FIG.asldr.val,'string',num2str(-Stimuli.atten_dB));
     %     set_RP_tagvals(RP1, RP2, FFR_SNRenv_Gating, Stimuli);
-    FFR_set_attns(Stimuli.atten_dB,-120,Stimuli.channel,Stimuli.KHosc,RP1,RP2);
+%     FFR_set_attns(Stimuli.atten_dB,-120,Stimuli.channel,Stimuli.KHosc,RP1,RP2);
     set(FIG.asldr.SPL,'string',sprintf('%.1f dB SPL',Stimuli.calib_dBSPLout-abs(get(FIG.asldr.slider,'val'))));
     FFRwav('attenCalib');
     
     % LQ 01/31/05
 elseif strcmp(command_str, 'slide_atten_text')
-    FIG.NewStim = 0;
+    FIG.NewStim = 2;
     new_atten = get(FIG.asldr.val, 'string');
     if new_atten(1) ~= '-'
         new_atten = ['-' new_atten];
@@ -274,8 +275,9 @@ elseif strcmp(command_str, 'slide_atten_text')
         Stimuli.atten_dB = -new_atten;
         set(FIG.asldr.slider, 'value', new_atten);
     end
-    FFR_set_attns(Stimuli.atten_dB,-120,Stimuli.channel,Stimuli.KHosc,RP1,RP2);
+%     FFR_set_attns(Stimuli.atten_dB,-120,Stimuli.channel,Stimuli.KHosc,RP1,RP2);
     %     set_RP_tagvals(RP1, RP2, FFR_SNRenv_Gating, Stimuli);
+    
     set(FIG.asldr.SPL,'string',sprintf('%.1f dB SPL',Stimuli.calib_dBSPLout-abs(get(FIG.asldr.slider,'val'))));
     FFRwav('attenCalib');
     
