@@ -481,34 +481,36 @@ elseif strcmp(command_str,'calibInit')
     
  elseif strcmp(command_str,'attenCalib') %AS/MH/MP | Sprint 2023 Update
     cdd;
-    
     invfiltdata = get(FIG.radio.invCalib,'UserData'); 
-
     cal = loadpic(invfiltdata.CalibPICnum2use);  % use INVERSE calib to compute MAX dB SPL
-    
-%     CalibData=cal.CalibData(:,1:2);
-%     CalibData(:,2)=trifilt(CalibData(:,2)',5)';
     rdd;
     
-%     if get(FIG.radio.clickYes,'value')
-%         Stimuli.MaxdBSPLCalib=median(CalibData(:,2));  %use this convention ALWAYS in analysis too!
-%         %% LONG-TERM - decide if median is right - it avoids ends with very low values
-%     else % tone
-%         Stimuli.MaxdBSPLCalib=CalibInterp(Stimuli.freq_hz/1000, CalibData);
-%     end
-
-
     [sig, fs] =audioread([Stimuli.UPDdir Stimuli.filename]);
     curDir= pwd;
     cdd;
-
     cd(curDir);
-    %calibdata = struct;
-    
+
     
     %RIGHT NOW ONLY USING ONE CALIB CURVE TO CALIBRATE OTHER.....
-    calibdata= cal.CalibData();
-    Stimuli.calib_dBSPLout= get_SPL_from_calib(sig, fs, calibdata, false);
+    
+    if ~strcmpi(Stimuli.ear,'both')
+        
+        %find and choose the appropriate left or right calib
+        calib_to_use = contains(cal.ear_ord,string(Stimuli.ear),'IgnoreCase',true);
+        calib_to_use = find(calib_to_use);
+        
+        if calib_to_use == 2
+            CalibData=cal.CalibData2(:,1:2);
+        else
+            CalibData = cal.CalibData(:,1:2);
+        end
+    else %both ears
+        %use mean of the inv calib curves
+        CalibData(:,1) = cal.CalibData(:,1);
+        CalibData(:,2) = (cal.CalibData(:,2)+cal.CalibData2(:,2))/2;
+    end
+    
+    Stimuli.calib_dBSPLout= get_SPL_from_calib(sig, fs, CalibData, false);
     set(FIG.asldr.SPL,'string',sprintf('%.1f dB SPL',Stimuli.calib_dBSPLout-abs(str2double(get(FIG.asldr.val, 'string')))));
     
 %     set(FIG.asldr.SPL, 'string', sprintf('%.1f dB SPL', Stimuli.MaxdBSPLCalib-Stimuli.atten_dB));    

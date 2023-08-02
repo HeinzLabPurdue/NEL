@@ -425,7 +425,26 @@ elseif strcmp(command_str,'attenCalib') %AS/MH/MP | Sprint 2023 Update
 
     cal = loadpic(invfiltdata.CalibPICnum2use);  % use INVERSE calib to compute MAX dB SPL
     
-    CalibData=cal.CalibData(:,1:2);
+    
+    %identify the inverse CalibData to use. 
+    %single ear
+    if ~strcmpi(Stimuli.ear,'both')
+        
+        %find and choose the appropriate left or right calib
+         calib_to_use = contains(cal.ear_ord,string(Stimuli.ear),'IgnoreCase',true);
+         calib_to_use = find(calib_to_use);
+         
+         if calib_to_use == 2
+             CalibData=cal.CalibData2(:,1:2);
+         else
+             CalibData = cal.CalibData(:,1:2);
+         end
+    else %both ears
+        %use mean of the inv calib curves
+        CalibData(:,1) = cal.CalibData(:,1);
+        CalibData(:,2) = (cal.CalibData(:,2)+cal.CalibData2(:,2))/2;
+    end
+
     CalibData(:,2)=trifilt(CalibData(:,2)',5)';
     rdd;
     
