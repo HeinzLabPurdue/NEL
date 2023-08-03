@@ -96,8 +96,40 @@ AR = 0; %0=No Artifact rejection, 1=Do Artifact rejection
 % stim.CalibPICnum2use = calibPicNum;  % save this so we know what calib file to use right from data file
 % coefFileNum = NaN;
 
-%NEW
+%NEW%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %get user-specified Raw calib
+%note to MH from AS, if doing FPL calibration, make sure to consider both L
+%and R transducers (CalibData and CalibData2). 
+
+%AS copied from dpoae.m. Might help. Basically search for right and left
+%and assign the right calibdata to the right transducer.
+
+% if length(cal.ear_ord)>1
+%     %L1 - 'Right' inv calib
+%     calib_to_use = contains(cal.ear_ord,'right','IgnoreCase',true);
+%     calib_to_use = find(calib_to_use);
+%     
+%     if calib_to_use == 2
+%         CalibData_L1 = cal.CalibData2(:,1:2);
+%     else
+%         CalibData_L1 = cal.CalibData(:,1:2);
+%     end 
+%     
+%     %L2 - 'Left' inv calib
+%     calib_to_use = contains(cal.ear_ord,'left','IgnoreCase',true);
+%     calib_to_use = find(calib_to_use);
+%     
+%     if calib_to_use == 2
+%         CalibData_L2 = cal.CalibData2(:,1:2);
+%     else
+%         CalibData_L2 = cal.CalibData(:,1:2);
+%     end 
+% else
+%     CalibData_L1 = cal.CalibData(:,1:2);
+%     CalibData_L2 = CalibData_L1;
+% end
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 cdd;
 filttype = {'allpass','allpass'};
 % filttype = {'allstop','allstop'};
