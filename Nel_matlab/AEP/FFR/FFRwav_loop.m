@@ -22,7 +22,7 @@ if NelData.General.RP2_3and4 && (~NelData.General.RX8) % NEL1 with RP2 #3 & #4
     
     %% For ADC (data in)
     invoke(RP3,'ClearCOF');
-    invoke(RP3,'LoadCOF',[prog_dir '\object\FFR_ADC_2chan.rcx']); %AS should check params work with NEL1 phys circuit then implement.
+    invoke(RP3,'LoadCOF',[prog_dir '..\object\RP2_3_2chan_phys.rcx']); %AS should check params work with NEL1 phys circuit then implement.
     invoke(RP3,'SetTagVal','ADdur', FFR_Gating.FFRlength_ms);
     invoke(RP3,'Run');
 elseif (~NelData.General.RP2_3and4) && (~NelData.General.RX8) % NEL1 without (RP2 #3 & #4), and not NEL2 because no RX8
