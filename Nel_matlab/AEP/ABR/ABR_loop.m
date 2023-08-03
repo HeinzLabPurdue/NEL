@@ -326,7 +326,7 @@ while isempty(get(FIG.push.close,'Userdata'))
                     AEP_set_attns(Stimuli.atten_dB,Stimuli.channel,Stimuli.KHosc,RP1,RP2);
                 case 6
                     %recalculate params if new freq!
-                    
+                    clickAmp=0; toneAmp=5;
                     if ~Stimuli.cyc_flag
                         if get(FIG.radio.fast, 'value') == 1
                             CAP_Gating.duration_ms=Stimuli.fast.duration_ms;
@@ -436,6 +436,8 @@ while isempty(get(FIG.push.close,'Userdata'))
                     invoke(RP1,'SetTagVal','clickAmp',clickAmp);
                     invoke(RP1,'SetTagVal','StmOn',CAP_Gating.duration_ms);
                     invoke(RP1,'SetTagVal','StmOff',CAP_Gating.period_ms-CAP_Gating.duration_ms);
+                    invoke(RP1,'SetTagVal','RiseFall',CAP_Gating.rftime_ms);
+
                 case 18
                     if Stimuli.rec_channel>2
                         FIG.ax.line2 = plot(0.4,0,'r*',[0 1],[Stimuli.threshV Stimuli.threshV],':r',0.6,0,'b*',[0 1],[Stimuli.threshV2 Stimuli.threshV2],':b');
