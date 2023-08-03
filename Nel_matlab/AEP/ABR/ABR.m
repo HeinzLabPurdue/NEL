@@ -151,7 +151,7 @@ elseif strcmp(command_str,'slide_freq')
 elseif strcmp(command_str,'slide_freq_text')
     FIG.NewStim = 6;
     new_freq = str2num(get(FIG.fsldr.val, 'string'));
-    if new_freq < get(FIG.fsldr.slider,'min')*Stimuli.fmult | ...
+    if new_freq < get(FIG.fsldr.slider,'min')*Stimuli.fmult || ...
             new_freq > get(FIG.fsldr.slider,'max')*Stimuli.fmult
         set(FIG.fsldr.val,'string',num2str(Stimuli.freq_hz));
     else

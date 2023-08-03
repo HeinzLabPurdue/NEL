@@ -38,13 +38,17 @@ if ~AutoLevel_params.ReRunFlag
     %Stimuli.MaxdBSPLCalib is TDT max atten
 %     AutoLevel_params.attenMask=[round((Stimuli.MaxdBSPLCalib-AutoLevel_params.maxdBSPLtoRUN)/AutoLevel_params.stepdB): ...
 %             min(120,ceil((Stimuli.atten_dB+AutoLevel_params.dB_below_thresh)/AutoLevel_params.stepdB))];
+
+if ~AutoLevel_params.zero_to_eighty_override
     dBs2RUN=AutoLevel_params.stepdB*floor(max(Stimuli.MaxdBSPLCalib-Stimuli.atten_dB-...
-            AutoLevel_params.dB_below_thresh,Stimuli.MaxdBSPLCalib-120)/AutoLevel_params.stepdB)...
-            :AutoLevel_params.stepdB:min(Stimuli.MaxdBSPLCalib,AutoLevel_params.maxdBSPLtoRUN);
+        AutoLevel_params.dB_below_thresh,Stimuli.MaxdBSPLCalib-120)/AutoLevel_params.stepdB)...
+        :AutoLevel_params.stepdB:min(Stimuli.MaxdBSPLCalib,AutoLevel_params.maxdBSPLtoRUN);
     if dBs2RUN(1)<Stimuli.MaxdBSPLCalib-120 % Case: When the floor10 of -20 is not possible
         dBs2RUN(1)=Stimuli.MaxdBSPLCalib-120;
     end
-
+else
+    dBs2RUN = 0:10:80;
+end
     if Stimuli.MaxdBSPLCalib<AutoLevel_params.maxdBSPLtoRUN % Case when calibration is < 90
         AutoLevel_params.dBs2RUN=[dBs2RUN ,Stimuli.MaxdBSPLCalib];
         warning ('Calibration Below 90');

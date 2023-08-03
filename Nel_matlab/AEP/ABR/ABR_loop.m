@@ -6,10 +6,24 @@ if Stimuli.clickYes==1  %KH 06Jan2012
     CAP_Gating.duration_ms=Stimuli.clickLength_ms;
 else
     clickAmp=0; toneAmp=5;
-    if get(FIG.radio.fast, 'value') == 1
-        CAP_Gating.duration_ms=Stimuli.fast.duration_ms;
+    if ~Stimuli.cyc_flag
+        if get(FIG.radio.fast, 'value') == 1
+            CAP_Gating.duration_ms=Stimuli.fast.duration_ms;
+            CAP_Gating.rftime_ms = Stimuli.fast.rftime_ms;
+        else
+            CAP_Gating.duration_ms=Stimuli.slow.duration_ms;
+            CAP_Gating.rftime_ms = Stimuli.slow.rftime_ms;
+        end
     else
-        CAP_Gating.duration_ms=Stimuli.slow.duration_ms;
+        if get(FIG.radio.fast, 'value') == 1
+            CAP_Gating.duration_cyc=Stimuli.duration_cyc+Stimuli.rftime_cyc;
+            CAP_Gating.duration_ms = CAP_Gating.duration_cyc * 1/(Stimuli.freq_hz/1000);
+            CAP_Gating.rftime_ms = Stimuli.rftime_cyc * 1/(Stimuli.freq_hz/1000);
+        else
+            CAP_Gating.duration_cyc=Stimuli.duration_cyc+Stimuli.rftime_cyc;
+            CAP_Gating.duration_ms = CAP_Gating.duration_cyc * 1/(Stimuli.freq_hz/1000);
+            CAP_Gating.rftime_ms = Stimuli.rftime_cyc * 1/(Stimuli.freq_hz/1000);
+        end
     end
 end
 
@@ -303,6 +317,7 @@ while isempty(get(FIG.push.close,'Userdata'))
                     invoke(RP1,'SetTagVal','StmOn',CAP_Gating.duration_ms);
                     invoke(RP1,'SetTagVal','StmOff',CAP_Gating.period_ms-CAP_Gating.duration_ms);
                     invoke(RP3,'SetTagVal','ADdur',CAP_Gating.CAPlength_ms);
+                    invoke(RP1,'SetTagVal','RiseFall',CAP_Gating.rftime_ms);
                     CAPnpts=floor((CAP_Gating.CAPlength_ms/1000)*Stimuli.RPsamprate_Hz);
                     firstSTIM = 1;
                     FIG.NewStim = 0;
@@ -310,6 +325,31 @@ while isempty(get(FIG.push.close,'Userdata'))
                 case 5
                     AEP_set_attns(Stimuli.atten_dB,Stimuli.channel,Stimuli.KHosc,RP1,RP2);
                 case 6
+                    %recalculate params if new freq!
+                    
+                    if ~Stimuli.cyc_flag
+                        if get(FIG.radio.fast, 'value') == 1
+                            CAP_Gating.duration_ms=Stimuli.fast.duration_ms;
+                            CAP_Gating.rftime_ms = Stimuli.fast.rftime_ms;
+                        else
+                            CAP_Gating.duration_ms=Stimuli.slow.duration_ms;
+                            CAP_Gating.rftime_ms = Stimuli.slow.rftime_ms;
+                        end
+                    else
+                        if get(FIG.radio.fast, 'value') == 1
+                            CAP_Gating.duration_cyc=Stimuli.duration_cyc+Stimuli.rftime_cyc;
+                            CAP_Gating.duration_ms = CAP_Gating.duration_cyc * 1/(Stimuli.freq_hz/1000);
+                            CAP_Gating.rftime_ms = Stimuli.rftime_cyc * 1/(Stimuli.freq_hz/1000);
+                        else
+                            CAP_Gating.duration_cyc=Stimuli.duration_cyc+Stimuli.rftime_cyc;
+                            CAP_Gating.duration_ms = CAP_Gating.duration_cyc * 1/(Stimuli.freq_hz/1000);
+                            CAP_Gating.rftime_ms = Stimuli.rftime_cyc * 1/(Stimuli.freq_hz/1000);
+                        end
+                    end
+                    
+                    invoke(RP1,'SetTagVal','StmOn',CAP_Gating.duration_ms);
+                    invoke(RP1,'SetTagVal','StmOff',CAP_Gating.period_ms-CAP_Gating.duration_ms);
+                    invoke(RP1,'SetTagVal','RiseFall',CAP_Gating.rftime_ms);
                     invoke(RP1,'SetTagVal','freq',Stimuli.freq_hz);
                 case 7
                     AEP_set_attns(Stimuli.atten_dB,Stimuli.channel,Stimuli.KHosc,RP1,RP2);
@@ -372,10 +412,24 @@ while isempty(get(FIG.push.close,'Userdata'))
                         CAP_Gating.duration_ms=Stimuli.clickLength_ms;
                     else
                         clickAmp=0; toneAmp=5;
-                        if get(FIG.radio.fast, 'value') == 1
-                            CAP_Gating.duration_ms=Stimuli.fast.duration_ms;
+                        if ~Stimuli.cyc_flag
+                            if get(FIG.radio.fast, 'value') == 1
+                                CAP_Gating.duration_ms=Stimuli.fast.duration_ms;
+                                CAP_Gating.rftime_ms = Stimuli.fast.rftime_ms;
+                            else
+                                CAP_Gating.duration_ms=Stimuli.slow.duration_ms;
+                                CAP_Gating.rftime_ms = Stimuli.fast.rftime_ms;
+                            end
                         else
-                            CAP_Gating.duration_ms=Stimuli.slow.duration_ms;
+                            if get(FIG.radio.fast, 'value') == 1
+                                CAP_Gating.duration_cyc=Stimuli.duration_cyc+Stimuli.rftime_cyc;
+                                CAP_Gating.duration_ms = CAP_Gating.duration_cyc * 1/(Stimuli.freq_hz/1000);
+                                CAP_Gating.rftime_ms = Stimuli.rftime_cyc * 1/(Stimuli.freq_hz/1000);
+                            else
+                                CAP_Gating.duration_cyc=Stimuli.duration_cyc+Stimuli.rftime_cyc;
+                                CAP_Gating.duration_ms = CAP_Gating.duration_cyc * 1/(Stimuli.freq_hz/1000);
+                                CAP_Gating.rftime_ms = Stimuli.rftime_cyc * 1/(Stimuli.freq_hz/1000);
+                            end
                         end
                     end
                     invoke(RP1,'SetTagVal','toneAmp',toneAmp);
