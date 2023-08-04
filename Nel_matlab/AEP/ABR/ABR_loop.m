@@ -31,7 +31,8 @@ end
 %% For stimulus
 % RP1=actxcontrol('RPco.x',[0 0 1 1]);
 % invoke(RP1,'ConnectRP2',NelData.General.TDTcommMode,1);
-RP1= connect_tdt('RP2', 1);
+
+RP1 = connect_tdt('RP2', 1);
 invoke(RP1,'ClearCOF');
 invoke(RP1,'LoadCOF',[prog_dir '\object\CAP_left.rcx']);
 
