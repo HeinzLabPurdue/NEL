@@ -49,7 +49,7 @@ if (isempty(select))
    return;
 end
 if (exist('RPco1','var') == 1)
-   PAset(120.0);
+   PAset(120);
    invoke(RPco1,'SetTagVal','Select_L',select(1));
    invoke(RPco1,'SetTagVal','Connect_L',connect(1));
    invoke(RPco2,'SetTagVal','Select_R',select(2));

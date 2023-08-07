@@ -59,6 +59,7 @@ if NelData.General.RP2_3and4 && (~NelData.General.RX8) % NEL1 with RP2 #3 & #4
     %     RP2=actxcontrol('RPco.x',[0 0 1 1]);
     %     invoke(RP2,'ConnectRP2',NelData.General.TDTcommMode,2);
     RP2= connect_tdt('RP2', 2);
+    invoke(RP2,'ClearCOF');
     invoke(RP2,'LoadCOF',[prog_dir '\object\CAP_BitSet.rcx']);
     invoke(RP2,'Run');
     
