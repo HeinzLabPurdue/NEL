@@ -15,6 +15,7 @@ x.Stimuli=Stimuli;
 x.Stimuli.RunLevels_params = RunLevels_params;
 x.Stimuli.FFR_Gating = FFR_Gating;
 x.Line.freq_Hz = Stimuli.fc; % zz 04nov11 original only had one frequency, updated to carrier frequency
+x.invfilterdata = invfiltdata;
 
 x.AD_Data.Gain=Display.Gain;
 

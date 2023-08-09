@@ -1,7 +1,7 @@
 % Sets naming structure for file and relevant stimuli metadata
 
 function [x, aux_fname, fname]=make_FFRwav_text_file_subfunc1 ...
-    (misc, Stimuli, PROG, NelData, comment, RunLevels_params, FFR_Gating, Display, FFRattens)
+    (misc, Stimuli, invfiltdata, PROG, NelData, comment, RunLevels_params, FFR_Gating, Display, FFRattens)
 
     fname = current_data_file(...
         [misc.fileExtension strrep(Stimuli.filename(1:end-4),'-','_m')],1);
@@ -47,11 +47,17 @@ x.General.host = lower(getenv('hostname'));
 x.Stimuli=Stimuli;
 x.Stimuli.RunLevels_params = RunLevels_params;
 x.Stimuli.FFR_Gating = FFR_Gating;
+x.invfilterdata = invfiltdata;
+
 % x.Line.freq_Hz = Stimuli.fc; % zz 04nov11 original only had one frequency, updated to carrier frequency
 
 x.AD_Data.Gain=Display.Gain;
 
 % stimuli_fname = fullfile(pathstr,'Signals');
 
-x.Stimuli.atten_dB = Stimuli.atten_dB + RunLevels_params.stepdB*RunLevels_params.attenMask;
+%AS - Why is below line done here??? How about we comment it out. Should have the right
+%attenuation value as is. If this value is weird...just uncomment I guess.
+
+% x.Stimuli.atten_dB = Stimuli.atten_dB + RunLevels_params.stepdB*RunLevels_params.attenMask;
+
 x.Line.attens_dB = FFRattens;

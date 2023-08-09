@@ -8,7 +8,9 @@ gray_dark=[1 1 1];
 gray_light=[1 1 1];
 
 %% Calibration
-FIG.radio.invCalib = uicontrol(FIG.handle,'callback','FFRwav(''invCalib'');','style','radio','Enable','on','Units','normalized','position',[.125 .355 .08 .03],'string','invCalib','fontsize',12,'BackgroundColor','w','value',1); %added by KH 06Jan2012
+%INV CALIB WILL ALWAYS BE RUN!
+FIG.statText.calibLabel = uicontrol(FIG.handle, 'callback', '', 'style', 'text','Units','normalized', 'position', [.06 .38 .2 .03], 'string', 'Sorry! You MUST use inv calib!','fontsize',12,'BackgroundColor','w','FontWeight','Bold');
+FIG.radio.invCalib = uicontrol(FIG.handle,'callback','FFRwav(''invCalib'');','style','radio','Enable','off','Units','normalized','position',[.125 .355 .08 .03],'string','invCalib','fontsize',12,'BackgroundColor','w','value',1); %added by KH 06Jan2012
 
 %% Fast/Slow
 FIG.radio.fast   = uicontrol(FIG.handle,'callback','FFRwav(''fast'');','style','radio','Enable','on','Units','normalized','position',[.125 .315 .08 .03],'string','Fast','fontsize',12,'BackgroundColor','w','value',1);

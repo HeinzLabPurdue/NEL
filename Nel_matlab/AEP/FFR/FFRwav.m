@@ -1,6 +1,6 @@
 function h_fig = FFRwav(command_str,eventdata)
 
-global RP PROG FIG Stimuli FFR_Gating root_dir prog_dir Display NelData PROTOCOL
+global RP PROG FIG Stimuli FFR_Gating root_dir prog_dir Display NelData PROTOCOL filttype invfiltdata
 
 PROTOCOL = 'FFRwav';
 prog_dir = [root_dir 'AEP\FFR\'];
@@ -59,6 +59,7 @@ elseif strcmp(command_str,'update_stim')
             set(FIG.asldr.val,'string',num2str(-Stimuli.atten_dB));
             %             set_RP_tagvals(RP1, RP2, FFR_SNRenv_Gating, Stimuli);
             
+            Stimuli.calib_levelSPL = Stimuli.calib_dBSPLout-Stimuli.atten_dB;
         case 'list'
             FIG.NewStim = 2;
             fName.FFRwav_stimlist=dir([Stimuli.OLDDir '*.wav']);
@@ -273,6 +274,9 @@ elseif strcmp(command_str,'slide_atten')
     set(FIG.asldr.val,'string',num2str(-Stimuli.atten_dB));
     %     set_RP_tagvals(RP1, RP2, FFR_SNRenv_Gating, Stimuli);
 %     FFR_set_attns(Stimuli.atten_dB,-120,Stimuli.channel,Stimuli.KHosc,RP1,RP2);
+    
+    Stimuli.calib_levelSPL = Stimuli.calib_dBSPLout-Stimuli.atten_dB;
+
     set(FIG.asldr.SPL,'string',sprintf('%.1f dB SPL',Stimuli.calib_dBSPLout-abs(get(FIG.asldr.slider,'val'))));
     FFRwav('attenCalib');
     
@@ -295,8 +299,10 @@ elseif strcmp(command_str, 'slide_atten_text')
         Stimuli.atten_dB = -new_atten;
         set(FIG.asldr.slider, 'value', new_atten);
     end
+    
 %     FFR_set_attns(Stimuli.atten_dB,-120,Stimuli.channel,Stimuli.KHosc,RP1,RP2);
     %     set_RP_tagvals(RP1, RP2, FFR_SNRenv_Gating, Stimuli);
+    Stimuli.calib_levelSPL = Stimuli.calib_dBSPLout-Stimuli.atten_dB;
     
     set(FIG.asldr.SPL,'string',sprintf('%.1f dB SPL',Stimuli.calib_dBSPLout-abs(get(FIG.asldr.slider,'val'))));
     FFRwav('attenCalib');
@@ -409,15 +415,8 @@ elseif strcmp(command_str,'calibInit')
 %     [~, Stimuli.calibPicNum]= run_invCalib(get(FIG.radio.invCalib,'value'));
     Stimuli.invCalib=get(FIG.radio.invCalib,'value');
 %     filttype = {'inversefilt','inversefilt'};
-    if get(FIG.radio.invCalib,'value')
-%         if Stimuli.channel == 1
-%             filttype = {'allstop','inversefilt'};
-%         elseif get(FIG.radio.left,'value') == 1
-%             filttype = {'inversefilt','allstop'};
-%         elseif get(FIG.radio.both,'value') == 1
-%             filttype = {'inversefilt','inversefilt'};
-%         end
-%         
+    %INV FILTER WILL ALWAYS BE ON. DISABLING ABILITY TO TOGGLE FOR NOW.
+    if get(FIG.radio.invCalib,'value')    
         switch Stimuli.channel
             case 1 %right side
                 filttype = {'allstop','inversefilt'};

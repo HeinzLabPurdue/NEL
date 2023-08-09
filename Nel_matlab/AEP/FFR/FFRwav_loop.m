@@ -1,4 +1,4 @@
-global COMM prog_dir PROG data_dir NelData Stimuli 
+global COMM prog_dir PROG data_dir NelData Stimuli filttype invfiltdata
 
 % if ~(double(invoke(RP1,'GetTagVal', 'Stage')) == 2)
 %     FFR_set_attns(-120,-120,Stimuli.channel,Stimuli.KHosc,RP1,RP2); %% Check with MH
@@ -45,7 +45,7 @@ elseif NelData.General.RX8  %NEL2 with RX8
     %% For ADC (data in)
     RP3= COMM.handle.RX8;
     invoke(RP3,'ClearCOF');
-    filttype = {'inversefilt','inversefilt'};
+%     filttype = {'inversefilt','inversefilt'};
     invfilterdata = set_invFilter(filttype, Stimuli.calibPicNum);
 %     [~, ~, b_invCalib_coef]= run_invCalib(-2);
     
@@ -422,7 +422,7 @@ while isempty(get(FIG.push.close,'Userdata'))
                     end 
                     
                 case 4   % Run Levels
-                    [firstSTIM, NelData]=FFRwav_RunLevels(FIG,Stimuli,RunLevels_params, misc, FFR_Gating, ...
+                    [firstSTIM, NelData]=FFRwav_RunLevels(FIG,Stimuli, invfiltdata, RunLevels_params, misc, FFR_Gating, ...
                         FFRnpts,interface_type, Display, NelData, data_dir, RP1, RP3, PROG);
                     veryfirstSTIM=1; ...
                         % misc.n = int(~(invoke(RP1,'GetTagVal','ORG')));
