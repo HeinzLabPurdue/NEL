@@ -46,9 +46,12 @@ no_ref = 0;
 no_lock = 0;
 
 if FREQS.isinit == 1
+   
    getatn;
    [error] = make_tone;
-   attenuator(Stimuli.ear,0);
+%    attenuator(Stimuli.ear,0);  % original
+   attenuator(1,0);   % 8/4/23 (MH/AS): Allow pre-PA1/2 cross over (Select) to avoid LE distortion/-30dB atten from RP2-2Out1.  Use post PA1/2 cross-over (Connect) to aviod the bad hardware on HeinzLab NEL2 Mix/select
+   attenuator(2,0);
 end
 
 % Compute next stimulus frequency. 

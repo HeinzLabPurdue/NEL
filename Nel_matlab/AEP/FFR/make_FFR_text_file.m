@@ -7,7 +7,6 @@
 % if ~(RunLevels_params.bMultiOutputFiles)  % added by GE 26Apr2004.
 
 make_FFR_text_file_subfunc1;
-
 x.Line.attens_dB = FFRattens; % cell array(3)
 x.Stimuli.atten_dB = Stimuli.atten_dB + RunLevels_params.stepdB*RunLevels_params.attenMask; % added by GE 26Apr2004.
 

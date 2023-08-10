@@ -143,7 +143,7 @@ for attenLevel = Stimuli.atten_dB + RunLevels_params.stepdB*RunLevels_params.att
       end
    end
    
-   if (bAbort == 1 | save == 1)
+   if (bAbort == 1 || save == 1)
       break;
    end
    %    FFRdataAvg{attenIND} = FFRdataAvg{attenIND} / (2*RunLevels_params.nPairs);
