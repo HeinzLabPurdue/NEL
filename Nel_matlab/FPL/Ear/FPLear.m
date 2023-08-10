@@ -1,6 +1,7 @@
-global root_dir NelData data_dir
+global root_dir NelData data_dir PROTOCOL
 
 % NEL Version of RunMEMR_chin_edited_NEL1.m based off Hari's SNAPLab script
+PROTOCOL = 'FPLear'; 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 host=lower(getenv('hostname'));
@@ -23,12 +24,18 @@ card = initialize_card;
 %% Inverse Calibration
 %NEEDS TO BE CLEANED UP ASAP.
 % 1. run_invCalib needs cleaned up...currently clunky
-% 2. Need calibration to be correct for MEMR (currently all pass, w/o calib)
-[~, calibPicNum, ~] = run_invCalib(false);   % skipping INV calib for now since based on 94 dB SPL benig highest value, bot the 105 dB SPL from inv Calib.
-[coefFileNum, ~, ~] = run_invCalib(-2);
+% % 2. Need calibration to be correct for MEMR (currently all pass, w/o calib)
+% [~, calibPicNum, ~] = run_invCalib(false);   % skipping INV calib for now since based on 94 dB SPL benig highest value, bot the 105 dB SPL from inv Calib.
+% [coefFileNum, ~, ~] = run_invCalib(-2);
+% 
+% calib.CalibPICnum2use = calibPicNum;  % save this so we know what calib file to use right from data file
+% coefFileNum = NaN;
 
-calib.CalibPICnum2use = calibPicNum;  % save this so we know what calib file to use right from data file
-coefFileNum = NaN;
+filttype = {'allpass','allpass'};
+RawCalibPicNum = NaN;
+
+invfilterdata = set_invFilter(filttype, RawCalibPicNum, true);
+coefFileNum = invfilterdata.coefFileNum;
 
 %% Enter subject information
 if ~isfield(NelData,'FPL') % First time through, need to ask all this.
@@ -181,7 +188,7 @@ outut_Pa_20uPa_per_Vpp_2 = output_Pa_2 / P_ref; % unit: 20 uPa / Vpeak
 calib.EarRespH_2 =  outut_Pa_20uPa_per_Vpp_2 ./ Vo; %save for later
 
 %% Plot data
-figure(11);
+figure(61);
 ax(1) = subplot(2, 1, 1);
 semilogx(calib.freq, db(abs(calib.EarRespH_1)), 'linew', 2);
 hold on; 

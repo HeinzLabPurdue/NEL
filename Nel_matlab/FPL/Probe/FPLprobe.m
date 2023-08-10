@@ -1,4 +1,4 @@
-global root_dir NelData data_dir
+global  NelData PROTOCOL root_dir data_dir
 
 % NEL Version of RunMEMR_chin_edited_NEL1.m based off Hari's SNAPLab script
 
@@ -16,11 +16,18 @@ card = initialize_card;
 %NEEDS TO BE CLEANED UP ASAP.
 % 1. run_invCalib needs cleaned up...currently clunky
 % 2. Need calibration to be correct for MEMR (currently all pass, w/o calib)
-[~, calibPicNum, ~] = run_invCalib(false);   % skipping INV calib for now since based on 94 dB SPL benig highest value, bot the 105 dB SPL from inv Calib.
-[coefFileNum, ~, ~] = run_invCalib(-2);
+% [~, calibPicNum, ~] = run_invCalib(false);   % skipping INV calib for now since based on 94 dB SPL benig highest value, bot the 105 dB SPL from inv Calib.
+% [coefFileNum, ~, ~] = run_invCalib(-2);
+% 
+% calib.CalibPICnum2use = calibPicNum;  % save this so we know what calib file to use right from data file
+% coefFileNum = NaN;
 
-calib.CalibPICnum2use = calibPicNum;  % save this so we know what calib file to use right from data file
-coefFileNum = NaN;
+PROTOCOL = 'FPLprobe'; 
+filttype = {'allpass','allpass'};
+RawCalibPicNum = NaN;
+
+invfilterdata = set_invFilter(filttype, RawCalibPicNum, true);
+coefFileNum = invfilterdata.coefFileNum;
 
 %% Enter subject information
 if ~isfield(NelData,'FPL') % First time through, need to ask all this.
@@ -174,7 +181,7 @@ for m = 1: calib.CavNumb
 end
 
 %% Plot data
-figure;
+figure(66);
 ax(1) = subplot(2, 1, 1);
 semilogx(calib.freq, db(abs(calib.CavRespH_1)) + 20, 'linew', 2);
 hold on; 
@@ -300,7 +307,8 @@ end
 %% Shut Down TDT, no matter what button pushed, or if ended naturally
 close_play_circuit(card.f1RP, card.RP);
 rc = PAset(120.0*ones(1,4)); % need to use PAset, since it saves current value in PA, which is assumed way in NEL (causes problems when PAset is used to set attens later)
-run_invCalib(false);
+% run_invCalib(false);
+invfilterdata = set_invFilter(filttype, RawCalibPicNum, true);
 
 %% Return to GUI script, unless need to save
 if strcmp(NelData.FPL.rc,'abort') || strcmp(NelData.FPL.rc,'restart')
@@ -309,7 +317,6 @@ end
 
 %% Set up data structure to save
 calib.date = datestr(clock);
-
 warning('off');  % ??
 
 %% Big Switch case to handle end of data collection
@@ -318,8 +325,7 @@ switch NelData.FPL.rc
         % if want to RE-ADD stop, see DPOAE
         
     case 'saveNquit'
-        
-        %% Option to save comment in data file
+        % Option to save comment in data file
         comment='';
         TEMPans = inputdlg('Enter Comment (optional)');
         if ~isempty(TEMPans)
@@ -327,10 +333,10 @@ switch NelData.FPL.rc
         end
         calib.comment = comment;
         
-        %% NEL based data saving script
+        % NEL based data saving script
         make_FPLprobe_text_file;
         
-        %% remind user to turn of microphone
+        % remind user to turn of microphone
         h = msgbox('Please remember to turn off the microphone');
         uiwait(h);
         
