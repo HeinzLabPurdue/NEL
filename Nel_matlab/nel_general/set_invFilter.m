@@ -38,6 +38,12 @@ end
 errorFlag = false;
 coefFileNum = RawCalibPicNum;
 
+if strcmp(filttype,{'inversefilt_FPL', 'inversefilt_FPL'})
+    FPLflag = true;
+else
+    FPLflag = false; 
+end
+
 cdd;
 %calib file is needed
 if ~firstCalibFlag
@@ -48,8 +54,13 @@ if ~firstCalibFlag
             errorFlag = true;
         else
             %Checking for valid raw calib file in data directory
-            pic_str = sprintf('p%04d_%s',RawCalibPicNum,'calib_raw*');
-            fname = dir(pic_str);
+            if FPLflag 
+                 pic_str = sprintf('p%04d_%s',RawCalibPicNum,'calib_FPL_raw*');
+                 fname = dir(pic_str);
+            else
+                pic_str = sprintf('p%04d_%s',RawCalibPicNum,'calib_raw*');
+                fname = dir(pic_str);
+            end
             
             if isempty(fname)
                 warndlg('Invalid Raw Calibration File Number in set_invFilter. Running allstop.','WARNING!!!','modal');
@@ -124,6 +135,14 @@ switch filttype{1}
         
         b_chan1 = temp.b(:)';
         fprintf('\n Channel 1 | invFIR Coefs set successfully from %s', coef_str);
+    case 'inversefilt_FPL'
+        %need 2 checks
+        % inverse and coeffs
+        coef_str = sprintf('coef_%04d_%s',coefFileNum,'calib_FPL.mat');       
+        temp = load(coef_str);
+        
+        b_chan1 = temp.b(:)';
+        fprintf('\n Channel 1 | invFIR Coefs set successfully from %s', coef_str);
     otherwise
         warndlg('\n Invalid filter type specified in set_invFilter()...defaulting to allstop','WARNING!!!','modal')
         errorFlag = true;
@@ -146,7 +165,23 @@ switch filttype{2}
     case 'inversefilt'
         %need 2 checks
         % inverse and coeffs
-        coef_str = sprintf('coef_%04d_%s',coefFileNum,'calib.mat');       
+        coef_str = sprintf('coef_%04d_%s',coefFileNum,'calib.mat');
+        temp = load(coef_str);
+        
+        %sets b2 to be occupied in the case a single side calibration is done,
+        %since we default to saving b first regardless of channel.
+        
+        if isempty(temp.b2)
+            temp.b2 = temp.b;
+            warning("\n \n ***Single sided calibration, but using chan 2. b2 is set to b for inverse filtering*** \n \n",[],[]);
+        end
+        
+        b_chan2 = temp.b2(:)';
+        fprintf('\n Channel 2 | invFIR Coefs set successfully from %s', coef_str);
+    case 'inversefilt_FPL'
+        %need 2 checks
+        % inverse and coeffs
+        coef_str = sprintf('coef_%04d_%s',coefFileNum,'calib_FPL.mat');
         temp = load(coef_str);
         
         %sets b2 to be occupied in the case a single side calibration is done,

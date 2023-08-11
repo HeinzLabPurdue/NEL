@@ -3,7 +3,7 @@
 stim.fmin = 500;
 stim.fmax = 16000;
 stim.speed = 1; % oct/sec
-stim.drop_f1 = 105-65;  % levels
+stim.drop_f1 = 105-75;  % levels
 stim.drop_f2 = stim.drop_f1 + 10; % f2 = f1 - 10 (ie +10 more attn)
 stim.ratio = 1.22;
 
@@ -11,9 +11,9 @@ stim.buffdur = 0.25;% buffer duration
 stim.Fs = 48828.125;
 
 stim.SNRcriterion = 6;
-stim.maxTrials = 3;
-stim.minTrials = 1;
-stim.ThrowAway = 1;
+stim.maxTrials = 12;
+stim.minTrials = 10;
+stim.ThrowAway = 0;
 
 % Analysis Params: 
 stim.analysis.windowdur = 0.25;

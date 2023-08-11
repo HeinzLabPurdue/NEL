@@ -1,7 +1,7 @@
 global root_dir NelData data_dir PROTOCOL
 
 % NEL Version of RunMEMR_chin_edited_NEL1.m based off Hari's SNAPLab script
-PROTOCOL = 'FPLear'; 
+PROTOCOL = 'FPLear';
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 host=lower(getenv('hostname'));
@@ -17,25 +17,51 @@ host = host(~isspace(host));
 probefile = fullfile(PathName, FileName);
 load(probefile);
 
-calib = x.FPLprobeData.calib; 
+calib = x.FPLprobeData.calib;
 %% Initialize TDT
 card = initialize_card;
 
-%% Inverse Calibration
-%NEEDS TO BE CLEANED UP ASAP.
-% 1. run_invCalib needs cleaned up...currently clunky
-% % 2. Need calibration to be correct for MEMR (currently all pass, w/o calib)
-% [~, calibPicNum, ~] = run_invCalib(false);   % skipping INV calib for now since based on 94 dB SPL benig highest value, bot the 105 dB SPL from inv Calib.
-% [coefFileNum, ~, ~] = run_invCalib(-2);
-% 
-% calib.CalibPICnum2use = calibPicNum;  % save this so we know what calib file to use right from data file
-% coefFileNum = NaN;
+%% New Ear Calib or Inverse Calib
 
-filttype = {'allpass','allpass'};
-RawCalibPicNum = NaN;
-
-invfilterdata = set_invFilter(filttype, RawCalibPicNum, true);
-coefFileNum = invfilterdata.coefFileNum;
+if (NelData.General.RP2_3and4 || NelData.General.RX8)
+    cdd;
+    all_Calib_files= dir('p*calib_FPL*');
+    if isempty(all_Calib_files)
+        newCalib = true;
+        doInvCalib = false;
+    else
+        inStr= questdlg('Calib files already exists - run new calib or use latest FIR coeffs?', 'New or Rerun?', 'New Calib', 'FIR Calib', 'FIR Calib');
+        if strcmp(inStr, 'New Calib')
+            newCalib= true;
+            doInvCalib = false;
+        elseif strcmp(inStr, 'FIR Calib')
+            newCalib= false;
+            doInvCalib = true;
+        end
+    end
+    rdd;
+    
+    if doInvCalib %already has a raw
+        filttype = {'inversefilt_FPL','inversefilt_FPL'};
+        cdd;
+        all_raw = findPics('FPL_raw*');
+        RawCalibPicNum = max(all_raw);     
+        %prompt user for RAW calib
+        RawCalibPicNum = inputdlg('Please confirm the RAW calibration file to use (default = last raw calib): ', 'Calibration!',...
+            1,{num2str(RawCalibPicNum)});
+        RawCalibPicNum = str2double(RawCalibPicNum{1});
+        rdd;
+    else %first time calib
+        filttype = {'allpass','allpass'};
+        RawCalibPicNum = NaN;
+    end
+    
+    invfilterdata = set_invFilter(filttype, RawCalibPicNum, true);
+    coefFileNum = invfilterdata.coefFileNum;
+    
+else
+    newCalib= true;
+end
 
 %% Enter subject information
 if ~isfield(NelData,'FPL') % First time through, need to ask all this.
@@ -142,7 +168,7 @@ mic_output_V_1 = Vavg_1 / (DR_onesided * mic_gain);
 output_Pa_1 = mic_output_V_1/mic_sens;
 outut_Pa_20uPa_per_Vpp_1 = output_Pa_1 / P_ref; % unit: 20 uPa / Vpeak
 
-freq = 1000*linspace(0,calib.SamplingRate/2,length(Vavg_1))';
+freq = calib.freq; %1000*linspace(0,calib.SamplingRate/2,length(Vavg_1))';
 
 Vo = rfft(calib.vo)*5*db2mag(-1 * calib.Attenuation);
 calib.EarRespH_1 =  outut_Pa_20uPa_per_Vpp_1 ./ Vo; %save for later
@@ -177,7 +203,7 @@ vins_ear_2 = demean(vins_ear_2, 2);
 energy = squeeze(sum(vins_ear_2.^2, 2));
 good = energy < median(energy) + 2*mad(energy);
 vavg_2 = squeeze(mean(vins_ear_2(good, :), 1));
-Vavg_2 = rfft(vavg_2'); 
+Vavg_2 = rfft(vavg_2');
 calib.vavg_ear_2 = vavg_2;
 
 % Apply calibartions to convert voltage to pressure
@@ -186,25 +212,6 @@ output_Pa_2 = mic_output_V_2/mic_sens;
 outut_Pa_20uPa_per_Vpp_2 = output_Pa_2 / P_ref; % unit: 20 uPa / Vpeak
 
 calib.EarRespH_2 =  outut_Pa_20uPa_per_Vpp_2 ./ Vo; %save for later
-
-%% Plot data
-figure(61);
-ax(1) = subplot(2, 1, 1);
-semilogx(calib.freq, db(abs(calib.EarRespH_1)), 'linew', 2);
-hold on; 
-semilogx(calib.freq, db(abs(calib.EarRespH_2)), 'linew', 2);
-hold off; 
-ylabel('Response (dB re: 20 \mu Pa / V_{peak})', 'FontSize', 16);
-ax(2) = subplot(2, 1, 2);
-semilogx(calib.freq, unwrap(angle(calib.EarRespH_1), [], 1), 'linew', 2);
-hold on; 
-semilogx(calib.freq, unwrap(angle(calib.EarRespH_2), [], 1), 'linew', 2);
-hold off; 
-xlabel('Frequency (Hz)', 'FontSize', 16);
-ylabel('Phase (rad)', 'FontSize', 16);
-linkaxes(ax, 'x');
-legend('show');
-xlim([100, 24e3]);
 
 %% Calculate Ear properties
 % *ec: Ear canal
@@ -266,12 +273,30 @@ end
 
 ud_status = get(h_push_stop,'Userdata');  % only call this once - ACT on 1st button push
 
+%% Plot data
+figure(61);
+% ax(1) = subplot(2, 1, 1);
+semilogx(calib.freq, db(abs(calib.Pfor_1)), 'linew', 2);
+hold on;
+semilogx(calib.freq, db(abs(calib.Pfor_2)), 'linew', 2);
+hold off;
+ylabel('Response (dB re: 20 \mu Pa / V_{peak})', 'FontSize', 16);
+% ax(2) = subplot(2, 1, 2);
+% semilogx(calib.freq, unwrap(angle(calib.Pfor_1), [], 1), 'linew', 2);
+% hold on;
+% semilogx(calib.freq, unwrap(angle(calib.Pfor_2), [], 1), 'linew', 2);
+% hold off;
+xlabel('Frequency (Hz)', 'FontSize', 16);
+% ylabel('Phase (rad)', 'FontSize', 16);
+% linkaxes(ax, 'x');
+legend('show');
+xlim([100, 24e3]);
 %% Plot Ear Absorbance
 figure(12);
-hold on; 
+hold on;
 semilogx(calib.freq * 1e-3, 100*(1 - abs(calib.Rec_1).^2), 'linew', 2);
 semilogx(calib.freq * 1e-3, 100*(1 - abs(calib.Rec_2).^2), 'linew', 2);
-hold off; 
+hold off;
 xlabel('Frequency (Hz)', 'FontSize', 16);
 ylabel('Absorbance (%)', 'FontSize', 16);
 xlim([0.2, 8]); ylim([0, 100]);
@@ -297,7 +322,11 @@ end
 %% Shut Down TDT, no matter what button pushed, or if ended naturally
 close_play_circuit(card.f1RP, card.RP);
 rc = PAset(120.0*ones(1,4)); % need to use PAset, since it saves current value in PA, which is assumed way in NEL (causes problems when PAset is used to set attens later)
-run_invCalib(false);
+
+%set back to allpass
+filttype = {'allpass','allpass'};
+RawCalibPicNum = NaN;
+invfilterdata = set_invFilter(filttype, RawCalibPicNum, true);
 
 %% Return to GUI script, unless need to save
 if strcmp(NelData.FPL.rc,'abort') || strcmp(NelData.FPL.rc,'restart')
@@ -324,12 +353,25 @@ switch NelData.FPL.rc
         end
         calib.comment = comment;
         
-        %% NEL based data saving script
+        fname = current_data_file('calib_FPL',1); 
+        if newCalib
+            fname= strcat(fname, '_raw');
+        else
+            fname= sprintf('%s_inv%d', fname, coefFileNum);
+        end
+        
         make_FPLear_text_file;
+        
+        if newCalib
+            [~, temp_picName] = fileparts(fname);
+            get_inv_calib_fir_coeff(getPicNum(temp_picName), 1);
+        end
+       
         
         %% remind user to turn of microphone
         h = msgbox('Please remember to turn off the microphone');
         uiwait(h);
+        
         
 end
 

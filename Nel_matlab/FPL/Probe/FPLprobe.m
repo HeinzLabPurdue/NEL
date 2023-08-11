@@ -19,8 +19,7 @@ card = initialize_card;
 % [~, calibPicNum, ~] = run_invCalib(false);   % skipping INV calib for now since based on 94 dB SPL benig highest value, bot the 105 dB SPL from inv Calib.
 % [coefFileNum, ~, ~] = run_invCalib(-2);
 % 
-% calib.CalibPICnum2use = calibPicNum;  % save this so we know what calib file to use right from data file
-% coefFileNum = NaN;
+calib.CalibPICnum2use = NaN;  % save this so we know what calib file to use right from data file
 
 PROTOCOL = 'FPLprobe'; 
 filttype = {'allpass','allpass'};
@@ -308,6 +307,10 @@ end
 close_play_circuit(card.f1RP, card.RP);
 rc = PAset(120.0*ones(1,4)); % need to use PAset, since it saves current value in PA, which is assumed way in NEL (causes problems when PAset is used to set attens later)
 % run_invCalib(false);
+% invfilterdata = set_invFilter(filttype, RawCalibPicNum, true);
+%set back to allpass
+filttype = {'allpass','allpass'};
+RawCalibPicNum = NaN;
 invfilterdata = set_invFilter(filttype, RawCalibPicNum, true);
 
 %% Return to GUI script, unless need to save
@@ -317,7 +320,7 @@ end
 
 %% Set up data structure to save
 calib.date = datestr(clock);
-warning('off');  % ??
+% warning('off');  % ??
 
 %% Big Switch case to handle end of data collection
 switch NelData.FPL.rc

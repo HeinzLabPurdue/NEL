@@ -27,8 +27,11 @@ x.FPLprobeData.calib = calib;
 % Save to ProbeCal_Data folder for use later since general for that day
 curdir = pwd; 
 cd('C:\NEL\Nel_matlab\FPL\Probe\ProbeCal_Data')
-generalfname = ['FPLprobe_' date];  
-save(generalfname,'x');  % std mat file
+
+generalfname = ['FPLprobe_' date '*.mat'];
+numFiles = max(size((dir(generalfname)))); 
+mainfilename = sprintf('%s_%d', generalfname(1:end-5), numFiles+1); 
+save(mainfilename,'x');  % std mat file
 fprintf('%s %s.mat\n','Saved data file to general folder: ',generalfname);
 cd(curdir); 
 

@@ -19,7 +19,7 @@ x.Stimuli = [];  % general NEL structures - NOT used here, but keep for generali
 x.Line    = [];
 x.User = [];
 x.Hardware.NELmaxvolts_V   = VOLTS;   % max volts in NEL circuit design
-x.Hardware.CalibPICnum2use = stim.CalibPICnum2use;  % Save Calib file to use for these data - based on how hardware is setup (run-invCalib)
+x.Hardware.CalibPICnum2use = Stimuli.calibPicNum;  % Save Calib file to use for these data - based on how hardware is setup (run-invCalib)
 
 %% saving specific MEMR data
 x.sweptDPOAEData.stim = stim;

@@ -1,7 +1,5 @@
 global NelData 
 
-fname = current_data_file('FPLear',1);
-
 %% General NEL data saving
 x.General.program_name  = PROG;
 x.General.version = VERSION;
@@ -14,12 +12,21 @@ x.Stimuli = [];  % general NEL structures - NOT used here, but keep for generali
 x.Line    = [];
 x.User = [];
 x.Hardware.NELmaxvolts_V   = VOLTS;   % max volts in NEL circuit design
-x.Hardware.CalibPICnum2use = calib.CalibPICnum2use;  % Save Calib file to use for these data - based on how hardware is setup (run-invCalib)
+%x.Hardware.CalibPICnum2use = calib.CalibPICnum2use;  % Save Calib file to use for these data - based on how hardware is setup (run-invCalib)
 
-% x.CalibData = ddata_struct{1};
-% x.CalibData2 = ddata_struct{2};
+CalibData = zeros(length(freq), 5); 
+CalibData2 = zeros(length(freq), 5); 
+% Frequencies in NEL form
+CalibData(:,1) = calib.freq./1000; % kHz
+CalibData2(:,1) = calib.freq./1000;
+% Output in NEL form
+CalibData(:,2) = db(abs(calib.Pfor_1.*(5/sqrt(2))));
+CalibData2(:,2) = db(abs(calib.Pfor_2.*(5/sqrt(2))));
 
-% x.ear_ord = ['left', 'right']; % check value of ddata_struct_ear;
+x.CalibData = CalibData;
+x.CalibData2 = CalibData2;
+
+x.chan_ord = [{'Left'}, {'Right'}]; % check value of ddata_struct_ear;
 
 %% saving specific FPL specific data
 x.FPLearData = calib;
