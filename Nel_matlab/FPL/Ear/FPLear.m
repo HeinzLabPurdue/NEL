@@ -1,6 +1,5 @@
 global root_dir NelData data_dir PROTOCOL
 
-% NEL Version of RunMEMR_chin_edited_NEL1.m based off Hari's SNAPLab script
 PROTOCOL = 'FPLear';
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -354,19 +353,16 @@ switch NelData.FPL.rc
         calib.comment = comment;
         
         fname = current_data_file('calib_FPL',1); 
-        if newCalib
+        
+        if newCalib % save as raw and get coeffs
             fname= strcat(fname, '_raw');
-        else
+            [~, temp_picName] = fileparts(fname);
+            get_inv_calib_fir_coeff(getPicNum(temp_picName), 1);
+        else % save as inverse calib
             fname= sprintf('%s_inv%d', fname, coefFileNum);
         end
         
         make_FPLear_text_file;
-        
-        if newCalib
-            [~, temp_picName] = fileparts(fname);
-            get_inv_calib_fir_coeff(getPicNum(temp_picName), 1);
-        end
-       
         
         %% remind user to turn of microphone
         h = msgbox('Please remember to turn off the microphone');

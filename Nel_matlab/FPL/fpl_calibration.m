@@ -85,11 +85,6 @@ if strcmp(command_str,'start')
             PROG = 'FPLear.m';	     % program name is recorded in the data file
             FPLear;
             rmpath('C:\NEL\Nel_matlab\FPL\Ear')
-%        case 'Inverse'
-%            addpath('C:\NEL\Nel_matlab\FPL\Inverse')
-%            PROG = 'FPLinv.m'; 
-%            FPLinv; 
-%            rmpath('C:\NEL\Nel_matlab\FPL\Inverse'); 
     end
     
     if strcmp(NelData.FPL.rc,'restart')
