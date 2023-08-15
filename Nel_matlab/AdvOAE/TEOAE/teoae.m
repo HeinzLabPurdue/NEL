@@ -1,4 +1,4 @@
-global root_dir NelData data_dir
+global root_dir NelData data_dir PROTOCOL
 
 % NEL Version of RunMEMR_chin_edited_NEL1.m based off Hari's SNAPLab script
 
@@ -8,12 +8,11 @@ host = host(~isspace(host));
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %Insert NEL/GUI Parameters here...none for WBMEMR
-
+PROTOCOL = 'OAE'; 
 %% Initialize TDT
 card = initialize_card;
 
 %% Inverse Calibration
-%NEEDS TO BE CLEANED UP ASAP.
 cdd;
 allCalibFiles= dir('*calib*raw*');
 Stimuli.calibPicNum= getPicNum(allCalibFiles(end).name);

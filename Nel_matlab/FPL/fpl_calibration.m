@@ -15,8 +15,7 @@ global root_dir NelData
 h_fig = findobj('Tag','FPL_Main_Fig');    %% Finds handle for TC-Figure
 
 if nargin<1
-    
-    disp('no command string!');
+   
     PARAMS = zeros(1,18);				%initialize before opening parameter files
     
     DATE = date;
@@ -56,8 +55,6 @@ else
     h_push_saveNquit = handles(2);
     h_push_restart = handles(3);
     h_push_abort = handles(4);
-    
-    disp(command_str) % debugging
 end
 
 if strcmp(command_str,'start')
@@ -70,8 +67,7 @@ if strcmp(command_str,'start')
     error = 0;  % ? needed
     
     set(h_push_stop,'Userdata',[]);
-    %     set(h_push_start,'Userdata',dpoaedata);
-    
+
     % Run to get stim params and choose which OAE type to use.
     FPL_type = questdlg('What type of Calibration:', 'Set Calib Type','Probe','Ear', 'Ear');
     switch FPL_type

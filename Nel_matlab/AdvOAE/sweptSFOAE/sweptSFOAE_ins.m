@@ -11,9 +11,9 @@ stim.drop_Supp = 40; % for 60dB suppressor
 
 % Trial params
 stim.SNRcriterion = 6;
-stim.minTrials = 1;
-stim.maxTrials = 3;
-stim.ThrowAway = 1;
+stim.minTrials = 12;
+stim.maxTrials = 50;
+stim.ThrowAway = 0;
 
 % Standard params
 stim.Fs = 48828.125;

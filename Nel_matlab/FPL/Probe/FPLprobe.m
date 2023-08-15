@@ -19,7 +19,6 @@ card = initialize_card;
 % [~, calibPicNum, ~] = run_invCalib(false);   % skipping INV calib for now since based on 94 dB SPL benig highest value, bot the 105 dB SPL from inv Calib.
 % [coefFileNum, ~, ~] = run_invCalib(-2);
 % 
-calib.CalibPICnum2use = NaN;  % save this so we know what calib file to use right from data file
 
 PROTOCOL = 'FPLprobe'; 
 filttype = {'allpass','allpass'};
@@ -63,7 +62,6 @@ disp('Starting stimulation...');
 Fs = calib.SamplingRate * 1000; % to Hz
 
 vo = calib.y;
-
 calib.vo = vo;
 vins_1 = zeros(calib.CavNumb, calib.Averages, calib.BufferSize);
 vins_2 = zeros(calib.CavNumb, calib.Averages, calib.BufferSize);
@@ -306,12 +304,9 @@ end
 %% Shut Down TDT, no matter what button pushed, or if ended naturally
 close_play_circuit(card.f1RP, card.RP);
 rc = PAset(120.0*ones(1,4)); % need to use PAset, since it saves current value in PA, which is assumed way in NEL (causes problems when PAset is used to set attens later)
-% run_invCalib(false);
-% invfilterdata = set_invFilter(filttype, RawCalibPicNum, true);
-%set back to allpass
-filttype = {'allpass','allpass'};
-RawCalibPicNum = NaN;
-invfilterdata = set_invFilter(filttype, RawCalibPicNum, true);
+
+%set to all pass??? necessary only if inv calibrating
+dummy = set_invFilter({'allpass','allpass'},RawCalibPicNum);
 
 %% Return to GUI script, unless need to save
 if strcmp(NelData.FPL.rc,'abort') || strcmp(NelData.FPL.rc,'restart')

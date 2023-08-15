@@ -22,7 +22,7 @@ fName_calib= strrep(fName_calib, '_raw', '');
 
 picSearchString = sprintf('%s%04d*.mat', 'p', calibPicNum);
 picMATFile = dir(picSearchString);
-load(picMATFile.name(1:end-4));
+load(picMATFile.name(1:end-4),'x');
 pic_data = x;
 
 chans = length(pic_data.chan_ord);

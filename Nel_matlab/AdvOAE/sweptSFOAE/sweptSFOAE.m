@@ -1,4 +1,4 @@
-global root_dir NelData data_dir
+global root_dir NelData data_dir PROTOCOL
 
 % NEL Version of RunMEMR_chin_edited_NEL1.m based off Hari's SNAPLab script
 
@@ -8,7 +8,7 @@ host = host(~isspace(host));
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %Insert NEL/GUI Parameters here...none for WBMEMR
-
+PROTOCOL = 'OAE'; 
 %% Initialize TDT
 card = initialize_card;
 
@@ -130,7 +130,7 @@ while doneWithTrials == 0
         ProbeBuffs(k - stim.ThrowAway,  :) = vins;
     end
     
-    pause(0.15);
+    pause(0.05);
     
     % Do suppressor only
     dropProbe = 120;
@@ -145,7 +145,7 @@ while doneWithTrials == 0
         SuppBuffs(k - stim.ThrowAway,  :) = vins;
     end
     
-    pause(0.15);
+    pause(0.05);
     
     % Do both
     dropProbe = stim.drop_Probe;
@@ -161,13 +161,13 @@ while doneWithTrials == 0
         BothBuffs(k - stim.ThrowAway,  :) = vins;
     end
     
-    pause(0.15);
+    pause(0.05);
     
     fprintf(1, 'Done with trial %d \n', k);
     
     %% Analysis to check SNR
     % test OAE
-    windowdur = 0.5;
+    windowdur = 0.05;
     if k - stim.ThrowAway >= stim.minTrials
         SFOAEtrials = ProbeBuffs(1:(k - stim.ThrowAway), :) + SuppBuffs(1:(k - stim.ThrowAway), :) - BothBuffs(1:(k - stim.ThrowAway), :);
         SFOAE = median(SFOAEtrials,1);

@@ -11,7 +11,7 @@ x.General.comment       = calib.comment;
 x.Stimuli = [];  % general NEL structures - NOT used here, but keep for generality 
 x.Line    = [];
 x.User = [];
-x.Hardware.NELmaxvolts_V   = VOLTS;   % max volts in NEL circuit design
+x.Hardware.NELmaxvolts_V = VOLTS;   % max volts in NEL circuit design
 %x.Hardware.CalibPICnum2use = calib.CalibPICnum2use;  % Save Calib file to use for these data - based on how hardware is setup (run-invCalib)
 
 fullCalibData = zeros(length(freq), 5); 
@@ -32,8 +32,8 @@ CalibData2(:,1) = nel_freq;
 CalibData(:,2) = interp1(fullCalibData(:,1), fullCalibData(:,2), nel_freq); 
 CalibData2(:,2) = interp1(fullCalibData2(:,1), fullCalibData2(:,2), nel_freq); 
 
-x.CalibData = fullCalibData;
-x.CalibData2 = fullCalibData2;
+x.CalibData = CalibData;
+x.CalibData2 = CalibData2;
 
 x.chan_ord = [{'Left'}, {'Right'}]; % check value of ddata_struct_ear;
 

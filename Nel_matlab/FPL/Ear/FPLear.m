@@ -1,22 +1,13 @@
 global root_dir NelData data_dir PROTOCOL
 
-PROTOCOL = 'FPLear';
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 host=lower(getenv('hostname'));
 host = host(~isspace(host));
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%Insert NEL/GUI Parameters here...none for WBMEMR
+%Insert NEL/GUI Parameters here.
+PROTOCOL = 'FPLear';
 
-%% Get Probe File
-% Setting up for now as in SNAPlab
-[FileName,PathName,FilterIndex] = uigetfile(strcat('C:\NEL\Nel_matlab\FPL\Probe\ProbeCal_Data\FPLprobe*', date, '*.mat'),...
-    'Please pick DRIVE PROBE CALIBRATION file to use');
-probefile = fullfile(PathName, FileName);
-load(probefile);
-
-calib = x.FPLprobeData.calib;
 %% Initialize TDT
 card = initialize_card;
 
@@ -62,6 +53,15 @@ else
     newCalib= true;
 end
 
+%% Get Probe File
+% Setting up for now as in SNAPlab
+[FileName,PathName,FilterIndex] = uigetfile(strcat('C:\NEL\Nel_matlab\FPL\Probe\ProbeCal_Data\FPLprobe*', date, '*.mat'),...
+    'Please pick DRIVE PROBE CALIBRATION file to use');
+probefile = fullfile(PathName, FileName);
+load(probefile);
+
+calib = x.FPLprobeData.calib;
+
 %% Enter subject information
 if ~isfield(NelData,'FPL') % First time through, need to ask all this.
     
@@ -90,9 +90,6 @@ end
 
 %% Initializing variables
 FPLear_ins;
-
-subj = input('Please subject ID:', 's');
-calib.subj = subj;
 
 earflag = 1;
 while earflag == 1
@@ -308,7 +305,6 @@ set(h_push_restart,'Enable','off');
 set(h_push_abort,'Enable','off');
 set(h_push_saveNquit,'Enable','off');
 
-
 %store last button command, or that it ended all reps
 if ~isempty(ud_status)
     NelData.FPL.rc = ud_status;  % button was pushed
@@ -323,9 +319,7 @@ close_play_circuit(card.f1RP, card.RP);
 rc = PAset(120.0*ones(1,4)); % need to use PAset, since it saves current value in PA, which is assumed way in NEL (causes problems when PAset is used to set attens later)
 
 %set back to allpass
-filttype = {'allpass','allpass'};
-RawCalibPicNum = NaN;
-invfilterdata = set_invFilter(filttype, RawCalibPicNum, true);
+dummy = set_invFilter({'allpass','allpass'},RawCalibPicNum);
 
 %% Return to GUI script, unless need to save
 if strcmp(NelData.FPL.rc,'abort') || strcmp(NelData.FPL.rc,'restart')
@@ -339,7 +333,10 @@ warning('off');  % ??
 
 %% Big Switch case to handle end of data collection
 switch NelData.FPL.rc
-    case 'stop'   % 6/2023MH: MAY ADDD LATER (to stop, reset chin, then restart from where stopped) for NOW - only saveNquit, ohtherwise, abort or restart is already out by here
+    case 'stop'   
+        % 6/2023MH: MAY ADDD LATER (to stop, reset chin, then restart from 
+        % where stopped) for NOW - only saveNquit, ohtherwise, abort or restart
+        % is already out by here
         % if want to RE-ADD stop, see DPOAE
         
     case 'saveNquit'
@@ -352,18 +349,20 @@ switch NelData.FPL.rc
         end
         calib.comment = comment;
         
-        fname = current_data_file('calib_FPL',1); 
+        fname = current_data_file('calib_FPL',1);
         
         if newCalib % save as raw and get coeffs
             fname= strcat(fname, '_raw');
-            [~, temp_picName] = fileparts(fname);
-            get_inv_calib_fir_coeff(getPicNum(temp_picName), 1);
         else % save as inverse calib
             fname= sprintf('%s_inv%d', fname, coefFileNum);
         end
         
         make_FPLear_text_file;
         
+        if newCalib
+            [~, temp_picName] = fileparts(fname);
+            get_inv_calib_fir_coeff(getPicNum(temp_picName), 1);
+        end
         %% remind user to turn of microphone
         h = msgbox('Please remember to turn off the microphone');
         uiwait(h);
