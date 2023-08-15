@@ -22,8 +22,8 @@ fName_calib= strrep(fName_calib, '_raw', '');
 
 picSearchString = sprintf('%s%04d*.mat', 'p', calibPicNum);
 picMATFile = dir(picSearchString);
-load(picMATFile.name(1:end-4)); 
-pic_data = x; 
+load(picMATFile.name(1:end-4));
+pic_data = x;
 
 chans = length(pic_data.chan_ord);
 
@@ -44,20 +44,30 @@ for c = 1:chans
     filter_gain(freq_near11k:end)= linspace(filter_gain(freq_near11k), 0, numel(filter_gain)-freq_near11k+1);
     fs=  48828.125;
     Nfilter= 255;
-
+    
+    %     if c==1
+    %         b = fir2(Nfilter, freq_kHz/(fs/2/1e3), db2mag(filter_gain));
+    %         b=b';
+    %         b_nogain= [1 zeros(1, Nfilter)];
+    %         b_nogain=b_nogain';
+    %     elseif c==2
+    %         b2 = fir2(Nfilter, freq_kHz/(fs/2/1e3), db2mag(filter_gain));
+    %         % fir2(Nfilter, freq_kHz, [db2mag(filter_gain(1)); db2mag(filter_gain); db2mag(filter_gain(end)); 0]);
+    %         b2=b2';
+    %         b2_nogain= [1 zeros(1, Nfilter)];
+    %         b2_nogain=b2_nogain';
+    %     end
     if c==1
-        b = fir2(Nfilter, freq_kHz/(fs/2/1e3), db2mag(filter_gain));
+        b = fir2(Nfilter, [0; freq_kHz; 20; fs/2/1e3]/(fs/2/1e3), [db2mag(filter_gain(1)); db2mag(filter_gain); db2mag(filter_gain(end)); 0]);
         b=b';
         b_nogain= [1 zeros(1, Nfilter)];
         b_nogain=b_nogain';
     elseif c==2
-        b2 = fir2(Nfilter, freq_kHz/(fs/2/1e3), db2mag(filter_gain)); 
-        % fir2(Nfilter, freq_kHz, [db2mag(filter_gain(1)); db2mag(filter_gain); db2mag(filter_gain(end)); 0]);
+        b2 = fir2(Nfilter, [0; freq_kHz; 20; fs/2/1e3]/(fs/2/1e3), [db2mag(filter_gain(1)); db2mag(filter_gain); db2mag(filter_gain(end)); 0]);
         b2=b2';
         b2_nogain= [1 zeros(1, Nfilter)];
         b2_nogain=b2_nogain';
     end
-    
     
 end
 
@@ -71,7 +81,7 @@ save(invFIR_fName_calib,'b','b_nogain','b2','b2_nogain');  % save coefs
 
 % freq_kHz=data(:,1);
 % dBspl_at0dB_atten=data(:,2);
-% 
+%
 % %% figure out inverse filter gains
 % % ER2 technical specs says gain at 1V rms should be 100 dB
 % % https://www.etymotic.com/auditory-research/insert-earphones-for-research/er2.html
@@ -80,12 +90,12 @@ save(invFIR_fName_calib,'b','b_nogain','b2','b2_nogain');  % save coefs
 % % 117 dB: too loud. So set ideal dB SPL to something between 90-100 dB
 % dBSPL_ideal= 105;
 % filter_gain= dBSPL_ideal-dBspl_at0dB_atten;
-% 
+%
 % % Suppress high frequency gain (Taper to zero?)
 % freq_near11k= dsearchn(freq_kHz, 11);
 % filter_gain(freq_near11k:end)= linspace(filter_gain(freq_near11k), 0, numel(filter_gain)-freq_near11k+1);
-% 
-% 
+%
+%
 % %% design filter
 % fs=  48828.125;
 % Nfilter= 255;
@@ -138,27 +148,27 @@ if plotYes
     
     %% verify
     
-%     addpath('C:\NEL2\Users\SP\inverese_calib_filtering')
-%     dur=1;
-%     x = create_sinusoid(freq_kHz*1e3, fs, dur, sqrt(2)*20e-6*db2mag(dBspl_at0dB_atten));
-%     xlim([100 20e3]);
-%     
-%     y=filter(b, 1, x);
-%     
-%     figure(1);
-%     ax(3)=subplot(313);
-%     hold on
-%     plot_dpss_psd(x, fs, 'yrange', 100);
-%     plot_dpss_psd(y, fs);
-%     title('testing');
-%     
-%     legend('raw', 'filtered', 'Location', 'northwest');
-%     
-%     set(findall(gcf,'-property','FontSize'), 'fontsize', 16);
-%     rmpath('C:\NEL2\Users\SP\inverese_calib_filtering')
-%     
-%     linkaxes(ax, 'x');
-%     xlim([160 16e3]);
+    %     addpath('C:\NEL2\Users\SP\inverese_calib_filtering')
+    %     dur=1;
+    %     x = create_sinusoid(freq_kHz*1e3, fs, dur, sqrt(2)*20e-6*db2mag(dBspl_at0dB_atten));
+    %     xlim([100 20e3]);
+    %
+    %     y=filter(b, 1, x);
+    %
+    %     figure(1);
+    %     ax(3)=subplot(313);
+    %     hold on
+    %     plot_dpss_psd(x, fs, 'yrange', 100);
+    %     plot_dpss_psd(y, fs);
+    %     title('testing');
+    %
+    %     legend('raw', 'filtered', 'Location', 'northwest');
+    %
+    %     set(findall(gcf,'-property','FontSize'), 'fontsize', 16);
+    %     rmpath('C:\NEL2\Users\SP\inverese_calib_filtering')
+    %
+    %     linkaxes(ax, 'x');
+    %     xlim([160 16e3]);
     
 end
 
