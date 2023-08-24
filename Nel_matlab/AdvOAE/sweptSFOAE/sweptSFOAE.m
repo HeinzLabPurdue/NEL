@@ -281,18 +281,18 @@ end
 %% Set up data structure to save
 stim.date = datestr(clock);
 
-answer = questdlg('Would you like to analyze this data?'...
-    ,'Analyze?','Yes','No', 'No');
-%Handle response
-switch answer
-    case {'Yes'}
-        % Call function
-        % instead of saving as a separate file, it just saves stim_AR in a
-        [res_SFOAE] = sweptSFOAE_analysis(stim);
-        disp('Saving Analyzed data ...')
-    case {'No'}
-        % do nothing
-end
+% answer = questdlg('Would you like to analyze this data?'...
+%     ,'Analyze?','Yes','No', 'No');
+% %Handle response
+% switch answer
+%     case {'Yes'}
+%         % Call function
+%         % instead of saving as a separate file, it just saves stim_AR in a
+%         [res_SFOAE] = sweptSFOAE_analysis(stim);
+%         disp('Saving Analyzed data ...')
+%     case {'No'}
+%         % do nothing
+% end
 
 warning('off');  % ??
 

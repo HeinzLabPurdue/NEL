@@ -130,7 +130,7 @@ while doneWithTrials == 0
         resp(k - stim.ThrowAway,  :) = vins;
     end
     
-    pause(0.25);
+    %pause(0.05);
     
     fprintf(1, 'Done with # %d trials \n', k);
     

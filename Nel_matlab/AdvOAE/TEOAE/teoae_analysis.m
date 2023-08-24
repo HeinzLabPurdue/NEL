@@ -36,6 +36,15 @@ res.Resp =  output_Pa_per_20uPa;
 res.NoiseFloor = noise_Pa_per_20uPa;
 
 %% Plot the result somewhere too 
-
-
+figure; 
+hold on;
+plot(res.freq, db(abs(res.Resp)), 'linew', 2); 
+plot(res.freq, db(abs(res.NoiseFloor)), 'linew', 2); 
+legend('OAE', 'NF'); 
+title('TEOAE'); 
+xlim([500, 20e3])
+xlabel('Frequency (Hz)'); 
+ylabel('Amplitude(dB)'); 
+set(gca, 'XScale', 'log'); 
+drawnow; 
 end

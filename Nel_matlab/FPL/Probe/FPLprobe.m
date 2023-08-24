@@ -114,7 +114,7 @@ for m = 1: calib.CavNumb
     outut_Pa_20uPa_per_Vpp_1 = output_Pa_1 / P_ref; % unit: 20 uPa / Vpeak
     
     freq = 1000*linspace(0,calib.SamplingRate/2,length(Vavg_1))';
-    calib.freq = freq;
+    calib.freq = freq; %Hz
     
     % CARD MAT2VOLTS = 5.0
     Vo = rfft(calib.vo)*5*db2mag(-1 * calib.Attenuation);
@@ -306,7 +306,7 @@ close_play_circuit(card.f1RP, card.RP);
 rc = PAset(120.0*ones(1,4)); % need to use PAset, since it saves current value in PA, which is assumed way in NEL (causes problems when PAset is used to set attens later)
 
 %set to all pass??? necessary only if inv calibrating
-dummy = set_invFilter({'allpass','allpass'},RawCalibPicNum);
+dummy = set_invFilter({'allpass','allpass'},RawCalibPicNum, true);
 
 %% Return to GUI script, unless need to save
 if strcmp(NelData.FPL.rc,'abort') || strcmp(NelData.FPL.rc,'restart')

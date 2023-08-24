@@ -56,7 +56,7 @@ end
 %% Get Probe File
 % Setting up for now as in SNAPlab
 [FileName,PathName,FilterIndex] = uigetfile(strcat('C:\NEL\Nel_matlab\FPL\Probe\ProbeCal_Data\FPLprobe*', date, '*.mat'),...
-    'Please pick DRIVE PROBE CALIBRATION file to use');
+    'Please pick PROBE CALIBRATION file to use');
 probefile = fullfile(PathName, FileName);
 load(probefile);
 
@@ -167,7 +167,14 @@ outut_Pa_20uPa_per_Vpp_1 = output_Pa_1 / P_ref; % unit: 20 uPa / Vpeak
 freq = calib.freq; %1000*linspace(0,calib.SamplingRate/2,length(Vavg_1))';
 
 Vo = rfft(calib.vo)*5*db2mag(-1 * calib.Attenuation);
-calib.EarRespH_1 =  outut_Pa_20uPa_per_Vpp_1 ./ Vo; %save for later
+
+if doInvCalib
+    Vo_1 = filtfilt(invfilterdata.b_chan1, 1, Vo); 
+else 
+    Vo_1 = Vo; 
+end
+
+calib.EarRespH_1 =  outut_Pa_20uPa_per_Vpp_1 ./ Vo_1; %save for later
 
 
 %% Do driver 2 next:
@@ -205,9 +212,15 @@ calib.vavg_ear_2 = vavg_2;
 % Apply calibartions to convert voltage to pressure
 mic_output_V_2 = Vavg_2 / (DR_onesided * mic_gain);
 output_Pa_2 = mic_output_V_2/mic_sens;
-outut_Pa_20uPa_per_Vpp_2 = output_Pa_2 / P_ref; % unit: 20 uPa / Vpeak
+output_Pa_20uPa_per_Vpp_2 = output_Pa_2 / P_ref; % unit: 20 uPa / Vpeak
 
-calib.EarRespH_2 =  outut_Pa_20uPa_per_Vpp_2 ./ Vo; %save for later
+if doInvCalib
+    Vo_2 = filtfilt(invfilterdata.b_chan2, 1, Vo); 
+else 
+    Vo_2 = Vo; 
+end
+
+calib.EarRespH_2 =  output_Pa_20uPa_per_Vpp_2 ./ Vo_2; %save for later
 
 %% Calculate Ear properties
 % *ec: Ear canal
@@ -269,35 +282,69 @@ end
 
 ud_status = get(h_push_stop,'Userdata');  % only call this once - ACT on 1st button push
 
+%% Set up like NEL varibles
+fullCalibData = zeros(length(freq), 5); 
+fullCalibData2 = zeros(length(freq), 5); 
+% Frequencies in NEL form
+fullCalibData(:,1) = calib.freq./1000; % kHz
+fullCalibData2(:,1) = calib.freq./1000;
+% Output in NEL form
+fullCalibData(:,2) = db(abs(calib.Pfor_1.*(5/sqrt(2))));
+fullCalibData2(:,2) = db(abs(calib.Pfor_2.*(5/sqrt(2))));
+
+% Resample to match frequencies from standard NEL calib
+nel_freq = [0.05*2.0.^((0:345)/40)]'; 
+CalibData = zeros(length(nel_freq), 5);
+CalibData2 = zeros(length(nel_freq), 5);
+CalibData(:,1) = nel_freq; 
+CalibData2(:,1) = nel_freq; 
+CalibData(:,2) = interp1(fullCalibData(:,1), fullCalibData(:,2), nel_freq); 
+CalibData2(:,2) = interp1(fullCalibData2(:,1), fullCalibData2(:,2), nel_freq); 
 %% Plot data
 figure(61);
-% ax(1) = subplot(2, 1, 1);
-semilogx(calib.freq, db(abs(calib.Pfor_1)), 'linew', 2);
+semilogx(CalibData(:,1).*1000, CalibData(:,2), 'linew', 2, 'color', [0 0.447 0.741]);
 hold on;
-semilogx(calib.freq, db(abs(calib.Pfor_2)), 'linew', 2);
+semilogx(CalibData2(:,1).*1000, CalibData2(:,2), 'linew', 2, 'color', [0.635 0.078 0.184]);
+hold on; 
+plot([10 20e3], [105 105], '--', 'linew', 2, 'color', [178 190 181]/255);
 hold off;
-ylabel('Response (dB re: 20 \mu Pa / V_{peak})', 'FontSize', 16);
-% ax(2) = subplot(2, 1, 2);
-% semilogx(calib.freq, unwrap(angle(calib.Pfor_1), [], 1), 'linew', 2);
-% hold on;
-% semilogx(calib.freq, unwrap(angle(calib.Pfor_2), [], 1), 'linew', 2);
-% hold off;
+ylabel('Response (dB)', 'FontSize', 16);
 xlabel('Frequency (Hz)', 'FontSize', 16);
-% ylabel('Phase (rad)', 'FontSize', 16);
-% linkaxes(ax, 'x');
-legend('show');
-xlim([100, 24e3]);
-%% Plot Ear Absorbance
-figure(12);
-hold on;
-semilogx(calib.freq * 1e-3, 100*(1 - abs(calib.Rec_1).^2), 'linew', 2);
-semilogx(calib.freq * 1e-3, 100*(1 - abs(calib.Rec_2).^2), 'linew', 2);
-hold off;
-xlabel('Frequency (Hz)', 'FontSize', 16);
-ylabel('Absorbance (%)', 'FontSize', 16);
-xlim([0.2, 8]); ylim([0, 100]);
-set(gca, 'FontSize', 16, 'XTick',[0.25, 0.5, 1, 2, 4, 8]);
+legend('Left', 'Right');
+xlim([100, 20e3]);
+xticks([100, 200, 400, 800, 1600, 3200, 6400, 12800])
+set(gca, 'XScale', 'log')
 
+%% Plot data
+% figure(61);
+% % ax(1) = subplot(2, 1, 1);
+% semilogx(calib.freq, db(abs(calib.Pfor_1)), 'linew', 2);
+% hold on;
+% semilogx(calib.freq, db(abs(calib.Pfor_2)), 'linew', 2);
+% hold off;
+% ylabel('Response (dB re: 20 \mu Pa / V_{peak})', 'FontSize', 16);
+% % ax(2) = subplot(2, 1, 2);
+% % semilogx(calib.freq, unwrap(angle(calib.Pfor_1), [], 1), 'linew', 2);
+% % hold on;
+% % semilogx(calib.freq, unwrap(angle(calib.Pfor_2), [], 1), 'linew', 2);
+% % hold off;
+% xlabel('Frequency (Hz)', 'FontSize', 16);
+% % ylabel('Phase (rad)', 'FontSize', 16);
+% % linkaxes(ax, 'x');
+% legend('show');
+% xlim([100, 24e3]);
+%% Plot Ear Absorbance
+if newCalib
+    figure(12);
+    semilogx(calib.freq * 1e-3, 100*(1 - abs(calib.Rec_1).^2), 'linew', 2);
+    hold on;
+    semilogx(calib.freq * 1e-3, 100*(1 - abs(calib.Rec_2).^2), 'linew', 2);
+    hold off;
+    xlabel('Frequency (Hz)', 'FontSize', 16);
+    ylabel('Absorbance (%)', 'FontSize', 16);
+    xlim([0.2, 8]); ylim([0, 100]);
+    set(gca, 'FontSize', 16, 'XTick',[0.25, 0.5, 1, 2, 4, 8]);
+end
 %% Shut off buttons once out of data collection loop
 % until we put STOP functionality in, all roads mean we're done here
 set(h_push_stop,'Enable','off');
@@ -319,7 +366,7 @@ close_play_circuit(card.f1RP, card.RP);
 rc = PAset(120.0*ones(1,4)); % need to use PAset, since it saves current value in PA, which is assumed way in NEL (causes problems when PAset is used to set attens later)
 
 %set back to allpass
-dummy = set_invFilter({'allpass','allpass'},RawCalibPicNum);
+dummy = set_invFilter({'allpass','allpass'},RawCalibPicNum, true);
 
 %% Return to GUI script, unless need to save
 if strcmp(NelData.FPL.rc,'abort') || strcmp(NelData.FPL.rc,'restart')
@@ -361,7 +408,7 @@ switch NelData.FPL.rc
         
         if newCalib
             [~, temp_picName] = fileparts(fname);
-            get_inv_calib_fir_coeff(getPicNum(temp_picName), 1);
+            get_inv_calib_fir_coeff(getPicNum(temp_picName));
         end
         %% remind user to turn of microphone
         h = msgbox('Please remember to turn off the microphone');

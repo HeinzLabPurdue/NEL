@@ -14,24 +14,6 @@ x.User = [];
 x.Hardware.NELmaxvolts_V = VOLTS;   % max volts in NEL circuit design
 %x.Hardware.CalibPICnum2use = calib.CalibPICnum2use;  % Save Calib file to use for these data - based on how hardware is setup (run-invCalib)
 
-fullCalibData = zeros(length(freq), 5); 
-fullCalibData2 = zeros(length(freq), 5); 
-% Frequencies in NEL form
-fullCalibData(:,1) = calib.freq./1000; % kHz
-fullCalibData2(:,1) = calib.freq./1000;
-% Output in NEL form
-fullCalibData(:,2) = db(abs(calib.Pfor_1.*(5/sqrt(2))));
-fullCalibData2(:,2) = db(abs(calib.Pfor_2.*(5/sqrt(2))));
-
-% Resample to match frequencies from standard NEL calib
-nel_freq = [0.05*2.0.^((0:345)/40)]'; 
-CalibData = zeros(length(nel_freq), 5);
-CalibData2 = zeros(length(nel_freq), 5);
-CalibData(:,1) = nel_freq; 
-CalibData2(:,1) = nel_freq; 
-CalibData(:,2) = interp1(fullCalibData(:,1), fullCalibData(:,2), nel_freq); 
-CalibData2(:,2) = interp1(fullCalibData2(:,1), fullCalibData2(:,2), nel_freq); 
-
 x.CalibData = CalibData;
 x.CalibData2 = CalibData2;
 
