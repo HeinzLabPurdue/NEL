@@ -7,7 +7,7 @@ invoke(RP, 'SetTagVal', 'onsetdel',0); % onset delay is in ms
 playrecTrigger = 1;
 
 if delayComp == 1
-    ADdelay = 97; % Samples
+    ADdelay = 216; % Samples was 97 pre 9/12/23, was 70 on 9/12/23
 else
     ADdelay = 0;
 end

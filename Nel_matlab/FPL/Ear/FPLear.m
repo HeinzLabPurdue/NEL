@@ -166,11 +166,11 @@ outut_Pa_20uPa_per_Vpp_1 = output_Pa_1 / P_ref; % unit: 20 uPa / Vpeak
 
 freq = calib.freq; %1000*linspace(0,calib.SamplingRate/2,length(Vavg_1))';
 
-Vo = rfft(calib.vo)*5*db2mag(-1 * calib.Attenuation);
-
 if doInvCalib
-    Vo_1 = filtfilt(invfilterdata.b_chan1, 1, Vo); 
+    vo_filt = filtfilt(invfilterdata.b_chan1, 1, calib.vo); 
+    Vo_1 = rfft(vo_filt)*5*db2mag(-1 * calib.Attenuation);
 else 
+    Vo = rfft(calib.vo)*5*db2mag(-1 * calib.Attenuation);
     Vo_1 = Vo; 
 end
 
@@ -215,8 +215,10 @@ output_Pa_2 = mic_output_V_2/mic_sens;
 output_Pa_20uPa_per_Vpp_2 = output_Pa_2 / P_ref; % unit: 20 uPa / Vpeak
 
 if doInvCalib
-    Vo_2 = filtfilt(invfilterdata.b_chan2, 1, Vo); 
+    vo_filt = filtfilt(invfilterdata.b_chan1, 1, calib.vo); 
+    Vo_2 = rfft(vo_filt)*5*db2mag(-1 * calib.Attenuation);
 else 
+    Vo = rfft(calib.vo)*5*db2mag(-1 * calib.Attenuation);
     Vo_2 = Vo; 
 end
 
