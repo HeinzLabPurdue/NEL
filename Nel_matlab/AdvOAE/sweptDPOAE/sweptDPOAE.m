@@ -24,35 +24,17 @@ invfiltdata = set_invFilter(filttype,Stimuli.calibPicNum);
 
 %% Enter subject information
 if ~isfield(NelData,'AdvOAE') % First time through, need to ask all this.
-    subj = input('Please subject ID:', 's');    % NelData.sweptSFOAE.subj,earflag
-    
-    earflag = 1;
-    while earflag == 1
-        ear = input('Please enter which year (L or R):', 's');
-        switch ear
-            case {'L', 'R', 'l', 'r', 'Left', 'Right', 'left', 'right',...
-                    'LEFT', 'RIGHT'}
-                earname = strcat(ear, 'Ear');
-                earflag = 0;
-            otherwise
-                fprintf(2, 'Unrecognized ear type! Try again!');
-        end
-    end
     
     uiwait(warndlg('Set ER-10B+ GAIN to 40 dB','SET ER-10B+ GAIN WARNING','modal'));
     
     % Save in case if restart
-    NelData.AdvOAE.subj=subj;
-    NelData.AdvOAE.ear=ear;
     NelData.AdvOAE.Fig2close=[];  % set up the place to keep track of figures generted here (to be closed in NEL_App Checkout)
     NelData.AdvOAE.AdvOAE_figNum=377;  % +200 from wbMEMR
     
 else
-    subj=NelData.AdvOAE.subj;
-    ear=NelData.AdvOAE.ear;
     
-    fprintf('RESTARTING: \n   Subj: %s;\n   Ear: %s\n',subj,ear)
-    uiwait(warndlg(sprintf('RESTARTING: \n   Subj: %s;\n   Ear: %s',subj,ear),'modal'));
+    fprintf('RESTARTING')
+    uiwait(warndlg(sprintf('RESTARTING'),'modal'));
 end
 
 % %% Start (w/ Delay if needed)
@@ -69,10 +51,6 @@ end
 
 %% Initializing SFOAE variables for running and live analysis
 sweptDPOAE_ins;
-
-stim.subj = subj; 
-stim.ear = ear; 
-
 
 %% Running Script
 
@@ -102,6 +80,7 @@ resp = zeros(maxTrials, size(buffdata,2));
 %% Loop for presenting stimuli
 % variable for live analysis
 k = 0;
+
 t = stim.t;
 testfreq = [.75, 1, 1.5, 2, 3, 4, 6, 8, 12].* 1000;
 
