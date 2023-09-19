@@ -1,13 +1,12 @@
 % Stim generation for DPOAE
 
-% Stimulus Parameters
 stim.fmin = 500;
 stim.fmax = 16000;
 stim.speed = 1; % oct/sec
 stim.drop_f1 = 105-75;  % levels
 stim.drop_f2 = stim.drop_f1 + 10; % f2 = f1 - 10 (ie +10 more attn)
 stim.ratio = 1.22;
-stim.scale = 'log'; 
+
 stim.buffdur = 0.25;% buffer duration
 stim.Fs = 48828.125;
 
@@ -15,12 +14,12 @@ stim.Fs = 48828.125;
 stim.SNRcriterion = 6;
 stim.maxTrials = 50;
 stim.minTrials = 12;
-stim.ThrowAway = 0; % trials to not save
+stim.ThrowAway = 0;
 
 % Add useful info to structure
-gain = 40; 
+gain = 30; 
 stim.mic_sens = 50e-3; % mV/Pa
-stim.mic_gain = db2mag(gain); % +6 for balanced cable
+stim.mic_gain = db2mag(gain + 6); % +6 for balanced cable
 stim.P_ref = 20e-6;
 stim.DR_onesided = 1;
 stim.VoltageToPascal = 1 / (stim.DR_onesided * stim.mic_gain * stim.mic_sens);
@@ -28,8 +27,6 @@ stim.PascalToLinearSPL = 1 /  stim.P_ref;
 
 %% For live analysis
 stim.windowdur = 0.25;
-stim.offsetwin = 0.0; % not finding additional delay
-%stim.testfreq = [.75, 1, 1.5, 2, 3, 4, 6, 8, 12].* 1000;
 stim.npoints = 128; 
 
 if stim.speed < 0 % fixed
@@ -40,7 +37,7 @@ end
 
 %% Create stimulus
 buffdur = stim.buffdur;
-Fs = stim.Fs; 
+Fs = stim.Fs;
 
 if stim.speed < 0 % downsweep
     f_start = stim.fmax;
