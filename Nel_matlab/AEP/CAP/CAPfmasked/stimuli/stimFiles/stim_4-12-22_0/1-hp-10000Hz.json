@@ -1,0 +1,13 @@
+{
+    "type":"noise-bands", 
+    "comment":"created with noiseBandMaskerDesigner.m 04-Jan-2021", 
+    "n_bands":1, 
+    "bands":[
+        {
+            "amplitude":0.1, 
+            "fc_low":10000, 
+            "fc_high":12000
+        }
+    ], 
+    "name":"1-hp-10000Hz"
+}

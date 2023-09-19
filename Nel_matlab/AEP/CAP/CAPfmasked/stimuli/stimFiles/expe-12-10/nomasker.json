@@ -1,0 +1,8 @@
+{
+    "type":"noise-bands", 
+    "comment":"created with noiseBandMaskerDesigner.m 05-Jan-2021", 
+    "n_bands":0, 
+    "bands":[], 
+    "name":"nomasker", 
+    "extra_atten_dB":0
+}

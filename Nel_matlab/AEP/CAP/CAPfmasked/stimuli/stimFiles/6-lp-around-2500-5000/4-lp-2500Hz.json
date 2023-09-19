@@ -1,0 +1,18 @@
+{
+    "type":"noise-bands", 
+    "comment":"created with noiseBandMaskerDesigner", 
+    "n_bands":1, 
+    "bands":{
+        "amplitude":0.1, 
+        "fc_low":200, 
+        "fc_high":2500
+    }, 
+    "name":"4-lp-2500Hz", 
+    "wavefiles":{
+        "fs":48828, 
+        "duration_s":3, 
+        "filter_order":64, 
+        "filter_order_mult":2, 
+        "filename":"4-lp-2500Hz_48828_128_3.wav"
+    }
+}

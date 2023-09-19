@@ -39,7 +39,7 @@ x.Stimuli.L2_dBSPL     = PARAMS(12);
 x.Stimuli.L1_dBSPL     = PARAMS(13);
 
 x.Line    = [];
-
+x.invfilterdata = invfiltdata;
 x.DpoaeData = dpoaedata;
 x.DpoaeSpectra = dpoaespectra;
 x.Dpoaefreqs = dpoaefreqs;

@@ -1,0 +1,18 @@
+{
+    "type":"noise-bands", 
+    "comment":"created with noiseBandMaskerDesigner", 
+    "n_bands":1, 
+    "bands":{
+        "amplitude":0.1, 
+        "fc_low":200, 
+        "fc_high":5000
+    }, 
+    "name":"7-lp-5000Hz", 
+    "wavefiles":{
+        "fs":48828, 
+        "duration_s":3, 
+        "filter_order":64, 
+        "filter_order_mult":2, 
+        "filename":"7-lp-5000Hz_48828_128_3.wav"
+    }
+}

@@ -1,0 +1,24 @@
+{
+    "type":"noise-bands", 
+    "comment":"created with noiseBandMaskerDesigner.m 03-Jan-2021", 
+    "n_bands":3, 
+    "bands":[
+        {
+            "amplitude":0.1, 
+            "fc_low":200, 
+            "fc_high":3150
+        }, 
+        {
+            "amplitude":0.05012, 
+            "fc_low":3150, 
+            "fc_high":4850
+        }, 
+        {
+            "amplitude":0.1, 
+            "fc_low":4850, 
+            "fc_high":12000
+        }
+    ], 
+    "name":"9-notch4000_bw1700_26dB", 
+    "extra_atten_dB":0
+}

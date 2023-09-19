@@ -1,0 +1,23 @@
+{
+    "type":"noise-bands", 
+    "comment":"created with noiseBandMaskerDesigner.m 22-Apr-2021", 
+    "n_bands":3, 
+    "bands":[
+        {
+            "amplitude":0.1, 
+            "fc_low":200, 
+            "fc_high":6900
+        }, 
+        {
+            "amplitude":1E-5, 
+            "fc_low":6900, 
+            "fc_high":8700
+        }, 
+        {
+            "amplitude":0.1, 
+            "fc_low":8700, 
+            "fc_high":12000
+        }
+    ], 
+    "name":"3-notch7800_bw1800"
+}

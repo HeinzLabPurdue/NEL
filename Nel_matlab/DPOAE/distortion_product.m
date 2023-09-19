@@ -4,7 +4,7 @@ function h_fig = distortion_product(command_str)
 %THE FOLLOWING GLOBAL PARAMETERS ARE SHARED ACROSS FUNCTIONS
 
 global PARAMS PROG VERSION VOLTS
-global root_dir NelData
+global root_dir NelData raw_pic_file
 
 h_fig = findobj('Tag','DPOAE_Main_Fig');    %% Finds handle for TC-Figure
 
@@ -85,9 +85,14 @@ if ~strcmp(command_str,'initialize')		%you're returning via callback, retrieve f
     h_text6b = handles(21);
     
     dpoaedata= get(h_push_start,'Userdata');
-    if NelData.General.RP2_3and4 || NelData.General.RX8 % if NEL1 || NEL2
-        run_invCalib(false); % DPOAEs play 2 tones: easier to use raw-calib file with an allpass system; % SP on 22Sep19
-    end
+    
+    %AS/MP calibration done in dpoae.m
+%     if NelData.General.RP2_3and4 || NelData.General.RX8 % if NEL1 || NEL2
+% %         run_invCalib(false); % DPOAEs play 2 tones: easier to use raw-calib file with an allpass system; % SP on 22Sep19
+%         filttype = {'inversefilt','inversefilt'};
+%         invfiltdata = set_invFilter(filttype
+%         
+%     end
     % This means: need to use the last raw calib file
 end
 
@@ -227,7 +232,9 @@ elseif strcmp(command_str,'saveNquit')
     
 elseif strcmp(command_str,'close')
     if NelData.General.RP2_3and4 || NelData.General.RX8
-        run_invCalib(false);
+%         run_invCalib(false);
+        filttype = {'allpass','allpass'};
+        dummy = set_invFilter(filttype,raw_pic_file);
     end
     close('Distortion Product Otoacoustic Emissions');
 end

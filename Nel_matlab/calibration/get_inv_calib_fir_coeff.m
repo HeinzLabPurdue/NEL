@@ -1,4 +1,4 @@
-function get_inv_calib_fir_coeff(calibPicNum, plotYes)
+function get_inv_calib_fir_coeff(calibPicNum,plotYes)
 
 co= [  0    0.4470    0.7410
     0.8500    0.3250    0.0980
@@ -19,41 +19,84 @@ cdd;
 fName_calib=getFileName(calibPicNum);
 fName_calib= strrep(fName_calib, '_raw', '');
 
-data= loadpic(calibPicNum);
-data=data.CalibData;
+pic_data = loadpic(calibPicNum);
+chans = length(pic_data.ear_ord);
 
-freq_kHz=data(:,1);
-dBspl_at0dB_atten=data(:,2);
+for c = 1:chans
+    if c == 1
+        data=pic_data.CalibData;
+        b2=[];
+        b2_nogain=[];
 
-%% figure out inverse filter gains
-% ER2 technical specs says gain at 1V rms should be 100 dB
-% https://www.etymotic.com/auditory-research/insert-earphones-for-research/er2.html
-% We are playing = 10V pp (TDT max Output)
-% RMS= 10/sqrt(2); : should be ~(100+17)=~117 dB
-% 117 dB: too loud. So set ideal dB SPL to something between 90-100 dB
-dBSPL_ideal= 105; 
-filter_gain= dBSPL_ideal-dBspl_at0dB_atten;
+    elseif c == 2
+        data=pic_data.CalibData2;
+    end
+    
+    freq_kHz=data(:,1);
+    dBspl_at0dB_atten=data(:,2);
+    dBSPL_ideal= 105;
+    filter_gain= dBSPL_ideal-dBspl_at0dB_atten;
+    freq_near11k= dsearchn(freq_kHz, 11);
+    filter_gain(freq_near11k:end)= linspace(filter_gain(freq_near11k), 0, numel(filter_gain)-freq_near11k+1);
+    fs=  48828.125;
+    Nfilter= 255;
 
-% Suppress high frequency gain (Taper to zero?)
-freq_near11k= dsearchn(freq_kHz, 11);
-filter_gain(freq_near11k:end)= linspace(filter_gain(freq_near11k), 0, numel(filter_gain)-freq_near11k+1);
+    if c==1
+        b = fir2(Nfilter, [0; freq_kHz; 20; fs/2/1e3]/(fs/2/1e3), [db2mag(filter_gain(1)); db2mag(filter_gain); db2mag(filter_gain(end)); 0]);
+        b=b';
+        b_nogain= [1 zeros(1, Nfilter)];
+        b_nogain=b_nogain';
+    elseif c==2
+        b2 = fir2(Nfilter, [0; freq_kHz; 20; fs/2/1e3]/(fs/2/1e3), [db2mag(filter_gain(1)); db2mag(filter_gain); db2mag(filter_gain(end)); 0]);
+        b2=b2';
+        b2_nogain= [1 zeros(1, Nfilter)];
+        b2_nogain=b2_nogain';
+    end
+    
+    
+end
 
 
-%% design filter
-fs=  48828.125;
-Nfilter= 255;
-b = fir2(Nfilter, [0; freq_kHz; 20; fs/2/1e3]/(fs/2/1e3), [db2mag(filter_gain(1)); db2mag(filter_gain); db2mag(filter_gain(end)); 0]);
-% b = fir2(Nfilter, [0; .1; freq_kHz; 20; fs/2/1e3]/(fs/2/1e3), [0; 0; db2mag(filter_gain-max(filter_gain)); 0; 0]);
-% b_nogain = fir2(Nfilter, [0; .1; freq_kHz; 20; fs/2/1e3]/(fs/2/1e3), [1; 1; db2mag(zeros(size(filter_gain))); 0; 0]);
-b_nogain= [1 zeros(1, Nfilter)];
+invFIR_fName_calib = strcat('coef_',fName_calib(2:end-2));
+save(invFIR_fName_calib,'b','b_nogain','b2','b2_nogain');  % save coefs
 
+
+
+%data=data.CalibData;
+
+% freq_kHz=data(:,1);
+% dBspl_at0dB_atten=data(:,2);
+% 
+% %% figure out inverse filter gains
+% % ER2 technical specs says gain at 1V rms should be 100 dB
+% % https://www.etymotic.com/auditory-research/insert-earphones-for-research/er2.html
+% % We are playing = 10V pp (TDT max Output)
+% % RMS= 10/sqrt(2); : should be ~(100+17)=~117 dB
+% % 117 dB: too loud. So set ideal dB SPL to something between 90-100 dB
+% dBSPL_ideal= 105;
+% filter_gain= dBSPL_ideal-dBspl_at0dB_atten;
+% 
+% % Suppress high frequency gain (Taper to zero?)
+% freq_near11k= dsearchn(freq_kHz, 11);
+% filter_gain(freq_near11k:end)= linspace(filter_gain(freq_near11k), 0, numel(filter_gain)-freq_near11k+1);
+% 
+% 
+% %% design filter
+% fs=  48828.125;
+% Nfilter= 255;
+% b = fir2(Nfilter, [0; freq_kHz; 20; fs/2/1e3]/(fs/2/1e3), [db2mag(filter_gain(1)); db2mag(filter_gain); db2mag(filter_gain(end)); 0]);
+% % b = fir2(Nfilter, [0; .1; freq_kHz; 20; fs/2/1e3]/(fs/2/1e3), [0; 0; db2mag(filter_gain-max(filter_gain)); 0; 0]);
+% % b_nogain = fir2(Nfilter, [0; .1; freq_kHz; 20; fs/2/1e3]/(fs/2/1e3), [1; 1; db2mag(zeros(size(filter_gain))); 0; 0]);
+% b_nogain= [1 zeros(1, Nfilter)];
+
+%% plot
 
 % freqz(b)
 if plotYes
     figure(5)
     freqz(b_nogain,1,2056, fs)
     title('No gain filter')
-  
+    
     figure(6)
     freqz(b,1,2056, fs)
     title('Inverted gain filter')
@@ -61,7 +104,7 @@ end
 
 [gd, w]= grpdelay(b,1,2056, fs);
 
-%% plot
+
 if plotYes
     figure(1); clf;
     xtick_vals= [.1 .2 1 3 10 16];
@@ -86,6 +129,7 @@ if plotYes
     set(gca, 'XScale', 'log');
     
     title(sprintf('mean group delay  (below 10kHz)= %.1f ms',  mean(gd(w<10e3))/fs*1e3));
+    
     
     %% verify
     
@@ -112,11 +156,13 @@ if plotYes
     xlim([160 16e3]);
     
 end
-b=b'; %#ok<*NASGU>
-b_nogain=b_nogain';
 
-invFIR_fName_calib = strcat('coef_',fName_calib(2:end-2));
-save(invFIR_fName_calib,'b','b_nogain')  % save coefs
+%% 
+% b=b'; %#ok<*NASGU>
+% b_nogain=b_nogain';
+% 
+% invFIR_fName_calib = strcat('coef_',fName_calib(2:end-2));
+% save(invFIR_fName_calib,'b','b_nogain')  % save coefs
 
 
 rdd;

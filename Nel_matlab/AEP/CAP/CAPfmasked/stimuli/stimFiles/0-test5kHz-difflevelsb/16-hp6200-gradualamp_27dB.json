@@ -1,0 +1,28 @@
+{
+    "type":"noise-bands", 
+    "comment":"created with noiseBandMaskerDesigner.m 16-Nov-2021", 
+    "n_bands":4, 
+    "bands":[
+        {
+            "amplitude":0.01778, 
+            "fc_low":3500, 
+            "fc_high":4200
+        }, 
+        {
+            "amplitude":0.03162, 
+            "fc_low":4200, 
+            "fc_high":4800
+        }, 
+        {
+            "amplitude":0.0446, 
+            "fc_low":4800, 
+            "fc_high":6200
+        }, 
+        {
+            "amplitude":0.1, 
+            "fc_low":6200, 
+            "fc_high":12000
+        }
+    ], 
+    "name":"16-hp6200-gradualamp"
+}

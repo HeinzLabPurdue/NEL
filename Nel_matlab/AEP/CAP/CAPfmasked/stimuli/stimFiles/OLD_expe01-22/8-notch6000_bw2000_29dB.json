@@ -1,0 +1,24 @@
+{
+    "type":"noise-bands", 
+    "comment":"created with noiseBandMaskerDesigner.m 04-Jan-2021", 
+    "n_bands":3, 
+    "bands":[
+        {
+            "amplitude":0.1, 
+            "fc_low":200, 
+            "fc_high":5000
+        }, 
+        {
+            "amplitude":0.03548, 
+            "fc_low":5000, 
+            "fc_high":7000
+        }, 
+        {
+            "amplitude":0.1, 
+            "fc_low":7000, 
+            "fc_high":12000
+        }
+    ], 
+    "name":"8-notch6000_bw2000_29dB", 
+    "extra_atten_dB":0
+}
