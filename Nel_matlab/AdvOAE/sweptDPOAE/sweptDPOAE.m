@@ -113,7 +113,7 @@ while doneWithTrials == 0
         resp(k - stim.ThrowAway,  :) = vins;
     end
     
-    WaitSecs(0.15);
+    pause(0.15);
     
     if k > stim.ThrowAway
         % Set empty matricies for next steps

@@ -7,7 +7,7 @@ offsetwin = stim.offsetwin; % not finding additional delay
 npoints = stim.npoints;
 
 DPOAEtrials = stim.resp; 
-
+trials = size(stim.resp, 1); 
 %% Set variables from the stim
 phi1_inst = 2 * pi * stim.phi1_inst;
 phi2_inst = 2 * pi * stim.phi2_inst;
