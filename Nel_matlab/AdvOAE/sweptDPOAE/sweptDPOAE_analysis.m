@@ -191,12 +191,11 @@ legend('OAE', 'NF', 'F2', 'F1')
 drawnow;
 
 
-%% Save result function
+% Save result function
 res.windowdur = windowdur;
 res.offsetwin = offsetwin;
 res.npoints = npoints;
 res.avgDPOAEresp = DPOAE;   % average mic response
-res.avgNOISEresp = NOISE;
 res.t_freq = t_freq;
 res.f.f2 = freq_f2;         % frequency vectors
 res.f.f1 = freq_f1;
@@ -207,14 +206,11 @@ res.a.f1 = a_f1;
 res.b.f1 = b_f1;
 res.a.f2 = a_f2;
 res.b.f2 = b_f2;
-res.a.n = a_n; % subtraction method
-res.b.n = b_n;
 res.tau.dp = tau_dp;
 res.stim = stim;
-res.subj = stim.subj;
 res.ear = stim.ear;
 res.complex.oae = oae_complex; 
 res.complex.nf = noise_complex; 
-res.complex.nf2 = noise_complex2; 
+
 
 end

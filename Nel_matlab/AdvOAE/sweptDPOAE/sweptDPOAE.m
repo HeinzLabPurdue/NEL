@@ -43,7 +43,7 @@ end
 
 %% Initializing SFOAE variables for running and live analysis
 sweptDPOAE_ins;
-
+stim.ear = ear; 
 %% Running Script
 % Set stims in buffdata:
 buffdata = [stim.y1; stim.y2];
@@ -110,10 +110,8 @@ while doneWithTrials == 0
     
     % save the response
     if k > stim.ThrowAway
-        resp(k - stim.ThrowAway,  :) = vins;
+        resp(k - stim.ThrowAway,  :) = vins;profiles_dir
     end
-    
-    pause(0.15);
     
     if k > stim.ThrowAway
         % Set empty matricies for next steps
@@ -285,7 +283,7 @@ switch answer
     case {'Yes'}
         % Call function
         % instead of saving as a separate file, it just saves stim_AR in a
-        [res_DPOAE] = sweptDPOAE_analysis(stim);
+        sweptDPOAE_analysis(stim);
         disp('Saving Analyzed data ...')
     case {'No'}
         % do nothing

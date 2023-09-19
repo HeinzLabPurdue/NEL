@@ -1,8 +1,8 @@
 function res = sweptSFOAE_analysis(stim)
 
-windowdur = stim.analysis.windowdur;
-offsetwin = stim.analysis.offsetwin;
-npoints = stim.analysis.npoints;
+windowdur = 0.06;
+offsetwin = 0.01;
+npoints = 512;
 
 
 phiProbe_inst = 2*pi*stim.phiProbe_inst;
@@ -197,7 +197,7 @@ figure;
 plot(testfreq/1000, db(abs(oae_complex).*res.multiplier), 'linew', 1.75);
 hold on;
 plot(testfreq/1000, db(abs(noise_complex).*res.multiplier), '--', 'linew', 1.5);
-title(sprintf('SFOAE Subj: %s, Ear: %s', string(stim.subj), string(stim.ear)))
+title('SFOAE') 
 set(gca, 'XScale', 'log', 'FontSize', 14)
 xlim([.5, 16])
 xticks([.5, 1, 2, 4, 8, 16])
@@ -220,8 +220,7 @@ res.b_n = b_n;
 res.stim = stim;
 res.tau = tau;
 res.phasor = phasor; 
-res.subj = stim.subj;
-res.ear = stim.ear;
+
 res.multiplier = stim.VoltageToPascal.* stim.PascalToLinearSPL;
 res.complex.oae = oae_complex; 
 res.complex.nf = noise_complex; 
