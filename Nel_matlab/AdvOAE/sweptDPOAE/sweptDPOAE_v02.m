@@ -24,31 +24,21 @@ invfiltdata = set_invFilter(filttype,Stimuli.calibPicNum);
 
 %% Enter subject information
 if ~isfield(NelData,'AdvOAE') % First time through, need to ask all this.
-<<<<<<< HEAD
+
     ear = questdlg('Which Ear?', 'Ear', 'L', 'R', 'R');
     uiwait(warndlg('Set ER-10B+ GAIN to 40 dB','SET ER-10B+ GAIN WARNING','modal'));
     
     % Save in case if restart
     NelData.AdvOAE.ear = ear;
-=======
-    
-    uiwait(warndlg('Set ER-10B+ GAIN to 40 dB','SET ER-10B+ GAIN WARNING','modal'));
-    
-    % Save in case if restart
->>>>>>> ea9636887ff9b674ef36a1527b27a5b854be900d
     NelData.AdvOAE.Fig2close=[];  % set up the place to keep track of figures generted here (to be closed in NEL_App Checkout)
     NelData.AdvOAE.AdvOAE_figNum=377;  % +200 from wbMEMR
     
 else
-<<<<<<< HEAD
     ear = NelData.AdvOAE.ear;
-    fprintf('RESTARTING: \n   Subj: %s;\n   Ear: %s\n',subj,ear)
-    uiwait(warndlg(sprintf('RESTARTING: \n   Subj: %s;\n   Ear: %s',subj,ear),'modal'));
-=======
-    
+
     fprintf('RESTARTING')
     uiwait(warndlg(sprintf('RESTARTING'),'modal'));
->>>>>>> ea9636887ff9b674ef36a1527b27a5b854be900d
+
 end
 
 %% Initializing SFOAE variables for running and live analysis
@@ -74,16 +64,10 @@ SNRcriterion = stim.SNRcriterion;
 maxTrials = stim.maxTrials;
 minTrials = stim.minTrials;
 
-<<<<<<< HEAD
 phi_dp_inst = (2.*stim.phi1_inst - stim.phi2_inst) * 2 * pi; %dp
-=======
-resp = zeros(maxTrials, size(buffdata,2));
 
 %% Loop for presenting stimuli
 % variable for live analysis
-k = 0;
-
->>>>>>> ea9636887ff9b674ef36a1527b27a5b854be900d
 t = stim.t;
 npoints = stim.npoints;
 nearfreqs = stim.nearfreqs;
@@ -247,16 +231,17 @@ while doneWithTrials == 0
         drawnow;
         
         fprintf(1, 'Trials run: %d / Noisy Trials: %d \n', k_kept, noisy_trials);
+        
         % Check for button push
         % either ABORT or RESTART needs to break loop immediately,
-        % saveNquit will complete current LEVEL sweep
+        % saveNquit will complete current sweep
         ud_status = get(h_push_stop,'Userdata');  % only call this once - ACT on 1st button push
         if ~isempty(ud_status)
             break;
         end
         
-    end
-end
+    end % if k > throwaways
+end %done w/ trials
 
 stim.resp = resp(1:k_kept,:);
 
