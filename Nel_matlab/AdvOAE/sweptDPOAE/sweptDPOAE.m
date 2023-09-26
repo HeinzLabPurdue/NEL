@@ -56,7 +56,7 @@ end
 %% Set attenuation and play
 drop_f1 = stim.drop_f1;
 drop_f2 = stim.drop_f2;
-delayComp = 1; % Always
+delayComp = 344; % Always
 
 % Live analysis parameters
 windowdur = stim.windowdur;
@@ -110,7 +110,7 @@ while doneWithTrials == 0
     
     % save the response
     if k > stim.ThrowAway
-        resp(k - stim.ThrowAway,  :) = vins;profiles_dir
+        resp(k - stim.ThrowAway,  :) = vins;
     end
     
     if k > stim.ThrowAway

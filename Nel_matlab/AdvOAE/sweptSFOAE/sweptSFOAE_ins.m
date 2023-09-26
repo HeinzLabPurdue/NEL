@@ -9,8 +9,8 @@ stim.diff = 50; % Hz (Fprobe - 50 = Fsupp; Probe is higher)
 stim.buffdur = 0.25; %seconds; for either side of sweep 
 stim.Fs = 48828.125;
 
-stim.drop_Probe = 60; % for 40dB probe
-stim.drop_Supp = 40; % for 60dB suppressor
+stim.drop_Probe = 65; % for 40dB probe
+stim.drop_Supp = 45; % for 60dB suppressor
 
 % Trial params
 stim.ThrowAway = 0;

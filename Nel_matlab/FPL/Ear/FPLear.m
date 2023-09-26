@@ -10,7 +10,7 @@ PROTOCOL = 'FPLear';
 
 %% Initialize TDT
 card = initialize_card;
-
+ADdelay = 216; 
 %% New Ear Calib or Inverse Calib
 
 if (NelData.General.RP2_3and4 || NelData.General.RX8)
@@ -41,9 +41,11 @@ if (NelData.General.RP2_3and4 || NelData.General.RX8)
             1,{num2str(RawCalibPicNum)});
         RawCalibPicNum = str2double(RawCalibPicNum{1});
         rdd;
+       ADdelay = 344; 
     else %first time calib
         filttype = {'allpass','allpass'};
         RawCalibPicNum = NaN;
+         ADdelay = 216;
     end
     
     invfilterdata = set_invFilter(filttype, RawCalibPicNum, true);
@@ -133,7 +135,7 @@ drop = [120, 120];
 drop(driver) = calib.Attenuation;
 
 for n = 1:(calib.Averages + calib.ThrowAway)
-    vin = PlayCaptureNEL(card, buffdata, drop(1), drop(2), 1);
+    vin = PlayCaptureNEL(card, buffdata, drop(1), drop(2), ADdelay);
     
     % Save data
     if (n > calib.ThrowAway)
@@ -166,13 +168,13 @@ outut_Pa_20uPa_per_Vpp_1 = output_Pa_1 / P_ref; % unit: 20 uPa / Vpeak
 
 freq = calib.freq; %1000*linspace(0,calib.SamplingRate/2,length(Vavg_1))';
 
-if doInvCalib
-    vo_filt = filtfilt(invfilterdata.b_chan1, 1, calib.vo); 
-    Vo_1 = rfft(vo_filt)*5*db2mag(-1 * calib.Attenuation);
-else 
+% if doInvCalib
+%      vo_filt = filter(invfilterdata.b_chan1, 1, calib.vo); 
+%      Vo_1 = rfft(vo_filt)*5*db2mag(-1 * calib.Attenuation);
+% else 
     Vo = rfft(calib.vo)*5*db2mag(-1 * calib.Attenuation);
     Vo_1 = Vo; 
-end
+% end
 
 calib.EarRespH_1 =  outut_Pa_20uPa_per_Vpp_1 ./ Vo_1; %save for later
 
@@ -186,7 +188,7 @@ drop = [120, 120];
 drop(driver) = calib.Attenuation;
 
 for n = 1:(calib.Averages + calib.ThrowAway)
-    vin = PlayCaptureNEL(card, buffdata, drop(1), drop(2), 1);
+    vin = PlayCaptureNEL(card, buffdata, drop(1), drop(2), ADdelay);
     
     % Save data
     if (n > calib.ThrowAway)
@@ -214,13 +216,13 @@ mic_output_V_2 = Vavg_2 / (DR_onesided * mic_gain);
 output_Pa_2 = mic_output_V_2/mic_sens;
 output_Pa_20uPa_per_Vpp_2 = output_Pa_2 / P_ref; % unit: 20 uPa / Vpeak
 
-if doInvCalib
-    vo_filt = filtfilt(invfilterdata.b_chan1, 1, calib.vo); 
-    Vo_2 = rfft(vo_filt)*5*db2mag(-1 * calib.Attenuation);
-else 
+% if doInvCalib
+%      vo_filt = filter(invfilterdata.b_chan1, 1, calib.vo); 
+%      Vo_2 = rfft(vo_filt)*5*db2mag(-1 * calib.Attenuation);
+% else 
     Vo = rfft(calib.vo)*5*db2mag(-1 * calib.Attenuation);
     Vo_2 = Vo; 
-end
+%end
 
 calib.EarRespH_2 =  output_Pa_20uPa_per_Vpp_2 ./ Vo_2; %save for later
 

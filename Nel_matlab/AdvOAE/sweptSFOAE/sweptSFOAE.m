@@ -88,7 +88,8 @@ ProbeBuffs = zeros(maxTrials, numel(stim.yProbe));
 SuppBuffs = zeros(maxTrials, numel(stim.yProbe));
 BothBuffs = zeros(maxTrials, numel(stim.yProbe));
 flip = -1;
-delayComp = 1;
+delayComp = 344;
+stim.delayComp = delayComp; 
 
 %% Data Collection Loop
 disp('Starting stimulation...');

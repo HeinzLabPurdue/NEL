@@ -80,7 +80,7 @@ for m = 1: calib.CavNumb
     drop(driver) = calib.Attenuation;
     
     for n = 1:(calib.Averages + calib.ThrowAway)
-        vin = PlayCaptureNEL(card, buffdata, drop(1), drop(2), 1);
+        vin = PlayCaptureNEL(card, buffdata, drop(1), drop(2), 216);
         
         % Save data
         if (n > calib.ThrowAway)
@@ -130,7 +130,7 @@ for m = 1: calib.CavNumb
     drop(driver) = calib.Attenuation;
     
     for n = 1:(calib.Averages + calib.ThrowAway)
-        vin = PlayCaptureNEL(card, buffdata, drop(1), drop(2), 1);
+        vin = PlayCaptureNEL(card, buffdata, drop(1), drop(2), 216);
         
         % Save data
         if (n > calib.ThrowAway)

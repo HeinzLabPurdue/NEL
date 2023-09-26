@@ -43,7 +43,7 @@ for c = 1:chans
     freq_near11k= dsearchn(freq_kHz, 11);
     filter_gain(freq_near11k:end)= linspace(filter_gain(freq_near11k), 0, numel(filter_gain)-freq_near11k+1);
     fs=  48828.125;
-    Nfilter= 255;
+    Nfilter= 255; %255
     
     %     if c==1
     %         b = fir2(Nfilter, freq_kHz/(fs/2/1e3), db2mag(filter_gain));

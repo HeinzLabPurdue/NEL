@@ -241,6 +241,8 @@ elseif status_rx8 % Most call for run_invCalib are from NEL1. For NEL2 (with RX8
             invoke(COMM.handle.RX8,'LoadCof',[object_dir '\FFR_RX8_ADC_invCalib_2chan.rcx']);
         case 'FFRwav'
             invoke(COMM.handle.RX8,'LoadCof',[object_dir '\FFR_RX8_ADC_invCalib_2chan.rcx']);
+        case 'FPL'
+            invoke(COMM.handle.RX8,'LoadCof',[object_dir '\FFR_RX8_ADC_invCalib_2chan_FPL.rcx']);
         otherwise 
             fprintf('PROTOCOL not set in set_invFilter...setting to ABR circuit file'); 
             invoke(COMM.handle.RX8,'LoadCof',[object_dir '\ABR_RX8_ADC_invCalib_2chan.rcx']);

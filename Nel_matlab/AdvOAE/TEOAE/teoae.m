@@ -85,11 +85,12 @@ drops(click.driver) = click.Attenuation;
 
 % Make arrays to store measured mic outputs
 resp = zeros(click.Averages, size(buffdata,2));
-
+delayComp = 344; 
+stim.ADdelay = delayComp;
 disp('Starting stimulation...');
 for k = 1:(click.Averages + click.ThrowAway)
     
-    vin = PlayCaptureNEL(card, buffdata, drops(1), drops(2), 1);
+    vin = PlayCaptureNEL(card, buffdata, drops(1), drops(2), delayComp);
     
     % Save data
     if k > click.ThrowAway

@@ -1,7 +1,7 @@
 function res = sweptSFOAE_analysis(stim)
 
 windowdur = 0.06;
-offsetwin = 0.01;
+offsetwin = 0.0;
 npoints = 512;
 
 
