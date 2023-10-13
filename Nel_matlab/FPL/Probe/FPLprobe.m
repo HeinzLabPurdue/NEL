@@ -254,7 +254,7 @@ plot(freq/1000,dB(calib.Zc_1),'--'); %plot estimated Zc
 calib.CavLength_1 = la_1;
 
 if ~(calib.Error_1 >= 0 && calib.Error_1 <=1)
-    h = warndlg ('Calibration error out of range!');
+    h = warndlg (sprintf('Calibration error out of range! Error: %f', calib.Error_1 ));
     waitfor(h);
 end
  hold off; 
@@ -279,7 +279,7 @@ plot(freq/1000,dB(calib.Zc_2),'--'); %plot estimated Zc
 calib.CavLength_2 = la_2;
 
 if ~(calib.Error_2 >= 0 && calib.Error_2 <=1)
-    h = warndlg ('Calibration error out of range!');
+   h = warndlg (sprintf('Calibration error out of range! Error: %f', calib.Error_2 ));
     waitfor(h);
 end
 

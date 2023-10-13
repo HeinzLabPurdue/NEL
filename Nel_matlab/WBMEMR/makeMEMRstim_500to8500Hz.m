@@ -22,7 +22,7 @@ stim.clickatt = 12;
 stim.noiseatt = 60:-6:0; %Note makeNBNoiseFFT returns RMS of -20 dB re: 1
 % stim.noiseatt = 42:-6:0; %Note makeNBNoiseFFT returns RMS of -20 dB re: 1
 % stim.noiseatt = 6:-6:0; %Note makeNBNoiseFFT returns RMS of -20 dB re: 1
-stim.noiseatt = 70:-6:10; %Note makeNBNoiseFFT returns RMS of -20 dB re: 1
+%stim.noiseatt = 70:-6:10; %Note makeNBNoiseFFT returns RMS of -20 dB re: 1
 
 
 % stim.noiseatt = fliplr(stim.noiseatt(end-4:end));
