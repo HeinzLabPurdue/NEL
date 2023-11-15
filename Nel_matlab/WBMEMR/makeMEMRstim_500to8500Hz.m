@@ -11,7 +11,7 @@ if ~exist('rawstim', 'var')
     stim.fc = 4500; % 1 - 8 kHz
     stim.bw = 8000;
     stim.noiseramp = 5;
-    stim.nreps = 3; % How many reps per trial  [7 is default]
+    stim.nreps = 7; % How many reps per trial  [7 is default]
 else
     stim = rawstim;
 end
@@ -21,7 +21,8 @@ stim.clickatt = 12;
 % stim.clickatt = stim.clickatt + 6; % WITH HB7 USING DIFFERENTIAL OUPUT
 stim.noiseatt = 60:-6:0; %Note makeNBNoiseFFT returns RMS of -20 dB re: 1
 % stim.noiseatt = 42:-6:0; %Note makeNBNoiseFFT returns RMS of -20 dB re: 1
-stim.noiseatt = 6:-6:0; %Note makeNBNoiseFFT returns RMS of -20 dB re: 1
+% stim.noiseatt = 6:-6:0; %Note makeNBNoiseFFT returns RMS of -20 dB re: 1
+%stim.noiseatt = 70:-6:10; %Note makeNBNoiseFFT returns RMS of -20 dB re: 1
 
 
 % stim.noiseatt = fliplr(stim.noiseatt(end-4:end));
@@ -31,8 +32,8 @@ stim.noiseatt = 6:-6:0; %Note makeNBNoiseFFT returns RMS of -20 dB re: 1
 stim.ThrowAway = 1;  % initial trials to throw away
 
 %TODO: Change back to 32 after debugging
-stim.Averages = 3;  % num trials to AVERAGE [defaul is 32]
-disp('CHANGED to 3 reps for testing***')
+stim.Averages = 32;  % num trials to AVERAGE [defaul is 32]
+%disp('CHANGED to 3 reps for testing***')
 
 stim.pad = 256; % Number of samples extra to read in after stim ends
 stim.nLevels = numel(stim.noiseatt);

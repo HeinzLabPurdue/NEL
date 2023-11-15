@@ -131,8 +131,8 @@ AR = 0; %0=No Artifact rejection, 1=Do Artifact rejection
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 cdd;
-filttype = {'allpass','allpass'};
-% filttype = {'allstop','allstop'};
+%filttype = {'allpass','allpass'};
+filttype = {'inversefilt_FPL','inversefilt_FPL'};
 all_raw = findPics('raw*');
 RawCalibPicNum = max(all_raw);
 

@@ -36,9 +36,6 @@ if nargin<1
         delete(h_fig);
     end
     
-    colordef none;
-    whitebg('w');
-    
     h_fig = figure('NumberTitle','off','Name','Wideband Middle Ear Muscle Reflex','Units','normalized',...
     'Visible','on', 'position',[0.045  0.045  0.17  0.14],'MenuBar','none','Tag','WBMEMR_Main_Fig');
     

@@ -1,34 +1,68 @@
-global root_dir NelData data_dir
-
-% NEL Version of RunMEMR_chin_edited_NEL1.m based off Hari's SNAPLab script
+global root_dir NelData data_dir PROTOCOL
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 host=lower(getenv('hostname'));
 host = host(~isspace(host));
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%Insert NEL/GUI Parameters here...none for WBMEMR
+%Insert NEL/GUI Parameters here.
+PROTOCOL = 'FPLear';
+
+%% Initialize TDT
+card = initialize_card;
+ADdelay = 216; 
+%% New Ear Calib or Inverse Calib
+
+if (NelData.General.RP2_3and4 || NelData.General.RX8)
+    cdd;
+    all_Calib_files= dir('p*calib_FPL*');
+    if isempty(all_Calib_files)
+        newCalib = true;
+        doInvCalib = false;
+    else
+        inStr= questdlg('Calib files already exists - run new calib or use latest FIR coeffs?', 'New or Rerun?', 'New Calib', 'FIR Calib', 'FIR Calib');
+        if strcmp(inStr, 'New Calib')
+            newCalib= true;
+            doInvCalib = false;
+        elseif strcmp(inStr, 'FIR Calib')
+            newCalib= false;
+            doInvCalib = true;
+        end
+    end
+    rdd;
+    
+    if doInvCalib %already has a raw
+        filttype = {'inversefilt_FPL','inversefilt_FPL'};
+        cdd;
+        all_raw = findPics('FPL_raw*');
+        RawCalibPicNum = max(all_raw);     
+        %prompt user for RAW calib
+        RawCalibPicNum = inputdlg('Please confirm the RAW calibration file to use (default = last raw calib): ', 'Calibration!',...
+            1,{num2str(RawCalibPicNum)});
+        RawCalibPicNum = str2double(RawCalibPicNum{1});
+        rdd;
+       ADdelay = 344; 
+    else %first time calib
+        filttype = {'allpass','allpass'};
+        RawCalibPicNum = NaN;
+         ADdelay = 216;
+    end
+    
+    invfilterdata = set_invFilter(filttype, RawCalibPicNum, true);
+    coefFileNum = invfilterdata.coefFileNum;
+    
+else
+    newCalib= true;
+end
 
 %% Get Probe File
 % Setting up for now as in SNAPlab
 [FileName,PathName,FilterIndex] = uigetfile(strcat('C:\NEL\Nel_matlab\FPL\Probe\ProbeCal_Data\FPLprobe*', date, '*.mat'),...
-    'Please pick DRIVE PROBE CALIBRATION file to use');
+    'Please pick PROBE CALIBRATION file to use');
 probefile = fullfile(PathName, FileName);
 load(probefile);
 
-calib = x.FPLprobeData.calib; 
-%% Initialize TDT
-card = initialize_card;
-
-%% Inverse Calibration
-%NEEDS TO BE CLEANED UP ASAP.
-% 1. run_invCalib needs cleaned up...currently clunky
-% 2. Need calibration to be correct for MEMR (currently all pass, w/o calib)
-[~, calibPicNum, ~] = run_invCalib(false);   % skipping INV calib for now since based on 94 dB SPL benig highest value, bot the 105 dB SPL from inv Calib.
-[coefFileNum, ~, ~] = run_invCalib(-2);
-
-calib.CalibPICnum2use = calibPicNum;  % save this so we know what calib file to use right from data file
-coefFileNum = NaN;
+calib = x.FPLprobeData.calib;
 
 %% Enter subject information
 if ~isfield(NelData,'FPL') % First time through, need to ask all this.
@@ -58,9 +92,6 @@ end
 
 %% Initializing variables
 FPLear_ins;
-
-subj = input('Please subject ID:', 's');
-calib.subj = subj;
 
 earflag = 1;
 while earflag == 1
@@ -104,7 +135,7 @@ drop = [120, 120];
 drop(driver) = calib.Attenuation;
 
 for n = 1:(calib.Averages + calib.ThrowAway)
-    vin = PlayCaptureNEL(card, buffdata, drop(1), drop(2), 1);
+    vin = PlayCaptureNEL(card, buffdata, drop(1), drop(2), ADdelay);
     
     % Save data
     if (n > calib.ThrowAway)
@@ -135,10 +166,17 @@ mic_output_V_1 = Vavg_1 / (DR_onesided * mic_gain);
 output_Pa_1 = mic_output_V_1/mic_sens;
 outut_Pa_20uPa_per_Vpp_1 = output_Pa_1 / P_ref; % unit: 20 uPa / Vpeak
 
-freq = 1000*linspace(0,calib.SamplingRate/2,length(Vavg_1))';
+freq = calib.freq; %1000*linspace(0,calib.SamplingRate/2,length(Vavg_1))';
 
-Vo = rfft(calib.vo)*5*db2mag(-1 * calib.Attenuation);
-calib.EarRespH_1 =  outut_Pa_20uPa_per_Vpp_1 ./ Vo; %save for later
+% if doInvCalib
+%      vo_filt = filter(invfilterdata.b_chan1, 1, calib.vo); 
+%      Vo_1 = rfft(vo_filt)*5*db2mag(-1 * calib.Attenuation);
+% else 
+    Vo = rfft(calib.vo)*5*db2mag(-1 * calib.Attenuation);
+    Vo_1 = Vo; 
+% end
+
+calib.EarRespH_1 =  outut_Pa_20uPa_per_Vpp_1 ./ Vo_1; %save for later
 
 
 %% Do driver 2 next:
@@ -150,7 +188,7 @@ drop = [120, 120];
 drop(driver) = calib.Attenuation;
 
 for n = 1:(calib.Averages + calib.ThrowAway)
-    vin = PlayCaptureNEL(card, buffdata, drop(1), drop(2), 1);
+    vin = PlayCaptureNEL(card, buffdata, drop(1), drop(2), ADdelay);
     
     % Save data
     if (n > calib.ThrowAway)
@@ -170,34 +208,23 @@ vins_ear_2 = demean(vins_ear_2, 2);
 energy = squeeze(sum(vins_ear_2.^2, 2));
 good = energy < median(energy) + 2*mad(energy);
 vavg_2 = squeeze(mean(vins_ear_2(good, :), 1));
-Vavg_2 = rfft(vavg_2'); 
+Vavg_2 = rfft(vavg_2');
 calib.vavg_ear_2 = vavg_2;
 
 % Apply calibartions to convert voltage to pressure
 mic_output_V_2 = Vavg_2 / (DR_onesided * mic_gain);
 output_Pa_2 = mic_output_V_2/mic_sens;
-outut_Pa_20uPa_per_Vpp_2 = output_Pa_2 / P_ref; % unit: 20 uPa / Vpeak
+output_Pa_20uPa_per_Vpp_2 = output_Pa_2 / P_ref; % unit: 20 uPa / Vpeak
 
-calib.EarRespH_2 =  outut_Pa_20uPa_per_Vpp_2 ./ Vo; %save for later
+% if doInvCalib
+%      vo_filt = filter(invfilterdata.b_chan1, 1, calib.vo); 
+%      Vo_2 = rfft(vo_filt)*5*db2mag(-1 * calib.Attenuation);
+% else 
+    Vo = rfft(calib.vo)*5*db2mag(-1 * calib.Attenuation);
+    Vo_2 = Vo; 
+%end
 
-%% Plot data
-figure(11);
-ax(1) = subplot(2, 1, 1);
-semilogx(calib.freq, db(abs(calib.EarRespH_1)), 'linew', 2);
-hold on; 
-semilogx(calib.freq, db(abs(calib.EarRespH_2)), 'linew', 2);
-hold off; 
-ylabel('Response (dB re: 20 \mu Pa / V_{peak})', 'FontSize', 16);
-ax(2) = subplot(2, 1, 2);
-semilogx(calib.freq, unwrap(angle(calib.EarRespH_1), [], 1), 'linew', 2);
-hold on; 
-semilogx(calib.freq, unwrap(angle(calib.EarRespH_2), [], 1), 'linew', 2);
-hold off; 
-xlabel('Frequency (Hz)', 'FontSize', 16);
-ylabel('Phase (rad)', 'FontSize', 16);
-linkaxes(ax, 'x');
-legend('show');
-xlim([100, 24e3]);
+calib.EarRespH_2 =  output_Pa_20uPa_per_Vpp_2 ./ Vo_2; %save for later
 
 %% Calculate Ear properties
 % *ec: Ear canal
@@ -259,24 +286,75 @@ end
 
 ud_status = get(h_push_stop,'Userdata');  % only call this once - ACT on 1st button push
 
-%% Plot Ear Absorbance
-figure(12);
-hold on; 
-semilogx(calib.freq * 1e-3, 100*(1 - abs(calib.Rec_1).^2), 'linew', 2);
-semilogx(calib.freq * 1e-3, 100*(1 - abs(calib.Rec_2).^2), 'linew', 2);
-hold off; 
-xlabel('Frequency (Hz)', 'FontSize', 16);
-ylabel('Absorbance (%)', 'FontSize', 16);
-xlim([0.2, 8]); ylim([0, 100]);
-set(gca, 'FontSize', 16, 'XTick',[0.25, 0.5, 1, 2, 4, 8]);
+%% Set up like NEL varibles
+fullCalibData = zeros(length(freq), 5); 
+fullCalibData2 = zeros(length(freq), 5); 
+% Frequencies in NEL form
+fullCalibData(:,1) = calib.freq./1000; % kHz
+fullCalibData2(:,1) = calib.freq./1000;
+% Output in NEL form
+fullCalibData(:,2) = db(abs(calib.Pfor_1.*(5/sqrt(2))));
+fullCalibData2(:,2) = db(abs(calib.Pfor_2.*(5/sqrt(2))));
 
+% Resample to match frequencies from standard NEL calib
+nel_freq = [0.05*2.0.^((0:345)/40)]'; 
+CalibData = zeros(length(nel_freq), 5);
+CalibData2 = zeros(length(nel_freq), 5);
+CalibData(:,1) = nel_freq; 
+CalibData2(:,1) = nel_freq; 
+CalibData(:,2) = interp1(fullCalibData(:,1), fullCalibData(:,2), nel_freq); 
+CalibData2(:,2) = interp1(fullCalibData2(:,1), fullCalibData2(:,2), nel_freq); 
+%% Plot data
+figure(61);
+semilogx(CalibData(:,1).*1000, CalibData(:,2), 'linew', 2, 'color', [0 0.447 0.741]);
+hold on;
+semilogx(CalibData2(:,1).*1000, CalibData2(:,2), 'linew', 2, 'color', [0.635 0.078 0.184]);
+hold on; 
+plot([10 20e3], [105 105], '--', 'linew', 2, 'color', [178 190 181]/255);
+hold off;
+ylabel('Response (dB)', 'FontSize', 16);
+xlabel('Frequency (Hz)', 'FontSize', 16);
+legend('Left', 'Right');
+xlim([100, 20e3]);
+xticks([100, 200, 400, 800, 1600, 3200, 6400, 12800])
+set(gca, 'XScale', 'log')
+
+%% Plot data
+% figure(61);
+% % ax(1) = subplot(2, 1, 1);
+% semilogx(calib.freq, db(abs(calib.Pfor_1)), 'linew', 2);
+% hold on;
+% semilogx(calib.freq, db(abs(calib.Pfor_2)), 'linew', 2);
+% hold off;
+% ylabel('Response (dB re: 20 \mu Pa / V_{peak})', 'FontSize', 16);
+% % ax(2) = subplot(2, 1, 2);
+% % semilogx(calib.freq, unwrap(angle(calib.Pfor_1), [], 1), 'linew', 2);
+% % hold on;
+% % semilogx(calib.freq, unwrap(angle(calib.Pfor_2), [], 1), 'linew', 2);
+% % hold off;
+% xlabel('Frequency (Hz)', 'FontSize', 16);
+% % ylabel('Phase (rad)', 'FontSize', 16);
+% % linkaxes(ax, 'x');
+% legend('show');
+% xlim([100, 24e3]);
+%% Plot Ear Absorbance
+if newCalib
+    figure(12);
+    semilogx(calib.freq * 1e-3, 100*(1 - abs(calib.Rec_1).^2), 'linew', 2);
+    hold on;
+    semilogx(calib.freq * 1e-3, 100*(1 - abs(calib.Rec_2).^2), 'linew', 2);
+    hold off;
+    xlabel('Frequency (Hz)', 'FontSize', 16);
+    ylabel('Absorbance (%)', 'FontSize', 16);
+    xlim([0.2, 8]); ylim([0, 100]);
+    set(gca, 'FontSize', 16, 'XTick',[0.25, 0.5, 1, 2, 4, 8]);
+end
 %% Shut off buttons once out of data collection loop
 % until we put STOP functionality in, all roads mean we're done here
 set(h_push_stop,'Enable','off');
 set(h_push_restart,'Enable','off');
 set(h_push_abort,'Enable','off');
 set(h_push_saveNquit,'Enable','off');
-
 
 %store last button command, or that it ended all reps
 if ~isempty(ud_status)
@@ -290,7 +368,9 @@ end
 %% Shut Down TDT, no matter what button pushed, or if ended naturally
 close_play_circuit(card.f1RP, card.RP);
 rc = PAset(120.0*ones(1,4)); % need to use PAset, since it saves current value in PA, which is assumed way in NEL (causes problems when PAset is used to set attens later)
-run_invCalib(false);
+
+%set back to allpass
+dummy = set_invFilter({'allpass','allpass'},RawCalibPicNum, true);
 
 %% Return to GUI script, unless need to save
 if strcmp(NelData.FPL.rc,'abort') || strcmp(NelData.FPL.rc,'restart')
@@ -304,7 +384,10 @@ warning('off');  % ??
 
 %% Big Switch case to handle end of data collection
 switch NelData.FPL.rc
-    case 'stop'   % 6/2023MH: MAY ADDD LATER (to stop, reset chin, then restart from where stopped) for NOW - only saveNquit, ohtherwise, abort or restart is already out by here
+    case 'stop'   
+        % 6/2023MH: MAY ADDD LATER (to stop, reset chin, then restart from 
+        % where stopped) for NOW - only saveNquit, ohtherwise, abort or restart
+        % is already out by here
         % if want to RE-ADD stop, see DPOAE
         
     case 'saveNquit'
@@ -317,12 +400,24 @@ switch NelData.FPL.rc
         end
         calib.comment = comment;
         
-        %% NEL based data saving script
+        fname = current_data_file('calib_FPL',1);
+        
+        if newCalib % save as raw and get coeffs
+            fname= strcat(fname, '_raw');
+        else % save as inverse calib
+            fname= sprintf('%s_inv%d', fname, coefFileNum);
+        end
+        
         make_FPLear_text_file;
         
+        if newCalib
+            [~, temp_picName] = fileparts(fname);
+            get_inv_calib_fir_coeff(getPicNum(temp_picName));
+        end
         %% remind user to turn of microphone
         h = msgbox('Please remember to turn off the microphone');
         uiwait(h);
+        
         
 end
 

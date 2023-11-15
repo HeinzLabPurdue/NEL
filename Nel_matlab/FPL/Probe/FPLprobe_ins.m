@@ -16,7 +16,7 @@ calib.doFilt = 0;
 calib.electricAcousticPolarity = -1; 
 calib.device = 'ER-10B'; 
 
-calib.CavTemp = 30; % in C degree
+calib.CavTemp = 24; % 30in C degree
 calib.CavDiam = 0.8; % cm 
 %calib.CavDiam = 0.794; % cm 
 

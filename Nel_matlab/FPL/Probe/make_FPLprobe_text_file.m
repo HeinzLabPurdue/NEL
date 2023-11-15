@@ -19,7 +19,7 @@ x.Stimuli = [];  % general NEL structures - NOT used here, but keep for generali
 x.Line    = [];
 x.User = [];
 x.Hardware.NELmaxvolts_V   = VOLTS;   % max volts in NEL circuit design
-x.Hardware.CalibPICnum2use = calib.CalibPICnum2use;  % Save Calib file to use for these data - based on how hardware is setup (run-invCalib)
+x.invfilterdata = invfilterdata;  
 
 %% saving specific MEMR data
 x.FPLprobeData.calib = calib;
@@ -27,9 +27,16 @@ x.FPLprobeData.calib = calib;
 % Save to ProbeCal_Data folder for use later since general for that day
 curdir = pwd; 
 cd('C:\NEL\Nel_matlab\FPL\Probe\ProbeCal_Data')
-generalfname = ['FPLprobe_' date];  
-save(generalfname,'x');  % std mat file
-fprintf('%s %s.mat\n','Saved data file to general folder: ',generalfname);
+
+generalfname = ['FPLprobe_' date '*.mat'];
+if isempty(dir(generalfname))
+    numFiles = 0; 
+else 
+    numFiles = max(size((dir(generalfname)))); 
+end 
+mainfilename = sprintf('%s_%d', generalfname(1:end-5), numFiles+1); 
+save(mainfilename,'x');  % std mat file
+fprintf('%s %s.mat\n','Saved data file to general folder: ',mainfilename);
 cd(curdir); 
 
 %% Save data file
