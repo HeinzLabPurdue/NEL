@@ -15,8 +15,7 @@ global root_dir NelData
 h_fig = findobj('Tag','FPL_Main_Fig');    %% Finds handle for TC-Figure
 
 if nargin<1
-    
-    disp('no command string!');
+   
     PARAMS = zeros(1,18);				%initialize before opening parameter files
     
     DATE = date;
@@ -34,13 +33,10 @@ if nargin<1
     if (ishandle(h_fig))
         delete(h_fig);
     end
-    
-    % This is probably why it's turning white !!!
-    % colordef none;
-    % whitebg('w');
-    
+
     h_fig = figure('NumberTitle','off','Name','FPL Calibration','Units','normalized',...
-        'Visible','on', 'position',[0.045  0.045  0.17  0.14],'MenuBar','none','Tag','FPL_Main_Fig');
+        'Visible','on', 'position',[0.045  0.045  0.17  0.14],'MenuBar','none',...
+        'Tag','FPL_Main_Fig');
     
     % SH changed name to generalize
     eval('FPLplot');
@@ -59,8 +55,6 @@ else
     h_push_saveNquit = handles(2);
     h_push_restart = handles(3);
     h_push_abort = handles(4);
-    
-    disp(command_str) % debugging
 end
 
 if strcmp(command_str,'start')
@@ -73,10 +67,9 @@ if strcmp(command_str,'start')
     error = 0;  % ? needed
     
     set(h_push_stop,'Userdata',[]);
-    %     set(h_push_start,'Userdata',dpoaedata);
-    
+
     % Run to get stim params and choose which OAE type to use.
-    FPL_type = questdlg('What type of Calibration:', 'Set Calib Type','Probe','Ear','xInverse', 'Probe');
+    FPL_type = questdlg('What type of Calibration:', 'Set Calib Type','Probe','Ear', 'Ear');
     switch FPL_type
         case 'Probe'
             addpath('C:\NEL\Nel_matlab\FPL\Probe');
@@ -88,13 +81,6 @@ if strcmp(command_str,'start')
             PROG = 'FPLear.m';	     % program name is recorded in the data file
             FPLear;
             rmpath('C:\NEL\Nel_matlab\FPL\Ear')
-%       case 'Inverse'
-            % Want to be able to rerun Ear after the in-ear calibration to check that
-            % the generated filter is flattening things.
-            %             addpath('C:\NEL\Nel_matlab\FPL\TEOAE');
-            %             PROG = 'teoae.m';
-            %             teoae;
-            %             rmpath('C:\NEL\Nel_matlab\FPL\TEOAE');
     end
     
     if strcmp(NelData.FPL.rc,'restart')
@@ -115,10 +101,7 @@ elseif strcmp(command_str,'abort')
 elseif strcmp(command_str, 'close')
     close('FPL Calibration');  % GUI (buttons)
     
-    % % % %     %% close all figs, except GUI (?
-    % % % %     set(handleToYourMainGUI, 'HandleVisibility', 'off');
-    % % % %     close all;
-    % % % %     set(handleToYourMainGUI, 'HandleVisibility', 'on');
+% Close all figs except main GUI? 
     
 elseif strcmp(command_str,'saveNquit')
     set(h_push_stop,'Userdata','saveNquit');

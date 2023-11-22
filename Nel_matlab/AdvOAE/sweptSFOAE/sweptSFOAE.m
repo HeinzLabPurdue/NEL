@@ -1,4 +1,4 @@
-global root_dir NelData data_dir
+global root_dir NelData data_dir PROTOCOL
 
 % NEL Version of RunMEMR_chin_edited_NEL1.m based off Hari's SNAPLab script
 
@@ -8,113 +8,96 @@ host = host(~isspace(host));
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %Insert NEL/GUI Parameters here...none for WBMEMR
-
+PROTOCOL = 'OAE';
 %% Initialize TDT
 card = initialize_card;
 
 %% Inverse Calibration
-%NEEDS TO BE CLEANED UP ASAP.
-% 1. run_invCalib needs cleaned up...currently clunky
-% 2. Need calibration to be correct for MEMR (currently all pass, w/o calib)
-[~, calibPicNum, ~] = run_invCalib(false);   % skipping INV calib for now since based on 94 dB SPL benig highest value, bot the 105 dB SPL from inv Calib.
-[coefFileNum, ~, ~] = run_invCalib(-2);
-
-stim.CalibPICnum2use = calibPicNum;  % save this so we know what calib file to use right from data file
-coefFileNum = NaN;
+cdd;
+allCalibFiles= dir('*calib*raw*');
+Stimuli.calibPicNum= getPicNum(allCalibFiles(end).name);
+Stimuli.calibPicNum= str2double(inputdlg('Enter RAW Calibration File Number (default = last raw calib)','Load Calib File', 1,{num2str(Stimuli.calibPicNum)}));
+rdd;
+filttype = {'inversefilt_FPL','inversefilt_FPL'};
+invfiltdata = set_invFilter(filttype,Stimuli.calibPicNum);
 
 %% Enter subject information
 if ~isfield(NelData,'AdvOAE') % First time through, need to ask all this.
-    subj = input('Please subject ID:', 's');    % NelData.sweptSFOAE.subj,earflag
-    stim.subj = subj;
     
-    earflag = 1;
-    while earflag == 1
-        ear = input('Please enter which year (L or R):', 's');
-        switch ear
-            case {'L', 'R', 'l', 'r', 'Left', 'Right', 'left', 'right',...
-                    'LEFT', 'RIGHT'}
-                earname = strcat(ear, 'Ear');
-                earflag = 0;
-                stim.ear = ear;
-            otherwise
-                fprintf(2, 'Unrecognized ear type! Try again!');
-        end
-    end
-    
+    ear = questdlg('Which Ear?', 'Ear', 'L', 'R', 'R');
     uiwait(warndlg('Set ER-10B+ GAIN to 40 dB','SET ER-10B+ GAIN WARNING','modal'));
     
     % Save in case if restart
-    NelData.AdvOAE.subj=subj;
-    NelData.AdvOAE.ear=ear;
+    NelData.AdvOAE.ear = ear;
     NelData.AdvOAE.Fig2close=[];  % set up the place to keep track of figures generted here (to be closed in NEL_App Checkout)
-    NelData.AdvOAE.AdvOAE_figNum=277;  % +100 from wbMEMR
+    NelData.AdvOAE.AdvOAE_figNum=277;  % +200 from wbMEMR
     
 else
-    subj=NelData.AdvOAE.subj;
-    ear=NelData.AdvOAE.ear;
+    ear = NelData.AdvOAE.ear;
     
-    disp(sprintf('RESTARTING: \n   Subj: %s;\n   Ear: %s',subj,ear))
-    uiwait(warndlg(sprintf('RESTARTING: \n   Subj: %s;\n   Ear: %s',subj,ear),'modal'));
+    fprintf('RESTARTING')
+    uiwait(warndlg(sprintf('RESTARTING'),'modal'));
+    
 end
-
-% %% Start (w/ Delay if needed)
-% button = input('Do you want a 10 second delay? (Y or N):', 's');
-% switch button
-%     case {'Y', 'y', 'yes', 'Yes', 'YES'}
-%         DELAY_sec=10;
-%         fprintf(1, '\n%.f seconds until START...\n',DELAY_sec);
-%         pause(DELAY_sec)
-%         fprintf(1, '\nWe waited %.f seconds ...\nStarting Stimulation...\n',DELAY_sec);
-%     otherwise
-%         fprintf(1, '\nStarting Stimulation...\n');
-% end
 
 %% Initializing SFOAE variables for running and live analysis
 sweptSFOAE_ins;
-
-%% Additional info
-mic_sens = 0.05; % V / Pa-RMS
-mic_gain = db2mag(40);
-P_ref = 20e-6; % Pa-RMS
-DR_onesided = 1;
-stim.VoltageToPascal = 1 / (DR_onesided * mic_gain * mic_sens);
-stim.PascalToLinearSPL = 1 /  P_ref;
-delayComp = 1; 
+stim.ear = ear;
 
 % SH?: Change figure name, give handle?
 snr_fig = figure;
 
-% Make arrays to store measured mic outputs
-ProbeBuffs = zeros(stim.maxTrials, numel(stim.yProbe));
-SuppBuffs = zeros(stim.maxTrials, numel(stim.yProbe));
-BothBuffs = zeros(stim.maxTrials, numel(stim.yProbe));
-flip = -1;
+% Set live analysis parameters
+windowdur = stim.windowdur;
+SNRcriterion = stim.SNRcriterion;
+maxTrials = stim.maxTrials;
+minTrials = stim.minTrials;
 
-% variable for live analysis
-k = 0;
-doneWithTrials = 0;
+phiProbe_inst = stim.phiProbe_inst*2*pi;
 t = stim.t;
-testfreq = [.75, 1, 1.5, 2, 3, 4, 6, 8, 12].* 1000;
+npoints = stim.npoints;
+nearfreqs = stim.nearfreqs;
+VtoSPL = stim.VoltageToPascal .* stim.PascalToLinearSPL;
+
+edges = 2 .^ linspace(log2(stim.fmin), log2(stim.fmax), 21);
+bandEdges = edges(2:2:end-1);
+centerFreqs = edges(3:2:end-2);
 
 if stim.speed < 0
-    f1 = stim.fmax;
-    f2 = stim.fmin;
+    f_start = stim.fmax;
+    f_end = stim.fmin;
 else
-    f1 = stim.fmin;
-    f2 = stim.fmax;
+    f_start = stim.fmin;
+    f_end = stim.fmax;
 end
 
-if stim.speed < 20
-    t_freq = log2(testfreq/f1)/stim.speed + stim.buffdur;
+testfreq = 2 .^ linspace(log2(f_start), log2(f_end), npoints);
+
+if strcmp(stim.scale, 'log')
+    t_freq = log2(testfreq/f_start)/stim.speed + stim.buffdur;
 else
-    t_freq = (testfreq-f1)/stim.speed + stim.buffdur;
+    t_freq = (testfreq-f_start)/stim.speed + stim.buffdur;
 end
+
+k = 0;
+doneWithTrials = 0;
+figure;
+
+% Make arrays to store measured mic outputs
+ProbeBuffs = zeros(maxTrials, numel(stim.yProbe));
+SuppBuffs = zeros(maxTrials, numel(stim.yProbe));
+BothBuffs = zeros(maxTrials, numel(stim.yProbe));
+flip = -1;
+delayComp = 344;
+stim.delayComp = delayComp; 
 
 %% Data Collection Loop
 disp('Starting stimulation...');
 
 while doneWithTrials == 0
     k = k + 1;
+    k_kept = k - stim.ThrowAway;
+    
     % alternate phase of the suppressor
     flip = flip .* -1;
     
@@ -128,10 +111,10 @@ while doneWithTrials == 0
     
     % Save data
     if k > stim.ThrowAway
-        ProbeBuffs(k - stim.ThrowAway,  :) = vins;
+        ProbeBuffs(k_kept,  :) = vins;
     end
     
-    pause(0.15);
+    pause(0.05);
     
     % Do suppressor only
     dropProbe = 120;
@@ -143,10 +126,10 @@ while doneWithTrials == 0
     
     % Save data
     if k > stim.ThrowAway
-        SuppBuffs(k - stim.ThrowAway,  :) = vins;
+        SuppBuffs(k_kept,  :) = vins;
     end
     
-    pause(0.15);
+    pause(0.05);
     
     % Do both
     dropProbe = stim.drop_Probe;
@@ -159,95 +142,146 @@ while doneWithTrials == 0
     
     % Save data
     if k > stim.ThrowAway
-        BothBuffs(k - stim.ThrowAway,  :) = vins;
+        BothBuffs(k_kept,  :) = vins;
     end
     
-    pause(0.15);
-    
-    fprintf(1, 'Done with trial %d \n', k);
+    pause(0.05);
+   
     
     %% Analysis to check SNR
-    % test OAE
-    windowdur = 0.5;
-    if k - stim.ThrowAway >= stim.minTrials
-        SFOAEtrials = ProbeBuffs(1:(k - stim.ThrowAway), :) + SuppBuffs(1:(k - stim.ThrowAway), :) - BothBuffs(1:(k - stim.ThrowAway), :);
-        SFOAE = median(SFOAEtrials,1);
-        coeffs_temp = zeros(length(testfreq), 2);
-        coeffs_noise = zeros(length(testfreq), 8);
-        for m = 1:length(testfreq)
-            win = find( (t > (t_freq(m)-windowdur/2)) & ...
-                (t < (t_freq(m)+windowdur/2)));
+    if k > stim.ThrowAway
+        % Set empty matricies for next steps
+        coeffs_resp = zeros(npoints, 2);
+        coeffs_noise = zeros(npoints, 8);
+        
+        for p = 1:npoints
+            win = find( (t > (t_freq(p) - windowdur/2)) & ...
+                (t < (t_freq(p) + windowdur/2)));
             taper = hanning(numel(win))';
             
-            resp = SFOAE(win) .* taper;
+            a_plus_b_minus_ab = ProbeBuffs(k_kept,:) ...
+                + SuppBuffs(k_kept,:) - BothBuffs(k_kept,:);
+            resp_trial = a_plus_b_minus_ab(win).* taper; % just curr trial
             
-            phiProbe_inst = stim.phiProbe_inst;
-            model_sf = [cos(2*pi*phiProbe_inst(win)) .* taper;
-                -sin(2*pi*phiProbe_inst(win)) .* taper];
+            model_probe = [cos(phiProbe_inst(win)) .* taper;
+                -sin(phiProbe_inst(win)) .* taper];
+            model_noise = ...
+                [cos(nearfreqs(1)*phiProbe_inst(win)) .* taper;
+                -sin(nearfreqs(1)*phiProbe_inst(win)) .* taper;
+                cos(nearfreqs(2)*phiProbe_inst(win)) .* taper;
+                -sin(nearfreqs(2)*phiProbe_inst(win)) .* taper;
+                cos(nearfreqs(3)*phiProbe_inst(win)) .* taper;
+                -sin(nearfreqs(3)*phiProbe_inst(win)) .* taper;
+                cos(nearfreqs(4)*phiProbe_inst(win)) .* taper;
+                -sin(nearfreqs(4)*phiProbe_inst(win)) .* taper];
             
-            if stim.speed < 0
-                nearfreqs = [1.10, 1.12, 1.14, 1.16];
-            else
-                nearfreqs = [.90, .88, .86, .84];
-            end
-            
-            model_noise = [cos(2*pi*nearfreqs(1)*phiProbe_inst(win)) .* taper;
-                -sin(2*pi*nearfreqs(1)*phiProbe_inst(win)) .* taper;
-                cos(2*pi*nearfreqs(2)*phiProbe_inst(win)) .* taper;
-                -sin(2*pi*nearfreqs(2)*phiProbe_inst(win)) .* taper;
-                cos(2*pi*nearfreqs(3)*phiProbe_inst(win)) .* taper;
-                -sin(2*pi*nearfreqs(3)*phiProbe_inst(win)) .* taper;
-                cos(2*pi*nearfreqs(4)*phiProbe_inst(win)) .* taper;
-                -sin(2*pi*nearfreqs(4)*phiProbe_inst(win)) .* taper];
-            
-            coeffs_temp(m,:) = model_sf' \ resp';
-            coeffs_noise(m,:) = model_noise' \ resp';
+            coeffs_resp(p,:) = model_probe' \ resp_trial';
+            coeffs_noise(p,:) = model_noise' \ resp_trial';
         end
         
-        % for noise
-        noise2 = zeros(length(testfreq),4);
+        % calculate amplitudes
+        oae_trials(k_kept,:) = abs(complex(coeffs_resp(:, 1),  coeffs_resp(:, 2)));
+        median_oae = median(oae_trials,1);
+        sfoae_full = db(median_oae.*VtoSPL);
+        
+        noise_trial = zeros(npoints,4);
         for i = 1:2:8
-            noise2(:,ceil(i/2)) = abs(complex(coeffs_noise(:,i), coeffs_noise(:,i+1)));
+            noise_trial(:,ceil(i/2)) = complex(coeffs_noise(:,i), coeffs_noise(:,i+1));
         end
-        noise = mean(noise2, 2);
+        noise_trials(k_kept,:) = abs(mean(noise_trial, 2));
+        median_noise = median(noise_trials,1);
+        nf_full = db(median_noise.*VtoSPL);
         
-        oae = abs(complex(coeffs_temp(:,1), coeffs_temp(:,2)));
+        % Get summary points (weighted by SNR)
+        sfoae = zeros(length(centerFreqs),1);
+        nf = zeros(length(centerFreqs),1);
+        sfoae_w = zeros(length(centerFreqs),1);
+        nf_w = zeros(length(centerFreqs),1);
         
-        SNR_temp = db(oae) - db(noise);
+        % weighted average around 9 center frequencies
+        for z = 1:length(centerFreqs)
+            band = find( testfreq >= bandEdges(z) & testfreq < bandEdges(z+1));
+            
+            % TO DO: NF from which SNR was calculated included median of 7 points
+            % nearest the target frequency.
+            SNR = sfoae_full(band) - nf_full(band);
+            weight = (10.^(SNR./10)).^2;
+            
+            sfoae(z, 1) = mean(sfoae_full(band));
+            nf(z,1) = mean(nf_full(band));
+            
+            sfoae_w(z,1) = sum(weight.*sfoae_full(band))/sum(weight);
+            nf_w(z,1) = sum(weight.*nf_full(band))/sum(weight);
+            
+        end
         
-        figure(snr_fig);
+        % median SNR
+        SNR_temp = sfoae_w - nf_w;
+        
+        noisy_trials = 0;
+        % artifact check
+        if k_kept > 1
+            std_oae = std(oae_trials,1);
+            for r = 1:k_kept
+                for q = 1:npoints
+                    if oae_trials(r,q) > median_oae(1,q) + 3*std_oae(1,q)
+                        noisy_trials = noisy_trials+1;
+                        break;
+                    end
+                end
+            end
+        end
+        
+        % if SNR is good enough and we've hit the minimum number of
+        % trials, then stop.
+        if SNR_temp(1:8) >= SNRcriterion
+            if k_kept >= minTrials + noisy_trials
+                doneWithTrials = 1;
+            end
+        elseif k == maxTrials
+            doneWithTrials = 1;
+        end
+        
+        pass = (SNR_temp>=SNRcriterion);
+        oae_pass = sfoae_w;
+        oae_fail = sfoae_w;
+        oae_pass(~pass) = NaN;
+        oae_fail(pass) = NaN;
+        
+        % Plot amplitudes from live analysis
         hold off;
-        plot(testfreq./1000,db(oae.*10000), 'o', 'linew', 2);
+        plot(centerFreqs./1000,oae_pass, 'o', 'linew', 2, 'color', [0 0.4470 0.7410]);
         hold on;
-        plot(testfreq./1000,db(noise.*10000), 'x', 'linew', 2);
-        legend('SFOAE', 'NOISE');
+        plot(centerFreqs/1000,oae_fail, 'o', 'linew', 2, 'color', 'k'),
+        plot(centerFreqs./1000,nf_w, 'x', 'linew', 2, 'color', [0.6350 0.0780 0.1840]);
+        hold off;
+        legend('SFOAE', '', 'NOISE', 'location', 'northeast');
+        title('SFOAE')
         xlabel('Frequency (Hz)')
-        ylabel('Median Amplitude dB')
+        ylabel('Median Amplitude (dB SPL)')
         set(gca, 'XScale', 'log', 'FontSize', 14)
-        xticks([.5, 1, 2, 4, 8, 16])
-        xlim([0.5, 16])
+        xlim([0.5, 16]);
+        xticks([.5, 1, 2, 4, 8, 16]);
+        ylim([-45, 45]);
+        yticks((-45:15:45))
+        grid on;
+        drawnow;
         
-        
-        if SNR_temp(1:8) > stim.SNRcriterion
-            doneWithTrials = 1;
-        elseif k-stim.ThrowAway == stim.maxTrials
-            doneWithTrials = 1;
-        end
-        
+        fprintf(1, 'Trials run: %d / Noisy Trials: %d \n', k_kept, noisy_trials);
     end
     
     % Check for button push to abort/restart/saveNquit
     ud_status = get(h_push_stop,'Userdata');  % only call this once - ACT on 1st button push
     if ~isempty(ud_status)
-        break;
+        break
     end
     
 end % End of Trials
 
 % Only save what was filled - initialized matixes are size maxTrials x resplength
-stim.ProbeBuffs = ProbeBuffs(1:k - stim.ThrowAway,:);
-stim.SuppBuffs = SuppBuffs(1:k - stim.ThrowAway,:);
-stim.BothBuffs = BothBuffs(1:k - stim.ThrowAway,:);
+stim.ProbeBuffs = ProbeBuffs(1:k_kept,:);
+stim.SuppBuffs = SuppBuffs(1:k_kept,:);
+stim.BothBuffs = BothBuffs(1:k_kept,:);
 
 
 %% Shut off buttons once out of data collection loop
@@ -257,7 +291,7 @@ set(h_push_restart,'Enable','off');
 set(h_push_abort,'Enable','off');
 set(h_push_saveNquit,'Enable','off');
 
-stim.NUMtrials_Completed = k;  % save how many trials completed
+stim.NUMtrials_Completed = k_kept;  % save how many trials completed
 
 %store last button command, or that it ended all reps
 if ~isempty(ud_status)
@@ -271,7 +305,8 @@ end
 %% Shut Down TDT, no matter what button pushed, or if ended naturally
 close_play_circuit(card.f1RP, card.RP);
 rc = PAset(120.0*ones(1,4)); % need to use PAset, since it saves current value in PA, which is assumed way in NEL (causes problems when PAset is used to set attens later)
-run_invCalib(false);
+filttype = {'allpass','allpass'};
+dummy = set_invFilter(filttype,Stimuli.calibPicNum);
 
 %% Return to GUI script, unless need to save
 if strcmp(NelData.AdvOAE.rc,'abort') || strcmp(NelData.AdvOAE.rc,'restart')
@@ -281,18 +316,18 @@ end
 %% Set up data structure to save
 stim.date = datestr(clock);
 
-answer = questdlg('Would you like to analyze this data?'...
-    ,'Analyze?','Yes','No', 'No');
-%Handle response
-switch answer
-    case {'Yes'}
-        % Call function
-        % instead of saving as a separate file, it just saves stim_AR in a
-        [res_SFOAE] = sweptSFOAE_analysis(stim);
-        disp('Saving Analyzed data ...')
-    case {'No'}
-        % do nothing
-end
+% answer = questdlg('Would you like to analyze this data?'...
+%     ,'Analyze?','Yes','No', 'No');
+% %Handle response
+% switch answer
+%     case {'Yes'}
+%         % Call function
+%         % instead of saving as a separate file, it just saves stim_AR in a
+%         [res_SFOAE] = sweptSFOAE_analysis(stim);
+%         disp('Saving Analyzed data ...')
+%     case {'No'}
+%         % do nothing
+% end
 
 warning('off');  % ??
 

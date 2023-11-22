@@ -1,4 +1,4 @@
-global root_dir NelData data_dir
+global root_dir NelData data_dir PROTOCOL
 
 % NEL Version of RunMEMR_chin_edited_NEL1.m based off Hari's SNAPLab script
 
@@ -8,19 +8,18 @@ host = host(~isspace(host));
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %Insert NEL/GUI Parameters here...none for WBMEMR
-
+PROTOCOL = 'OAE'; 
 %% Initialize TDT
 card = initialize_card;
 
 %% Inverse Calibration
-%NEEDS TO BE CLEANED UP ASAP.
-% 1. run_invCalib needs cleaned up...currently clunky
-% 2. Need calibration to be correct for MEMR (currently all pass, w/o calib)
-[~, calibPicNum, ~] = run_invCalib(false);   % skipping INV calib for now since based on 94 dB SPL benig highest value, bot the 105 dB SPL from inv Calib.
-[coefFileNum, ~, ~] = run_invCalib(-2);
-
-click.CalibPICnum2use = calibPicNum;  % save this so we know what calib file to use right from data file
-coefFileNum = NaN;
+cdd;
+allCalibFiles= dir('*calib*raw*');
+Stimuli.calibPicNum= getPicNum(allCalibFiles(end).name);
+Stimuli.calibPicNum= str2double(inputdlg('Enter RAW Calibration File Number (default = last raw calib)','Load Calib File', 1,{num2str(Stimuli.calibPicNum)}));
+rdd;
+filttype = {'inversefilt_FPL','inversefilt_FPL'};
+invfiltdata = set_invFilter(filttype,Stimuli.calibPicNum);
 
 %% Enter subject information
 if ~isfield(NelData,'AdvOAE') % First time through, need to ask all this.
@@ -86,11 +85,12 @@ drops(click.driver) = click.Attenuation;
 
 % Make arrays to store measured mic outputs
 resp = zeros(click.Averages, size(buffdata,2));
-
+delayComp = 344; 
+stim.ADdelay = delayComp;
 disp('Starting stimulation...');
 for k = 1:(click.Averages + click.ThrowAway)
     
-    vin = PlayCaptureNEL(card, buffdata, drops(1), drops(2), 1);
+    vin = PlayCaptureNEL(card, buffdata, drops(1), drops(2), delayComp);
     
     % Save data
     if k > click.ThrowAway
@@ -130,7 +130,8 @@ end
 %% Shut Down TDT, no matter what button pushed, or if ended naturally
 close_play_circuit(card.f1RP, card.RP);
 rc = PAset(120.0*ones(1,4)); % need to use PAset, since it saves current value in PA, which is assumed way in NEL (causes problems when PAset is used to set attens later)
-run_invCalib(false);
+filttype = {'allpass','allpass'};
+dummy = set_invFilter(filttype,Stimuli.calibPicNum);
 
 %% Return to GUI script, unless need to save
 if strcmp(NelData.AdvOAE.rc,'abort') || strcmp(NelData.AdvOAE.rc,'restart')

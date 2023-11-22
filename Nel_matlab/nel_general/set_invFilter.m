@@ -37,6 +37,11 @@ end
 % -Inverse filter
 errorFlag = false;
 coefFileNum = RawCalibPicNum;
+FPLflag = false; 
+
+if strcmp(filttype,{'inversefilt_FPL', 'inversefilt_FPL'})
+    FPLflag = true;
+end
 
 cdd;
 %calib file is needed
@@ -48,9 +53,9 @@ if ~firstCalibFlag
             errorFlag = true;
         else
             %Checking for valid raw calib file in data directory
-            pic_str = sprintf('p%04d_%s',RawCalibPicNum,'calib_raw*');
+            pic_str = sprintf('p%04d_%s',RawCalibPicNum,'*_raw*');
             fname = dir(pic_str);
-            
+
             if isempty(fname)
                 warndlg('Invalid Raw Calibration File Number in set_invFilter. Running allstop.','WARNING!!!','modal');
                 errorFlag = true;
@@ -59,7 +64,7 @@ if ~firstCalibFlag
             end
             
             %if need an inverse calib
-            if sum(strcmp('inversefilt',filttype))
+            if sum(strcmp('inversefilt',filttype)) || sum(strcmp('inversefilt_FPL',filttype))
                 %check for missing coeff file
                 CalibPICnum2use = findPics(sprintf('inv%d',coefFileNum));
                 pic_str = sprintf('coef_%04d_%s',coefFileNum,'calib*');
@@ -124,6 +129,14 @@ switch filttype{1}
         
         b_chan1 = temp.b(:)';
         fprintf('\n Channel 1 | invFIR Coefs set successfully from %s', coef_str);
+    case 'inversefilt_FPL'
+        %need 2 checks
+        % inverse and coeffs
+        coef_str = sprintf('coef_%04d_%s',coefFileNum,'calib_FPL.mat');       
+        temp = load(coef_str);
+        
+        b_chan1 = temp.b(:)';
+        fprintf('\n Channel 1 | FPL invFIR Coefs set successfully from %s', coef_str);
     otherwise
         warndlg('\n Invalid filter type specified in set_invFilter()...defaulting to allstop','WARNING!!!','modal')
         errorFlag = true;
@@ -146,7 +159,7 @@ switch filttype{2}
     case 'inversefilt'
         %need 2 checks
         % inverse and coeffs
-        coef_str = sprintf('coef_%04d_%s',coefFileNum,'calib.mat');       
+        coef_str = sprintf('coef_%04d_%s',coefFileNum,'calib.mat');
         temp = load(coef_str);
         
         %sets b2 to be occupied in the case a single side calibration is done,
@@ -159,6 +172,22 @@ switch filttype{2}
         
         b_chan2 = temp.b2(:)';
         fprintf('\n Channel 2 | invFIR Coefs set successfully from %s', coef_str);
+    case 'inversefilt_FPL'
+        %need 2 checks
+        % inverse and coeffs
+        coef_str = sprintf('coef_%04d_%s',coefFileNum,'calib_FPL.mat');
+        temp = load(coef_str);
+        
+        %sets b2 to be occupied in the case a single side calibration is done,
+        %since we default to saving b first regardless of channel.
+        
+        if isempty(temp.b2)
+            temp.b2 = temp.b;
+            warning("\n \n ***Single sided calibration, but using chan 2. b2 is set to b for inverse filtering*** \n \n",[],[]);
+        end
+        
+        b_chan2 = temp.b2(:)';
+        fprintf('\n Channel 2 | FPL invFIR Coefs set successfully from %s', coef_str);
     otherwise
         warndlg('Invalid filter type specified in set_invFilter()...defaulting to allstop','WARNING!!!','modal')
         errorFlag = true;
@@ -212,6 +241,11 @@ elseif status_rx8 % Most call for run_invCalib are from NEL1. For NEL2 (with RX8
             invoke(COMM.handle.RX8,'LoadCof',[object_dir '\FFR_RX8_ADC_invCalib_2chan.rcx']);
         case 'FFRwav'
             invoke(COMM.handle.RX8,'LoadCof',[object_dir '\FFR_RX8_ADC_invCalib_2chan.rcx']);
+        case 'FPL'
+            invoke(COMM.handle.RX8,'LoadCof',[object_dir '\FFR_RX8_ADC_invCalib_2chan_FPL.rcx']);
+        otherwise 
+            fprintf('PROTOCOL not set in set_invFilter...setting to ABR circuit file'); 
+            invoke(COMM.handle.RX8,'LoadCof',[object_dir '\ABR_RX8_ADC_invCalib_2chan.rcx']);
     end
     
     e1= COMM.handle.RX8.WriteTagV('FIR_Coefs1', 0, b_chan1);

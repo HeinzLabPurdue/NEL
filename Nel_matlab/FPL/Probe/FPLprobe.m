@@ -1,4 +1,4 @@
-global root_dir NelData data_dir
+global  NelData PROTOCOL root_dir data_dir
 
 % NEL Version of RunMEMR_chin_edited_NEL1.m based off Hari's SNAPLab script
 
@@ -16,11 +16,16 @@ card = initialize_card;
 %NEEDS TO BE CLEANED UP ASAP.
 % 1. run_invCalib needs cleaned up...currently clunky
 % 2. Need calibration to be correct for MEMR (currently all pass, w/o calib)
-[~, calibPicNum, ~] = run_invCalib(false);   % skipping INV calib for now since based on 94 dB SPL benig highest value, bot the 105 dB SPL from inv Calib.
-[coefFileNum, ~, ~] = run_invCalib(-2);
+% [~, calibPicNum, ~] = run_invCalib(false);   % skipping INV calib for now since based on 94 dB SPL benig highest value, bot the 105 dB SPL from inv Calib.
+% [coefFileNum, ~, ~] = run_invCalib(-2);
+% 
 
-calib.CalibPICnum2use = calibPicNum;  % save this so we know what calib file to use right from data file
-coefFileNum = NaN;
+PROTOCOL = 'FPLprobe'; 
+filttype = {'allpass','allpass'};
+RawCalibPicNum = NaN;
+
+invfilterdata = set_invFilter(filttype, RawCalibPicNum, true);
+coefFileNum = invfilterdata.coefFileNum;
 
 %% Enter subject information
 if ~isfield(NelData,'FPL') % First time through, need to ask all this.
@@ -57,7 +62,6 @@ disp('Starting stimulation...');
 Fs = calib.SamplingRate * 1000; % to Hz
 
 vo = calib.y;
-
 calib.vo = vo;
 vins_1 = zeros(calib.CavNumb, calib.Averages, calib.BufferSize);
 vins_2 = zeros(calib.CavNumb, calib.Averages, calib.BufferSize);
@@ -76,7 +80,7 @@ for m = 1: calib.CavNumb
     drop(driver) = calib.Attenuation;
     
     for n = 1:(calib.Averages + calib.ThrowAway)
-        vin = PlayCaptureNEL(card, buffdata, drop(1), drop(2), 1);
+        vin = PlayCaptureNEL(card, buffdata, drop(1), drop(2), 216);
         
         % Save data
         if (n > calib.ThrowAway)
@@ -110,7 +114,7 @@ for m = 1: calib.CavNumb
     outut_Pa_20uPa_per_Vpp_1 = output_Pa_1 / P_ref; % unit: 20 uPa / Vpeak
     
     freq = 1000*linspace(0,calib.SamplingRate/2,length(Vavg_1))';
-    calib.freq = freq;
+    calib.freq = freq; %Hz
     
     % CARD MAT2VOLTS = 5.0
     Vo = rfft(calib.vo)*5*db2mag(-1 * calib.Attenuation);
@@ -126,7 +130,7 @@ for m = 1: calib.CavNumb
     drop(driver) = calib.Attenuation;
     
     for n = 1:(calib.Averages + calib.ThrowAway)
-        vin = PlayCaptureNEL(card, buffdata, drop(1), drop(2), 1);
+        vin = PlayCaptureNEL(card, buffdata, drop(1), drop(2), 216);
         
         % Save data
         if (n > calib.ThrowAway)
@@ -174,7 +178,7 @@ for m = 1: calib.CavNumb
 end
 
 %% Plot data
-figure;
+figure(66);
 ax(1) = subplot(2, 1, 1);
 semilogx(calib.freq, db(abs(calib.CavRespH_1)) + 20, 'linew', 2);
 hold on; 
@@ -250,7 +254,7 @@ plot(freq/1000,dB(calib.Zc_1),'--'); %plot estimated Zc
 calib.CavLength_1 = la_1;
 
 if ~(calib.Error_1 >= 0 && calib.Error_1 <=1)
-    h = warndlg ('Calibration error out of range!');
+    h = warndlg (sprintf('Calibration error out of range! Error: %f', calib.Error_1 ));
     waitfor(h);
 end
  hold off; 
@@ -275,7 +279,7 @@ plot(freq/1000,dB(calib.Zc_2),'--'); %plot estimated Zc
 calib.CavLength_2 = la_2;
 
 if ~(calib.Error_2 >= 0 && calib.Error_2 <=1)
-    h = warndlg ('Calibration error out of range!');
+   h = warndlg (sprintf('Calibration error out of range! Error: %f', calib.Error_2 ));
     waitfor(h);
 end
 
@@ -300,7 +304,9 @@ end
 %% Shut Down TDT, no matter what button pushed, or if ended naturally
 close_play_circuit(card.f1RP, card.RP);
 rc = PAset(120.0*ones(1,4)); % need to use PAset, since it saves current value in PA, which is assumed way in NEL (causes problems when PAset is used to set attens later)
-run_invCalib(false);
+
+%set to all pass??? necessary only if inv calibrating
+dummy = set_invFilter({'allpass','allpass'},RawCalibPicNum, true);
 
 %% Return to GUI script, unless need to save
 if strcmp(NelData.FPL.rc,'abort') || strcmp(NelData.FPL.rc,'restart')
@@ -309,8 +315,7 @@ end
 
 %% Set up data structure to save
 calib.date = datestr(clock);
-
-warning('off');  % ??
+% warning('off');  % ??
 
 %% Big Switch case to handle end of data collection
 switch NelData.FPL.rc
@@ -318,8 +323,7 @@ switch NelData.FPL.rc
         % if want to RE-ADD stop, see DPOAE
         
     case 'saveNquit'
-        
-        %% Option to save comment in data file
+        % Option to save comment in data file
         comment='';
         TEMPans = inputdlg('Enter Comment (optional)');
         if ~isempty(TEMPans)
@@ -327,10 +331,10 @@ switch NelData.FPL.rc
         end
         calib.comment = comment;
         
-        %% NEL based data saving script
+        % NEL based data saving script
         make_FPLprobe_text_file;
         
-        %% remind user to turn of microphone
+        % remind user to turn of microphone
         h = msgbox('Please remember to turn off the microphone');
         uiwait(h);
         

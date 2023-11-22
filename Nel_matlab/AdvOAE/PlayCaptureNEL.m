@@ -1,4 +1,4 @@
-function vin = PlayCaptureNEL(card, buffdata, dropA, dropB, delayComp)
+function vin = PlayCaptureNEL(card, buffdata, dropA, dropB, ADdelay)
 f1RP = card.f1RP; 
 RP = card.RP; 
 
@@ -6,11 +6,11 @@ RP = card.RP;
 invoke(RP, 'SetTagVal', 'onsetdel',0); % onset delay is in ms
 playrecTrigger = 1;
 
-if delayComp == 1
-    ADdelay = 97; % Samples
-else
-    ADdelay = 0;
-end
+% if delayComp == 1
+%     ADdelay = 344; % Samples was 97 pre 9/12/23, was 70 on 9/12/23
+% else
+%     ADdelay = 0;
+% end
 
 resplength = size(buffdata,2) + ADdelay;
 

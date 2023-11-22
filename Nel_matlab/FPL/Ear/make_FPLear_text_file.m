@@ -1,28 +1,26 @@
 global NelData 
 
-fname = current_data_file('FPLear',1);
-
 %% General NEL data saving
 x.General.program_name  = PROG;
 x.General.version = VERSION;
 x.General.picture_number = NelData.File_Manager.picture+1;
-x.General.track          = NelData.File_Manager.track.No;
-x.General.unit           = NelData.File_Manager.unit.No;
 x.General.date          = date;
 x.General.time          = datestr(now,13);
-x.General.spike_res     = 1e-5;
-x.General.spike_unit    = 'sec';
-x.General.timing_unit   = 'ms';
 x.General.comment       = calib.comment;
 
 x.Stimuli = [];  % general NEL structures - NOT used here, but keep for generality 
 x.Line    = [];
 x.User = [];
-x.Hardware.NELmaxvolts_V   = VOLTS;   % max volts in NEL circuit design
-x.Hardware.CalibPICnum2use = calib.CalibPICnum2use;  % Save Calib file to use for these data - based on how hardware is setup (run-invCalib)
+x.Hardware.NELmaxvolts_V = VOLTS;   % max volts in NEL circuit design
+%x.Hardware.CalibPICnum2use = calib.CalibPICnum2use;  % Save Calib file to use for these data - based on how hardware is setup (run-invCalib)
 
-%% saving specific MEMR data
-x.FPLearData.calib = calib;
+x.CalibData = CalibData;
+x.CalibData2 = CalibData2;
+
+x.chan_ord = [{'Left'}, {'Right'}]; % check value of ddata_struct_ear;
+
+%% saving specific FPL specific data
+x.FPLearData = calib;
 
 %% Save data file
 MfileSAVE=0;

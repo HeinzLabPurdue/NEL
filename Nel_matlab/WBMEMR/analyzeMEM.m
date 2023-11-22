@@ -2,7 +2,7 @@ clear;
 close all;
 clc;
 
-[FileName,PathName,FilterIndex] = uigetfile(strcat('MEMR*.mat'),...
+[FileName,PathName,FilterIndex] = uigetfile(strcat('*memr*.mat'),...
     'Please pick MEM data file to analyze');
 MEMfile = fullfile(PathName, FileName);
 load(MEMfile);
@@ -14,10 +14,11 @@ MEMband = [500, 2000];
 ind = (freq >= MEMband(1)) & (freq <= MEMband(2));
 
 for k = 1:stim.nLevels
-    temp = reshape(squeeze(stim.resp(k, :, 2:end, 1:endsamps)),...
+    temp = reshape(squeeze(stim.resp(k, :, 2:end, 1:endsamps)),... % 2:end is last six clicks
         (stim.nreps-1)*stim.Averages, endsamps);
     resp(k, :) = trimmean(temp, 20, 1); %#ok<*SAGROW>
-    resp_freq(k, :) = pmtm(resp(k, :), 4, freq, stim.Fs);
+    %resp_freq(k, :) = pmtm(resp(k, :), 4, freq, stim.Fs);
+    resp_freq(k, :) = pmtm(resp(k, 345:end), 4, freq, stim.Fs);
     
     %     if k < 3
     %         blevs = 1:k;
@@ -32,7 +33,7 @@ for k = 1:stim.nLevels
     end
     
     bline(k, :) = trimmean(temp2, 20, 1);
-    bline_freq(k, :) = pmtm(bline(k, :), 4, freq, stim.Fs);
+    bline_freq(k, :) = pmtm(bline(k, 345:end), 4, freq, stim.Fs);
 end
 
 
@@ -40,7 +41,7 @@ end
 if(min(stim.noiseatt) == 6)
     elicitor = 94 - (stim.noiseatt - 6);
 else
-    elicitor = 94 - stim.noiseatt;
+    elicitor = 105 - stim.noiseatt;
 end
 
 MEM = pow2db(resp_freq ./ bline_freq);
@@ -58,20 +59,22 @@ cols = [103,0,31;
 5,48,97];
 cols = cols(end:-1:1, :)/255;
 
+figure
 % cols = jet(size(MEM, 1));
 axes('NextPlot','replacechildren', 'ColorOrder',cols);
-semilogx(freq / 1e3, MEM, 'linew', 2);
+semilogx((freq)/ 1e3, MEM, 'linew', 2); %used to have +11 with frequency
 xlim([0.2, 8]);
 ticks = [0.25, 0.5, 1, 2, 4, 8];
 set(gca, 'XTick', ticks, 'XTickLabel', num2str(ticks'), 'FontSize', 10);
 legend(num2str(elicitor'));
 xlabel('Frequency (kHz)', 'FontSize', 10);
 ylabel('Ear canal pressure (dB re: Baseline)', 'FontSize', 10);
-
+% offline analysis will be not EC pressure, but absorbed power, multiplied
+% by the conductance. 
 
 
 figure;
-plot(elicitor, mean(abs(MEM(:, ind)), 2)*5 , 'ok-', 'linew', 2);
+plot(elicitor, mean(abs(MEM(:, ind)), 2)*5 , 'ok-', 'linew', 2); % x5 is to compare to D. Keefe
 hold on;
 xlabel('Elicitor Level (dB SPL)', 'FontSize', 10);
 ylabel('\Delta Absorbed Power (dB)', 'FontSize', 10);
