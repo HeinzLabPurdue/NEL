@@ -29,7 +29,13 @@ if nargin < 1
     PROG = struct('name','FFR(v1.ge_mh.1).m');  % modified by GE 26Apr2004.
     [FIG, h_fig]=get_FFR_FIG(); % Initialize FIG
     
-    [misc, Stimuli, RunLevels_params, Display, interface_type]=FFRwav_ins(NelData);
+    INSfile=questdlg('Select INS file:','INS FILE','regular','LONG','regular'); %MH: Jan 4 2024
+    
+    if strcmp(INSfile,'LONG')
+        [misc, Stimuli, RunLevels_params, Display, interface_type]=FFRwav_ins_LONG(NelData);
+    else
+        [misc, Stimuli, RunLevels_params, Display, interface_type]=FFRwav_ins(NelData);
+    end
     
     [FIG, FFR_Gating, Display]=FFRwav_loop_plot(FIG,Display,Stimuli,interface_type);
     
