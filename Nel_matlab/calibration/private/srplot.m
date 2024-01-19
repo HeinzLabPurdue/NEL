@@ -12,9 +12,14 @@ FIG.push.recall  = uicontrol(FIG.handle,'callback','calibrate(''recall'');','sty
     'fontsize',12,'fontangle','normal','fontweight','normal');
 
 FIG.ax1.axes = axes('position',[.1 .42 .8 .56]);
-FIG.ax1.line1 = semilogx(0.1,0);
+
 % set(FIG.ax1.line1,'Color',[.1 .1 .6],'LineWidth',2,'EraseMode','back');
-set(FIG.ax1.line1,'Color',[.1 .1 .6],'LineWidth',2);
+
+%plotting!
+FIG.ax1.line1 = semilogx(0.1,0);
+set(FIG.ax1.line1,'Color',[52, 119, 235]/255,'LineWidth',2,'visible','on');
+
+
 axis([Stimuli.frqlo Stimuli.frqhi 100 120]);
 set(FIG.ax1.axes, 'XTick', ...
    unique(min(Stimuli.frqhi,max(Stimuli.frqlo, [Stimuli.frqlo++.000001 0.1 0.2 0.4 1 2 4 7 10 15 20:10:50 100 Stimuli.frqhi]))));
@@ -27,9 +32,12 @@ else
    set(FIG.ax1.axes,'YLim',[-40 -20]);
 end
 hold on;
+FIG.ax1.line2 = semilogx(0.1,0);
+set(FIG.ax1.line2,'Color',[191, 60, 36]/255,'LineWidth',2,'visible','on');
+
 % FIG.ax1.line2 = semilogx(0.1,-20,'EraseMode','none');
-FIG.ax1.line2 = semilogx(0.1,-20);
-set(FIG.ax1.line2,'Color',[.1 .1 .6],'Marker','o','Visible','off');
+% FIG.ax1.line2 = semilogx(0.1,-20);
+% set(FIG.ax1.line2,'Color',[.1 .1 .6],'Marker','o','Visible','off');
 
 FIG.ax2.axes = axes('position',[.6 .005 .3 .32]);	%set axis size to accommodate dimensions of image file
 axis([0 1 0 1]);
