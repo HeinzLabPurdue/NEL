@@ -1,5 +1,9 @@
 function [FIG, h_fig]=get_FFR_FIG()
 
+
+%%% AF/MH: Mar8 2024 - come back here to clean up with new objects
+
+
 % Set up with 2 recording channel radio buttons
 push = cell2struct(cell(1,5),{'forget_now', 'run_levels', 'Close', 'prev_stim', 'next_stim'},2);
 radio = cell2struct(cell(1,10),{'fast','slow','left','right','both','chan_1','chan_2','Simultaneous','atAD', 'atELEC'},2);
