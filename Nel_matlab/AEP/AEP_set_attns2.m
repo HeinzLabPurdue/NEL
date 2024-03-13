@@ -36,7 +36,7 @@ if ~isnan(ear2)
     if (bitget(ear2,1)) % Right
         attens_devices(row2,2) = attn2;
     end
-    if (bitget(ear,2)) % Left
+    if (bitget(ear2,2)) % Left
         attens_devices(row2,1) = attn2;
     end
 end
