@@ -63,7 +63,9 @@ end
 % set_RP_tagvals(RP1, RP2, FFR_Gating, Stimuli);
 
 % FFR_set_attns(Stimuli.atten_dB,-120,Stimuli.channel,Stimuli.KHosc,RP1,RP2);
-AEP_set_attns(Stimuli.atten_dB,Stimuli.channel,Stimuli.KHosc,RP1,RP2);  %% debug deal with later Khite
+
+%% MH/AF - convet to AEP_set_attns2
+AEP_set_attns2(Stimuli.atten_dB,Stimuli.channel,Stimuli.atten2_dB,Stimuli.channel2,Stimuli.KHosc,RP1,RP2);  %% debug deal with later Khite
 
 FFRnpts=floor(FFR_Gating.FFRlength_ms/1000*Stimuli.RPsamprate_Hz); %Changed from ceil to floor based on ABR, VMA, SH (7/18/23)
 if Stimuli.FFRmem_reps>0
@@ -320,8 +322,9 @@ while isempty(get(FIG.push.close,'Userdata'))
             switch FIG.NewStim
                 
                 case 0 % Do nothing (SP)
-%                     FFR_set_attns(Stimuli.atten_dB,-120,Stimuli.channel,Stimuli.KHosc,RP1,RP2);
-                      AEP_set_attns(Stimuli.atten_dB,Stimuli.channel,Stimuli.KHosc,RP1,RP2);
+                    %                     FFR_set_attns(Stimuli.atten_dB,-120,Stimuli.channel,Stimuli.KHosc,RP1,RP2);
+                    %% MH/AF - convet to AEP_set_attns2
+                    AEP_set_attns2(Stimuli.atten_dB,Stimuli.channel,Stimuli.atten2_dB,Stimuli.channel2,Stimuli.KHosc,RP1,RP2);
                       
                 case 1 % case: fast or slow
                     % set_RP_tagvals(RP1, RP2, FFR_Gating, Stimuli);
@@ -368,12 +371,13 @@ while isempty(get(FIG.push.close,'Userdata'))
                     invoke(RP1,'Run');
                     
                     % round attenuation
-%                     att_run = floor(Stimuli.maxSPL-Stimuli.atten_dB-20);
+                    %                     att_run = floor(Stimuli.maxSPL-Stimuli.atten_dB-20);
                     
                     %FFR_set_attns(Stimuli.atten_dB,-120,Stimuli.channel,Stimuli.KHosc,RP1,RP2);
-%                     FFR_set_attns(att_run,-120,Stimuli.channel,Stimuli.KHosc,RP1,RP2);
+                    %                     FFR_set_attns(att_run,-120,Stimuli.channel,Stimuli.KHosc,RP1,RP2);
                     
-                    AEP_set_attns(Stimuli.atten_dB,Stimuli.channel,Stimuli.KHosc,RP1,RP2);
+                    %% MH/AF - convet to AEP_set_attns2
+                    AEP_set_attns2(Stimuli.atten_dB,Stimuli.channel,Stimuli.atten2_dB,Stimuli.channel2,Stimuli.KHosc,RP1,RP2);
                     
                     % debug deal with later Khite
                     
@@ -522,7 +526,8 @@ end
 
 Stimuli.KHosc = 0;    % added by GE/MH, 17Jan2003.  To force Krohn-Hite to disconnect.
 % FFR_set_attns(-120,-120, Stimuli.channel, Stimuli.KHosc, RP1, RP2);
-AEP_set_attns(120,Stimuli.channel,Stimuli.KHosc,RP1,RP2);
+%% MH/AF - convet to AEP_set_attns2
+AEP_set_attns2(120,Stimuli.channel,120,Stimuli.channel2,Stimuli.KHosc,RP1,RP2);
 rc = PAset([120;120;120;120]); % added by GE/MH, 17Jan2003.  To force all attens to 120
 
 invoke(RP1,'Halt');

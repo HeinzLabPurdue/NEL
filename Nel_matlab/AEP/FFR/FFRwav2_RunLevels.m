@@ -253,6 +253,8 @@ if (bAbort == 0)
     
     %    disp(sprintf(ButtonName))
     if ~strcmp(ButtonName,'No')
+    %% MH/AF
+        warndlg('fix FFR_set_attns to AEP_set_attens2')
         FFR_set_attns(-120,-120,Stimuli.channel,Stimuli.KHosc,RP1,RP3);
         PAset([120;120;120;120]);
         set(FIG.statText.status, 'String', 'STATUS: saving data...');
@@ -281,6 +283,8 @@ end
 
 %% Reset to "free running..." mode:
 set(FIG.statText.status, 'String', ['STATUS (' interface_type '): free running...']);
+%% MH/AF
+warndlg('fix FFR_set_attns to AEP_set_attens2')
 FFR_set_attns(Stimuli.atten_dB,-120,Stimuli.channel,Stimuli.KHosc,RP1,RP3);
 set(FIG.push.run_levels,'string','Run levels...');
 set(FIG.push.run_levels,'Userdata','');

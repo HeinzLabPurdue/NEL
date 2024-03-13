@@ -19,13 +19,13 @@ FIG.radio.slow   = uicontrol(FIG.handle,'callback','FFRwav2(''slow'');','style',
 
 %% Stimulus menu
 FIG.popup.siglabel = uicontrol(FIG.handle, 'callback', '', 'style', 'text','Units','normalized', 'position', [.35 .22 .05 .04], 'string', 'Stimulus 1:','fontsize',12,'BackgroundColor','w','FontWeight','Bold');
-FIG.popup.stims = uicontrol(FIG.handle,'callback', 'FFRwav2(''update_stim'',''newStim2'');','style','popup','Units','normalized','Userdata',Stimuli.filename,'position',[.43 .23 .4 .04],'string',{fName.name},'fontsize',12);
+FIG.popup.stims = uicontrol(FIG.handle,'callback', 'FFRwav2(''update_stim'',''newStim'');','style','popup','Units','normalized','Userdata',Stimuli.filename,'position',[.43 .23 .4 .04],'string',{fName.name},'fontsize',12);
 FIG.push.prev_stim = uicontrol(FIG.handle,'callback','FFRwav2(''update_stim'',''prevStim'');','style','pushbutton','Units','normalized','position',[.4 .23 .03 .04],'string','<<','fontsize',12,'fontangle','normal','fontweight','normal');
 FIG.push.next_stim = uicontrol(FIG.handle,'callback','FFRwav2(''update_stim'',''nextStim'');','style','pushbutton','Units','normalized','position',[.83 .23 .03 .04],'string','>>','fontsize',12,'fontangle','normal','fontweight','normal');
 
 %% Stimulus2 menu
 FIG.popup2.siglabel = uicontrol(FIG.handle, 'callback', '', 'style', 'text','Units','normalized', 'position', [.35 .11 .05 .04], 'string', 'Stimulus 2:','fontsize',12,'BackgroundColor','w','FontWeight','Bold');
-FIG.popup2.stims = uicontrol(FIG.handle,'callback', 'FFRwav2(''update_stim'',''newStim2'');','style','popup','Units','normalized','Userdata',Stimuli.filename2,'position',[.43 .12 .4 .04],'string',{fName2.name},'fontsize',12);
+FIG.popup2.stims = uicontrol(FIG.handle,'callback', 'FFRwav2(''update_stim'',''newStim2'');','style','popup','Units','normalized','Userdata',Stimuli.filename2,'position',[.43 .12 .4 .04],'string',{fName2.name},'fontsize',12,'Value',find(strcmp({fName.name},Stimuli.filename2)));
 FIG.push2.prev_stim2 = uicontrol(FIG.handle,'callback','FFRwav2(''update_stim'',''prevStim2'');','style','pushbutton','Units','normalized','position',[.4 .12 .03 .04],'string','<<','fontsize',12,'fontangle','normal','fontweight','normal');
 FIG.push2.next_stim2 = uicontrol(FIG.handle,'callback','FFRwav2(''update_stim'',''nextStim2'');','style','pushbutton','Units','normalized','position',[.83 .12 .03 .04],'string','>>','fontsize',12,'fontangle','normal','fontweight','normal');
 
@@ -96,16 +96,16 @@ FIG.statText.status =  uicontrol(FIG.handle, 'style', 'text','Units','normalized
 
 
 %% Speakers
-FIG.statText.EarLabel = uicontrol(FIG.handle, 'callback', '', 'style', 'text','Units','normalized', 'position', [.1 .24 .1 .05], 'string', 'Stimulus 1:','fontsize',12,'BackgroundColor','w','FontWeight','Bold');
-FIG.radio.left   = uicontrol(FIG.handle,'callback','FFRwav2(''left'');', 'style','radio','Enable','on','Units','normalized','position',[.125 .235 .08 .03],'string','Left Ear', 'fontsize',12,'BackgroundColor','w','value',0);
-FIG.radio.right  = uicontrol(FIG.handle,'callback','FFRwav2(''right'');','style','radio','Enable','on','Units','normalized','position',[.125 .205 .08 .03],'string','Right Ear','fontsize',12,'BackgroundColor','w','value',1);
-FIG.radio.both   = uicontrol(FIG.handle,'callback','FFRwav2(''both'');', 'style','radio','Enable','on','Units','normalized','position',[.125 .175 .08 .03],'string','Both Ears','fontsize',12,'BackgroundColor','w','value',0);
+FIG.statText.EarLabel = uicontrol(FIG.handle, 'callback', '', 'style', 'text','Units','normalized', 'position', [.02 .24 .1 .05], 'string', 'Stimulus 1:','fontsize',12,'BackgroundColor','w','FontWeight','Bold');
+FIG.radio.left   = uicontrol(FIG.handle,'callback','FFRwav2(''left'');', 'style','radio','Enable','on','Units','normalized','position',[.045 .235 .08 .03],'string','Left Ear', 'fontsize',12,'BackgroundColor','w','value',0);
+FIG.radio.right  = uicontrol(FIG.handle,'callback','FFRwav2(''right'');','style','radio','Enable','on','Units','normalized','position',[.045 .205 .08 .03],'string','Right Ear','fontsize',12,'BackgroundColor','w','value',1);
+FIG.radio.both   = uicontrol(FIG.handle,'callback','FFRwav2(''both'');', 'style','radio','Enable','on','Units','normalized','position',[.045 .175 .08 .03],'string','Both Ears','fontsize',12,'BackgroundColor','w','value',0);
 
 %%% Speakers for signal 2
-FIG.statText.EarLabel2 = uicontrol(FIG.handle, 'callback', '', 'style', 'text','Units','normalized', 'position', [.02 .24 .1 .05], 'string', 'Stimulus 2:','fontsize',12,'BackgroundColor','w','FontWeight','Bold');
-FIG.radio.left2   = uicontrol(FIG.handle,'callback','FFRwav2(''left2'');', 'style','radio','Enable','on','Units','normalized','position',[.045 .235 .08 .03],'string','Left Ear', 'fontsize',12,'BackgroundColor','w','value',0);
-FIG.radio.right2  = uicontrol(FIG.handle,'callback','FFRwav2(''right2'');','style','radio','Enable','on','Units','normalized','position',[.045 .205 .08 .03],'string','Right Ear','fontsize',12,'BackgroundColor','w','value',1);
-FIG.radio.both2   = uicontrol(FIG.handle,'callback','FFRwav2(''both2'');', 'style','radio','Enable','on','Units','normalized','position',[.045 .175 .08 .03],'string','Both Ears','fontsize',12,'BackgroundColor','w','value',0);
+FIG.statText.EarLabel2 = uicontrol(FIG.handle, 'callback', '', 'style', 'text','Units','normalized', 'position', [.1 .24 .1 .05], 'string', 'Stimulus 2:','fontsize',12,'BackgroundColor','w','FontWeight','Bold');
+FIG.radio.left2   = uicontrol(FIG.handle,'callback','FFRwav2(''left2'');', 'style','radio','Enable','on','Units','normalized','position',[.125 .235 .08 .03],'string','Left Ear', 'fontsize',12,'BackgroundColor','w','value',0);
+FIG.radio.right2  = uicontrol(FIG.handle,'callback','FFRwav2(''right2'');','style','radio','Enable','on','Units','normalized','position',[.125 .205 .08 .03],'string','Right Ear','fontsize',12,'BackgroundColor','w','value',1);
+FIG.radio.both2   = uicontrol(FIG.handle,'callback','FFRwav2(''both2'');', 'style','radio','Enable','on','Units','normalized','position',[.125 .175 .08 .03],'string','Both Ears','fontsize',12,'BackgroundColor','w','value',0);
 
 
 %% Setting 2 channel vs 1 channel  (RECORDING)
@@ -127,13 +127,13 @@ FIG.push.close   = uicontrol(FIG.handle,'callback','FFRwav2(''close'');','style'
 FIG.push.run_levels = uicontrol(FIG.handle,'callback','FFRwav2(''run_levels'');','style','pushbutton','Units','normalized','position',[.1 .726 .125 .09],'string','Run levels...','fontsize',12,'fontangle','normal','fontweight','normal');
 FIG.push.forget_now = uicontrol(FIG.handle,'callback','FFRwav2(''forget_now'');','style','pushbutton','Units','normalized','position',[.07 .43 .125 .05],'string','Forget NOW','fontsize',12,'fontangle','normal','fontweight','normal','Userdata','');
 
-%% ???? CHANGE THIS???  
-if (FFR_set_attns(0,0,1,0) == 0)
-    set(FIG.radio.left,'Enable','off');
-end
-if (FFR_set_attns(0,0,2,0) == 0)
-    set(FIG.radio.right,'Enable','off');
-end
+%% ???? CHANGE THIS???  %% MH/AF take out  (set later correctly)
+% if (FFR_set_attns(0,0,1,0) == 0)
+%     set(FIG.radio.left,'Enable','off');
+% end
+% if (FFR_set_attns(0,0,2,0) == 0)
+%     set(FIG.radio.right,'Enable','off');
+% end
 set(FIG.handle,'Userdata',struct('handles',FIG));
 set(FIG.handle,'Visible','on');
 
