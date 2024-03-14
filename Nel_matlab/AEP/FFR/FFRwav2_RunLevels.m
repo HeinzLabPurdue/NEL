@@ -1,7 +1,7 @@
 %% Working
 
-function [firstSTIM, NelData]=FFRwav_RunLevels(FIG,Stimuli,invfiltdata, RunLevels_params, misc, FFR_Gating,...
-    FFRnpts,interface_type, Display, NelData, data_dir, RP1, RP3, PROG)
+function [firstSTIM, NelData]=FFRwav2_RunLevels(FIG,Stimuli,invfiltdata, RunLevels_params, misc, FFR_Gating,...
+    FFRnpts,interface_type, Display, NelData, data_dir, RP1,RP2, RP3, PROG)
 
 % RP1=RP.activeX;
 % RP2=RP.activeX;
@@ -128,7 +128,7 @@ for attenIND = 1
                 
                 % fixing the function to make sure the polarity matches, starts with 1,
                 % which must match with 1 for original
-                
+                % AF 14 March  should this be based on RP1 and 2 ????
                 if  invoke(RP1,'GetTagVal','ORG') == mod(currStim,2) && maxFFRobs1 <= critVal && maxFFRobs2<= critVal2
                     %                     if  invoke(RP1,'GetTagVal','ORG')
                     bNoSampleObtained = 0;
@@ -254,8 +254,10 @@ if (bAbort == 0)
     %    disp(sprintf(ButtonName))
     if ~strcmp(ButtonName,'No')
     %% MH/AF
-        warndlg('fix FFR_set_attns to AEP_set_attens2')
-        FFR_set_attns(-120,-120,Stimuli.channel,Stimuli.KHosc,RP1,RP3);
+%         warndlg('fix FFR_set_attns to AEP_set_attens2')
+% AEP_set_attns2(-120,Stimuli.channel,Stimuli.atten2_dB,Stimuli.channel2,Stimuli.KHosc,RP1,RP2);  
+%       
+% FFR_set_attns(-120,-120,Stimuli.channel,Stimuli.KHosc,RP1,RP3);
         PAset([120;120;120;120]);
         set(FIG.statText.status, 'String', 'STATUS: saving data...');
         % chan 1
@@ -284,8 +286,9 @@ end
 %% Reset to "free running..." mode:
 set(FIG.statText.status, 'String', ['STATUS (' interface_type '): free running...']);
 %% MH/AF
-warndlg('fix FFR_set_attns to AEP_set_attens2')
-FFR_set_attns(Stimuli.atten_dB,-120,Stimuli.channel,Stimuli.KHosc,RP1,RP3);
+% warndlg('fix FFR_set_attns to AEP_set_attens2')
+AEP_set_attns2(Stimuli.atten_dB,Stimuli.channel,Stimuli.atten2_dB,Stimuli.channel2,Stimuli.KHosc,RP1,RP2);  
+% FFR_set_attns(Stimuli.atten_dB,-120,Stimuli.channel,Stimuli.KHosc,RP1,RP3);
 set(FIG.push.run_levels,'string','Run levels...');
 set(FIG.push.run_levels,'Userdata','');
 set(FIG.push.forget_now,'string','Forget NOW');

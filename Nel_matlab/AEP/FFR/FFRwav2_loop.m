@@ -429,8 +429,8 @@ while isempty(get(FIG.push.close,'Userdata'))
                     end 
                     
                 case 4   % Run Levels
-                    [firstSTIM, NelData]=FFRwav_RunLevels(FIG,Stimuli, invfiltdata, RunLevels_params, misc, FFR_Gating, ...
-                        FFRnpts,interface_type, Display, NelData, data_dir, RP1, RP3, PROG);
+                    [firstSTIM, NelData]=FFRwav2_RunLevels(FIG,Stimuli, invfiltdata, RunLevels_params, misc, FFR_Gating, ...
+                        FFRnpts,interface_type, Display, NelData, data_dir, RP1, RP2, RP3, PROG);
                     veryfirstSTIM=1; ...
                         % misc.n = int(~(invoke(RP1,'GetTagVal','ORG')));
                     
