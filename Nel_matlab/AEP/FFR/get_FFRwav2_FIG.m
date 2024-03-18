@@ -6,7 +6,7 @@ function [FIG, h_fig]=get_FFRwav2_FIG()
 
 % Set up with 2 recording channel radio buttons
 push = cell2struct(cell(1,7),{'forget_now', 'run_levels', 'Close', 'prev_stim', 'next_stim', 'prev_stim2', 'next_stim2'},2);
-radio = cell2struct(cell(1,13),{'fast','slow','left','right','both','left2','right2','both2','chan_1','chan_2','Simultaneous','atAD', 'atELEC'},2);
+radio = cell2struct(cell(1,14),{'fast','slow','left','right','both','left2','right2','both2','no_audio2','chan_1','chan_2','Simultaneous','atAD', 'atELEC'},2);
 statText  = cell2struct(cell(1,5),{'memReps', 'status', 'threshV', 'gain', 'voltDisplay'},2);
 bg  = cell2struct(cell(1,3),{'spl','stim','nt'},2);
 bg2  = cell2struct(cell(1,3),{'spl','stim','nt'},2);

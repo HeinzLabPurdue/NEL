@@ -317,6 +317,20 @@ elseif strcmp(command_str,'left2')
         Stimuli.ear2='left';
         set(FIG.radio.right2,'value',0);
         set(FIG.radio.both2,'value',0);
+        set(FIG.radio.no_audio2,'value',0);
+        
+        set(FIG.asldr2.slider, 'Visible','on');
+        set(FIG.asldr2.min, 'Visible','on');
+        set(FIG.asldr2.max, 'Visible','on');
+        set(FIG.asldr2.val, 'Visible','on');
+        set(FIG.asldr2.SPL, 'Visible','on');
+        set(FIG.popup2.siglabel, 'Visible','on');
+        set(FIG.popup2.stims, 'Visible','on');
+        set(FIG.push2.prev_stim2, 'Visible','on');
+        set(FIG.push2.next_stim2, 'Visible','on');
+        set(FIG.bg2.spl.parent, 'Visible','on');
+        
+        
     else
         set(FIG.radio.left2,'value',1);
     end
@@ -331,6 +345,19 @@ elseif strcmp(command_str,'right2')
         Stimuli.ear2='right';
         set(FIG.radio.left2,'value',0);
         set(FIG.radio.both2,'value',0);
+        
+        set(FIG.asldr2.slider, 'Visible','on');
+        set(FIG.asldr2.min, 'Visible','on');
+        set(FIG.asldr2.max, 'Visible','on');
+        set(FIG.asldr2.val, 'Visible','on');
+        set(FIG.asldr2.SPL, 'Visible','on');
+        set(FIG.popup2.siglabel, 'Visible','on');
+        set(FIG.popup2.stims, 'Visible','on');
+        set(FIG.push2.prev_stim2, 'Visible','on');
+        set(FIG.push2.next_stim2, 'Visible','on');
+        set(FIG.bg2.spl.parent, 'Visible','on');
+        
+        
     else
         set(FIG.radio.right2,'value',1);
     end
@@ -345,13 +372,56 @@ elseif strcmp(command_str,'both2')
         Stimuli.ear2='both';
         set(FIG.radio.left2,'value',0);
         set(FIG.radio.right2,'value',0);
+        
+        set(FIG.asldr2.slider, 'Visible','on');
+        set(FIG.asldr2.min, 'Visible','on');
+        set(FIG.asldr2.max, 'Visible','on');
+        set(FIG.asldr2.val, 'Visible','on');
+        set(FIG.asldr2.SPL, 'Visible','on');
+        set(FIG.popup2.siglabel, 'Visible','on');
+        set(FIG.popup2.stims, 'Visible','on');
+        set(FIG.push2.prev_stim2, 'Visible','on');
+        set(FIG.push2.next_stim2, 'Visible','on');
+        set(FIG.bg2.spl.parent, 'Visible','on');
+        
+        
     else
         set(FIG.radio.both2,'value',1);
     end
     
     FFRwav2('update_stim', 'spl');
     FFRwav2('calibInit');
+    %%% AF add this March 18
     
+elseif strcmp(command_str,'no_audio2')
+    if get(FIG.radio.no_audio2, 'value') == 1
+        FIG.NewStim = 0;
+        
+        Stimuli.channel2 = NaN;
+        Stimuli.ear2=NaN;
+        
+        set(FIG.radio.left2,'value',0);
+        set(FIG.radio.right2,'value',0);
+        set(FIG.radio.both2,'value',0);
+        
+        %hide everything related to signal 2
+        set(FIG.asldr2.slider, 'Visible','off');
+        set(FIG.asldr2.min, 'Visible','off');
+        set(FIG.asldr2.max, 'Visible','off');
+        set(FIG.asldr2.val, 'Visible','off');
+        set(FIG.asldr2.SPL, 'Visible','off');
+        set(FIG.popup2.siglabel, 'Visible','off');
+        set(FIG.popup2.stims, 'Visible','off');
+        set(FIG.push2.prev_stim2, 'Visible','off');
+        set(FIG.push2.next_stim2, 'Visible','off');
+        set(FIG.bg2.spl.parent, 'Visible','off');
+        
+    else
+        set(FIG.radio.no_audio2,'value',1);
+    end
+    
+    FFRwav2('update_stim', 'spl');
+    FFRwav2('calibInit');    
 
 elseif strcmp(command_str,'chan_1')
     if get(FIG.radio.chan_1, 'value') == 1

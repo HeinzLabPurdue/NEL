@@ -42,16 +42,24 @@ if ~isnan(ear2)
 end
 % attens_devices = attn * attens_devices;
 [select,connect,PAattns] = find_mix_settings(attens_devices);
-
-%hopefully works AS/MH/SH - 03/17/2023
-if(~bitget(ear,1)&&~bitget(ear2,1)) %Right
-    %set left PA5-3 to 120 attn
-    PAattns(4) = 120;
+if ~isnan(ear2)
+    %hopefully works AS/MH/SH - 03/17/2023
+    if(~bitget(ear,1)&&~bitget(ear2,1)) %Right
+        %set left PA5-3 to 120 attn
+        PAattns(4) = 120;
+    end
+    if(~bitget(ear,2)&&~bitget(ear2,2)) %Left
+        PAattns(3) = 120;
+    end
+elseif isnan(ear2)
+     if(~bitget(ear,1)) %Right
+        %set left PA5-3 to 120 attn
+        PAattns(4) = 120;
+    end
+    if(~bitget(ear,2)) %Left
+        PAattns(3) = 120;
+    end   
 end
-if(~bitget(ear,2)&&~bitget(ear2,2)) %Left
-    PAattns(3) = 120;
-end
-
 if (isempty(select))
    % nelerror('CAP: can''t find proper select/connect configuration');
    rc = 0;
