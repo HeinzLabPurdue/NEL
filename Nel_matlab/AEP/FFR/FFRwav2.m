@@ -345,6 +345,7 @@ elseif strcmp(command_str,'right2')
         Stimuli.ear2='right';
         set(FIG.radio.left2,'value',0);
         set(FIG.radio.both2,'value',0);
+        set(FIG.radio.no_audio2,'value',0);
         
         set(FIG.asldr2.slider, 'Visible','on');
         set(FIG.asldr2.min, 'Visible','on');
@@ -372,6 +373,7 @@ elseif strcmp(command_str,'both2')
         Stimuli.ear2='both';
         set(FIG.radio.left2,'value',0);
         set(FIG.radio.right2,'value',0);
+        set(FIG.radio.no_audio2,'value',0);
         
         set(FIG.asldr2.slider, 'Visible','on');
         set(FIG.asldr2.min, 'Visible','on');
