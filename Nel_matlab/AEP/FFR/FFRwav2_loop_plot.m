@@ -80,7 +80,7 @@ FIG.asldr.SPL    = uicontrol(FIG.handle,'style','text','string',sprintf('%.1f dB
 FIG.asldr2.slider = uicontrol(FIG.handle,'callback','FFRwav2(''slide_atten2'');','style','slider','SliderStep',[1/120 5/120],'Enable','on','min',-120,'max',0,'Units','normalized','position',[.4 .07 .525 .04],'Value',-Stimuli.atten_dB);
 FIG.asldr2.min    = uicontrol(FIG.handle,'style','text','string',num2str(get(FIG.asldr.slider,'min')),'backgroundcolor',gray_dark,'Units','normalized','position',[.38 .04 .05 .03],'fontsize',10);
 FIG.asldr2.max    = uicontrol(FIG.handle,'style','text','string',num2str(get(FIG.asldr.slider,'max')),'backgroundcolor',gray_dark,'Units','normalized','position',[.875 .04 .05 .03],'fontsize',10,'horizontalalignment','right');
-FIG.asldr2.val    = uicontrol(FIG.handle,'style','edit','Units','normalized','Userdata',Stimuli.atten_dB,'position',[.6325 .07 .06 .04],'string',num2str(-Stimuli.atten_dB),'fontsize',12,'callback', 'FFRwav2(''slide_atten_text'');');
+FIG.asldr2.val    = uicontrol(FIG.handle,'style','edit','Units','normalized','Userdata',Stimuli.atten_dB,'position',[.6325 .07 .06 .04],'string',num2str(-Stimuli.atten_dB),'fontsize',12,'callback', 'FFRwav2(''slide_atten_text2'');');
 FIG.asldr2.SPL    = uicontrol(FIG.handle,'style','text','string',sprintf('%.1f dB SPL',0), 'backgroundcolor',[1 1 1],'Units','normalized','position',[.93 .07 .075 .03],'fontsize',10,'horizontalalignment','left');
 
 %% LQ 01/31/05 add callback
