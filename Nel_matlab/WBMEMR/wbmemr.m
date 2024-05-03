@@ -1,4 +1,4 @@
-global root_dir NelData data_dir
+global root_dir NelData data_dir PROTOCOL
 
 % NEL Version of RunMEMR_chin_edited_NEL1.m based off Hari's SNAPLab script
 
@@ -8,7 +8,7 @@ host = host(~isspace(host));
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %Insert NEL/GUI Parameters here...none for WBMEMR
-
+PROTOCOL = 'MEMR';
 %% Calibration
 
 %default WBMEMR calib...needs improvement  (based on NO invCalib so far -
