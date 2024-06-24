@@ -38,6 +38,9 @@ fname= strrep(fname, 'complex_', '');
 aux_fname = fullfile(pathstr,['a' name(2:end)]);
 
 x.General.program_name  = PROG.name;
+% AF FA 6/24/24  add which NEl which is savd in VERSION
+x.General.version = VERSION;
+
 x.General.picture_number = NelData.File_Manager.picture+1;
 x.General.date          = date;
 x.General.time          = datestr(now,13);
