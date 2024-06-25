@@ -20,6 +20,7 @@ x.Line.freq_Hz = Stimuli.fc; % zz 04nov11 original only had one frequency, updat
 x.invfilterdata = invfiltdata;
 
 x.AD_Data.Gain=Display.Gain;
+x.MetaData=NelData.Metadata;
 
 stimuli_fname = fullfile(pathstr,'Signals');
 copyfile(Stimuli.filename,stimuli_fname,'f');

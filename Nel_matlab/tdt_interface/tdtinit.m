@@ -134,7 +134,9 @@ end
     elseif NelData.General.RX8
         VERSION = 'NEL2';
     end
-
+    NelData.Metadata.NEL = VERSION;
+    NelData.Metadata.Date = date;
+    
 
 %% Old stuff
 rc = 1;

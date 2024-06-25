@@ -33,3 +33,4 @@ x.invfilterdata = invfiltdata;
 
 x.AD_Data.Gain=Display.Gain;
 x.AD_Data.SampleRate= Stimuli.RPsamprate_Hz/RunLevels_params.decimateFact;
+x.MetaData=NelData.Metadata;

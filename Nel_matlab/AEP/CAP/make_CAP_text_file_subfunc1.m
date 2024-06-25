@@ -30,3 +30,4 @@ x.Line.freq_Hz = Stimuli.freq_hz;
 
 x.AD_Data.Gain=Display.Gain;
 x.AD_Data.SampleRate= Stimuli.RPsamprate_Hz/RunLevels_params.decimateFact;
+x.MetaData=NelData.Metadata;

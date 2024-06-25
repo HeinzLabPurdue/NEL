@@ -55,6 +55,7 @@ x.invfilterdata = invfiltdata;
 % x.Line.freq_Hz = Stimuli.fc; % zz 04nov11 original only had one frequency, updated to carrier frequency
 
 x.AD_Data.Gain=Display.Gain;
+x.MetaData=NelData.Metadata;
 
 % stimuli_fname = fullfile(pathstr,'Signals');
 

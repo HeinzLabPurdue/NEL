@@ -51,27 +51,29 @@ case 'Yes'
         end
     end
 case 'No'
-   dflt_name = [NelData.General.User '-' strrep(datestr(date,29),'-','_')];
-   descr = inputdlg({['Short Description' char(10) '(e.g. ''Chin1234_AN_normal'' ''Chin1234_AN_500OBN''):']},'Experiment''s Description',1,{''},200);
-   if (~isempty(descr) & ~isempty(descr{1}))
-      dflt_name = strrep([dflt_name '-' descr{1}],' ','_');
-   end
-   valid_dirname = 0;
-   while (valid_dirname == 0)
-      dirname = inputdlg({'New directory name:'},'File Manager',1,{dflt_name},180);
-      if (isempty(dirname) | isempty(dirname{1}))
-         dirname = choose_data_dir('Yes',1);
-         valid_dirname = 1;
-      else
-         dirname = dirname{1};
+   dirname = [NelData.Metadata.User, '-', datestr(date,29),'-', NelData.Metadata.ChinID,'-',NelData.Metadata.Exposure,'-',NelData.Metadata.Sedation];
+NelData.Metadata.Dirname=dirname;
+   
+   %    descr = inputdlg({['Short Description' char(10) '(e.g. ''Chin1234_AN_normal'' ''Chin1234_AN_500OBN''):']},'Experiment''s Description',1,{''},200);
+%    if (~isempty(descr) & ~isempty(descr{1}))
+%       dflt_name = strrep([dflt_name '-' descr{1}],' ','_');
+%    end
+%    valid_dirname = 0;
+%    while (valid_dirname == 0)
+%       dirname = inputdlg({'New directory name:'},'File Manager',1,{dflt_name},180);
+%       if (isempty(dirname) | isempty(dirname{1}))
+%          dirname = choose_data_dir('Yes',1);
+%          valid_dirname = 1;
+%       else
+%          dirname = dirname{1};
          if ( (nel_mkdir(data_dir,dirname) == 1) & (nel_mkdir([data_dir dirname],'Object') == 1) ...
                & (nel_mkdir([data_dir dirname],'Signals') == 1) )
             valid_dirname = 1;
          else
             waitfor(errordlg(['Can not create directory ''' data_dir dirname ''' or it''s sub directories']));
          end
-      end
-   end
+%       end
+%    end
 end
 
 if (recursive_flag == 0)
