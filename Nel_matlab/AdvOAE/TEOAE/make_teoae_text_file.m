@@ -1,4 +1,4 @@
-global NelData 
+global NelData VERSION
 
 fname = current_data_file('TEOAE',1);
 

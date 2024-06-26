@@ -1,5 +1,5 @@
 global NelData 
-
+global VERSION
 fname = current_data_file('sweptDPOAE',1);
 
 %% General NEL data saving

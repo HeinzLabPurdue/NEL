@@ -4,7 +4,7 @@ function rc = tdtinit(h)
 % AF 8/22/01
 
 %%
-global RX RP PA Trigger SwitchBox
+global RX RP PA Trigger SwitchBox data_dir
 global default_rco devices_names_vector hardwired_devices NelData
 % AF FA 6/24/24 add VERSION
 global VERSION
@@ -137,7 +137,11 @@ end
     NelData.Metadata.NEL = VERSION;
     NelData.Metadata.Date = date;
     
-
+         filename_metadat=[data_dir   NelData.Metadata.Dirname '\MetaData\MetaData_'  datestr(now,'yyyy-mm-dd_HH_MM_SS') '.mat'];
+         MetaData_info=NelData.Metadata;
+         save(filename_metadat,'MetaData_info');
+         
+         
 %% Old stuff
 rc = 1;
 for i = 1:2 %length(RP)
