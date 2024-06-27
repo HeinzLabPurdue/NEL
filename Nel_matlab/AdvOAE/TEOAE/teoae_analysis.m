@@ -2,7 +2,7 @@ function [res] = teoae_analysis(click)
 
 res.resp_win = click.resp(:, (click.StimWin+1):(click.StimWin + click.RespDur)); % Remove stimulus by windowing
 
-resp = res.resp_win; 
+resp = res.resp_win;
 
 if click.doFilt
     % High pass at 200 Hz using IIR filter
@@ -23,7 +23,7 @@ Vavg_nf = rfft(res.noisefloor);
 % Apply calibartions to convert voltage to pressure
 % For ER-10X, this is approximate
 mic_sens = click.mic_sens; % mV/Pa. TO DO: change after calibration
-mic_gain = click.mic_gain; 
+mic_gain = click.mic_gain;
 P_ref = click.P_ref;
 DR_onesided = click.DR_onesided;
 factors = DR_onesided * mic_gain * mic_sens * P_ref;
@@ -35,16 +35,27 @@ res.freq = 1000*linspace(0,click.SamplingRate/2,length(Vavg))';
 res.Resp =  output_Pa_per_20uPa;
 res.NoiseFloor = noise_Pa_per_20uPa;
 
-%% Plot the result somewhere too 
-figure; 
+%% Plot the result somewhere too
+figure;
 hold on;
-plot(res.freq, db(abs(res.Resp)), 'linew', 2); 
-plot(res.freq, db(abs(res.NoiseFloor)), 'linew', 2); 
-legend('OAE', 'NF'); 
-title('TEOAE'); 
+
+% plot norms
+load('sf_norms', 'upOAE', 'loOAE', 'upNF', 'loNF', 'f');
+col = [237, 246, 252]./255;
+colNF = [252, 237, 240]./255;
+fill([f, f(end), f(end:-1:1), f(1)], [loOAE, upOAE(end), upOAE(end:-1:1), loOAE(1)], col, 'linestyle', 'none')
+hold on;
+fill([f, f(end), f(end:-1:1), f(1)], [loNF, upNF(end), upNF(end:-1:1), loNF(1)], colNF, 'linestyle', 'none')
+alpha(.5);
+
+% results
+plot(res.freq, db(abs(res.Resp)), 'linew', 2);
+plot(res.freq, db(abs(res.NoiseFloor)), 'linew', 2);
+legend('OAE', 'NF');
+title('TEOAE');
 xlim([500, 20e3])
-xlabel('Frequency (Hz)'); 
-ylabel('Amplitude(dB)'); 
-set(gca, 'XScale', 'log'); 
-drawnow; 
+xlabel('Frequency (Hz)');
+ylabel('Amplitude(dB)');
+set(gca, 'XScale', 'log');
+drawnow;
 end

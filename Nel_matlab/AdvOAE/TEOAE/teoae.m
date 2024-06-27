@@ -71,6 +71,11 @@ end
 %% Initializing SFOAE variables for running and live analysis
 teoae_ins;
 
+% if adding a live plotting, will need this; currently only in analysis
+% load('teoae_norms', 'upOAE', 'loOAE', 'upNF', 'loNF', 'f');
+% col = [237, 246, 252]./255;
+% colNF = [252, 237, 240]./255;
+
 %% Running Script
 
 vo = click.y;

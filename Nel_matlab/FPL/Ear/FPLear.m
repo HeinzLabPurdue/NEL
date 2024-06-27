@@ -340,11 +340,19 @@ set(gca, 'XScale', 'log')
 %% Plot Ear Absorbance
 if newCalib
     figure(12);
+    hold on; 
+    % plot absorbance norms
+    load('FPLear_norms.mat', 'f', 'loabs', 'hiabs'); 
+    col = [.9, .9, .9];
+    fill([f, f(end), f(end:-1:1), f(1)], [loabs, hiabs(end), hiabs(end:-1:1), loabs(1)], col, 'linestyle', 'none')
+    alpha(.5);
+
+    % plot data
     semilogx(calib.freq * 1e-3, 100*(1 - abs(calib.Rec_1).^2), 'linew', 2);
     hold on;
     semilogx(calib.freq * 1e-3, 100*(1 - abs(calib.Rec_2).^2), 'linew', 2);
     hold off;
-    xlabel('Frequency (Hz)', 'FontSize', 16);
+    xlabel('Frequency (kHz)', 'FontSize', 16);
     ylabel('Absorbance (%)', 'FontSize', 16);
     xlim([0.2, 8]); ylim([0, 100]);
     set(gca, 'FontSize', 16, 'XTick',[0.25, 0.5, 1, 2, 4, 8]);

@@ -27,12 +27,12 @@ if ~isfield(NelData,'AdvOAE') % First time through, need to ask all this.
 
     ear = questdlg('Which Ear?', 'Ear', 'L', 'R', 'R');
     uiwait(warndlg('Set ER-10B+ GAIN to 40 dB','SET ER-10B+ GAIN WARNING','modal'));
-    
+
     % Save in case if restart
     NelData.AdvOAE.ear = ear;
     NelData.AdvOAE.Fig2close=[];  % set up the place to keep track of figures generted here (to be closed in NEL_App Checkout)
     NelData.AdvOAE.AdvOAE_figNum=377;  % +200 from wbMEMR
-    
+
 else
     ear = NelData.AdvOAE.ear;
 
@@ -43,7 +43,12 @@ end
 
 %% Initializing SFOAE variables for running and live analysis
 sweptDPOAE_ins;
-stim.ear = ear; 
+stim.ear = ear;
+load('dp_norms', 'upOAE', 'loOAE', 'upNF', 'loNF', 'f');
+col = [237, 246, 252]./255;
+colNF = [252, 237, 240]./255;
+% this is some initial values, but can be re-decided later
+% values we need are f, loNF, loOAE, upNF, upOAE
 %% Running Script
 % Set stims in buffdata:
 buffdata = [stim.y1; stim.y2];
@@ -104,27 +109,27 @@ disp('Starting stimulation...');
 while doneWithTrials == 0
     k = k + 1;
     k_kept = k - stim.ThrowAway;
-    
+
     %Start playing from the buffer:
     vins = PlayCaptureNEL(card, buffdata, drop_f1, drop_f2, delayComp);
-    
+
     % save the response
     if k > stim.ThrowAway
         resp(k - stim.ThrowAway,  :) = vins;
     end
-    
+
     if k > stim.ThrowAway
         % Set empty matricies for next steps
         coeffs_resp = zeros(npoints, 2);
         coeffs_noise = zeros(npoints, 8);
-        
+
         for p = 1:npoints
             win = find( (t > (t_freq(p) - windowdur/2)) & ...
                 (t < (t_freq(p) + windowdur/2)));
             taper = hanning(numel(win))';
-            
+
             resp_trial = vins(win) .* taper; % just current trial
-            
+
             model_dp = [cos(phi_dp_inst(win)) .* taper;
                 -sin(phi_dp_inst(win)) .* taper];
             model_noise = ...
@@ -136,16 +141,16 @@ while doneWithTrials == 0
                 -sin(nearfreqs(3)*phi_dp_inst(win)) .* taper;
                 cos(nearfreqs(4)*phi_dp_inst(win)) .* taper;
                 -sin(nearfreqs(4)*phi_dp_inst(win)) .* taper];
-            
+
             coeffs_resp(p,:) = model_dp' \ resp_trial';
             coeffs_noise(p,:) = model_noise' \ resp_trial';
         end
-        
+
         % calculate amplitudes
         oae_trials(k_kept,:) = abs(complex(coeffs_resp(:, 1),  coeffs_resp(:, 2)));
         median_oae = median(oae_trials,1);
         dpoae_full = db(median_oae.*VtoSPL);
-        
+
         noise_trial = zeros(npoints,4);
         for i = 1:2:8
             noise_trial(:,ceil(i/2)) = complex(coeffs_noise(:,i), coeffs_noise(:,i+1));
@@ -153,35 +158,35 @@ while doneWithTrials == 0
         noise_trials(k_kept,:) = abs(mean(noise_trial, 2));
         median_noise = median(noise_trials,1);
         dpnf_full = db(median_noise.*VtoSPL);
-        
+
         dpoae = zeros(length(centerFreqs),1);
         dpnf = zeros(length(centerFreqs),1);
         dpoae_w = zeros(length(centerFreqs),1);
         dpnf_w = zeros(length(centerFreqs),1);
-        
+
         % weighted average around 9 center frequencies
         for z = 1:length(centerFreqs)
             band = find( testfreq >= bandEdges(z) & testfreq < bandEdges(z+1));
-            
+
             % TO DO: NF from which SNR was calculated included median of 7 points
             % nearest the target frequency.
             SNR = dpoae_full(band) - dpnf_full(band);
             weight = (10.^(SNR./10)).^2;
-            
+
             dpoae(z, 1) = mean(dpoae_full(band));
             dpnf(z,1) = mean(dpnf_full(band));
-            
+
             dpoae_w(z,1) = sum(weight.*dpoae_full(band))/sum(weight);
             dpnf_w(z,1) = sum(weight.*dpnf_full(band))/sum(weight);
-            
+
         end
-        
+
         % median SNR
         SNR_temp = dpoae_w - dpnf_w;
-        
+
         noisy_trials = 0;
         % artifact check
-        if k_kept >= stim.minTrials
+        if k_kept > 1
             std_oae = std(oae_trials,1);
             for r = 1:k_kept
                 for q = 1:npoints
@@ -192,7 +197,7 @@ while doneWithTrials == 0
                 end
             end
         end
-        
+
         % if SNR is good enough and we've hit the minimum number of
         % trials, then stop.
         if SNR_temp(1:8) >= SNRcriterion
@@ -202,17 +207,24 @@ while doneWithTrials == 0
         elseif k == maxTrials
             doneWithTrials = 1;
         end
-        
+
         pass = (SNR_temp>=SNRcriterion);
         oae_pass = dpoae_w;
         oae_fail = dpoae_w;
         oae_pass(~pass) = NaN;
         oae_fail(pass) = NaN;
-        
+
         % Plot amplitudes from live analysis
         hold off;
-        plot(centerFreqs./1000,oae_pass, 'o', 'linew', 2, 'color', [0 0.4470 0.7410]);
+
+        %plot norms
+        fill([f, f(end), f(end:-1:1), f(1)], [loOAE, upOAE(end), upOAE(end:-1:1), loOAE(1)], col, 'linestyle', 'none')
         hold on;
+        fill([f, f(end), f(end:-1:1), f(1)], [loNF, upNF(end), upNF(end:-1:1), loNF(1)], colNF, 'linestyle', 'none')
+        alpha(.5);
+
+        %plot data
+        plot(centerFreqs./1000,oae_pass, 'o', 'linew', 2, 'color', [0 0.4470 0.7410]);
         plot(centerFreqs/1000,oae_fail, 'o', 'linew', 2, 'color', 'k'),
         plot(centerFreqs./1000,dpnf_w, 'x', 'linew', 2, 'color', [0.6350 0.0780 0.1840]);
         hold off;
@@ -227,9 +239,9 @@ while doneWithTrials == 0
         yticks((-45:15:45))
         grid on;
         drawnow;
-        
+
         fprintf(1, 'Trials run: %d / Noisy Trials: %d \n', k_kept, noisy_trials);
-        
+
         % Check for button push
         % either ABORT or RESTART needs to break loop immediately,
         % saveNquit will complete current sweep
@@ -237,7 +249,7 @@ while doneWithTrials == 0
         if ~isempty(ud_status)
             break;
         end
-        
+
     end % if k > throwaways
 end %done w/ trials
 
@@ -295,9 +307,9 @@ warning('off');  % ??
 switch NelData.AdvOAE.rc
     case 'stop'   % 6/2023MH: MAY ADDD LATER (to stop, reset chin, then restart from where stopped) for NOW - only saveNquit, ohtherwise, abort or restart is already out by here
         % if want to RE-ADD stop, see DPOAE
-        
+
     case 'saveNquit'
-        
+
         %% Option to save comment in data file
         comment='';
         TEMPans = inputdlg('Enter Comment (optional)');
@@ -305,14 +317,14 @@ switch NelData.AdvOAE.rc
             comment=TEMPans{1};
         end
         stim.comment = comment;
-        
+
         %% NEL based data saving script
         make_sweptdpoae_text_file;
-        
+
         %% remind user to turn of microphone
         h = msgbox('Please remember to turn off the microphone');
         uiwait(h);
-        
+
 end
 
 

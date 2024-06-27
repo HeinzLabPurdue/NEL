@@ -43,6 +43,9 @@ end
 %% Initializing SFOAE variables for running and live analysis
 sweptSFOAE_ins;
 stim.ear = ear;
+load('sf_norms', 'upOAE', 'loOAE', 'upNF', 'loNF', 'f');
+col = [237, 246, 252]./255;
+colNF = [252, 237, 240]./255;
 
 % SH?: Change figure name, give handle?
 snr_fig = figure;
@@ -250,8 +253,15 @@ while doneWithTrials == 0
         
         % Plot amplitudes from live analysis
         hold off;
-        plot(centerFreqs./1000,oae_pass, 'o', 'linew', 2, 'color', [0 0.4470 0.7410]);
+
+        %plot norms
+        fill([f, f(end), f(end:-1:1), f(1)], [loOAE, upOAE(end), upOAE(end:-1:1), loOAE(1)], col, 'linestyle', 'none')
         hold on;
+        fill([f, f(end), f(end:-1:1), f(1)], [loNF, upNF(end), upNF(end:-1:1), loNF(1)], colNF, 'linestyle', 'none')
+        alpha(.5);
+
+        %plot results
+        plot(centerFreqs./1000,oae_pass, 'o', 'linew', 2, 'color', [0 0.4470 0.7410]);
         plot(centerFreqs/1000,oae_fail, 'o', 'linew', 2, 'color', 'k'),
         plot(centerFreqs./1000,nf_w, 'x', 'linew', 2, 'color', [0.6350 0.0780 0.1840]);
         hold off;
