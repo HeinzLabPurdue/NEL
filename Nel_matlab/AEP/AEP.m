@@ -21,10 +21,15 @@ if nargin < 1
     %AEP_ins; %sending here to choose AEP measure 
     
     % Ask the question of ABR/CAP/FFR
+    usr = NelData.General.User;
+     allCalibFiles= dir('*calib_raw*');
+    if isempty(allCalibFiles)
+        uiwait(warndlg('No Calibration File exist in this directory!','modal'));
+    else
     interface_type=questdlg('Select AEP Measure:','AEP','CAP','ABR','FFR','ABR'); %SP 30Jun2016
 
     % Set up for specific AEP
-    usr = NelData.General.User;
+    
     % Add folder where that measure lives: 
     addpath([NelData.General.RootDir 'Nel_matlab' filesep 'AEP' filesep interface_type]);
 
@@ -57,7 +62,7 @@ if nargin < 1
 
             end
     end
-    
+end
     %% Clean up and exit gracefully: 
     if ishandle(h_fig)
         delete(h_fig); 

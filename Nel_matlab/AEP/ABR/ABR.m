@@ -353,6 +353,7 @@ elseif strcmp(command_str,'calibInit')
         Stimuli.calibPicNum= getPicNum(allCalibFiles(end).name);
         Stimuli.calibPicNum= str2double(inputdlg('Enter RAW Calibration File Number (default = last raw calib)','Load Calib File', 1,{num2str(Stimuli.calibPicNum)}));
         rdd;
+    
     end
     
 %     [~, Stimuli.calibPicNum]= run_invCalib(get(FIG.radio.invCalib,'value'));
