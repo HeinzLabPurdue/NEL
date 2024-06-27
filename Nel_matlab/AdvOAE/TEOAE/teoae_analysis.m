@@ -40,22 +40,33 @@ figure;
 hold on;
 
 % plot norms
-load('sf_norms', 'upOAE', 'loOAE', 'upNF', 'loNF', 'f');
+load('teoae_norms', 'upOAE', 'loOAE', 'upNF', 'loNF', 'f');
 col = [237, 246, 252]./255;
 colNF = [252, 237, 240]./255;
+f = f/1e3; 
+f(1) = f(2); 
 fill([f, f(end), f(end:-1:1), f(1)], [loOAE, upOAE(end), upOAE(end:-1:1), loOAE(1)], col, 'linestyle', 'none')
 hold on;
 fill([f, f(end), f(end:-1:1), f(1)], [loNF, upNF(end), upNF(end:-1:1), loNF(1)], colNF, 'linestyle', 'none')
-alpha(.5);
+alpha(.8);
+
+teoae_resp = db(abs(res.Resp)); 
+nf_resp = db(abs(res.NoiseFloor)); 
 
 % results
-plot(res.freq, db(abs(res.Resp)), 'linew', 2);
-plot(res.freq, db(abs(res.NoiseFloor)), 'linew', 2);
+plot(res.freq/1e3, teoae_resp, '-', 'linew', 2, 'color', [0 0.4470 0.7410]);
+plot(res.freq/1e3, nf_resp, '-', 'linew', 2, 'color', [0.6350 0.0780 0.1840]);
+hold off; 
 legend('OAE', 'NF');
 title('TEOAE');
-xlim([500, 20e3])
-xlabel('Frequency (Hz)');
+xlabel('Frequency (kHz)');
 ylabel('Amplitude(dB)');
-set(gca, 'XScale', 'log');
+set(gca, 'XScale', 'log', 'FontSize', 14)
+xlim([.5, 20])
+xticks([.5, 1, 2, 4, 8, 16]);
+ylim([-80, 30]);
+yticks((-45:15:45))
+grid on;
+
 drawnow;
 end

@@ -221,7 +221,7 @@ while doneWithTrials == 0
         fill([f, f(end), f(end:-1:1), f(1)], [loOAE, upOAE(end), upOAE(end:-1:1), loOAE(1)], col, 'linestyle', 'none')
         hold on;
         fill([f, f(end), f(end:-1:1), f(1)], [loNF, upNF(end), upNF(end:-1:1), loNF(1)], colNF, 'linestyle', 'none')
-        alpha(.5);
+        alpha(.8);
 
         %plot data
         plot(centerFreqs./1000,oae_pass, 'o', 'linew', 2, 'color', [0 0.4470 0.7410]);
