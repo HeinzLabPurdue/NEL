@@ -56,7 +56,7 @@ end
 
 
 NelData = saved.NelData;
-NelData.Metadata = struct('NEL','','Date','','NELVersion',ProgName,'User','', 'Otherusers','', 'ChinID','','Sex','','Exposure','','ExposureDate','','Branch','','Comments','','Sedation','', 'Dirname','');
+NelData.Metadata = struct('NEL','','Date','','NELVersion',ProgName,'User','', 'Otherusers','', 'ChinID','','Sex','','Exposure','','ExposureDate','','Branch','','Comments','','Sedation','', 'Dirname','','calib_type','');
 
 NelData.File_Manager.track.No = -1;
 NelData.File_Manager.unit.No = -1;

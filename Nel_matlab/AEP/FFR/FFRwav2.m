@@ -20,7 +20,7 @@ end
 %     RP3= RP2;
 % elseif NelData.General.RX8
 % %     RP3= connect_tdt('RX8', 1);
-%       
+%
 % end
 
 
@@ -29,7 +29,7 @@ if nargin < 1
     PROG = struct('name','FFR(v1.ge_mh.1).m');  % modified by GE 26Apr2004.
     %[FIG, h_fig]=get_FFR_FIG(); % Initialize FIG
     
- 
+    
     [FIG, h_fig]=get_FFRwav2_FIG();
     
     [misc, Stimuli, RunLevels_params, Display, interface_type]=FFRwav2_ins(NelData);
@@ -41,10 +41,10 @@ if nargin < 1
     %     end
     
     FFRwav2('calibInit'); % Initialize RP2_4 with InvFilter
-% check how to do with 2 stim
+    % check how to do with 2 stim
     FFRwav2('right'); %default to right ear first
     FFRwav2('right2'); %default to right ear first
-% check how to do with 2 stim
+    % check how to do with 2 stim
     FFRwav2('update_stim', 'spl');
     FFRwav2('update_stim', 'spl2');
     FFRwav2_loop; % Working
@@ -66,8 +66,8 @@ elseif strcmp(command_str,'update_stim')
             set(FIG.asldr.val,'string',num2str(-Stimuli.atten_dB));
             %             set_RP_tagvals(RP1, RP2, FFR_SNRenv_Gating, Stimuli);
             
-            Stimuli.calib_levelSPL = Stimuli.calib_dBSPLout-Stimuli.atten_dB;           
-
+            Stimuli.calib_levelSPL = Stimuli.calib_dBSPLout-Stimuli.atten_dB;
+            
         case 'spl2'
             FIG.NewStim = 2;
             if get(FIG.bg2.spl.dB65, 'value')
@@ -81,11 +81,11 @@ elseif strcmp(command_str,'update_stim')
             %             set_RP_tagvals(RP1, RP2, FFR_SNRenv_Gating, Stimuli);
             
             Stimuli.calib_levelSPL2 = Stimuli.calib_dBSPLout2-Stimuli.atten2_dB;
-
+            
         case 'list'
             FIG.NewStim = 2;
             fName.FFRwav_stimlist=dir([Stimuli.OLDDir '*.wav']);
-                      
+            
             if ~get(FIG.bg.stim.stimDir,'value')
                 Stimuli.list=fName.FFRwav_stimlist;
                 FIG.popup.stims = uicontrol(FIG.handle,'callback', 'FFRwav2(''update_stim'',0);','style', ...
@@ -102,7 +102,7 @@ elseif strcmp(command_str,'update_stim')
                 %                 'string',({fName.FFRwav_stimlist.name}),'fontsize',12);
                 update_gating_flag= true;
             end
-
+            
             if ~get(FIG.bg2.stim.stimDir,'value')
                 Stimuli.list2=fName.FFRwav_stimlist;
                 FIG.popup2.stims = uicontrol(FIG.handle,'callback', 'FFRwav2(''update_stim'',0);','style', ...
@@ -140,27 +140,27 @@ elseif strcmp(command_str,'update_stim')
                 %                 'string',({fName.FFRwav_stimlist.name}),'fontsize',12);
                 update_gating_flag= true;
             end
-
-%         case 'noise_type' % not functional -- remove??
-%             FIG.NewStim = 2;
-%             if get(FIG.bg.nt.nt_ssn,'value')
-%                 Stimuli.OLDDir= [NelData.General.RootDir 'Users\SP\SNRenv_stimuli\stimSetStationary\'];
-%                 Stimuli.NoiseType=0;
-%             elseif get(FIG.bg.nt.nt_f,'value')
-%                 Stimuli.OLDDir= [NelData.General.RootDir 'Users\SP\SNRenv_stimuli\stimSetFluctuating\'];
-%                 Stimuli.NoiseType=1;
-%             end
-%             
-%             %         case 0
-%             %             FIG.NewStim = 2;
-%             %             StimInd= get(FIG.popup.stims, 'value');
-%             %             Stimuli.filename=Stimuli.list(StimInd).name;
-%             %             set(FIG.popup.stims, 'value', StimInd);
+            
+            %         case 'noise_type' % not functional -- remove??
+            %             FIG.NewStim = 2;
+            %             if get(FIG.bg.nt.nt_ssn,'value')
+            %                 Stimuli.OLDDir= [NelData.General.RootDir 'Users\SP\SNRenv_stimuli\stimSetStationary\'];
+            %                 Stimuli.NoiseType=0;
+            %             elseif get(FIG.bg.nt.nt_f,'value')
+            %                 Stimuli.OLDDir= [NelData.General.RootDir 'Users\SP\SNRenv_stimuli\stimSetFluctuating\'];
+            %                 Stimuli.NoiseType=1;
+            %             end
+            %
+            %             %         case 0
+            %             %             FIG.NewStim = 2;
+            %             %             StimInd= get(FIG.popup.stims, 'value');
+            %             %             Stimuli.filename=Stimuli.list(StimInd).name;
+            %             %             set(FIG.popup.stims, 'value', StimInd);
             
         case 'newStim'
             FIG.NewStim = 2;
-%             fName.FFRwav_stimlist=dir([Stimuli.OLDDir '*.wav']);
-%             Stimuli.list=fName.FFRwav_stimlist;
+            %             fName.FFRwav_stimlist=dir([Stimuli.OLDDir '*.wav']);
+            %             Stimuli.list=fName.FFRwav_stimlist;
             StimInd= get(FIG.popup.stims, 'value');
             Stimuli.filename=Stimuli.list(StimInd).name;
             resetAttn = true;
@@ -197,7 +197,7 @@ elseif strcmp(command_str,'update_stim')
             end
             Stimuli.filename=Stimuli.list(StimInd).name;
             set(FIG.popup.stims, 'value', StimInd);
-
+            
         case 'nextStim2'
             FIG.NewStim = 2;
             StimInd= get(FIG.popup2.stims, 'value');
@@ -212,7 +212,7 @@ elseif strcmp(command_str,'update_stim')
     xpr=resample(xp,round(Stimuli.RPsamprate_Hz), fsp);
     audiowrite([Stimuli.UPDdir Stimuli.filename], xpr, round(Stimuli.RPsamprate_Hz));
     copyfile([Stimuli.UPDdir Stimuli.filename],Stimuli.STIMfile,'f');
-
+    
     [xp2,fsp2]=audioread([Stimuli.OLDDir Stimuli.filename2]);
     xpr2=resample(xp2,round(Stimuli.RPsamprate_Hz), fsp2);
     audiowrite([Stimuli.UPDdir Stimuli.filename2], xpr2, round(Stimuli.RPsamprate_Hz));
@@ -278,7 +278,7 @@ elseif strcmp(command_str,'left')
     else
         set(FIG.radio.left,'value',1);
     end
-
+    
     FFRwav2('update_stim', 'spl');
     FFRwav2('calibInit');
     
@@ -309,7 +309,7 @@ elseif strcmp(command_str,'both')
     
     FFRwav2('update_stim', 'spl');
     FFRwav2('calibInit');
-
+    
 elseif strcmp(command_str,'left2')
     if get(FIG.radio.left2, 'value') == 1
         FIG.NewStim = 0;
@@ -334,7 +334,7 @@ elseif strcmp(command_str,'left2')
     else
         set(FIG.radio.left2,'value',1);
     end
-
+    
     FFRwav2('update_stim', 'spl');
     FFRwav2('calibInit');
     
@@ -423,8 +423,8 @@ elseif strcmp(command_str,'no_audio2')
     end
     
     FFRwav2('update_stim', 'spl');
-    FFRwav2('calibInit');    
-
+    FFRwav2('calibInit');
+    
 elseif strcmp(command_str,'chan_1')
     if get(FIG.radio.chan_1, 'value') == 1
         FIG.NewStim = 18;
@@ -471,13 +471,13 @@ elseif strcmp(command_str,'slide_atten')
     Stimuli.atten_dB = floor(-get(FIG.asldr.slider,'value'));
     set(FIG.asldr.val,'string',num2str(-Stimuli.atten_dB));
     %     set_RP_tagvals(RP1, RP2, FFR_SNRenv_Gating, Stimuli);
-%     FFR_set_attns(Stimuli.atten_dB,-120,Stimuli.channel,Stimuli.KHosc,RP1,RP2);
+    %     FFR_set_attns(Stimuli.atten_dB,-120,Stimuli.channel,Stimuli.KHosc,RP1,RP2);
     
     Stimuli.calib_levelSPL = Stimuli.calib_dBSPLout-Stimuli.atten_dB;
-
+    
     set(FIG.asldr.SPL,'string',sprintf('%.1f dB SPL',Stimuli.calib_dBSPLout-abs(get(FIG.asldr.slider,'val'))));
     FFRwav2('attenCalib');
-
+    
 elseif strcmp(command_str,'slide_atten2')
     FIG.NewStim = 2;
     
@@ -490,7 +490,7 @@ elseif strcmp(command_str,'slide_atten2')
     %     FFR_set_attns(Stimuli.atten_dB,-120,Stimuli.channel,Stimuli.KHosc,RP1,RP2);
     
     Stimuli.calib_levelSPL2 = Stimuli.calib_dBSPLout2-Stimuli.atten2_dB;
-
+    
     set(FIG.asldr2.SPL,'string',sprintf('%.1f dB SPL',Stimuli.calib_dBSPLout2-abs(get(FIG.asldr2.slider,'val'))));
     FFRwav2('attenCalib');
     
@@ -514,13 +514,13 @@ elseif strcmp(command_str, 'slide_atten_text')
         set(FIG.asldr.slider, 'value', new_atten);
     end
     
-%     FFR_set_attns(Stimuli.atten_dB,-120,Stimuli.channel,Stimuli.KHosc,RP1,RP2);
+    %     FFR_set_attns(Stimuli.atten_dB,-120,Stimuli.channel,Stimuli.KHosc,RP1,RP2);
     %     set_RP_tagvals(RP1, RP2, FFR_SNRenv_Gating, Stimuli);
     Stimuli.calib_levelSPL = Stimuli.calib_dBSPLout-Stimuli.atten_dB;
     
     set(FIG.asldr.SPL,'string',sprintf('%.1f dB SPL',Stimuli.calib_dBSPLout-abs(get(FIG.asldr.slider,'val'))));
     FFRwav2('attenCalib');
- 
+    
 elseif strcmp(command_str, 'slide_atten_text2')
     FIG.NewStim = 2;
     
@@ -641,14 +641,14 @@ elseif strcmp(command_str,'YLim')
     set(FIG.edit.yscale,'string', num2str(Display.YLim_atAD));
     
     
-%UPDATES
+    %UPDATES
 elseif strcmp(command_str,'calibInit')
     
     
     
     if isnan(Stimuli.calibPicNum)
         calib_type=questdlg('Select which Calib','Calibration','FPL','SPL','SPL');
-        NelData.
+        NelData.Metadata.calib_type=calib_type;
         cdd;
         switch calib_type
             case 'SPL'
@@ -664,32 +664,32 @@ elseif strcmp(command_str,'calibInit')
     
     Stimuli.invCalib=get(FIG.radio.invCalib,'value');
     %INV FILTER WILL ALWAYS BE ON. DISABLING ABILITY TO TOGGLE FOR NOW.
-    if get(FIG.radio.invCalib,'value')    
+    if get(FIG.radio.invCalib,'value')
         if Stimuli.channel == 1 & Stimuli.channel2 == 1  % both ONLY right side
             TEMPchannel=1;
         elseif Stimuli.channel == 2 & Stimuli.channel2 == 2  % both ONLY left side
             TEMPchannel=2;
         else   % all other options mean inv calib needs torun on both
             TEMPchannel=3;
-        end 
+        end
         
         switch TEMPchannel
             case 1 %right side
-                if strcmp(calib_type,'SPL')
+                if strcmp(NelData.Metadata.calib_type,'SPL')
                     filttype = {'allstop','inversefilt'};
-                elseif strcmp(calib_type,'FPL')
+                elseif strcmp(NelData.Metadata.calib_type,'FPL')
                     filttype = {'allstop','inversefilt_FPL'};
                 end
             case 2 %left side
-                if strcmp(calib_type,'SPL')
-                    filttype = {'inversefilt','allstop'}; 
-                elseif strcmp(calib_type,'FPL')
+                if strcmp(NelData.Metadata.calib_type,'SPL')
+                    filttype = {'inversefilt','allstop'};
+                elseif strcmp(NelData.Metadata.calib_type,'FPL')
                     filttype = {'inversefilt_FPL','allstop'};
                 end
             case 3 %both sides
-                if strcmp(calib_type,'SPL')
+                if strcmp(NelData.Metadata.calib_type,'SPL')
                     filttype = {'inversefilt','inversefilt'};
-                elseif strcmp(calib_type,'FPL') 
+                elseif strcmp(NelData.Metadata.calib_type,'FPL')
                     filttype = {'inversefilt_FPL','inversefilt_FPL'};
                 end
                 
@@ -699,14 +699,30 @@ elseif strcmp(command_str,'calibInit')
         filttype = {'allpass','allpass'};
     end
     
+    
+    
     invfiltdata = set_invFilter(filttype,Stimuli.calibPicNum);
+    
+    
     cdd;
     cal = loadpic(invfiltdata.CalibPICnum2use);  % use INVERSE calib to compute MAX dB SPL
     rdd;
     
-    ears_calib = cal.ear_ord;
-    r_present = sum(strcmp(ears_calib,'Right '));
-    l_present = sum(strcmp(ears_calib,'Left '));
+    
+    if strcmp(NelData.Metadata.calib_type,'SPL')
+        ears_calib = cal.ear_ord;  %cal.FPL.xxxx   x.FPLearData.ear
+        r_present = sum(strcmp(ears_calib,'Right '));
+        l_present = sum(strcmp(ears_calib,'Left '));
+    elseif strcmp(NelData.Metadata.calib_type,'FPL')
+        ears_calib = cal.FPLearData.ear;  %cal.FPL.xxxx   x.FPLearData.ear
+        r_present = sum([strcmp(ears_calib,'R'),strcmp(ears_calib,'r'),strcmp(ears_calib,'right')]);
+        l_present = sum([strcmp(ears_calib,'L'),strcmp(ears_calib,'l'),strcmp(ears_calib,'left')]);
+    end
+    
+    
+    
+    
+    
     
     %probably better way to do this..
     
@@ -757,9 +773,9 @@ elseif strcmp(command_str,'calibInit')
         set(FIG.radio.both2,'Enable','off')
     end
     
-    set(FIG.radio.invCalib,'UserData',invfiltdata); 
+    set(FIG.radio.invCalib,'UserData',invfiltdata);
     FFRwav2('attenCalib');
-
+    
     
     
     
@@ -769,9 +785,9 @@ elseif strcmp(command_str,'calibInit')
     
     
     %% STILL NEED TO DO
- elseif strcmp(command_str,'attenCalib') %AS/MH/MP | Sprint 2023 Update
+elseif strcmp(command_str,'attenCalib') %AS/MH/MP | Sprint 2023 Update
     cdd;
-    invfiltdata = get(FIG.radio.invCalib,'UserData'); 
+    invfiltdata = get(FIG.radio.invCalib,'UserData');
     cal = loadpic(invfiltdata.CalibPICnum2use);  % use INVERSE calib to compute MAX dB SPL
     rdd;
     
@@ -780,14 +796,19 @@ elseif strcmp(command_str,'calibInit')
     curDir= pwd;
     cdd;
     cd(curDir);
-
+    
     
     %RIGHT NOW ONLY USING ONE CALIB CURVE TO CALIBRATE OTHER.....
     
     if ~strcmpi(Stimuli.ear,'both')
         
-        %find and choose the appropriate left or right calib
-        calib_to_use = contains(cal.ear_ord,string(Stimuli.ear),'IgnoreCase',true);
+        if strcmp(NelData.Metadata.calib_type,'SPL')
+            calib_to_use = contains(cal.ear_ord,string(Stimuli.ear),'IgnoreCase',true);
+        elseif strcmp(NelData.Metadata.calib_type,'FPL')
+            calib_to_use = contains(cal.FPLearData.ear,string(Stimuli.ear),'IgnoreCase',true);
+        end
+        
+        
         calib_to_use = find(calib_to_use);
         
         if calib_to_use == 2
@@ -802,14 +823,18 @@ elseif strcmp(command_str,'calibInit')
     end
     
     Stimuli.calib_dBSPLout= get_SPL_from_calib(sig, fs, CalibData, false);
-    set(FIG.asldr.SPL,'string',sprintf('%.1f dB SPL',Stimuli.calib_dBSPLout-abs(str2double(get(FIG.asldr.val, 'string'))))); 
-   
-%     set(FIG.asldr.SPL, 'string', sprintf('%.1f dB SPL', Stimuli.MaxdBSPLCalib-Stimuli.atten_dB));    
+    set(FIG.asldr.SPL,'string',sprintf('%.1f dB SPL',Stimuli.calib_dBSPLout-abs(str2double(get(FIG.asldr.val, 'string')))));
+    
+    %     set(FIG.asldr.SPL, 'string', sprintf('%.1f dB SPL', Stimuli.MaxdBSPLCalib-Stimuli.atten_dB));
     
     if ~strcmpi(Stimuli.ear2,'both')
         
-        %find and choose the appropriate left or right calib
-        calib_to_use = contains(cal.ear_ord,string(Stimuli.ear2),'IgnoreCase',true);
+        if strcmp(NelData.Metadata.calib_type,'SPL')
+            calib_to_use = contains(cal.ear_ord,string(Stimuli.ear2),'IgnoreCase',true);
+        elseif strcmp(NelData.Metadata.calib_type,'FPL')
+            calib_to_use = contains(cal.FPLearData.ear,string(Stimuli.ear2),'IgnoreCase',true);
+        end
+        
         calib_to_use = find(calib_to_use);
         
         if calib_to_use == 2
@@ -823,51 +848,53 @@ elseif strcmp(command_str,'calibInit')
         CalibData(:,2) = (cal.CalibData(:,2)+cal.CalibData2(:,2))/2;
     end
     
+    
+    %%%% AF how to change this for FPL ????
     Stimuli.calib_dBSPLout2= get_SPL_from_calib(sig2, fs2, CalibData, false);
-    set(FIG.asldr2.SPL,'string',sprintf('%.1f dB SPL',Stimuli.calib_dBSPLout2-abs(str2double(get(FIG.asldr2.val, 'string'))))); 
-
-
-% elseif strcmp(command_str,'invCalib')
-%     %% MH/AS Jun 15 2023:  this is really CALIB, not invCALIB
-%     %% FIX LATER
-%     
-%     if NelData.General.RP2_3and4 && (~NelData.General.RX8)
-%         [~, Stimuli.calibPicNum]= run_invCalib(get(FIG.radio.invCalib,'value')); %NEL 1
-%     elseif isnan(Stimuli.calibPicNum)  % NEL2
-%         cdd;
-%         allCalibFiles= dir('*calib*raw*');
-%         Stimuli.calibPicNum= getPicNum(allCalibFiles(end).name);
-%         Stimuli.calibPicNum= str2double(inputdlg('Enter RAW Calibration File Number','Load Calib File', 1,{num2str(Stimuli.calibPicNum)}));
-%         rdd;
-%         
-%         %% FUTURE: have this use CALIB file picked by user, not automated
-%         %% SEE HOW TO DO THIS not every time,
-%         [~, Stimuli.calibPicNum]= run_invCalib(get(FIG.radio.invCalib,'value'));
-%         Stimuli.invCalib=get(FIG.radio.invCalib,'value');
-%         if get(FIG.radio.invCalib,'value')
-%             Stimuli.calibPicNum=Stimuli.calibPicNum+1;  % FIX THIS LATER to not assume +1
-%         end
-%         
-%         %% FIX LATER - won't handle toggle invCALI on/off
-%         %% SET invCALIB always run, then no issue
-%         
-%         
-%     end
-%     [sig, fs] =audioread([Stimuli.UPDdir Stimuli.filename]);
-%     curDir= pwd;
-%     cdd;
-%     %xx= Stimuli.calibPicNum();
-%     xx= loadpic(Stimuli.calibPicNum);
-%     class(xx);
-%     cd(curDir);
-%     %calibdata = struct;
-%     calibdata= xx.CalibData();
-%     Stimuli.calib_dBSPLout= get_SPL_from_calib(sig, fs, calibdata, false);
-%     set(FIG.asldr.SPL,'string',sprintf('%.1f dB SPL',Stimuli.calib_dBSPLout-abs(str2double(get(FIG.asldr.val, 'string')))));
+    set(FIG.asldr2.SPL,'string',sprintf('%.1f dB SPL',Stimuli.calib_dBSPLout2-abs(str2double(get(FIG.asldr2.val, 'string')))));
+    
+    
+    % elseif strcmp(command_str,'invCalib')
+    %     %% MH/AS Jun 15 2023:  this is really CALIB, not invCALIB
+    %     %% FIX LATER
+    %
+    %     if NelData.General.RP2_3and4 && (~NelData.General.RX8)
+    %         [~, Stimuli.calibPicNum]= run_invCalib(get(FIG.radio.invCalib,'value')); %NEL 1
+    %     elseif isnan(Stimuli.calibPicNum)  % NEL2
+    %         cdd;
+    %         allCalibFiles= dir('*calib*raw*');
+    %         Stimuli.calibPicNum= getPicNum(allCalibFiles(end).name);
+    %         Stimuli.calibPicNum= str2double(inputdlg('Enter RAW Calibration File Number','Load Calib File', 1,{num2str(Stimuli.calibPicNum)}));
+    %         rdd;
+    %
+    %         %% FUTURE: have this use CALIB file picked by user, not automated
+    %         %% SEE HOW TO DO THIS not every time,
+    %         [~, Stimuli.calibPicNum]= run_invCalib(get(FIG.radio.invCalib,'value'));
+    %         Stimuli.invCalib=get(FIG.radio.invCalib,'value');
+    %         if get(FIG.radio.invCalib,'value')
+    %             Stimuli.calibPicNum=Stimuli.calibPicNum+1;  % FIX THIS LATER to not assume +1
+    %         end
+    %
+    %         %% FIX LATER - won't handle toggle invCALI on/off
+    %         %% SET invCALIB always run, then no issue
+    %
+    %
+    %     end
+    %     [sig, fs] =audioread([Stimuli.UPDdir Stimuli.filename]);
+    %     curDir= pwd;
+    %     cdd;
+    %     %xx= Stimuli.calibPicNum();
+    %     xx= loadpic(Stimuli.calibPicNum);
+    %     class(xx);
+    %     cd(curDir);
+    %     %calibdata = struct;
+    %     calibdata= xx.CalibData();
+    %     Stimuli.calib_dBSPLout= get_SPL_from_calib(sig, fs, calibdata, false);
+    %     set(FIG.asldr.SPL,'string',sprintf('%.1f dB SPL',Stimuli.calib_dBSPLout-abs(str2double(get(FIG.asldr.val, 'string')))));
     
 elseif strcmp(command_str,'close')
     %     if NelData.General.RP2_3and4 && (~NelData.General.RX8)
-%     run_invCalib(false); % Initialize with allpass RP2_3
+    %     run_invCalib(false); % Initialize with allpass RP2_3
     %     end
     
     filttype = {'allpass','allpass'};
