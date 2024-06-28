@@ -421,6 +421,31 @@ elseif strcmp(command_str,'no_audio2')
     else
         set(FIG.radio.no_audio2,'value',1);
     end
+    if get(FIG.radio.no_audio2, 'value') == 0
+%       FIG.NewStim = 0;
+%         
+%         Stimuli.channel2 = NaN;
+%         Stimuli.ear2=NaN;
+        
+        set(FIG.radio.left2,'value',0);
+        set(FIG.radio.right2,'value',0);
+        set(FIG.radio.both2,'value',0);
+        
+        %hide everything related to signal 2
+        set(FIG.asldr2.slider, 'Visible','on');
+        set(FIG.asldr2.min, 'Visible','on');
+        set(FIG.asldr2.max, 'Visible','on');
+        set(FIG.asldr2.val, 'Visible','on');
+        set(FIG.asldr2.SPL, 'Visible','on');
+        set(FIG.popup2.siglabel, 'Visible','on');
+        set(FIG.popup2.stims, 'Visible','on');
+        set(FIG.push2.prev_stim2, 'Visible','on');
+        set(FIG.push2.next_stim2, 'Visible','on');
+        set(FIG.bg2.spl.parent, 'Visible','on');
+        
+    else
+        set(FIG.radio.no_audio2,'value',0);
+    end
     
     FFRwav2('update_stim', 'spl');
     FFRwav2('calibInit');
