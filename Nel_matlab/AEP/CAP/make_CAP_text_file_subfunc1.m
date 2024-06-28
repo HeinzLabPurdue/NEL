@@ -11,6 +11,7 @@ end
 aux_fname = fullfile(pathstr,['a' name(2:end)]);
 % aux_fname = fullfile(pathstr,['p' name(2:end)]);
 x.General.program_name  = PROG.name;
+
 x.General.picture_number = NelData.File_Manager.picture+1;
 x.General.date          = date;
 x.General.time          = datestr(now,13);
@@ -28,3 +29,4 @@ x.Line.freq_Hz = Stimuli.freq_hz;
 
 x.AD_Data.Gain=Display.Gain;
 x.AD_Data.SampleRate= Stimuli.RPsamprate_Hz/RunLevels_params.decimateFact;
+x.MetaData=NelData.Metadata;

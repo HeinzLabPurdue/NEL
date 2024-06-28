@@ -38,6 +38,8 @@ fname= strrep(fname, 'complex_', '');
 aux_fname = fullfile(pathstr,['a' name(2:end)]);
 
 x.General.program_name  = PROG.name;
+
+
 x.General.picture_number = NelData.File_Manager.picture+1;
 x.General.date          = date;
 x.General.time          = datestr(now,13);
@@ -52,6 +54,7 @@ x.invfilterdata = invfiltdata;
 % x.Line.freq_Hz = Stimuli.fc; % zz 04nov11 original only had one frequency, updated to carrier frequency
 
 x.AD_Data.Gain=Display.Gain;
+x.MetaData=NelData.Metadata;
 
 % stimuli_fname = fullfile(pathstr,'Signals');
 

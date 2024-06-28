@@ -6,6 +6,7 @@ x.General.picture_number = NelData.File_Manager.picture+1;
 x.General.date           = date;
 x.General.time           = datestr(now,13);
 x.General.comment        = comment;
+x.MetaData=NelData.Metadata;
 
 %store the parameter block
 

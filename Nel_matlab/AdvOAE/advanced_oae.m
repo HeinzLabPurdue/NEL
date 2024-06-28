@@ -5,8 +5,8 @@ function h_fig = advanced_oae(command_str)
 %to get memr running, while maintaining GUI start/stop properties
 %if you need more inspiration, see the DPOAE folder (distortion_product.m
 %and dpoae.m)
-
-global PARAMS PROG VERSION VOLTS
+% AF FA 6/24/24 removed VERSION and add it to tdinit
+global PARAMS PROG  VOLTS
 global root_dir NelData 
 
 % ud = get(handles.Nel_Main,'Userdata');
@@ -21,12 +21,15 @@ if nargin<1
     
     DATE = date;
     VOLTS = 5;   % NEL TDT is based on 5V peak as max voltage
+   
     
-    if NelData.General.RP2_3and4
-        VERSION = 'NEL1';
-    elseif NelData.General.RX8
-        VERSION = 'NEL2';
-    end
+    %AF FA 6/24/24 moved this to tdtinit
+    
+%     if NelData.General.RP2_3and4
+%         VERSION = 'NEL1';
+%     elseif NelData.General.RX8
+%         VERSION = 'NEL2';
+%     end
     
     %this starts the initialize process similar to that in
     %distortion_product.m
