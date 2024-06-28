@@ -49,12 +49,14 @@ if nargin < 1
         case 'CAP'
             h_fig = CAP; 
         case 'FFR' 
-            FFR_interface_type=questdlg('Which FFR stimulus type?:','','AM/FM','Custom .WAV File','AM/FM');
+            FFR_interface_type=questdlg('Which FFR stimulus type?:','','AM/FM','Custom .WAV File','Custom 2 .WAV Files','AM/FM');
             switch FFR_interface_type
                 case 'AM/FM'
                     h_fig = FFR();
                 case 'Custom .WAV File'
                     h_fig = FFRwav();
+                case 'Custom 2 .WAV Files'
+                    h_fig = FFRwav2();
 
 %               case 'SFR-mask'
 %                   h_fig = SFR_pink_mask_SNRenv;
