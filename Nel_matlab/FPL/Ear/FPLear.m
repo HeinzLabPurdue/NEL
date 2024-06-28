@@ -279,10 +279,20 @@ calib.Yphase_lf_2 = mean(cycs(1./calib.Zec_2(ok)))*360;
 fprintf(1, 'Low-frequency admittance phase: %2.3f%c\n',...
     calib.Yphase_lf_2, char(176));
 
+if strcmp(NelData.Metadata.NEL, 'NEL1')
+    NEL1delay = 25;
+else 
+    NEL1delay = 0; 
+end
+
 if doInvCalib
-    expDelay = 214+128; 
+    expDelay = 214+128 + NEL1delay; 
+    %214 is knowledge from measuring the click in an inf tube
+    %128 is half the FIR filter order
+    %25 for NEL1 delay is measured from click in tube across both NELS
+    %All of this is true as of 6/28/24 - May need to check periodically. 
 else
-    expDelay = 214;
+    expDelay = 214 + NEL1delay;
 end 
 % Give warning about NEL latency that was calculated
     h = warndlg (sprintf('Expected Latency: %d samples \n Chan. 1 Latency: %d samples \n Chan. 2 Latency: %d samples', expDelay, measuredDelay_1, measuredDelay_2), 'Computed Latencies', 'modal');
