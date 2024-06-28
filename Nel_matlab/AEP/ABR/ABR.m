@@ -322,7 +322,15 @@ elseif strcmp(command_str,'audiogram') %KH 10Jan2012
 elseif strcmp(command_str,'clickYes') %KH 10Jan2012
     Stimuli.clickYes = get(FIG.radio.clickYes,'value');
     FIG.NewStim = 16;
-
+    if Stimuli.clickYes==1
+        set(FIG.fsldr.slider,'Enable','off');
+        set(FIG.fsldr.val,'Enable','off');
+        
+    elseif Stimuli.clickYes==0
+        set(FIG.fsldr.slider,'Enable','on');
+        set(FIG.fsldr.val,'Enable','on');
+    end
+    
     
     ABR('attenCalib');
     %     Comment on Nov/5/19: added "invCalib" radio button.
