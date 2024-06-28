@@ -18,6 +18,7 @@ x.CalibData = CalibData;
 x.CalibData2 = CalibData2;
 
 x.chan_ord = [{'Left'}, {'Right'}]; % check value of ddata_struct_ear;
+x.MetaData=NelData.Metadata;
 
 %% saving specific FPL specific data
 x.FPLearData = calib;
