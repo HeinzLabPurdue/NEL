@@ -644,9 +644,19 @@ elseif strcmp(command_str,'YLim')
 %UPDATES
 elseif strcmp(command_str,'calibInit')
     
+    
+    
     if isnan(Stimuli.calibPicNum)
+        calib_type=questdlg('Select which Calib','Calibration','FPL','SPL','SPL');
+        NelData.
         cdd;
-        allCalibFiles= dir('*calib*raw*');
+        switch calib_type
+            case 'SPL'
+                allCalibFiles= dir('*calib_raw*');
+            case 'FPL'
+                allCalibFiles= dir('*calib_FPL_raw*');
+        end
+        
         Stimuli.calibPicNum= getPicNum(allCalibFiles(end).name);
         Stimuli.calibPicNum= str2double(inputdlg('Enter RAW Calibration File Number (default = last raw calib)','Load Calib File', 1,{num2str(Stimuli.calibPicNum)}));
         rdd;
@@ -665,11 +675,24 @@ elseif strcmp(command_str,'calibInit')
         
         switch TEMPchannel
             case 1 %right side
-                filttype = {'allstop','inversefilt'};
+                if strcmp(calib_type,'SPL')
+                    filttype = {'allstop','inversefilt'};
+                elseif strcmp(calib_type,'FPL')
+                    filttype = {'allstop','inversefilt_FPL'};
+                end
             case 2 %left side
-                filttype = {'inversefilt','allstop'};       
+                if strcmp(calib_type,'SPL')
+                    filttype = {'inversefilt','allstop'}; 
+                elseif strcmp(calib_type,'FPL')
+                    filttype = {'inversefilt_FPL','allstop'};
+                end
             case 3 %both sides
-                filttype = {'inversefilt','inversefilt'};
+                if strcmp(calib_type,'SPL')
+                    filttype = {'inversefilt','inversefilt'};
+                elseif strcmp(calib_type,'FPL') 
+                    filttype = {'inversefilt_FPL','inversefilt_FPL'};
+                end
+                
         end
         
     else
