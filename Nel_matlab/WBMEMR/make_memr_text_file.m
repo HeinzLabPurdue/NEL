@@ -1,4 +1,4 @@
-global NelData 
+global NelData VERSION
 
 fname = current_data_file('memr',1);
 
@@ -14,6 +14,7 @@ x.General.spike_res     = 1e-5;
 x.General.spike_unit    = 'sec';
 x.General.timing_unit   = 'ms';
 x.General.comment       = stim.comment;
+x.MetaData=NelData.Metadata;
 
 x.Stimuli = [];  % general NEL structures - NOT used here, but keep for generality 
 x.Line    = [];

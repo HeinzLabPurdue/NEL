@@ -41,13 +41,23 @@ if (exist([save_fname '.mat'],'file'))
     saved = load([profiles_dir 'Nel_Workspace.mat']);
 else
     %TODO: empty the block_templates definition
+%         saved.NelData = struct('Metadata',struct('NEL','','Date','','NELVersion',ProgName,'User','', 'Otherusers','', 'ChinID','','Sex','','Exposure','' ),'General', struct('User','', 'nChannels',1, 'save_fname', save_fname), ...
+%         'File_Manager', [], ... % will be filled later.
+%         'Block_templates', Nel_Templates ...
+%         );  
+    
     saved.NelData = struct('General', struct('User','', 'nChannels',1, 'save_fname', save_fname), ...
         'File_Manager', [], ... % will be filled later.
         'Block_templates', Nel_Templates ...
         );
+
     saved.NelData.run_mode = 0;
 end
+
+
 NelData = saved.NelData;
+NelData.Metadata = struct('NEL','','Date','','NELVersion',ProgName,'User','', 'Otherusers','', 'ChinID','','Sex','','Exposure','','ExposureDate','','Branch','','Comments','','Sedation','', 'Dirname','');
+
 NelData.File_Manager.track.No = -1;
 NelData.File_Manager.unit.No = -1;
 NelData.File_Manager.unit.SR = -1; %SP on 8May19

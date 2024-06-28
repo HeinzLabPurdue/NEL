@@ -1,5 +1,5 @@
 global NelData 
-
+global VERSION
 fname = current_data_file('sweptDPOAE',1);
 
 %% General NEL data saving
@@ -20,6 +20,9 @@ x.Line    = [];
 x.User = [];
 x.Hardware.NELmaxvolts_V   = VOLTS;   % max volts in NEL circuit design
 x.invfilterdata = invfiltdata;
+x.MetaData=NelData.Metadata;
+
+
 %% saving specific MEMR data
 x.sweptDPOAEData.stim = stim;
 
