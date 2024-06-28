@@ -38,7 +38,8 @@ end
 vin = invoke(RP, 'ReadTagVex', 'dataout', 0, resplength,...
     'F32','F64',1);
 
-vin = vin((ADdelay + 1):end);
+ADdelay = max([ADdelay-1, 1]); 
+vin = vin((ADdelay):end); % was + 1 until 6/28/24 SH
 
 % Get ready for next trial
 invoke(RP, 'SoftTrg', 8); % Stop and clear "OAE" buffer

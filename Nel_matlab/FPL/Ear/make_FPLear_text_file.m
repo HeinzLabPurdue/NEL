@@ -20,6 +20,9 @@ x.CalibData2 = CalibData2;
 x.chan_ord = [{'Left'}, {'Right'}]; % check value of ddata_struct_ear;
 x.MetaData=NelData.Metadata;
 
+x.NELdelay.delay_samps = [measuredDelay_1, measuredDelay_2]; 
+x.NELdelay.delay_ms = [measuredDelay_1, measuredDelay_2]./calib.SamplingRate; 
+
 %% saving specific FPL specific data
 x.FPLearData = calib;
 
