@@ -130,7 +130,8 @@ elseif strcmp(command_str,'calibrate')
     ears=[];
     
     cdd;
-    calibs = findPics('*raw');
+    calibs = findPics('*calib_raw');
+    
     lastfile = max(calibs);
     if ~isempty(lastfile)
         p = loadpic(lastfile);
