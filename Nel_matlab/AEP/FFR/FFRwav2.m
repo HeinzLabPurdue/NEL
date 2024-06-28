@@ -705,7 +705,7 @@ elseif strcmp(command_str,'calibInit')
     
     
     cdd;
-    cal = loadpic(invfiltdata.CalibPICnum2use);  % use INVERSE calib to compute MAX dB SPL
+    cal = loadpic_FFRWav2(invfiltdata.CalibPICnum2use);  % use INVERSE calib to compute MAX dB SPL
     rdd;
     
     
@@ -788,7 +788,7 @@ elseif strcmp(command_str,'calibInit')
 elseif strcmp(command_str,'attenCalib') %AS/MH/MP | Sprint 2023 Update
     cdd;
     invfiltdata = get(FIG.radio.invCalib,'UserData');
-    cal = loadpic(invfiltdata.CalibPICnum2use);  % use INVERSE calib to compute MAX dB SPL
+    cal = loadpic_FFRWav2(invfiltdata.CalibPICnum2use);  % use INVERSE calib to compute MAX dB SPL
     rdd;
     
     [sig, fs] =audioread([Stimuli.UPDdir Stimuli.filename]);
