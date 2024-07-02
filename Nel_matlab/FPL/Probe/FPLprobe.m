@@ -7,19 +7,10 @@ host=lower(getenv('hostname'));
 host = host(~isspace(host));
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%Insert NEL/GUI Parameters here...none for WBMEMR
-
 %% Initialize TDT
 card = initialize_card;
 
 %% Inverse Calibration
-%NEEDS TO BE CLEANED UP ASAP.
-% 1. run_invCalib needs cleaned up...currently clunky
-% 2. Need calibration to be correct for MEMR (currently all pass, w/o calib)
-% [~, calibPicNum, ~] = run_invCalib(false);   % skipping INV calib for now since based on 94 dB SPL benig highest value, bot the 105 dB SPL from inv Calib.
-% [coefFileNum, ~, ~] = run_invCalib(-2);
-% 
-
 PROTOCOL = 'FPLprobe'; 
 filttype = {'allpass','allpass'};
 RawCalibPicNum = NaN;
@@ -31,8 +22,7 @@ coefFileNum = invfilterdata.coefFileNum;
 if ~isfield(NelData,'FPL') % First time through, need to ask all this.
     
     uiwait(warndlg('Set ER-10B+ GAIN to 40 dB','SET ER-10B+ GAIN WARNING','modal'));
-    gain = 40;
-    
+       
     % Save in case if restart
     NelData.FPL.Fig2close=[];  % set up the place to keep track of figures generted here (to be closed in NEL_App Checkout)
     NelData.FPL.FPL_figNum=477;  % +200 from wbMEMR
@@ -41,20 +31,11 @@ else
     fprintf('RESTARTING...\n')
 end
 
-% %% Start (w/ Delay if needed)
-% button = input('Do you want a 10 second delay? (Y or N):', 's');
-% switch button
-%     case {'Y', 'y', 'yes', 'Yes', 'YES'}
-%         DELAY_sec=10;
-%         fprintf(1, '\n%.f seconds until START...\n',DELAY_sec);
-%         pause(DELAY_sec)
-%         fprintf(1, '\nWe waited %.f seconds ...\nStarting Stimulation...\n',DELAY_sec);
-%     otherwise
-%         fprintf(1, '\nStarting Stimulation...\n');
-% end
+gain = 40;
 
-%% Initializing SFOAE variables for running and live analysis
-FPLprobe_ins;
+%% Initializing variables for running and live analysis
+FPLprobe_ins; 
+ADdelay = 216; 
 disp('Starting stimulation...');
 
 %% Running Script
@@ -80,7 +61,7 @@ for m = 1: calib.CavNumb
     drop(driver) = calib.Attenuation;
     
     for n = 1:(calib.Averages + calib.ThrowAway)
-        vin = PlayCaptureNEL(card, buffdata, drop(1), drop(2), 216);
+        vin = PlayCaptureNEL(card, buffdata, drop(1), drop(2), ADdelay);
         
         % Save data
         if (n > calib.ThrowAway)
@@ -130,7 +111,7 @@ for m = 1: calib.CavNumb
     drop(driver) = calib.Attenuation;
     
     for n = 1:(calib.Averages + calib.ThrowAway)
-        vin = PlayCaptureNEL(card, buffdata, drop(1), drop(2), 216);
+        vin = PlayCaptureNEL(card, buffdata, drop(1), drop(2), ADdelay);
         
         % Save data
         if (n > calib.ThrowAway)

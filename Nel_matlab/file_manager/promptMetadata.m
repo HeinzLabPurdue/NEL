@@ -1,5 +1,8 @@
 function promptMetadata()
-    global NelData  SKIPintro
+% Add functionality to handle a debug/test mode and a FPLprobe mode
+% May be times when you dont have a chin/exposure/sedation
+
+global NelData  SKIPintro
      user = {''}; title = 'NEL Login'; 
      Empty= 1;
      fieldsize = [1 45; 1 45; 1 45; 1 45; 1 45; 1 45; 1 45];
@@ -31,7 +34,7 @@ function promptMetadata()
     
 
     expInfo_prompt2 = {'Category of Sedation'};
-    sedation_opts = {'Light','Ket+Xyl','Awake'};
+    sedation_opts = {'Light','Ket+Xyl','Awake'}; 
     expInfo2 = listdlg('PromptString',expInfo_prompt2,'SelectionMode','single','ListString',sedation_opts,'ListSize',[160,100]);
     NelData.Metadata.Sedation = sedation_opts{expInfo2};  
         end
