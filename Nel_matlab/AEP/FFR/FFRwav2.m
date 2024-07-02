@@ -717,6 +717,8 @@ elseif strcmp(command_str,'calibInit')
         ears_calib = cal.FPLearData.ear;  %cal.FPL.xxxx   x.FPLearData.ear
         r_present = sum([strcmp(ears_calib,'R'),strcmp(ears_calib,'r'),strcmp(ears_calib,'right')]);
         l_present = sum([strcmp(ears_calib,'L'),strcmp(ears_calib,'l'),strcmp(ears_calib,'left')]);
+        r_present=1;
+        l_present=1;
     end
     
     
