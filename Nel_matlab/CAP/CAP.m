@@ -336,8 +336,10 @@ elseif strcmp(command_str,'clickYes') %KH 10Jan2012
     if NelData.General.RP2_3and4 && (~NelData.General.RX8)
         if Stimuli.clickYes
             run_invCalib(true); % Initialize with allpass RP2_3
+              set(FIG.push.run_audiogram,'Enable','off');
         else
             run_invCalib(false); % Initialize with allpass RP2_3
+               set(FIG.push.run_audiogram,'Enable','on');
         end
     end
     
