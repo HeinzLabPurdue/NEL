@@ -35,7 +35,12 @@ gain = 40;
 
 %% Initializing variables for running and live analysis
 FPLprobe_ins; 
-ADdelay = 216; 
+ADdelay = 216;
+
+if strcmp(NelData.Metadata.NEL, 'NEL1')
+    ADdelay = ADdelay + 25; 
+end
+
 disp('Starting stimulation...');
 
 %% Running Script
