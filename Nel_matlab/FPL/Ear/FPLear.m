@@ -13,7 +13,7 @@ card = initialize_card;
 
 % Eliminating this here because will be live calculated: 
 % ADdelay = 216; 
-ADdelay = 0; 
+ADdelay = 2; % 2 is the minimum delay for this to work. means a delay of zero.  
 %% New Ear Calib or Inverse Calib
 
 if (NelData.General.RP2_3and4 || NelData.General.RX8)
