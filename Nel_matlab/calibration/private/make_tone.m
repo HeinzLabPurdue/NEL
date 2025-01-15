@@ -7,6 +7,9 @@ error = 0;
 %%
 if (NelData.General.RP2_3and4 || NelData.General.RX8)
     cdd;
+    allCalibsRAW= dir('p*calib*raw*');
+    all_calibRAW_picNums= cell2mat(cellfun(@(x) getPicNum(x), {allCalibsRAW.name}', 'UniformOutput', false));
+    
     all_Calib_files= dir('p*calib*');
     if isempty(all_Calib_files)
         newCalib= true;
@@ -19,8 +22,19 @@ if (NelData.General.RP2_3and4 || NelData.General.RX8)
         end
     end
     rdd;
-    doInvCalib= ~newCalib; % if not new (means old => coef-file exists), then run inverse calibration
-    coefFileNum= run_invCalib(doInvCalib);
+    CalibPicNum=all_calibRAW_picNums(end);
+    if ~newCalib; % if not new (means old => coef-file exists), then run inverse calibration
+        
+        filttype = {'inversefilt','inversefilt'};
+        invfiltdata = set_invFilter(filttype, CalibPicNum);  % need raw calib #
+    else
+        filttype = {'allpass','allpass'};
+        invfiltdata = set_invFilter(filttype,NaN,1);  % need raw calib #
+    end
+    
+    %% OLD
+    %     doInvCalib= ~newCalib; % if not new (means old => coef-file exists), then run inverse calibration
+    %     coefFileNum= run_invCalib(doInvCalib);
 else
     newCalib= true;
 end

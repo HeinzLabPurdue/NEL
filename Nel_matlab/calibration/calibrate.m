@@ -295,7 +295,10 @@ elseif strcmp(command_str,'recall')
     
 elseif strcmp(command_str,'close')
     if NelData.General.RP2_3and4 || NelData.General.RX8
-        coefFileNum= run_invCalib(false);
+        filttype = {'allstop','allstop'};
+        invfiltdata = set_invFilter(filttype,1);
+        %% OLD WAY
+        %         coefFileNum= run_invCalib(false);
     end
     delete(FIG.handle);
 end

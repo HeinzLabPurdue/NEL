@@ -334,18 +334,51 @@ elseif strcmp(command_str,'clickYes') %KH 10Jan2012
     Stimuli.clickYes = get(FIG.radio.clickYes,'value');
     FIG.NewStim = 16;
     if NelData.General.RP2_3and4 && (~NelData.General.RX8)
-        if Stimuli.clickYes
-            run_invCalib(true); % Initialize with allpass RP2_3
-              set(FIG.push.run_audiogram,'Enable','off');
+
+        % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        % SHOULD THIS go outside to always run when CAP starts?  right now
+        % it works bc/ click is default, but if that changed we might miss
+        % this?? 
+        cdd;
+        allCalibs= dir('p*calib*raw*');
+        all_calib_picNums= cell2mat(cellfun(@(x) getPicNum(x), {allCalibs.name}', 'UniformOutput', false));
+        CalibPicNum = inputdlg('Enter RAW Calibration Pic number:                [Cancel]=Use average calibration','Calibration Pic',1,{num2str(max(all_calib_picNums))});
+        if ~isempty(CalibPicNum)
+            CalibPicNum = str2double(CalibPicNum{1});
         else
-            run_invCalib(false); % Initialize with allpass RP2_3
-               set(FIG.push.run_audiogram,'Enable','on');
+            CalibPicNum = 1;
         end
+        
+        %AS/MP | inverse filtering,
+        % send the raw calib pic num to set_invFilter
+        % pull the inv calibration coefficients from
+        
+        filttype = {'inversefilt','inversefilt'};
+        invfiltdata = set_invFilter(filttype, CalibPicNum);
+        %           raw_pic_file = CalibPicNum;
+        
+        %Now loading INVERSE calib.
+        Stimuli.calibPicNum = invfiltdata.CalibPICnum2use;
+        rdd;
+
+       %% OLD WAY 
+%         if Stimuli.clickYes
+%             run_invCalib(true); % Initialize with allpass RP2_3
+%               set(FIG.push.run_audiogram,'Enable','off');
+%         else
+%             run_invCalib(false); % Initialize with allpass RP2_3
+%                set(FIG.push.run_audiogram,'Enable','on');
+%         end
+        
+        
     end
     
 elseif strcmp(command_str,'close')
     if NelData.General.RP2_3and4 && (~NelData.General.RX8)
-        run_invCalib(false); % Initialize with allpass RP2_3
+        filttype = {'allstop','allstop'};
+        invfiltdata = set_invFilter(filttype,1);
+        %% OLD WAY
+        %         run_invCalib(false); % Initialize with allpass RP2_3
     end
     set(FIG.push.close,'Userdata',1);
 end

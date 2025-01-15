@@ -38,6 +38,10 @@ x.Line    = [];
 
 DDATA = DDATA(1:find(DDATA(:,1)<=0, 1)-1,:);
 x.CalibData = DDATA;
+%%AF MH - added this 1/14/2025 to get into 2-channel format so
+%%set_invfilter.m works.  AN is monaural and RE (ch2) only
+x.CalibData2 = DDATA;   % 
+x.ear_ord = {'Left '  'Right '};
 x.User = [];
 
 x.Hardware.mic        = Stimuli.nmic;
