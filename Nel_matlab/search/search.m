@@ -148,7 +148,7 @@ elseif strcmp(command_str,'spike_channel')
     
 elseif strcmp(command_str,'invCalib')
     if NelData.General.RP2_3and4 || NelData.General.RX8
-%  OLD:       [~, Stimuli.calibPicNum]= run_invCalib(get(FIG.radio.invCalib,'value'));
+%old  [~, Stimuli.calibPicNum]= run_invCalib(get(FIG.radio.invCalib,'value'));
         
         
         % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
