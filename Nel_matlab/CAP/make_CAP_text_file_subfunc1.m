@@ -20,6 +20,7 @@ x.General.host = lower(getenv('hostname'));
 x.General.rejections    = rejections; % KH 2011 Jun 08
 
 x.General.runAudiogram = runAudiogram; %KH 10Jan2012
+x.General.CalibPicNum2USE = NelData.File_Manager.CalibPICnum2use;
 
 x.Stimuli=Stimuli;
 x.Stimuli.RunLevels_params = RunLevels_params;

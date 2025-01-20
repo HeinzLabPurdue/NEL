@@ -32,6 +32,7 @@ x.General.timing_unit    = 'ms';
 x.General.comment        = comment;
 x.General.trigger        = trigger;
 x.General.run_errors     = error_strs;
+x.General.CalibPicNum2USE = NelData.File_Manager.CalibPICnum2use;
 
 %Remove notch noise sweep stimulus files from data to be saved when running notchnoise_frequency_sweep
 if (isfield(block_info,'stim_matrix'));         %added by LR 14Nov2003

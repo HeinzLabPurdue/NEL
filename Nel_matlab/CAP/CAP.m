@@ -359,6 +359,7 @@ elseif strcmp(command_str,'clickYes') %KH 10Jan2012
         
         %Now loading INVERSE calib.
         Stimuli.calibPicNum = invfiltdata.CalibPICnum2use;
+        NelData.File_Manager.CalibPICnum2use =invfiltdata.CalibPICnum2use;
         rdd;
 
        %% OLD WAY 

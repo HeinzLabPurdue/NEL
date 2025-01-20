@@ -12,6 +12,7 @@ x.General.spike_res     = 1e-5;
 x.General.spike_unit    = 'sec';
 x.General.timing_unit   = 'ms';
 x.General.comment       = comment;
+x.General.CalibPicNum2USE = NelData.File_Manager.CalibPICnum2use;
 
 %store the parameter block
 x.Stimuli.file_frqlo     = PARAMS(1);
