@@ -74,9 +74,9 @@ if ~firstCalibFlag
                     errorFlag = true;
                 end
                 
-                %check for missing inv file
-                pic_str = sprintf('p*inv%d*',coefFileNum);
-                fname = dir(pic_str);
+%                 %check for missing inv file
+%                 pic_str = sprintf('p*inv%d*',coefFileNum);
+%                 fname = dir(pic_str);
                 
                 if isempty(fname)
                     warndlg('Invalid Inverse Calib File Number in set_invFilter. Running allstop.','WARNING!!!','modal');

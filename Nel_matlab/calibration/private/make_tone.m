@@ -22,9 +22,9 @@ if (NelData.General.RP2_3and4 || NelData.General.RX8)
         end
     end
     rdd;
-    CalibPicNum=all_calibRAW_picNums(end);
+   
     if ~newCalib; % if not new (means old => coef-file exists), then run inverse calibration
-        
+         CalibPicNum=all_calibRAW_picNums(end);
         filttype = {'inversefilt','inversefilt'};
         invfiltdata = set_invFilter(filttype, CalibPicNum);  % need raw calib #
     else
