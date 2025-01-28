@@ -103,7 +103,53 @@ end
 % SP/MH: Oct2 2019 turn on FIR inverse Calib filtering
 % disp('HERE START'); 
 % ding
-[~,block_info.invCALIBpic]=run_invCalib(true);
+% [~,block_info.invCALIBpic]=run_invCalib(true);
+
+
+
+
+
+%% AF,MH Jan 2025: Setup and run inv_calib filter for all of TCs
+if NelData.General.RP2_3and4 || NelData.General.RX8
+    cdd;
+    allCalibs= dir('p*calib*raw*');
+    all_calib_picNums= cell2mat(cellfun(@(x) getPicNum(x), {allCalibs.name}', 'UniformOutput', false));
+    CalibPicNum = inputdlg('Enter RAW Calibration Pic number:                [Cancel]=Use average calibration','Calibration Pic',1,{num2str(max(all_calib_picNums))});
+    if ~isempty(CalibPicNum)
+        CalibPicNum = str2double(CalibPicNum{1});
+    else
+        CalibPicNum = 1;
+    end
+    % Check if calib file exists
+    tempLIST=dir(sprintf('p%04d_calib*raw*',CalibPicNum));
+    if isempty(tempLIST)
+        warning('raw Calib file does not exist')
+        return;
+    end 
+        
+    %AS/MP | inverse filtering,
+    % send the raw calib pic num to set_invFilter
+    % pull the inv calibration coefficients from
+    
+    filttype = {'inversefilt','inversefilt'};
+    %Now loading INVERSE calib.
+    invfiltdata = set_invFilter(filttype, CalibPicNum);
+ 
+    % save Calib # in NelData for general use (eg in data file saving)
+    NelData.File_Manager.CalibPICnum2use =invfiltdata.CalibPICnum2use;
+    rdd;
+    
+else
+    cdd;
+    allCalibFiles= dir('*calib*raw*');
+    CalibPICnum2use= getPicNum(allCalibFiles(end).name);
+    CalibPICnum2use= str2double(inputdlg('Enter RAW Calibration File Number','Load Calib File', 1,{num2str(CalibPICnum2use)}));
+    NelData.File_Manager.CalibPICnum2use =CalibPICnum2use;
+    rdd;
+end
+
+
+
 
 %% Attens and SwitchBox code
 stim_info.attens_devices = stim_info.attens_devices .* DAL.Mix;
@@ -573,10 +619,11 @@ if (rc ~= 1)
     nelerror('''STM'': Error(s) detected within stimulus presentation loop');
 end
 
-% SP/MH: Oct2 2019 turn off FIR inverse Calib filtering
-% disp('HERE END'); 
-% ding
-run_invCalib(false);
+%% Shut off INV caliib filter 
+if NelData.General.RP2_3and4 || NelData.General.RX8
+    filttype = {'allstop','allstop'};
+    invfiltdata = set_invFilter(filttype,1);
+end
 
 % MH:11Nov2004  This is a bit of a hack, but is needed to generalize the use of nstim in showing Number of Spikes / Condition
 global nstim
