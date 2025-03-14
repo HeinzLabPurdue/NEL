@@ -1,9 +1,21 @@
 function finish
 % Nel finish function
 
+global NelData
+
+%AF  3/14/2025  backup to DD
+
+
+
+Datapath='C:\NEL\ExpData\';
+FolderName =NelData.Metadata.Dirname;
+sourceFolder=fullfile(Datapath,FolderName);
+DD_Path='Z:\data\Data Archived\';
+DDFolder=fullfile(DD_Path,FolderName);
+copyfile(sourceFolder,DDFolder);
+
 % AF 11/30/01
 
-global NelData
 if (isempty(NelData))
    return;
 end
