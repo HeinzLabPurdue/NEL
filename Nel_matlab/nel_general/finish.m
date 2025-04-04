@@ -10,7 +10,7 @@ global NelData
 Datapath='C:\NEL\ExpData\';
 FolderName =NelData.Metadata.Dirname;
 sourceFolder=fullfile(Datapath,FolderName);
-DD_Path='Z:\data\Data Archived\';
+DD_Path='Z:\data\Data Archived\2025\';
 DDFolder=fullfile(DD_Path,FolderName);
 copyfile(sourceFolder,DDFolder);
 
