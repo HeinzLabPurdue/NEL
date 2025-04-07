@@ -1,4 +1,4 @@
-function [tmplt,DAL,stimulus_vals,units,errstr] = SAM_TMDF_template(fieldname,stimulus_vals,units)
+function [tmplt,DAL,stimulus_vals,units,errstr] = SAM_TMDF_swept_template(fieldname,stimulus_vals,units)
 
 
 
@@ -8,24 +8,26 @@ tmplt = template_definition(fieldname);
 if (exist('stimulus_vals','var') == 1)
    
    global signals_dir
-   SAMsignals_dir=strcat(signals_dir,'AF\SAMtones');
+   SAMsignals_dir=strcat(signals_dir,'AF\SAMtone_swept');
    
    mdMin=stimulus_vals.Inloop.mdMin; mdMax=stimulus_vals.Inloop.mdMax; 
-   no_of_mdPoints=stimulus_vals.Inloop.no_of_mdPoints;
+%    no_of_mdPoints=stimulus_vals.Inloop.no_of_mdPoints;
    
-   if strcmp(stimulus_vals.Inloop.mdScale_type,'logarithmic')
-       mdScale=logspace(log10(mdMin),log10(mdMax),no_of_mdPoints);
-   elseif strcmp(stimulus_vals.Inloop.mdScale_type,'linear') 
-       mdScale=linspace(mdMin,mdMax,no_of_mdPoints);
-   end    
+ if strcmp(stimulus_vals.Inloop.swept_type,'up')
+ mdScale=1;
+ elseif strcmp(stimulus_vals.Inloop.swept_type,'down') 
+ mdScale=2;
+ end    
+% mdScale=1;
 stimulus_vals.Inloop.mdScale=mdScale;
-   for i=1:length(mdScale)
-       [tone,fs,filename]=amtone(stimulus_vals.Inloop.Carrfreq*1000,stimulus_vals.Inloop.Modfreq*1000,mdScale(i));
+%    for i=1:length(mdScale)
+      [tone,fs,filename]=amtone_swept(stimulus_vals.Inloop.Carrfreq*1000,stimulus_vals.Inloop.Modfreq*1000,mdScale);
+%       [tone,fs,filename]=amtone(stimulus_vals.Inloop.Carrfreq*1000,stimulus_vals.Inloop.Modfreq*1000,mdScale(i));
        stimulus_vals.Inloop.Compiled_FileName=fullfile(SAMsignals_dir,filename);
-       list{i}=stimulus_vals.Inloop.Compiled_FileName;
+       list{1}=stimulus_vals.Inloop.Compiled_FileName;
        audiowrite(fullfile(SAMsignals_dir,filename),tone,fs);
 
-   end    
+%    end    
   
    
    [stimulus_vals units] = NI_check_gating_params(stimulus_vals, units);
@@ -69,7 +71,7 @@ stimulus_vals.Inloop.mdScale=mdScale;
    DAL.funcName = 'data_acquisition_loop_NI'; 
    DAL.Inloop = Inloop;
    DAL.Gating = stimulus_vals.Gating;
-   DAL.short_description   = 'SAM_TMDF';
+   DAL.short_description   = 'SAM_swept';
 
   
    DAL.Mix         = mix_params2devs(stimulus_vals.Mix,used_devices);
@@ -119,10 +121,10 @@ IO_def.Inloop.Tone_Attenuation  =  {'min(120,current_unit_thresh-10)'  'dB'   [0
 IO_def.Inloop.Modfreq          =  { 0.05             'kHz'      [0.001  1.5]   0}; 
 IO_def.Inloop.Carrfreq          =  {'current_unit_bf' 'kHz'     [0.04  50]  0 0}; 
 IO_def.Inloop.Repetitions       =  {25                 ''       [1 600]};
-IO_def.Inloop.mdScale_type      =  {'{logarithmic}|linear'};
+IO_def.Inloop.swept_type      =  {'{up}|down| reference'};
 IO_def.Inloop.mdMin             =  {0.1         ''    [0 1]};
 IO_def.Inloop.mdMax             =  {1        ''       [0 1]};
-IO_def.Inloop.no_of_mdPoints    =  {4          ''     [1 100]};
+% IO_def.Inloop.no_of_mdPoints    =  {4          ''     [1 100]};
 
 %IO_def.Inloop.Noise_Attenuation =  {10               'dB'    [0    120]      };
 if (~isequal(current_unit_bf, prev_unit_bf) & isequal(fieldname,'Inloop'))
@@ -136,9 +138,9 @@ end
 %%%%%%%%%%%%%%%%%%%%
 %% Gating Section 
 %%%%%%%%%%%%%%%%%%%%
-IO_def.Gating.Duration         = {600       'ms'    [20 2000] 1};
+IO_def.Gating.Duration         = {1200       'ms'    [20 2000] 1};
 % IO_def.Gating.Period           = {'default_period(this.Duration)'    'ms'   [50 5000] 1};
-IO_def.Gating.Period           = {1000    'ms'   [50 5000] 1};
+IO_def.Gating.Period           = {1600    'ms'   [50 5000] 1};
 IO_def.Gating.Rise_fall_time   = {'default_rise_time(this.Duration)' 'ms'   [0  1000] 1}; 
 
 %%%%%%%%%%%%%%%%%%%%
@@ -146,5 +148,5 @@ IO_def.Gating.Rise_fall_time   = {'default_rise_time(this.Duration)' 'ms'   [0  
 %%%%%%%%%%%%%%%%%%%%
 IO_def.Mix.list        =  {'Left|Both|{Right}'};
 
-tmplt.tag         = 'AF_SAM_TMDF_tmplt';
+tmplt.tag         = 'AF_SAM_swept_tmplt';
 tmplt.IO_def = IO_def;

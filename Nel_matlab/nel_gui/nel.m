@@ -937,7 +937,7 @@ end
 % --------------------------------------------------------------------
 function varargout = Nel_Main_CloseRequestFcn(h, eventdata, handles, varargin)
 global NelData
-if (NelData.run_mode ~= 0)
+if (NelData.run_mode ==1)
     errordlg('Can not exit while in ''RUN'' mode');
     return;
 else
