@@ -37,8 +37,8 @@ FIG.bg.spl.dB80=uicontrol('parent',FIG.bg.spl.parent,'style','radio','Enable','o
 set(FIG.bg.spl.parent,'SelectionChangeFcn','FFRwav2(''update_stim'',''spl'');');
 %% Intensity buttongroup 2
 FIG.bg2.spl.parent= uibuttongroup('visible','on','Position',[.87 .12 .1 .04],'BackgroundColor',gray_light);
-FIG.bg2.spl.dB65=uicontrol('parent',FIG.bg2.spl.parent,'style','radio','Enable','on','Units','normalized','position',[0 0 .5 1],'string','65dB','fontsize',12,'BackgroundColor',gray_light,'value',0);
-FIG.bg2.spl.dB80=uicontrol('parent',FIG.bg2.spl.parent,'style','radio','Enable','on','Units','normalized','position',[.5 0 .5 1],'string','80dB','fontsize',12,'BackgroundColor',gray_light,'value',1);
+FIG.bg2.spl.dB65=uicontrol('parent',FIG.bg2.spl.parent,'style','radio','Enable','on','Units','normalized','position',[0 0 .5 1],'string','65dB','fontsize',12,'BackgroundColor',gray_light,'value',1);
+FIG.bg2.spl.dB80=uicontrol('parent',FIG.bg2.spl.parent,'style','radio','Enable','on','Units','normalized','position',[.5 0 .5 1],'string','80dB','fontsize',12,'BackgroundColor',gray_light,'value',0);
 % set(FIG.bg.spl.parent, 'SelectedObject', FIG.bg.spl.dB65);
 set(FIG.bg2.spl.parent,'SelectionChangeFcn','FFRwav2(''update_stim'',''spl2'');');
 

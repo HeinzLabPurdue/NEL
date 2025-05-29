@@ -71,7 +71,7 @@ elseif strcmp(command_str,'update_stim')
         case 'spl2'
             FIG.NewStim = 2;
             if get(FIG.bg2.spl.dB65, 'value')
-                Stimuli.atten2_dB = Stimuli.calib_dBSPLout2-65;
+                Stimuli.atten2_dB = 50;% Stimuli.calib_dBSPLout2-65;
                 Stimuli.atten2_dB = round(Stimuli.atten2_dB,1);
             elseif get(FIG.bg2.spl.dB80, 'value')
                 Stimuli.atten2_dB = Stimuli.calib_dBSPLout2-80;
