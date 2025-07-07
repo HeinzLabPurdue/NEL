@@ -10,15 +10,18 @@ if sweep_direction == 1
     elseif sweep_direction == 2
         depth_start = 0;    % Starting modulation depth for downward sweep
         depth_end = -36;    % Ending modulation depth for downward sweep
-    else
+elseif sweep_direction == 3
+        depth_start = 0;    % Starting modulation depth for downward sweep
+        depth_end = 0; 
+else
         error('Invalid sweep direction. Use 1 for upward sweep or 2 for downward sweep.');
 end
     
 
 
-fs=81920;
+fs=81900;%81920;
 
-t = [0:0.5*fs]'/fs;
+t = [0:floor(1.2*fs)-1]'/fs;%[0:floor(1.2*fs)]'/fs;
 
 
 %%% AF holding for removing onset and offset maybe zero for now
@@ -67,7 +70,8 @@ if sweep_direction == 1
        filename=sprintf('SAMtone_CF%0.3f_swept_upward_fm%0.4f.wav',fc/1000,fm/1000);
     elseif sweep_direction == 2
        filename=sprintf('SAMtone_CF%0.3f_swept_downward_fm%0.4f.wav',fc/1000,fm/1000);
-    
+elseif sweep_direction==3
+       filename=sprintf('SAMtone_CF%0.3f_swept_ref_fm%0.4f.wav',fc/1000,fm/1000);
 end
     
 % filename=sprintf('SAMtone_CF%0.3f_swept_fm%0.4f.wav',fc/1000,fm/1000);

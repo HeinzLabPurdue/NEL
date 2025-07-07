@@ -29,7 +29,7 @@ if (exist('stimulus_vals','var') == 1)
 
    DAL.Inloop = Inloop;
    DAL.Gating = stimulus_vals.Gating;
-   DAL.short_description   = 'PST';
+   DAL.short_description   = 'PST_0';
    DAL.endLinePlotParams                  = nel_plot_pst_params(DAL.Gating.Period/1000, DAL.Gating.Duration/1000);  % GE 04Nov2003.
 
    % [stimulus_vals.Mix units.Mix] = structdlg(tmplt.IO_def.Mix,'',stimulus_vals.Mix,'off');

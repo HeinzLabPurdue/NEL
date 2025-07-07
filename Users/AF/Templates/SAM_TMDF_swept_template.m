@@ -17,6 +17,9 @@ if (exist('stimulus_vals','var') == 1)
  mdScale=1;
  elseif strcmp(stimulus_vals.Inloop.swept_type,'down') 
  mdScale=2;
+ 
+  elseif strcmp(stimulus_vals.Inloop.swept_type,'reference') 
+ mdScale=3;
  end    
 % mdScale=1;
 stimulus_vals.Inloop.mdScale=mdScale;
@@ -71,8 +74,13 @@ stimulus_vals.Inloop.mdScale=mdScale;
    DAL.funcName = 'data_acquisition_loop_NI'; 
    DAL.Inloop = Inloop;
    DAL.Gating = stimulus_vals.Gating;
-   DAL.short_description   = 'SAM_swept';
-
+   if mdScale==1
+        DAL.short_description   = 'SAM_swept_up';
+   elseif mdScale==2
+        DAL.short_description   = 'SAM_swept_down';
+   elseif mdScale==3
+        DAL.short_description   = 'SAM_swept_ref';
+   end
   
    DAL.Mix         = mix_params2devs(stimulus_vals.Mix,used_devices);
 
@@ -121,7 +129,7 @@ IO_def.Inloop.Tone_Attenuation  =  {'min(120,current_unit_thresh-10)'  'dB'   [0
 IO_def.Inloop.Modfreq          =  { 0.05             'kHz'      [0.001  1.5]   0}; 
 IO_def.Inloop.Carrfreq          =  {'current_unit_bf' 'kHz'     [0.04  50]  0 0}; 
 IO_def.Inloop.Repetitions       =  {25                 ''       [1 600]};
-IO_def.Inloop.swept_type      =  {'{up}|down| reference'};
+IO_def.Inloop.swept_type      =  {'{up}|{down}|{reference}'};
 IO_def.Inloop.mdMin             =  {0.1         ''    [0 1]};
 IO_def.Inloop.mdMax             =  {1        ''       [0 1]};
 % IO_def.Inloop.no_of_mdPoints    =  {4          ''     [1 100]};

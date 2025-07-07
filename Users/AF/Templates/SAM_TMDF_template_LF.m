@@ -20,7 +20,7 @@ if (exist('stimulus_vals','var') == 1)
    end    
 stimulus_vals.Inloop.mdScale=mdScale;
    for i=1:length(mdScale)
-       [tone,fs,filename]=amtone(stimulus_vals.Inloop.Carrfreq*1000,stimulus_vals.Inloop.Modfreq*1000,mdScale(i));
+       [tone,fs,filename]=amtone_LF(stimulus_vals.Inloop.Carrfreq*1000,stimulus_vals.Inloop.Modfreq*1000,mdScale(i));
        stimulus_vals.Inloop.Compiled_FileName=fullfile(SAMsignals_dir,filename);
        list{i}=stimulus_vals.Inloop.Compiled_FileName;
        audiowrite(fullfile(SAMsignals_dir,filename),tone,fs);
@@ -69,7 +69,7 @@ stimulus_vals.Inloop.mdScale=mdScale;
    DAL.funcName = 'data_acquisition_loop_NI'; 
    DAL.Inloop = Inloop;
    DAL.Gating = stimulus_vals.Gating;
-   DAL.short_description   = 'SAM_TMDF';
+   DAL.short_description   = 'SAM_TMDF_LF';
 
   
    DAL.Mix         = mix_params2devs(stimulus_vals.Mix,used_devices);
@@ -116,7 +116,7 @@ persistent prev_unit_bf prev_unit_thresh
 %%%%%%%%%%%%%%%%%%%%
 
 IO_def.Inloop.Tone_Attenuation  =  {'min(120,current_unit_thresh-10)'  'dB'   [0    120] 0 0};  % 20 dB above threshold
-IO_def.Inloop.Modfreq          =  { 0.05             'kHz'      [0.001  1.5]   0}; 
+IO_def.Inloop.Modfreq          =  { 0.008             'kHz'      [0.0005  1.5]   0}; 
 IO_def.Inloop.Carrfreq          =  {'current_unit_bf' 'kHz'     [0.04  50]  0 0}; 
 IO_def.Inloop.Repetitions       =  {25                 ''       [1 600]};
 IO_def.Inloop.mdScale_type      =  {'{logarithmic}|linear'};
@@ -136,9 +136,9 @@ end
 %%%%%%%%%%%%%%%%%%%%
 %% Gating Section 
 %%%%%%%%%%%%%%%%%%%%
-IO_def.Gating.Duration         = {600       'ms'    [20 2000] 1};
+IO_def.Gating.Duration         = {1200       'ms'    [20 2000] 1};
 % IO_def.Gating.Period           = {'default_period(this.Duration)'    'ms'   [50 5000] 1};
-IO_def.Gating.Period           = {1000    'ms'   [50 5000] 1};
+IO_def.Gating.Period           = {1600    'ms'   [50 5000] 1};
 IO_def.Gating.Rise_fall_time   = {'default_rise_time(this.Duration)' 'ms'   [0  1000] 1}; 
 
 %%%%%%%%%%%%%%%%%%%%
