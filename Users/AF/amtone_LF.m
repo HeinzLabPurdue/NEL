@@ -9,11 +9,13 @@ function [samtone,fs,filename]=amtone_LF(fc,fm,M)
 % if (nargin <4)
 %     C=1;
 % end
+fs=81900;%81920;
 
-fs=81920;
+
+
 %T=1/fm;
 %t = [0:T*fs]'/fs;
-t = [0:1.2*fs]'/fs;
+t = [0:(1.2*fs)-1]'/fs;
 wc=2*pi*fc;
 wm=2*pi*fm;
 
