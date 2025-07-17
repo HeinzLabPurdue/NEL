@@ -10,7 +10,7 @@ function [samtone,fs,filename]=amtone_LF(fc,fm,M)
 %     C=1;
 % end
 fs=81900;%81920;
-
+%USE:    NI6052UsableRate_Hz(81920)
 
 
 %T=1/fm;

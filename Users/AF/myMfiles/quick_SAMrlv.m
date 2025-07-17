@@ -1,12 +1,12 @@
 function [BML,BML_ind,Rate_sps,R,level]=quick_SAMrlv(picnum,calibpic)
 
 
-y=loadPic(calibpic);
+y=loadpic(calibpic);
 calib_freq=y.CalibData(:,1);
 calib_level=y.CalibData(:,2);
 nbins=64;
 %for i=1:length(n)
-	x=loadPic(picnum);
+	x=loadpic(picnum);
 	level=x.Stimuli.attens;%SAM
 	lines=x.Line.attens.list(:,2); %SAM
 	spt=x.spikes{1};

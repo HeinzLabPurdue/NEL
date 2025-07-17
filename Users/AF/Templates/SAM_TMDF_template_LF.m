@@ -1,4 +1,4 @@
-function [tmplt,DAL,stimulus_vals,units,errstr] = SAM_TMDF_template(fieldname,stimulus_vals,units)
+function [tmplt,DAL,stimulus_vals,units,errstr] = SAM_TMDF_template_LF(fieldname,stimulus_vals,units)
 
 
 
@@ -146,5 +146,5 @@ IO_def.Gating.Rise_fall_time   = {'default_rise_time(this.Duration)' 'ms'   [0  
 %%%%%%%%%%%%%%%%%%%%
 IO_def.Mix.list        =  {'Left|Both|{Right}'};
 
-tmplt.tag         = 'AF_SAM_TMDF_tmplt';
+tmplt.tag         = 'AF_SAM_TMDF_LF_tmplt';
 tmplt.IO_def = IO_def;

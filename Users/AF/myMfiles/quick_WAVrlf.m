@@ -56,7 +56,7 @@ plot(ATTENS_dB, trifilt(spont{PICind},params.TriFiltWidth),'g-');
 % set(gca, 'XDir', 'reverse');
 xlabel('Attenuation (dB)')
 ylabel('Driven rate (sp/sec)')
-legend('DRIV','SPONT',2)
+legend('DRIV','SPONT')
 title(nameStr)
 set(gca,'Xdir','rev')
 

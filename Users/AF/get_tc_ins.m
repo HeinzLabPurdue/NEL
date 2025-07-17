@@ -5,7 +5,7 @@ frqlo   = 0.040;			%low frequency (in kHz) bounds for data
 frqhi   = 8.000;			%high frequency (in kHz) bounds for data
 fstlin  =     0;			% # of linear frequency steps (set = 0 for log steps)
 fstoct  =    -9;			% # of log freq. steps (per oct. OR per 10-dB BW for Qspaced) (= 0 for lin steps; NEGATIVE for Qspaced)
-attlo   =    10;			%low atten (in dB atten) for auto tracking
+attlo   =    20;			%low atten (in dB atten) for auto tracking
 atthi   =   120;			%high atten (in dB atten) for auto tracking
 attstp  =     2;			%size of initial attenuation steps (in dB atten) for auto tracking
 match2  =     2;			%number of threshod replications (1 or 2)
