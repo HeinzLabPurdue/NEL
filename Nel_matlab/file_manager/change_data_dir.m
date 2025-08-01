@@ -1,8 +1,8 @@
-function dirname = choose_data_dir(reactivate,recursive_flag)
+function dirname = change_data_dir(reactivate,recursive_flag)
 % dirname = choose_data_dir(reactivate)
 
 % AF 11/28/01
-new_dir_flag=0;
+new_dir_flag=1;
 
 global NelData data_dir SKIPintro
 
