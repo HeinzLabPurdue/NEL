@@ -7,7 +7,11 @@ home_dir = fileparts(fileparts(root_dir));
 if (~isequal(home_dir(end),'\'))
    home_dir = [home_dir '\'];
 end
-data_dir = [home_dir 'ExpData' fs];
+
+%Old place for storing data, when no separate data drive
+% data_dir = [home_dir 'ExpData' fs];
+
+data_dir = 'D:\NEL\ExpData\';
 signals_dir = [home_dir 'Signals' fs];
 icon_dir = [root_dir 'nel_gui\icons' fs];
 profiles_dir = [home_dir 'NelUsersProfiles' fs];
