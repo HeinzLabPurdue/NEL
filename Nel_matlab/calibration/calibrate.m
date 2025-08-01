@@ -60,10 +60,12 @@ if nargin < 1
     
 elseif strcmp(command_str,'return from parameter change')
     [FREQS, COMM, ~]= ReturnCal(FIG, Stimuli);
-    set(FIG.push.stop,'Enable','off');
+    %AF/PD we change this to on 
+    set(FIG.push.stop,'Enable','on');
+    
     set(FIG.push.recall,'Enable','on');
     set(FIG.push.calib,'Enable','on');
-    set(FIG.push.close,'Enable','on');
+    set(FIG.push.close,'Enable','off');
     set(FIG.push.params,'Enable','on');
     
     %perform calibration, plot results
@@ -178,8 +180,8 @@ elseif strcmp(command_str,'calibrate')
         update_params;
         
         set(FIG.push.stop,'Userdata',[]); 
-        
-        error = 0;
+        %AF/PD    7/31/25 
+%         error = 0;
         %calib loop
         while ~error && isempty(get(FIG.push.stop,'userdata'))
             %Set up TDT system for next stimulus:
@@ -365,6 +367,7 @@ elseif strcmp(command_str,'calibrate')
     
 elseif strcmp(command_str,'stop')
     set(FIG.push.stop,'Userdata',1);
+     set(FIG.push.close,'Enable','on');
     
 elseif strcmp(command_str,'recall')
     eval('read_text_file');
@@ -379,9 +382,12 @@ elseif strcmp(command_str,'close')
     if NelData.General.RP2_3and4 || NelData.General.RX8
 %         coefFileNum= run_invCalib(false);
         %set back to allpass
-        filttype = {'allpass','allpass'};
+        filttype = {'allstop','allstop'};
         RawCalibPicNum = NaN;
         invfilterdata = set_invFilter(filttype, RawCalibPicNum, true);
+        
+        %AF/PD 7/31/2025
+          set(FIG.push.stop,'Userdata',1);
     end
     
     delete(FIG.handle);
