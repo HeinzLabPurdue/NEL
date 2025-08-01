@@ -1,4 +1,4 @@
-global COMM prog_dir PROG data_dir NelData Stimuli filttype invfiltdata
+global COMM prog_dir PROG data_dir NelData Stimuli filttype invfiltdata FFR_Gating
 
 % if ~(double(invoke(RP1,'GetTagVal', 'Stage')) == 2)
 %     FFR_set_attns(-120,-120,Stimuli.channel,Stimuli.KHosc,RP1,RP2); %% Check with MH
@@ -305,7 +305,7 @@ while isempty(get(FIG.push.close,'Userdata'))
                 end
                 drawnow;
             else
-                veryfirstSTIM=0;
+                veryfirstSTIM=0; 
             end
             invoke(RP3,'SoftTrg',2);
         end
@@ -321,7 +321,7 @@ while isempty(get(FIG.push.close,'Userdata'))
                       AEP_set_attns(Stimuli.atten_dB,Stimuli.channel,Stimuli.KHosc,RP1,RP2);
                       
                 case 1 % case: fast or slow
-                    % set_RP_tagvals(RP1, RP2, FFR_Gating, Stimuli);
+              % set_RP_tagvals(RP1, RP2, FFR_Gating, Stimuli);
                     invoke(RP1, 'SetTagVal', 'StmOn', FFR_Gating.duration_ms);
                     invoke(RP1, 'SetTagVal', 'StmOff', FFR_Gating.period_ms-FFR_Gating.duration_ms);
                     invoke(RP1, 'SetTagVal', 'RiseFall', FFR_Gating.rftime_ms);
@@ -347,7 +347,7 @@ while isempty(get(FIG.push.close,'Userdata'))
                     end
                     
                     drawnow;  % clear the plot.
-                    FIG.NewStim = 0;
+                    FIG.NewStim = 2; 
                     break
                     
                 case 2 % case: updated wav-file
@@ -509,8 +509,11 @@ while isempty(get(FIG.push.close,'Userdata'))
 
                     drawnow;
                    
+                
                 case 101 ...
                         % For ??
+                    
+                    
             end
             FIG.NewStim = 0;
         end

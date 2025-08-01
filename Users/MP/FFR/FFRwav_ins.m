@@ -2,6 +2,8 @@
 function [misc,Stimuli, RunLevels_params, Display, interface_type]=FFRwav_ins(NelData)
 
 usr = NelData.General.User;
+stimulusdur_ms = NelData.stimulusduration_ms;
+
 
 if exist([NelData.General.RootDir 'Signals\' usr filesep 'FFR\'],'dir') >= 1
     FFRwavStimDir=[NelData.General.RootDir 'Signals\',usr,'\FFR\'];
@@ -45,12 +47,12 @@ switch interface_type
             ...
             'fast', struct( ...
             ... %zz 17jan12
-            'duration_ms', 1500, ... % 1728 for pilot
+            'duration_ms', 1.1*stimulusdur_ms, ... % 1728 for pilot
             'rftime_ms',  10, ...
-            'period_ms',  2003, ...   % make irregular to avoiid exact 2-sec repeat
+            'period_ms', 1.25*stimulusdur_ms, ...   % make irregular to avoiid exact 2-sec repeat
             'XstartPlot_ms',0, ...
-            'XendPlot_ms',1600, ... % 2000 for pilot, 1800 for short 
-            'FFRlength_ms',1600), ... % 2000 for pilot, 1800 for short 
+            'XendPlot_ms',1.1*stimulusdur_ms, ... % 2000 for pilot, 1800 for short 
+            'FFRlength_ms',1.1*stimulusdur_ms), ... % 2000 for pilot, 1800 for short 
             ...
             ...
             'slow', struct( ...
