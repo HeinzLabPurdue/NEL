@@ -10,7 +10,10 @@ PROTOCOL = 'FPLear';
 
 %% Initialize TDT
 card = initialize_card;
-ADdelay = 216; 
+
+% Eliminating this here because will be live calculated: 
+% ADdelay = 216; 
+ADdelay = 2; % 2 is the minimum delay for this to work. means a delay of zero.  
 %% New Ear Calib or Inverse Calib
 
 if (NelData.General.RP2_3and4 || NelData.General.RX8)
@@ -41,11 +44,11 @@ if (NelData.General.RP2_3and4 || NelData.General.RX8)
             1,{num2str(RawCalibPicNum)});
         RawCalibPicNum = str2double(RawCalibPicNum{1});
         rdd;
-       ADdelay = 344; 
+       %ADdelay = 344; 
     else %first time calib
         filttype = {'allpass','allpass'};
         RawCalibPicNum = NaN;
-         ADdelay = 216;
+         %ADdelay = 216;
     end
     
     invfilterdata = set_invFilter(filttype, RawCalibPicNum, true);
@@ -66,10 +69,7 @@ calib = x.FPLprobeData.calib;
 
 %% Enter subject information
 if ~isfield(NelData,'FPL') % First time through, need to ask all this.
-    
-    uiwait(warndlg('Set ER-10B+ GAIN to 40 dB','SET ER-10B+ GAIN WARNING','modal'));
-    gain = 40;
-    
+      
     % Save in case if restart
     NelData.FPL.Fig2close=[];  % set up the place to keep track of figures generted here (to be closed in NEL_App Checkout)
     NelData.FPL.FPL_figNum=477;  % +200 from wbMEMR
@@ -78,39 +78,12 @@ else
     fprintf('RESTARTING...\n')
 end
 
-% %% Start (w/ Delay if needed)
-% button = input('Do you want a 10 second delay? (Y or N):', 's');
-% switch button
-%     case {'Y', 'y', 'yes', 'Yes', 'YES'}
-%         DELAY_sec=10;
-%         fprintf(1, '\n%.f seconds until START...\n',DELAY_sec);
-%         pause(DELAY_sec)
-%         fprintf(1, '\nWe waited %.f seconds ...\nStarting Stimulation...\n',DELAY_sec);
-%     otherwise
-%         fprintf(1, '\nStarting Stimulation...\n');
-% end
-
 %% Initializing variables
-FPLear_ins;
+%FPLear_ins;
 
-earflag = 1;
-while earflag == 1
-    ear = input('Please enter which ear (L or R):', 's');
-    switch ear
-        case {'L', 'l', 'Left', 'left', 'LEFT'}
-            earname = strcat(ear, 'Ear');
-            earlabel = 'L';
-            earflag = 0;
-            calib.ear = earlabel;
-        case {'R', 'r', 'Right','right', 'RIGHT'}
-            earname = strcat(ear, 'Ear');
-            earlabel = 'R';
-            earflag = 0;
-            calib.ear = earlabel;
-        otherwise
-            fprintf(2, 'Unrecognized ear type! Try again!');
-    end
-end
+ear = questdlg('Which Ear?', 'Ear', 'L', 'R', 'R');
+calib.ear = ear;
+uiwait(warndlg('Set ER-10B+ GAIN to 40 dB','SET ER-10B+ GAIN WARNING','modal'));
 
 probeIndex = 0;
 gain = 40; % dB
@@ -120,7 +93,6 @@ Fs = calib.SamplingRate * 1000;
 y = zeros(1, calib.BufferSize);
 y(2 + (1)) = 0.95;
 vo = y(:); % Just in case
-
 
 disp('Starting stimulation...');
 
@@ -143,6 +115,24 @@ for n = 1:(calib.Averages + calib.ThrowAway)
     end
 end
 
+%% Calculate the delay when first passing zero delay
+% then adjust the buffer to account for measured difference
+abs_resp_temp = abs(mean(vins_ear_1,1)); 
+[~, clickpeak] = max(vo); 
+baselinepeak = max(abs_resp_temp(end-500:end)); 
+if doInvCalib
+    [~, resppeak] = max(abs_resp_temp); 
+else
+    [~, resppeak] = findpeaks(abs_resp_temp, 'MinPeakHeight', baselinepeak*2, 'NPeaks', 1);
+end
+measuredDelay_1 = resppeak - clickpeak; 
+measuredDelay_1 = max([measuredDelay_1 - 1, 1]); 
+new_vins_ear_1 = zeros(size(vins_ear_1)); 
+temp_vins_ear_1 = vins_ear_1(:, measuredDelay_1:end);
+new_vins_ear_1(:, 1:length(temp_vins_ear_1)) = temp_vins_ear_1; 
+vins_ear_1 = new_vins_ear_1; 
+
+%% back to rest of analysis
 if calib.doFilt
     % High pass at 100 Hz using IIR filter
     [b, a] = butter(4, 100 * 2 * 1e-3/calib.SamplingRate, 'high');
@@ -196,8 +186,24 @@ for n = 1:(calib.Averages + calib.ThrowAway)
     end
 end
 
-%compute the average
+%% Calculate the delay when first passing zero delay
+% then adjust the buffer to account for measured difference
+abs_resp_temp_2 = abs(mean(vins_ear_2,1)); 
+[~, clickpeak] = max(vo); 
+baselinepeak = max(abs_resp_temp_2(end-500:end)); 
+if doInvCalib
+    [~, resppeak] = max(abs_resp_temp); 
+else
+    [~, resppeak] = findpeaks(abs_resp_temp, 'MinPeakHeight', baselinepeak*2, 'NPeaks', 1);
+end
+measuredDelay_2 = resppeak - clickpeak; 
+measuredDelay_2 = max([measuredDelay_2 - 1, 1]); 
+new_vins_ear_2 = zeros(size(vins_ear_2)); 
+temp_vins_ear_2 = vins_ear_2(:, measuredDelay_2:end);
+new_vins_ear_2(:, 1:length(temp_vins_ear_2)) = temp_vins_ear_2; 
+vins_ear_2 = new_vins_ear_2; 
 
+%%
 if calib.doFilt
     % High pass at 100 Hz using IIR filter
     [b, a] = butter(4, 100 * 2 * 1e-3/calib.SamplingRate, 'high');
@@ -273,6 +279,25 @@ calib.Yphase_lf_2 = mean(cycs(1./calib.Zec_2(ok)))*360;
 fprintf(1, 'Low-frequency admittance phase: %2.3f%c\n',...
     calib.Yphase_lf_2, char(176));
 
+if strcmp(NelData.Metadata.NEL, 'NEL1')
+    NEL1delay = 25;
+else 
+    NEL1delay = 0; 
+end
+
+if doInvCalib
+    expDelay = 214+128 + NEL1delay; 
+    %214 is knowledge from measuring the click in an inf tube
+    %128 is half the FIR filter order
+    %25 for NEL1 delay is measured from click in tube across both NELS
+    %All of this is true as of 6/28/24 - May need to check periodically. 
+else
+    expDelay = 214 + NEL1delay;
+end 
+% Give warning about NEL latency that was calculated
+    h = warndlg (sprintf('Expected Latency: %d samples \n Chan. 1 Latency: %d samples \n Chan. 2 Latency: %d samples', expDelay, measuredDelay_1, measuredDelay_2), 'Computed Latencies', 'modal');
+    waitfor(h);
+    
 % Give errors if either is off
 if (calib.A_lf_1 > 0.29) || (calib.A_lf_2 > 0.29)
     h = warndlg ('Sound-leak alert! Low-frequency absorbance > 0.29');
@@ -340,14 +365,21 @@ set(gca, 'XScale', 'log')
 %% Plot Ear Absorbance
 if newCalib
     figure(12);
+    hold on; 
+    % plot absorbance norms
+    load('FPLear_norms.mat', 'f', 'loabs', 'hiabs'); 
+    col = [.9, .9, .9];
+    fill([f, f(end), f(end:-1:1), f(1)], [loabs, hiabs(end), hiabs(end:-1:1), loabs(1)], col, 'linestyle', 'none');
+
+    % plot data
     semilogx(calib.freq * 1e-3, 100*(1 - abs(calib.Rec_1).^2), 'linew', 2);
     hold on;
     semilogx(calib.freq * 1e-3, 100*(1 - abs(calib.Rec_2).^2), 'linew', 2);
     hold off;
-    xlabel('Frequency (Hz)', 'FontSize', 16);
+    xlabel('Frequency (kHz)', 'FontSize', 16);
     ylabel('Absorbance (%)', 'FontSize', 16);
     xlim([0.2, 8]); ylim([0, 100]);
-    set(gca, 'FontSize', 16, 'XTick',[0.25, 0.5, 1, 2, 4, 8]);
+    set(gca, 'FontSize', 16, 'XTick',[0.25, 0.5, 1, 2, 4, 8], 'XScale', 'log');
 end
 %% Shut off buttons once out of data collection loop
 % until we put STOP functionality in, all roads mean we're done here

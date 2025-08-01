@@ -62,7 +62,8 @@ switch (reactivate)
         
     case 'No'
         promptMetadata();
-        dirname = [NelData.Metadata.User, '-', datestr(date,29),'-', NelData.Metadata.ChinID,'-',NelData.Metadata.Exposure,'-',NelData.Metadata.Sedation];
+        
+        dirname = [NelData.Metadata.User, '-', strrep(datestr(date,29), '-', '_'),'-', NelData.Metadata.ChinID,'_',NelData.Metadata.Exposure,'_',NelData.Metadata.Sedation];
       
         
        

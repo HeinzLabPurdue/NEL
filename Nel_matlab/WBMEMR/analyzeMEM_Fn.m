@@ -47,9 +47,9 @@ MEM = pow2db(resp_freq ./ bline_freq);
 
 %Set elicitor values
 if(min(stim.noiseatt) == 6)
-    elicitor = 94 - (stim.noiseatt - 6);
+    elicitor = 105 - (stim.noiseatt - 6);
 else
-    elicitor = 94 - stim.noiseatt;
+    elicitor = 105 - stim.noiseatt;
 end
 
 %Sets colors
@@ -81,7 +81,14 @@ xlabel('Frequency (kHz)', 'FontSize', 10);
 ylabel('Ear canal pressure (dB re: Baseline)', 'FontSize', 10);
 
 subplot(1,2,2);
-plot(elicitor, mean(abs(MEM(:, ind)), 2)*5 , 'ok-', 'linew', 2);
+% Load norms and plot them
+load("memr_norms", 'elic', 'lomemr', 'upmemr');
+hold on;
+col = [.9,.9,.9]; 
+fill([elic, elic(end), elic(end:-1:1), elic(1)], [lomemr, upmemr(end), upmemr(end:-1:1), lomemr(1)], col, 'linestyle', 'none')
+alpha(.5);
+% plot data
+plot(elicitor, mean(abs(MEM(:, ind)), 2) , 'ok-', 'linew', 2);
 hold on;
 xlabel('Elicitor Level (dB SPL)', 'FontSize', 10);
 ylabel('\Delta Absorbed Power (dB)', 'FontSize', 10);

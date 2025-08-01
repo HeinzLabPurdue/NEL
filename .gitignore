@@ -4,7 +4,7 @@ Nel_matlab/FFR_NEL2satya/**
 **/*.wav
 Nel_matlab/calibrationOLD/**
 Mikes*Setup*Stuff_REORG/**
-Nel_matlab\FPL\Probe\ProbeCal_Data\**
+Nel_matlab/FPL/Probe/ProbeCal_Data/**
 
 #matlab autosave
 *.asv
