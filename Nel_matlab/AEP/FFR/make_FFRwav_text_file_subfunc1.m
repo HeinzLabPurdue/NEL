@@ -1,7 +1,7 @@
 % Sets naming structure for file and relevant stimuli metadata
 
 function [x, aux_fname, fname]=make_FFRwav_text_file_subfunc1 ...
-    (misc, Stimuli, invfiltdata, PROG, NelData, comment, RunLevels_params, FFR_Gating, Display, FFRattens)
+    (misc, Stimuli, invfiltdata, PROG, NelData, comment, RunLevels_params, FFR_Gating, Display, FFRattens, FFRinterstim)
 
     fname = current_data_file(...
         [misc.fileExtension strrep(Stimuli.filename(1:end-4),'-','_m')],1);
@@ -64,3 +64,4 @@ x.MetaData=NelData.Metadata;
 % x.Stimuli.atten_dB = Stimuli.atten_dB + RunLevels_params.stepdB*RunLevels_params.attenMask;
 
 x.Line.attens_dB = FFRattens;
+x.Line.intervalstim =FFRinterstim;

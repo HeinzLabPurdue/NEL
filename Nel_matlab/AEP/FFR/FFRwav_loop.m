@@ -509,8 +509,12 @@ while isempty(get(FIG.push.close,'Userdata'))
 
                     drawnow;
                    
-                case 101 ...
-                        % For ??
+                case 101 
+                    
+                    
+                        FFRwav_RunLevels_interleaved(FIG,Stimuli,invfiltdata, RunLevels_params, misc, FFR_Gating,...
+                        FFRnpts,interface_type, Display, NelData, data_dir, RP1, RP3, PROG, prog_dir)
+                    veryfirstSTIM=1; ...
             end
             FIG.NewStim = 0;
         end

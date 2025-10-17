@@ -1,3 +1,4 @@
+
 function h_fig = FFRwav(command_str,eventdata)
 
 global RP PROG FIG Stimuli FFR_Gating root_dir prog_dir Display NelData PROTOCOL filttype invfiltdata
@@ -48,7 +49,9 @@ elseif strcmp(command_str,'update_stim')
     
     switch eventdata
         case 'spl'
-            FIG.NewStim = 2;
+            if FIG.NewStim~= 101
+                FIG.NewStim = 2;
+            end
             if get(FIG.bg.spl.dB65, 'value')
                 Stimuli.atten_dB = Stimuli.calib_dBSPLout-65;
                 Stimuli.atten_dB = round(Stimuli.atten_dB,1);
@@ -130,14 +133,37 @@ elseif strcmp(command_str,'update_stim')
             end
             Stimuli.filename=Stimuli.list(StimInd).name;
             set(FIG.popup.stims, 'value', StimInd);
+            
+            
+            
+        case 'Interleaved'
+            FIG.NewStim = 101;
+            for StimInd =1:length(Stimuli.list)
+                Stimuli.filename_inter{StimInd}=Stimuli.list(StimInd).name;
+            end
+             resetAttn = true;
+            
     end
     
-    [xp,fsp]=audioread([Stimuli.OLDDir Stimuli.filename]);
-    xpr=resample(xp,round(Stimuli.RPsamprate_Hz), fsp);
-    audiowrite([Stimuli.UPDdir Stimuli.filename], xpr, round(Stimuli.RPsamprate_Hz));
-    copyfile([Stimuli.UPDdir Stimuli.filename],Stimuli.STIMfile,'f');
-    FFRwav('attenCalib'); % Initialize RP2_4 with InvFilter
     
+    if FIG.NewStim ==101
+         
+        for StimInd =1:length(Stimuli.list)
+            [xp,fsp]=audioread([Stimuli.OLDDir Stimuli.filename_inter{StimInd}]);
+            xpr=resample(xp,round(Stimuli.RPsamprate_Hz), fsp);
+            audiowrite([Stimuli.UPDdir Stimuli.filename_inter{StimInd}], xpr, round(Stimuli.RPsamprate_Hz));
+        end
+           
+    else
+        [xp,fsp]=audioread([Stimuli.OLDDir Stimuli.filename]);
+        xpr=resample(xp,round(Stimuli.RPsamprate_Hz), fsp);
+        audiowrite([Stimuli.UPDdir Stimuli.filename], xpr, round(Stimuli.RPsamprate_Hz));
+        copyfile([Stimuli.UPDdir Stimuli.filename],Stimuli.STIMfile,'f');
+        
+    end
+    
+    
+    FFRwav('attenCalib'); % Initialize RP2_4 with InvFilter
     %default new stim to 80 dB unless changed by user
     if resetAttn
         set(FIG.bg.spl.dB80, 'value',1);
@@ -485,6 +511,8 @@ elseif strcmp(command_str,'calibInit')
     rdd;
     
     [sig, fs] =audioread([Stimuli.UPDdir Stimuli.filename]);
+    
+    
     curDir= pwd;
     cdd;
     cd(curDir);
@@ -508,7 +536,10 @@ elseif strcmp(command_str,'calibInit')
         CalibData(:,1) = cal.CalibData(:,1);
         CalibData(:,2) = (cal.CalibData(:,2)+cal.CalibData2(:,2))/2;
     end
-    
+    %%%% Afagh maybe here should specify the duraion of sig we want to set
+    %%%% to be 80 dB sPL
+
+
     Stimuli.calib_dBSPLout= get_SPL_from_calib(sig, fs, CalibData, false);
     set(FIG.asldr.SPL,'string',sprintf('%.1f dB SPL',Stimuli.calib_dBSPLout-abs(str2double(get(FIG.asldr.val, 'string')))));
     

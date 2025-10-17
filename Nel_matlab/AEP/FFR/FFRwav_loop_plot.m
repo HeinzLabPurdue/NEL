@@ -81,7 +81,8 @@ FIG.edit.yscale     = uicontrol(FIG.handle,'callback','FFRwav(''YLim'');','style
 
 %% Make things happen
 FIG.push.close   = uicontrol(FIG.handle,'callback','FFRwav(''close'');','style','pushbutton','Units','normalized','position',[.1 .6 .125 .09],'string','Close','fontsize',12,'fontangle','normal','fontweight','normal');
-FIG.push.run_levels = uicontrol(FIG.handle,'callback','FFRwav(''run_levels'');','style','pushbutton','Units','normalized','position',[.1 .726 .125 .09],'string','Run levels...','fontsize',12,'fontangle','normal','fontweight','normal');
+FIG.push.run_levels = uicontrol(FIG.handle,'callback','FFRwav(''run_levels'');','style','pushbutton','Units','normalized','position',[.07 .726 .125 .09],'string','Run levels...','fontsize',12,'fontangle','normal','fontweight','normal');
+FIG.push.run_levels_Interleaved = uicontrol(FIG.handle,'callback','FFRwav(''update_stim'',''Interleaved'');','style','pushbutton','Units','normalized','position',[.2 .726 .1 .09],'string','Run Interleaved...','fontsize',12,'fontangle','normal','fontweight','normal');
 FIG.push.forget_now = uicontrol(FIG.handle,'callback','FFRwav(''forget_now'');','style','pushbutton','Units','normalized','position',[.07 .43 .125 .05],'string','Forget NOW','fontsize',12,'fontangle','normal','fontweight','normal','Userdata','');
 
 %% 
