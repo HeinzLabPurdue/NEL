@@ -70,8 +70,10 @@ if strcmp(command_str,'start')
     
       set(h_push_stop,'Userdata',[]);
 %     set(h_push_start,'Userdata',dpoaedata);
-     wbmemr;
-    
+       wbmemr;
+%     wbmemrrapid;
+     
+     
     if strcmp(NelData.WBMEMR.rc,'restart')
         wideband_memr('start');
     else  % saveNquit, or abort - need to close fig, otherwise don't close
