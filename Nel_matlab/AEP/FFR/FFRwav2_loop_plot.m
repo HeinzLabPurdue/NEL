@@ -123,9 +123,16 @@ FIG.radio.atELEC  = uicontrol(FIG.handle,'callback','FFRwav2(''atELEC'');','styl
 FIG.edit.yscale     = uicontrol(FIG.handle,'callback','FFRwav2(''YLim'');','style','edit','Units','normalized','position',[.265 .07 .05 .04],'string',Display.YLim_atAD,'fontsize',12);
 
 %% Make things happen
+% FIG.push.close   = uicontrol(FIG.handle,'callback','FFRwav2(''close'');','style','pushbutton','Units','normalized','position',[.1 .6 .125 .09],'string','Close','fontsize',12,'fontangle','normal','fontweight','normal');
+% FIG.push.run_levels = uicontrol(FIG.handle,'callback','FFRwav2(''run_levels'');','style','pushbutton','Units','normalized','position',[.1 .726 .125 .09],'string','Run levels...','fontsize',12,'fontangle','normal','fontweight','normal');
+% FIG.push.forget_now = uicontrol(FIG.handle,'callback','FFRwav2(''forget_now'');','style','pushbutton','Units','normalized','position',[.07 .43 .125 .05],'string','Forget NOW','fontsize',12,'fontangle','normal','fontweight','normal','Userdata','');
+% 
 FIG.push.close   = uicontrol(FIG.handle,'callback','FFRwav2(''close'');','style','pushbutton','Units','normalized','position',[.1 .6 .125 .09],'string','Close','fontsize',12,'fontangle','normal','fontweight','normal');
-FIG.push.run_levels = uicontrol(FIG.handle,'callback','FFRwav2(''run_levels'');','style','pushbutton','Units','normalized','position',[.1 .726 .125 .09],'string','Run levels...','fontsize',12,'fontangle','normal','fontweight','normal');
+FIG.push.run_levels = uicontrol(FIG.handle,'callback','FFRwav2(''run_levels'');','style','pushbutton','Units','normalized','position',[.07 .726 .125 .09],'string','Run levels...','fontsize',12,'fontangle','normal','fontweight','normal');
+FIG.push.run_levels_Interleaved = uicontrol(FIG.handle,'callback','FFRwav2(''update_stim'',''Interleaved'');','style','pushbutton','Units','normalized','position',[.2 .726 .1 .09],'string','Run Interleaved...','fontsize',12,'fontangle','normal','fontweight','normal');
 FIG.push.forget_now = uicontrol(FIG.handle,'callback','FFRwav2(''forget_now'');','style','pushbutton','Units','normalized','position',[.07 .43 .125 .05],'string','Forget NOW','fontsize',12,'fontangle','normal','fontweight','normal','Userdata','');
+
+
 
 %% ???? CHANGE THIS???  %% MH/AF take out  (set later correctly)
 % if (FFR_set_attns(0,0,1,0) == 0)

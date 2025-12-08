@@ -55,7 +55,11 @@ elseif strcmp(command_str,'update_stim')
     
     switch eventdata
         case 'spl'
-            FIG.NewStim = 2;
+              if FIG.NewStim~= 101
+                FIG.NewStim = 2;
+              end
+            
+    
             if get(FIG.bg.spl.dB65, 'value')
                 Stimuli.atten_dB = Stimuli.calib_dBSPLout-65;
                 Stimuli.atten_dB = round(Stimuli.atten_dB,1);
@@ -69,7 +73,10 @@ elseif strcmp(command_str,'update_stim')
             Stimuli.calib_levelSPL = Stimuli.calib_dBSPLout-Stimuli.atten_dB;
             
         case 'spl2'
-            FIG.NewStim = 2;
+            
+            if FIG.NewStim~= 101
+                FIG.NewStim = 2;
+            end
             if get(FIG.bg2.spl.dB65, 'value')
                 Stimuli.atten2_dB = 50;% Stimuli.calib_dBSPLout2-65;
                 Stimuli.atten2_dB = round(Stimuli.atten2_dB,1);
@@ -206,12 +213,37 @@ elseif strcmp(command_str,'update_stim')
             end
             Stimuli.filename2=Stimuli.list2(StimInd).name;
             set(FIG.popup2.stims, 'value', StimInd);
+            
+            
+         case 'Interleaved'
+            FIG.NewStim = 101;
+            for StimInd =1:length(Stimuli.list)
+                Stimuli.filename_inter{StimInd}=Stimuli.list(StimInd).name;
+            end
+             resetAttn = true;
+            
+            
+            
     end
     
-    [xp,fsp]=audioread([Stimuli.OLDDir Stimuli.filename]);
-    xpr=resample(xp,round(Stimuli.RPsamprate_Hz), fsp);
-    audiowrite([Stimuli.UPDdir Stimuli.filename], xpr, round(Stimuli.RPsamprate_Hz));
-    copyfile([Stimuli.UPDdir Stimuli.filename],Stimuli.STIMfile,'f');
+    
+    
+    if FIG.NewStim ==101
+         
+        for StimInd =1:length(Stimuli.list)
+            [xp,fsp]=audioread([Stimuli.OLDDir Stimuli.filename_inter{StimInd}]);
+            xpr=resample(xp,round(Stimuli.RPsamprate_Hz), fsp);
+            audiowrite([Stimuli.UPDdir Stimuli.filename_inter{StimInd}], xpr, round(Stimuli.RPsamprate_Hz));
+        end
+           
+    else
+        [xp,fsp]=audioread([Stimuli.OLDDir Stimuli.filename]);
+        xpr=resample(xp,round(Stimuli.RPsamprate_Hz), fsp);
+        audiowrite([Stimuli.UPDdir Stimuli.filename], xpr, round(Stimuli.RPsamprate_Hz));
+        copyfile([Stimuli.UPDdir Stimuli.filename],Stimuli.STIMfile,'f');
+        
+    end
+    
     
     [xp2,fsp2]=audioread([Stimuli.OLDDir Stimuli.filename2]);
     xpr2=resample(xp2,round(Stimuli.RPsamprate_Hz), fsp2);

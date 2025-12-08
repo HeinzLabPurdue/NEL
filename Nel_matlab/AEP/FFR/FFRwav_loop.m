@@ -62,6 +62,7 @@ end
 % FFR_set_attns(Stimuli.atten_dB,-120,Stimuli.channel,Stimuli.KHosc,RP1,RP2);
 AEP_set_attns(Stimuli.atten_dB,Stimuli.channel,Stimuli.KHosc,RP1,RP2);  %% debug deal with later Khite
 
+
 FFRnpts=floor(FFR_Gating.FFRlength_ms/1000*Stimuli.RPsamprate_Hz); %Changed from ceil to floor based on ABR, VMA, SH (7/18/23)
 if Stimuli.FFRmem_reps>0
     FFR_memFact=exp(-2/Stimuli.FFRmem_reps);
