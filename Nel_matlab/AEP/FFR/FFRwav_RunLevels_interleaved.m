@@ -20,8 +20,8 @@ critVal2 = Stimuli.threshV2;
 demean_flag = 1;
 
 
-stimRCXfName= [prog_dir '\object\FFRwav_polIN.rcx'];
-
+%stimRCXfName= [prog_dir '\object\FFRwav_polIN.rcx'];
+stimRCXfName= [prog_dir '\object\FFRwav2_polIN.rcx'];
 %% RunLevels_params.nPairs = Stimuli.FFRmem_reps;
 % Setup panel for acquire/write mode:
 set(FIG.push.run_levels,'string','Abort');
@@ -71,10 +71,12 @@ FFRdataAvg_PO_save2= cell(size(RunLevels_params.attenMask));
 FFRdataAvg_NP_save2= cell(size(RunLevels_params.attenMask));
 
 %% not storing all repetitions zz 04nov11
+listlength=length(Stimuli.filename_inter);
 FFRdataReps_outer1 = cell(size(RunLevels_params.attenMask));  % All Reps
 FFRdataReps_outer2 = cell(size(RunLevels_params.attenMask)); % chan 2
 FFRattens=cell(size(RunLevels_params.attenMask));
-FFRinterstim=cell(RunLevels_params.nPairs,1);
+FFRinterstim=cell(RunLevels_params.nPairs*listlength,1);
+
 %% Main Loop
 % Not looping through attens for SFR. Assuming single attenutation.
 for attenIND = 1
@@ -92,8 +94,8 @@ for attenIND = 1
     FFRdataAvg_PO_plot2{attenIND} = zeros(1, FFRnpts); % chan2
     FFRdataAvg_NP_plot2{attenIND} = zeros(1, FFRnpts);
     
-    FFRdataReps1= cell(1, 2*RunLevels_params.nPairs); % SP on 22Jul19
-    FFRdataReps2= cell(1, 2*RunLevels_params.nPairs); % SP on 22Jul19
+    FFRdataReps1= cell(1, 2*RunLevels_params.nPairs*listlength); % SP on 22Jul19
+    FFRdataReps2= cell(1, 2*RunLevels_params.nPairs*listlength); % SP on 22Jul19
     
     % 28Apr2004 M.Heinz: Setup to skip 1st pulse pair, which is sometimes from previous level condition
     % 7/22/19 if we want to skip first pair, should start at
@@ -102,7 +104,7 @@ for attenIND = 1
     
     
     i_stim=1;
-    for currStim = 0:2*RunLevels_params.nPairs
+    for currStim = 0:2*RunLevels_params.nPairs*listlength
        
         if mod(currStim,2) ==1
              copyfile([Stimuli.UPDdir Stimuli.filename_inter{i_stim}],Stimuli.STIMfile,'f');
@@ -127,14 +129,14 @@ for attenIND = 1
            
             
        
-               
+                    
         
         
         
         if currStim
             set(FIG.statText.status, 'String', sprintf('STATUS: averaging at -%.1f dB [%d | %d | %d]...', ...
-                attenLevel, currStim, rejections, 2*RunLevels_params.nPairs)); % KHZZ 2011 Nov 4
-             FFRinterstim{currStim}=i_stim;    
+                attenLevel, currStim, rejections, 2*RunLevels_params.nPairs*listlength)); % KHZZ 2011 Nov 4
+            FFRinterstim{currStim}=i_stim;   
         end
         
         if (strcmp(get(FIG.push.forget_now, 'Userdata'), 'save') && ~mod(currStim,2))
@@ -286,7 +288,9 @@ if (bAbort == 0)
     
     %    disp(sprintf(ButtonName))
     if ~strcmp(ButtonName,'No')
-        FFR_set_attns(-120,-120,Stimuli.channel,Stimuli.KHosc,RP1,RP3);
+%         FFR_set_attns(-120,-120,Stimuli.channel,Stimuli.KHosc,RP1,RP3);
+        AEP_set_attns2(120,Stimuli.channel,120,Stimuli.channel2,Stimuli.KHosc,RP1,RP2);
+        
         PAset([120;120;120;120]);
         set(FIG.statText.status, 'String', 'STATUS: saving data...');
         % chan 1
@@ -314,7 +318,12 @@ end
 
 %% Reset to "free running..." mode:
 set(FIG.statText.status, 'String', ['STATUS (' interface_type '): free running...']);
-FFR_set_attns(Stimuli.atten_dB,-120,Stimuli.channel,Stimuli.KHosc,RP1,RP3);
+
+%%%%%
+AEP_set_attns2(120,Stimuli.channel,120,Stimuli.channel2,Stimuli.KHosc,RP1,RP2);
+% FFR_set_attns(Stimuli.atten_dB,-120,Stimuli.channel,Stimuli.KHosc,RP1,RP3);
+%%%%%%%%
+
 set(FIG.push.run_levels,'string','Run levels...');
 set(FIG.push.run_levels,'Userdata','');
 set(FIG.push.forget_now,'string','Forget NOW');

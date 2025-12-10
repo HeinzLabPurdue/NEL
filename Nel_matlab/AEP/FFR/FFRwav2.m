@@ -78,7 +78,7 @@ elseif strcmp(command_str,'update_stim')
                 FIG.NewStim = 2;
             end
             if get(FIG.bg2.spl.dB65, 'value')
-                Stimuli.atten2_dB = 50;% Stimuli.calib_dBSPLout2-65;
+                Stimuli.atten2_dB =  Stimuli.calib_dBSPLout2-65;
                 Stimuli.atten2_dB = round(Stimuli.atten2_dB,1);
             elseif get(FIG.bg2.spl.dB80, 'value')
                 Stimuli.atten2_dB = Stimuli.calib_dBSPLout2-80;
@@ -230,25 +230,28 @@ elseif strcmp(command_str,'update_stim')
     
     if FIG.NewStim ==101
          
-        for StimInd =1:length(Stimuli.list)
+        for StimInd =1:length(Stimuli.list)-1
             [xp,fsp]=audioread([Stimuli.OLDDir Stimuli.filename_inter{StimInd}]);
             xpr=resample(xp,round(Stimuli.RPsamprate_Hz), fsp);
             audiowrite([Stimuli.UPDdir Stimuli.filename_inter{StimInd}], xpr, round(Stimuli.RPsamprate_Hz));
         end
            
-    else
-        [xp,fsp]=audioread([Stimuli.OLDDir Stimuli.filename]);
-        xpr=resample(xp,round(Stimuli.RPsamprate_Hz), fsp);
-        audiowrite([Stimuli.UPDdir Stimuli.filename], xpr, round(Stimuli.RPsamprate_Hz));
-        copyfile([Stimuli.UPDdir Stimuli.filename],Stimuli.STIMfile,'f');
-        
     end
+  
     
     
     [xp2,fsp2]=audioread([Stimuli.OLDDir Stimuli.filename2]);
     xpr2=resample(xp2,round(Stimuli.RPsamprate_Hz), fsp2);
     audiowrite([Stimuli.UPDdir Stimuli.filename2], xpr2, round(Stimuli.RPsamprate_Hz));
     copyfile([Stimuli.UPDdir Stimuli.filename2],Stimuli.STIMfile2,'f');
+    
+             [xp,fsp]=audioread([Stimuli.OLDDir Stimuli.filename]);
+        xpr=resample(xp,round(Stimuli.RPsamprate_Hz), fsp);
+        audiowrite([Stimuli.UPDdir Stimuli.filename], xpr, round(Stimuli.RPsamprate_Hz));
+        copyfile([Stimuli.UPDdir Stimuli.filename],Stimuli.STIMfile,'f')
+    
+    
+    
     
     FFRwav2('attenCalib'); % Initialize RP2_4 with InvFilter
     

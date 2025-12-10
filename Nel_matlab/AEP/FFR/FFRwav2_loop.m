@@ -14,6 +14,7 @@ demean_flag=1;
 % general solution is radio button on/off for stim 1 and 2
 stimRCXfName= [prog_dir '\object\FFRwav2_polIN.rcx'];
 
+
 if NelData.General.RP2_3and4 && (~NelData.General.RX8) % NEL1 with RP2 #3 & #4
     invoke(RP1,'ClearCOF');
     invoke(RP1,'LoadCOF', stimRCXfName);
@@ -65,6 +66,7 @@ end
 % FFR_set_attns(Stimuli.atten_dB,-120,Stimuli.channel,Stimuli.KHosc,RP1,RP2);
 
 %% MH/AF - convet to AEP_set_attns2
+
 AEP_set_attns2(Stimuli.atten_dB,Stimuli.channel,Stimuli.atten2_dB,Stimuli.channel2,Stimuli.KHosc,RP1,RP2);  %% debug deal with later Khite
 
 FFRnpts=floor(FFR_Gating.FFRlength_ms/1000*Stimuli.RPsamprate_Hz); %Changed from ceil to floor based on ABR, VMA, SH (7/18/23)
@@ -324,6 +326,7 @@ while isempty(get(FIG.push.close,'Userdata'))
                 case 0 % Do nothing (SP)
                     %                     FFR_set_attns(Stimuli.atten_dB,-120,Stimuli.channel,Stimuli.KHosc,RP1,RP2);
                     %% MH/AF - convet to AEP_set_attns2
+           
                     AEP_set_attns2(Stimuli.atten_dB,Stimuli.channel,Stimuli.atten2_dB,Stimuli.channel2,Stimuli.KHosc,RP1,RP2);
                       
                 case 1 % case: fast or slow
@@ -377,6 +380,8 @@ while isempty(get(FIG.push.close,'Userdata'))
                     %                     FFR_set_attns(att_run,-120,Stimuli.channel,Stimuli.KHosc,RP1,RP2);
                     
                     %% MH/AF - convet to AEP_set_attns2
+
+
                     AEP_set_attns2(Stimuli.atten_dB,Stimuli.channel,Stimuli.atten2_dB,Stimuli.channel2,Stimuli.KHosc,RP1,RP2);
                     
                     % debug deal with later Khite
@@ -517,8 +522,8 @@ while isempty(get(FIG.push.close,'Userdata'))
                     drawnow;
                    
                 case 101 
-                        FFRwav_RunLevels_interleaved(FIG,Stimuli,invfiltdata, RunLevels_params, misc, FFR_Gating,...
-                        FFRnpts,interface_type, Display, NelData, data_dir, RP1, RP3, PROG, prog_dir)
+                        FFRwav2_RunLevels_interleaved(FIG,Stimuli,invfiltdata, RunLevels_params, misc, FFR_Gating,...
+                        FFRnpts,interface_type, Display, NelData, data_dir, RP1, RP2, RP3, PROG, prog_dir)
                         veryfirstSTIM=1; ...
             end
             FIG.NewStim = 0;

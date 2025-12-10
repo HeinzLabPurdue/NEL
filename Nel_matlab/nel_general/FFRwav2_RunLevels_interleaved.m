@@ -1,7 +1,7 @@
 %% Working
 
 function [firstSTIM, NelData]=FFRwav_RunLevels_interleaved(FIG,Stimuli,invfiltdata, RunLevels_params, misc, FFR_Gating,...
-    FFRnpts,interface_type, Display, NelData, data_dir, RP1, RP3, PROG, prog_dir)
+    FFRnpts,interface_type, Display, NelData, data_dir, RP1, RP2, RP3, PROG, prog_dir)
 
 % RP1=RP.activeX;
 % RP2=RP.activeX;
@@ -20,8 +20,8 @@ critVal2 = Stimuli.threshV2;
 demean_flag = 1;
 
 
-stimRCXfName= [prog_dir '\object\FFRwav_polIN.rcx'];
-
+%stimRCXfName= [prog_dir '\object\FFRwav_polIN.rcx'];
+stimRCXfName= [prog_dir '\object\FFRwav2_polIN.rcx'];
 %% RunLevels_params.nPairs = Stimuli.FFRmem_reps;
 % Setup panel for acquire/write mode:
 set(FIG.push.run_levels,'string','Abort');
@@ -104,22 +104,40 @@ for attenIND = 1
     
     
     i_stim=1;
+    click_stim=length(Stimuli.list);
     for currStim = 0:2*RunLevels_params.nPairs*listlength
        
         if mod(currStim,2) ==1
-             copyfile([Stimuli.UPDdir Stimuli.filename_inter{i_stim}],Stimuli.STIMfile,'f');
+             copyfile([Stimuli.UPDdir Stimuli.filename_inter{i_stim}],Stimuli.STIMfile2,'f');
+               copyfile([Stimuli.UPDdir Stimuli.filename_inter{click_stim}],Stimuli.STIMfile,'f');
+               
               invoke(RP1,'Halt');
+%               invoke(RP2,'Halt');
                     
         %% SP: Is it necessary to clear COF?
         invoke(RP1,'ClearCOF');
         invoke(RP1,'LoadCOF', stimRCXfName);
-
+% 
+%         invoke(RP2,'ClearCOF');
+%         invoke(RP2,'LoadCOF', stimRCXfName);
+        
         %%
         invoke(RP1, 'SetTagVal', 'StmOn', FFR_Gating.duration_ms);
         invoke(RP1, 'SetTagVal', 'StmOff', FFR_Gating.period_ms-FFR_Gating.duration_ms);
         invoke(RP1, 'SetTagVal', 'RiseFall', FFR_Gating.rftime_ms);
+%         invoke(RP2, 'SetTagVal', 'StmOn', FFR_Gating.duration_ms);
+%         invoke(RP2, 'SetTagVal', 'StmOff', FFR_Gating.period_ms-FFR_Gating.duration_ms);
+%         invoke(RP2, 'SetTagVal', 'RiseFall', FFR_Gating.rftime_ms);
+%         
         invoke(RP1,'Run');
+%         invoke(RP2,'Run');
         invoke(RP1,'SoftTrg',1);
+%         invoke(RP2,'SoftTrg',1);
+        
+        
+  AEP_set_attns2(Stimuli.atten_dB,Stimuli.channel,Stimuli.atten2_dB,Stimuli.channel2,Stimuli.KHosc,RP1,RP2);
+  
+        
                     
              i_stim = i_stim + 1;
              if i_stim > length(Stimuli.list)
@@ -288,7 +306,9 @@ if (bAbort == 0)
     
     %    disp(sprintf(ButtonName))
     if ~strcmp(ButtonName,'No')
-        FFR_set_attns(-120,-120,Stimuli.channel,Stimuli.KHosc,RP1,RP3);
+%         FFR_set_attns(-120,-120,Stimuli.channel,Stimuli.KHosc,RP1,RP3);
+        AEP_set_attns2(120,Stimuli.channel,120,Stimuli.channel2,Stimuli.KHosc,RP1,RP2);
+        
         PAset([120;120;120;120]);
         set(FIG.statText.status, 'String', 'STATUS: saving data...');
         % chan 1
@@ -316,7 +336,12 @@ end
 
 %% Reset to "free running..." mode:
 set(FIG.statText.status, 'String', ['STATUS (' interface_type '): free running...']);
-FFR_set_attns(Stimuli.atten_dB,-120,Stimuli.channel,Stimuli.KHosc,RP1,RP3);
+
+%%%%%
+AEP_set_attns2(120,Stimuli.channel,120,Stimuli.channel2,Stimuli.KHosc,RP1,RP2);
+% FFR_set_attns(Stimuli.atten_dB,-120,Stimuli.channel,Stimuli.KHosc,RP1,RP3);
+%%%%%%%%
+
 set(FIG.push.run_levels,'string','Run levels...');
 set(FIG.push.run_levels,'Userdata','');
 set(FIG.push.forget_now,'string','Forget NOW');

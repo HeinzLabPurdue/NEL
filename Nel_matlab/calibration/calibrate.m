@@ -180,8 +180,8 @@ elseif strcmp(command_str,'calibrate')
         update_params;
         
         set(FIG.push.stop,'Userdata',[]); 
-        %AF/PD    7/31/25 
-%         error = 0;
+  
+        error = 0;
         %calib loop
         while ~error && isempty(get(FIG.push.stop,'userdata'))
             %Set up TDT system for next stimulus:
