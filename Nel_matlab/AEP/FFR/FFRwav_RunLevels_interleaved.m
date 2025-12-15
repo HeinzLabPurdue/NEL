@@ -20,8 +20,8 @@ critVal2 = Stimuli.threshV2;
 demean_flag = 1;
 
 
-%stimRCXfName= [prog_dir '\object\FFRwav_polIN.rcx'];
-stimRCXfName= [prog_dir '\object\FFRwav2_polIN.rcx'];
+stimRCXfName= [prog_dir '\object\FFRwav_polIN.rcx'];
+% stimRCXfName= [prog_dir '\object\FFRwav2_polIN.rcx'];
 %% RunLevels_params.nPairs = Stimuli.FFRmem_reps;
 % Setup panel for acquire/write mode:
 set(FIG.push.run_levels,'string','Abort');

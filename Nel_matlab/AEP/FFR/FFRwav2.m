@@ -830,6 +830,15 @@ elseif strcmp(command_str,'attenCalib') %AS/MH/MP | Sprint 2023 Update
     
     [sig, fs] =audioread([Stimuli.UPDdir Stimuli.filename]);
     [sig2, fs2] =audioread([Stimuli.UPDdir Stimuli.filename2]);
+    
+    %%%
+    %AF 12/15/2025% 
+    %cat it hardcoded for now to only include tha probe 
+    
+    sig=sig(30522:54935);
+    sig2=sig2(30522:54935);
+       
+       
     curDir= pwd;
     cdd;
     cd(curDir);

@@ -24,6 +24,11 @@ demean_flag = 1;
 stimRCXfName= [prog_dir '\object\FFRwav2_polIN.rcx'];
 %% RunLevels_params.nPairs = Stimuli.FFRmem_reps;
 % Setup panel for acquire/write mode:
+
+% invoke(RP1,'Halt');
+% invoke(RP1,'ClearCOF');
+
+
 set(FIG.push.run_levels,'string','Abort');
 set(FIG.push.forget_now,'string','Save NOW');
 bAbort = 0;
@@ -108,42 +113,51 @@ for attenIND = 1
     for currStim = 0:2*RunLevels_params.nPairs*listlength
        
         if mod(currStim,2) ==1
-             copyfile([Stimuli.UPDdir Stimuli.filename_inter{i_stim}],Stimuli.STIMfile2,'f');
-               copyfile([Stimuli.UPDdir Stimuli.filename_inter{click_stim}],Stimuli.STIMfile,'f');
+            copystatus1= copyfile([Stimuli.UPDdir Stimuli.filename_inter{i_stim}],Stimuli.STIMfile2,'f');
+            copystatus2=copyfile([Stimuli.UPDdir Stimuli.filename_inter{click_stim}],Stimuli.STIMfile,'f');
+                         i_stim = i_stim + 1;
+             if i_stim > length(Stimuli.list)-1
+                 i_stim = 1;
+             end
+        
+               % how to know when done?  
                
-              invoke(RP1,'Halt');
+%               invoke(RP1,'Halt');
 %               invoke(RP2,'Halt');
                     
         %% SP: Is it necessary to clear COF?
-        invoke(RP1,'ClearCOF');
+%         invoke(RP1,'ClearCOF');
+% if copystatus1==1 && copystatus2==1 
         invoke(RP1,'LoadCOF', stimRCXfName);
+         invoke(RP1,'Run');
+          invoke(RP1,'SoftTrg',1);
+% end
 % 
 %         invoke(RP2,'ClearCOF');
 %         invoke(RP2,'LoadCOF', stimRCXfName);
         
         %%
-        invoke(RP1, 'SetTagVal', 'StmOn', FFR_Gating.duration_ms);
-        invoke(RP1, 'SetTagVal', 'StmOff', FFR_Gating.period_ms-FFR_Gating.duration_ms);
-        invoke(RP1, 'SetTagVal', 'RiseFall', FFR_Gating.rftime_ms);
+%         invoke(RP1, 'SetTagVal', 'StmOn', FFR_Gating.duration_ms);
+%         invoke(RP1, 'SetTagVal', 'StmOff', FFR_Gating.period_ms-FFR_Gating.duration_ms);
+%         invoke(RP1, 'SetTagVal', 'RiseFall', FFR_Gating.rftime_ms);
 %         invoke(RP2, 'SetTagVal', 'StmOn', FFR_Gating.duration_ms);
 %         invoke(RP2, 'SetTagVal', 'StmOff', FFR_Gating.period_ms-FFR_Gating.duration_ms);
 %         invoke(RP2, 'SetTagVal', 'RiseFall', FFR_Gating.rftime_ms);
 %         
-        invoke(RP1,'Run');
+       
 %         invoke(RP2,'Run');
-        invoke(RP1,'SoftTrg',1);
+%         invoke(RP1,'SoftTrg',1);
 %         invoke(RP2,'SoftTrg',1);
         
         
+
+        Stimuli.atten_dB=50;
   AEP_set_attns2(Stimuli.atten_dB,Stimuli.channel,Stimuli.atten2_dB,Stimuli.channel2,Stimuli.KHosc,RP1,RP2);
   
         
-                    
-             i_stim = i_stim + 1;
-             if i_stim > length(Stimuli.list)
-                 i_stim = 1;
-             end
-        end
+      end              
+
+        
            
             
        
@@ -176,7 +190,12 @@ for attenIND = 1
                 FFRdata2 = invoke(RP3,'ReadTagV','ADbuf2',0,FFRnpts);
                 maxFFRobs1 = max(abs(FFRdata1)); %Artifact rejection KHZZ 2011 Nov 4
                 maxFFRobs2 = max(abs(FFRdata2));
+                
+         
+                
+      
 
+                  
                 %drawnow;
                 
                 % fixing the function to make sure the polarity matches, starts with 1,
@@ -214,6 +233,11 @@ for attenIND = 1
                         end
                     end
                     
+                    
+         
+
+
+
                     if currStim
                         FFRdataReps1{currStim}=FFRdata1; %added DA 7/23/13
                         FFRdataReps2{currStim}=FFRdata2;
@@ -225,7 +249,11 @@ for attenIND = 1
                 end %End for artifact rejection KH 2011 June 08
                 
                 invoke(RP3,'SoftTrg',2);
+                
             end
+            
+
+
 
         end
 
@@ -273,6 +301,26 @@ for attenIND = 1
             end
             drawnow;
         end
+      
+      while invoke(RP1,'GetTagVal','Stage')==1
+           
+      end
+          
+          
+          
+               % MH:  where to use this???    Ue it to detect OFF after POS/NEG has completed
+                    % invoke(RP1,'GetTagVal','Stage') 
+                
+                  % if stim# is even (NEG polarity) & STAGE = LOW, then HALT, copy next stim (
+                  if  invoke(RP1,'GetTagVal','Stage')==2   &&  mod(currStim+1,2) ==1
+                        invoke(RP1,'Halt');
+                        invoke(RP1,'ClearCOF');
+                  end     
+                  
+                  
+                  
+                  
+                  
     end
     
     % Odd that 1 is negative polarity - need to check if it's correct % SP
