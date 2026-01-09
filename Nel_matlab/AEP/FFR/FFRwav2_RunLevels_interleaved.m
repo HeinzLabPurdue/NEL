@@ -127,11 +127,11 @@ for attenIND = 1
                     
         %% SP: Is it necessary to clear COF?
 %         invoke(RP1,'ClearCOF');
-% if copystatus1==1 && copystatus2==1 
+  
         invoke(RP1,'LoadCOF', stimRCXfName);
-         invoke(RP1,'Run');
-          invoke(RP1,'SoftTrg',1);
-% end
+        invoke(RP1,'Run');
+        invoke(RP1,'SoftTrg',1);
+
 % 
 %         invoke(RP2,'ClearCOF');
 %         invoke(RP2,'LoadCOF', stimRCXfName);
@@ -168,7 +168,7 @@ for attenIND = 1
         if currStim
             set(FIG.statText.status, 'String', sprintf('STATUS: averaging at -%.1f dB [%d | %d | %d]...', ...
                 attenLevel, currStim, rejections, 2*RunLevels_params.nPairs*listlength)); % KHZZ 2011 Nov 4
-            FFRinterstim{currStim}=i_stim;   
+            FFRinterstim{currStim}=i_stim-1;   
         end
         
         if (strcmp(get(FIG.push.forget_now, 'Userdata'), 'save') && ~mod(currStim,2))
