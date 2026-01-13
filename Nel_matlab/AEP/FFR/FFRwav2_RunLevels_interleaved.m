@@ -137,9 +137,9 @@ for attenIND = 1
 %         invoke(RP2,'LoadCOF', stimRCXfName);
         
         %%
-%         invoke(RP1, 'SetTagVal', 'StmOn', FFR_Gating.duration_ms);
-%         invoke(RP1, 'SetTagVal', 'StmOff', FFR_Gating.period_ms-FFR_Gating.duration_ms);
-%         invoke(RP1, 'SetTagVal', 'RiseFall', FFR_Gating.rftime_ms);
+        invoke(RP1, 'SetTagVal', 'StmOn', FFR_Gating.duration_ms);
+        invoke(RP1, 'SetTagVal', 'StmOff', FFR_Gating.period_ms-FFR_Gating.duration_ms);
+        invoke(RP1, 'SetTagVal', 'RiseFall', FFR_Gating.rftime_ms);
 %         invoke(RP2, 'SetTagVal', 'StmOn', FFR_Gating.duration_ms);
 %         invoke(RP2, 'SetTagVal', 'StmOff', FFR_Gating.period_ms-FFR_Gating.duration_ms);
 %         invoke(RP2, 'SetTagVal', 'RiseFall', FFR_Gating.rftime_ms);

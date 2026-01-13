@@ -24,7 +24,7 @@ if nargin < 1
     usr = NelData.General.User;
     
     cdd;
-    allCalibFiles= dir('*calib_inv*');
+    allCalibFiles= dir('*calib_*inv*');
     if isempty(allCalibFiles)
         uiwait(warndlg('No Inverse Calibration File exist in this directory!','modal'));
     else
