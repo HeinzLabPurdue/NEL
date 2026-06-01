@@ -29,7 +29,8 @@ if nargin < 1
         uiwait(warndlg('No Inverse Calibration File exist in this directory!','modal'));
     else
     rdd;
-    interface_type=questdlg('Select AEP Measure:','AEP','CAP','ABR','FFR','ABR'); %SP 30Jun2016
+   
+    interface_type=questdlg('Select AEP Measure:','AEP','ABR','FFR','pABR','ABR'); %SP 30Jun2016
 
     % Set up for specific AEP
     
@@ -46,8 +47,8 @@ if nargin < 1
     switch interface_type
         case 'ABR'
             h_fig = ABR; 
-        case 'CAP'
-            h_fig = CAP; 
+        case 'pABR'
+           h_fig = FFRwav2(); 
         case 'FFR' 
             FFR_interface_type=questdlg('Which FFR stimulus type?:','','AM/FM','Custom .WAV File','Custom 2 .WAV Files','AM/FM');
             switch FFR_interface_type
@@ -64,7 +65,7 @@ if nargin < 1
 %                   h_fig = SFR_pink_mask_tdt;
 %               case 'EFR_HrmCpx'
 %                   h_fig = EFR_Harm_Cmplx;
-
+              
             end
     end
 end
