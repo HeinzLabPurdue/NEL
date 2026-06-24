@@ -1,9 +1,9 @@
 function h_fig = FFRwav2(command_str,eventdata)
 
-global RP PROG FIG Stimuli FFR_Gating root_dir prog_dir Display NelData PROTOCOL filttype invfiltdata
+global RP pABRstim  PROG FIG Stimuli FFR_Gating root_dir prog_dir Display NelData PROTOCOL filttype invfiltdata
 
 PROTOCOL = 'FFRwav2';
-prog_dir = [root_dir 'AEP\FFR\'];
+prog_dir = [root_dir 'AEP\pABR\']; %Changed from FFR to pABR
 usr = NelData.General.User; % current nel user
 
 % Decide if NEL1 or NEL2
@@ -60,12 +60,16 @@ elseif strcmp(command_str,'update_stim')
               end
             
     
-            if get(FIG.bg.spl.dB65, 'value')
-                Stimuli.atten_dB = Stimuli.calib_dBSPLout-65;
+            if get(FIG.bg.spl.dB75, 'value')
+                Stimuli.atten_dB = Stimuli.calib_dBSPLout-75;
+                pABRstim.atten_dB =   pABRstim.calib_dBSPLout-75; %#ok<*NODEF>
                 Stimuli.atten_dB = round(Stimuli.atten_dB,1);
+                pABRstim.atten_dB =  round( pABRstim.atten_dB,1); %#ok<*STRNU>
             elseif get(FIG.bg.spl.dB80, 'value')
                 Stimuli.atten_dB = Stimuli.calib_dBSPLout-80;
+                pABRstim.atten_dB =   pABRstim.calib_dBSPLout-80;
                 Stimuli.atten_dB = round(Stimuli.atten_dB,1);
+                pABRstim.atten_dB =  round( pABRstim.atten_dB,1);
             end
             set(FIG.asldr.val,'string',num2str(-Stimuli.atten_dB));
             %             set_RP_tagvals(RP1, RP2, FFR_SNRenv_Gating, Stimuli);
@@ -77,12 +81,16 @@ elseif strcmp(command_str,'update_stim')
             if FIG.NewStim~= 101
                 FIG.NewStim = 2;
             end
-            if get(FIG.bg2.spl.dB65, 'value')
-                Stimuli.atten2_dB =  Stimuli.calib_dBSPLout2-65;
+            if get(FIG.bg2.spl.dB75, 'value')
+                Stimuli.atten2_dB =  Stimuli.calib_dBSPLout2-75;
+                pABRstim.atten2_dB =   pABRstim.calib_dBSPLout2-75;
                 Stimuli.atten2_dB = round(Stimuli.atten2_dB,1);
+                pABRstim.atten2_dB = round(pABRstim.atten2_dB,1);
             elseif get(FIG.bg2.spl.dB80, 'value')
                 Stimuli.atten2_dB = Stimuli.calib_dBSPLout2-80;
+                pABRstim.atten2_dB = pABRstim.calib_dBSPLout2-80;
                 Stimuli.atten2_dB = round(Stimuli.atten2_dB,1);
+                pABRstim.atten2_dB = round(pABRstim.atten2_dB,1);
             end
             set(FIG.asldr2.val,'string',num2str(-Stimuli.atten2_dB));
             %             set_RP_tagvals(RP1, RP2, FFR_SNRenv_Gating, Stimuli);
@@ -253,13 +261,13 @@ elseif strcmp(command_str,'update_stim')
     
     
     
-    FFRwav2('attenCalib'); % Initialize RP2_4 with InvFilter
+    %FFRwav2('attenCalib'); % Initialize RP2_4 with InvFilter
     
     %default new stim to 80 dB unless changed by user
     if resetAttn
-        set(FIG.bg.spl.dB80, 'value',1);
+        set(FIG.bg.spl.dB75, 'value',1);
         FFRwav2('update_stim','spl');
-        set(FIG.bg2.spl.dB80, 'value',1);
+        set(FIG.bg2.spl.dB75, 'value',1);
         FFRwav2('update_stim','spl2');
     end
     
@@ -500,7 +508,7 @@ elseif strcmp(command_str,'Simultaneous')
 elseif strcmp(command_str,'slide_atten')
     FIG.NewStim = 2;
     
-    set(FIG.bg.spl.dB65, 'value',0);
+    set(FIG.bg.spl.dB75, 'value',0);
     set(FIG.bg.spl.dB80, 'value',0);
     
     Stimuli.atten_dB = floor(-get(FIG.asldr.slider,'value'));
@@ -511,12 +519,12 @@ elseif strcmp(command_str,'slide_atten')
     Stimuli.calib_levelSPL = Stimuli.calib_dBSPLout-Stimuli.atten_dB;
     
     set(FIG.asldr.SPL,'string',sprintf('%.1f dB SPL',Stimuli.calib_dBSPLout-abs(get(FIG.asldr.slider,'val'))));
-    FFRwav2('attenCalib');
+    %FFRwav2('attenCalib');
     
 elseif strcmp(command_str,'slide_atten2')
     FIG.NewStim = 2;
     
-    set(FIG.bg2.spl.dB65, 'value',0);
+    set(FIG.bg2.spl.dB75, 'value',0);
     set(FIG.bg2.spl.dB80, 'value',0);
     
     Stimuli.atten2_dB = floor(-get(FIG.asldr2.slider,'value'));
@@ -533,7 +541,7 @@ elseif strcmp(command_str,'slide_atten2')
 elseif strcmp(command_str, 'slide_atten_text')
     FIG.NewStim = 2;
     
-    set(FIG.bg.spl.dB65, 'value',0);
+    set(FIG.bg.spl.dB75, 'value',0);
     set(FIG.bg.spl.dB80, 'value',0);
     
     new_atten = get(FIG.asldr.val, 'string');
@@ -559,7 +567,7 @@ elseif strcmp(command_str, 'slide_atten_text')
 elseif strcmp(command_str, 'slide_atten_text2')
     FIG.NewStim = 2;
     
-    set(FIG.bg2.spl.dB65, 'value',0);
+    set(FIG.bg2.spl.dB75, 'value',0);
     set(FIG.bg2.spl.dB80, 'value',0);
     
     new_atten = get(FIG.asldr2.val, 'string');
@@ -744,6 +752,8 @@ elseif strcmp(command_str,'calibInit')
     rdd;
     
     
+   
+    
     if strcmp(NelData.Metadata.calib_type,'SPL')
         ears_calib = cal.ear_ord;  %cal.FPL.xxxx   x.FPLearData.ear
         r_present = sum(strcmp(ears_calib,'Right '));
@@ -828,6 +838,9 @@ elseif strcmp(command_str,'attenCalib') %AS/MH/MP | Sprint 2023 Update
     cal = loadpic_FFRWav2(invfiltdata.CalibPICnum2use);  % use INVERSE calib to compute MAX dB SPL
     rdd;
     
+   
+    
+    
     [sig, fs] =audioread([Stimuli.UPDdir Stimuli.filename]);
     [sig2, fs2] =audioread([Stimuli.UPDdir Stimuli.filename2]);
     
@@ -848,6 +861,11 @@ elseif strcmp(command_str,'attenCalib') %AS/MH/MP | Sprint 2023 Update
     
     %RIGHT NOW ONLY USING ONE CALIB CURVE TO CALIBRATE OTHER.....
     
+    if get(FIG.bg2.spl.dB75, 'value')
+        desiredSpl = 75;
+    elseif get(FIG.bg2.spl.dB80, 'value')
+         desiredSpl = 80;
+    end
     if ~strcmpi(Stimuli.ear,'both')
         
         if strcmp(NelData.Metadata.calib_type,'SPL')
@@ -861,16 +879,36 @@ elseif strcmp(command_str,'attenCalib') %AS/MH/MP | Sprint 2023 Update
         
         if calib_to_use == 2
             CalibData=cal.CalibData2(:,1:2);
+            frequencies = [500 1000 2000 4000 8000];
+            if ~isfield(pABRstim,'isBuilt') || ~pABRstim.isBuilt
+                [pABRstim] = make_toneburst_epochs(frequencies,  round(Stimuli.RPsamprate_Hz), 30, 40,CalibData,desiredSpl);
+                 pABRstim.isBuilt = true;
+            end
         else
             CalibData = cal.CalibData(:,1:2);
+            frequencies = [500 1000 2000 4000 8000];
+            if ~isfield(pABRstim,'isBuilt') || ~pABRstim.isBuilt
+                [pABRstim] = make_toneburst_epochs(frequencies,  round(Stimuli.RPsamprate_Hz), 30, 40,CalibData,desiredSpl);
+                 pABRstim.isBuilt = true;
+            end
+            
+            
         end
     else %both ears
         %use mean of the inv calib curves
         CalibData(:,1) = cal.CalibData(:,1);
         CalibData(:,2) = (cal.CalibData(:,2)+cal.CalibData2(:,2))/2;
+        frequencies = [500 1000 2000 4000 8000];
+       
+        if ~isfield(pABRstim,'isBuilt') || ~pABRstim.isBuilt
+                [pABRstim] = make_toneburst_epochs(frequencies,  round(Stimuli.RPsamprate_Hz), 30, 40,CalibData,desiredSpl);
+                 pABRstim.isBuilt = true;
+        end
+       
     end
     
     Stimuli.calib_dBSPLout= get_SPL_from_calib(sig, fs, CalibData, false);
+    pABRstim.calib_dBSPLout= pABRstim.maxSPL;
     set(FIG.asldr.SPL,'string',sprintf('%.1f dB SPL',Stimuli.calib_dBSPLout-abs(str2double(get(FIG.asldr.val, 'string')))));
     
     %     set(FIG.asldr.SPL, 'string', sprintf('%.1f dB SPL', Stimuli.MaxdBSPLCalib-Stimuli.atten_dB));
@@ -899,6 +937,7 @@ elseif strcmp(command_str,'attenCalib') %AS/MH/MP | Sprint 2023 Update
     
     %%%% AF how to change this for FPL ????
     Stimuli.calib_dBSPLout2= get_SPL_from_calib(sig2, fs2, CalibData, false);
+    pABRstim.calib_dBSPLout2= pABRstim.maxSPL;
     set(FIG.asldr2.SPL,'string',sprintf('%.1f dB SPL',Stimuli.calib_dBSPLout2-abs(str2double(get(FIG.asldr2.val, 'string')))));
     
     

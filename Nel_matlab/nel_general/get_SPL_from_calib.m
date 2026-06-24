@@ -33,6 +33,7 @@ calibOrgMaxOutput= calibdata(:,2); % This corresponds to db 5/sqrt(2) V => 1/sqr
 baseline_dB= 20*log10(1/sqrt(2)/(20e-6)); % 1Vpp wav-amp = 1/sqrt(2) rms = Ideal calibOUT
 calibOrgRelative_dB= calibOrgMaxOutput-baseline_dB;
 
+
 %% Consider a signal x.
 % Energy equation: sum(x.^2)=(1/nfft)*sum(|fft(x, nfft)|.^2)
 % So power equation: will be sum(x.^2)/L=(1/L/nfft)*sum(|fft(x, nfft)|.^2)

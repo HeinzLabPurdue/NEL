@@ -48,7 +48,10 @@ if nargin < 1
         case 'ABR'
             h_fig = ABR; 
         case 'pABR'
-           h_fig = FFRwav2(); 
+            addpath(genpath([root_dir  'pABR']));
+            warndlg('Change pABR directory file from FFR to pABR - ONCE DEBUG DONE')
+            h_fig = FFRwav2(); 
+            
         case 'FFR' 
             FFR_interface_type=questdlg('Which FFR stimulus type?:','','AM/FM','Custom .WAV File','Custom 2 .WAV Files','AM/FM');
             switch FFR_interface_type

@@ -1,7 +1,9 @@
 %% Working
 
-function [firstSTIM, NelData]=FFRwav_RunLevels_interleaved(FIG,Stimuli,invfiltdata, RunLevels_params, misc, FFR_Gating,...
+function [firstSTIM, NelData]=FFRwav2_RunLevels_interleaved(FIG,Stimuli,invfiltdata, RunLevels_params, misc, FFR_Gating,...
     FFRnpts,interface_type, Display, NelData, data_dir, RP1, RP2, RP3, PROG, prog_dir)
+
+pABR_flag = 1;
 
 % RP1=RP.activeX;
 % RP2=RP.activeX;
@@ -21,7 +23,12 @@ demean_flag = 1;
 
 
 %stimRCXfName= [prog_dir '\object\FFRwav_polIN.rcx'];
-stimRCXfName= [prog_dir '\object\FFRwav2_polIN.rcx'];
+if pABR_flag
+    
+   stimRCXfName= [prog_dir '\object\pABRwav2_polIN.rcx'];
+else
+    stimRCXfName= [prog_dir '\object\FFRwav2_polIN.rcx'];
+end
 %% RunLevels_params.nPairs = Stimuli.FFRmem_reps;
 % Setup panel for acquire/write mode:
 
@@ -106,19 +113,48 @@ for attenIND = 1
     % 7/22/19 if we want to skip first pair, should start at
     % for currStim= -1:2*RunLevels_params.nPairs and we should be checking
     % if currStim is >0 in if statements
+    frequencies = [500 1000 2000 4000 8000];
+    [pABR_Lstim,~, ~, ~] = make_toneburst_epochs(frequencies,round(Stimuli.RPsamprate_Hz), 30, 40);
     
-    
+    [~,pABR_Rstim, ~, ~] = make_toneburst_epochs(frequencies,round(Stimuli.RPsamprate_Hz), 30, 40);
     i_stim=1;
     click_stim=length(Stimuli.list);
     for currStim = 0:2*RunLevels_params.nPairs*listlength
        
-        if mod(currStim,2) ==1
+      if mod(currStim,2) ==1
+            if ~pABR_flag
             copystatus1= copyfile([Stimuli.UPDdir Stimuli.filename_inter{i_stim}],Stimuli.STIMfile2,'f');
             copystatus2=copyfile([Stimuli.UPDdir Stimuli.filename_inter{click_stim}],Stimuli.STIMfile,'f');
-                         i_stim = i_stim + 1;
+            
+            invoke(RP1,'LoadCOF', stimRCXfName);
+            invoke(RP1,'Run');
+            invoke(RP1,'SoftTrg',1);
+            else
+                xpR = pABR_Rstim(i_stim,:);
+                xpL = pABR_Lstim(i_stim,:);
+                
+                invoke(RP1,'LoadCOF', stimRCXfName);
+                invoke(RP1,'Run');
+                
+                tmpR=invoke(RP1,'WriteTagV','STIM_R',0, xpR); %#ok<NASGU>
+                tmpL=invoke(RP1,'WriteTagV','STIM_L',0, xpL); %#ok<NASGU>
+                
+%                 invoke(RP1,'Run');
+                invoke(RP1,'SoftTrg',1);
+
+                
+            end
+            
+            i_stim = i_stim + 1;
+            if ~pABR_flag
              if i_stim > length(Stimuli.list)-1
-                 i_stim = 1;
+                i_stim = 1;
              end
+            else
+               if i_stim > size(pABR_Lstim,1)-1
+                i_stim = 1;
+               end
+            end
         
                % how to know when done?  
                
@@ -128,9 +164,9 @@ for attenIND = 1
         %% SP: Is it necessary to clear COF?
 %         invoke(RP1,'ClearCOF');
   
-        invoke(RP1,'LoadCOF', stimRCXfName);
-        invoke(RP1,'Run');
-        invoke(RP1,'SoftTrg',1);
+%        invoke(RP1,'LoadCOF', stimRCXfName);  default before pABR included
+%        invoke(RP1,'Run');
+%        invoke(RP1,'SoftTrg',1);
 
 % 
 %         invoke(RP2,'ClearCOF');
@@ -151,9 +187,9 @@ for attenIND = 1
         
         
 
-        Stimuli.atten_dB=50;
+         Stimuli.atten_dB=50;
   AEP_set_attns2(Stimuli.atten_dB,Stimuli.channel,Stimuli.atten2_dB,Stimuli.channel2,Stimuli.KHosc,RP1,RP2);
-  
+%   
         
       end              
 
@@ -312,10 +348,12 @@ for attenIND = 1
                     % invoke(RP1,'GetTagVal','Stage') 
                 
                   % if stim# is even (NEG polarity) & STAGE = LOW, then HALT, copy next stim (
-                  if  invoke(RP1,'GetTagVal','Stage')==2   &&  mod(currStim+1,2) ==1
-                        invoke(RP1,'Halt');
-                        invoke(RP1,'ClearCOF');
-                  end     
+                  
+                  
+                  %if  invoke(RP1,'GetTagVal','Stage')==2   &&  mod(currStim+1,2) ==1
+                        %invoke(RP1,'Halt');
+                        %invoke(RP1,'ClearCOF');
+                  %end     
                   
                   
                   

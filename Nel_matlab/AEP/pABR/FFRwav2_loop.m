@@ -1,4 +1,4 @@
-global COMM prog_dir PROG data_dir NelData Stimuli filttype invfiltdata
+global COMM prog_dir PROG data_dir NelData Stimuli filttype invfiltdata pABRstim 
 
 % if ~(double(invoke(RP1,'GetTagVal', 'Stage')) == 2)
 %     FFR_set_attns(-120,-120,Stimuli.channel,Stimuli.KHosc,RP1,RP2); %% Check with MH
@@ -7,12 +7,30 @@ global COMM prog_dir PROG data_dir NelData Stimuli filttype invfiltdata
 % adding demean_flag (JMR 2021)
 demean_flag=1;
 
+%% pABR DEVELOP
+pABR_flag=1;
+
 
 %% For stimulus
 % stimRCXfName= [prog_dir '\object\FFRwav_polIN.rcx'];
 % ????? AF/MH Mar 2024 - do we want polINV in all cases??  maybe not -
 % general solution is radio button on/off for stim 1 and 2
-stimRCXfName= [prog_dir '\object\FFRwav2_polIN.rcx'];
+stimRCXfName= [prog_dir '\object\FFRwav2_polIN.rcx']; %#ok<NASGU>
+if pABR_flag
+    stimRCXfName= [prog_dir '\object\pABRwav2_polIN.rcx'];
+
+    % [xp,fsp]=audioread([Stimuli.OLDDir Stimuli.filename]);
+    % xpr=resample(xp,round(Stimuli.RPsamprate_Hz), fsp);
+    % audiowrite([Stimuli.UPDdir Stimuli.filename], xpr, round(Stimuli.RPsamprate_Hz));
+    % copyfile([Stimuli.UPDdir Stimuli.filename],Stimuli.STIMfile,'f')
+    pABR_Lstim=pABRstim.leftEpochs;
+    pABR_Rstim=pABRstim.rightEpochs;
+
+end
+
+
+
+
 
 
 if NelData.General.RP2_3and4 && (~NelData.General.RX8) % NEL1 with RP2 #3 & #4
@@ -65,9 +83,18 @@ end
 
 % FFR_set_attns(Stimuli.atten_dB,-120,Stimuli.channel,Stimuli.KHosc,RP1,RP2);
 
-%% MH/AF - convet to AEP_set_attns2
+%% pABR DEVELOP
+if pABR_flag
+    xpR = double(pABR_Rstim(1,:));
+    xpL = double(pABR_Lstim(1,:));
 
-AEP_set_attns2(Stimuli.atten_dB,Stimuli.channel,Stimuli.atten2_dB,Stimuli.channel2,Stimuli.KHosc,RP1,RP2);  %% debug deal with later Khite
+    tmpR = invoke(RP1,'WriteTagV','STIM_R',0,xpR); %writing directly to buffer JL 09June2026
+    tmpL = invoke(RP1,'WriteTagV','STIM_L',0,xpL);
+end
+
+
+%% MH/AF - convet to AEP_set_attns2
+AEP_set_attns2(pABRstim.atten_dB,Stimuli.channel, pABRstim.atten2_dB,Stimuli.channel2,Stimuli.KHosc,RP1,RP2);  %% debug deal with later Khite
 
 FFRnpts=floor(FFR_Gating.FFRlength_ms/1000*Stimuli.RPsamprate_Hz); %Changed from ceil to floor based on ABR, VMA, SH (7/18/23)
 if Stimuli.FFRmem_reps>0
@@ -327,7 +354,7 @@ while isempty(get(FIG.push.close,'Userdata'))
                     %                     FFR_set_attns(Stimuli.atten_dB,-120,Stimuli.channel,Stimuli.KHosc,RP1,RP2);
                     %% MH/AF - convet to AEP_set_attns2
            
-                    AEP_set_attns2(Stimuli.atten_dB,Stimuli.channel,Stimuli.atten2_dB,Stimuli.channel2,Stimuli.KHosc,RP1,RP2);
+                    AEP_set_attns2(pABRstim.atten_dB,Stimuli.channel, pABRstim.atten2_dB,Stimuli.channel2,Stimuli.KHosc,RP1,RP2);
                       
                 case 1 % case: fast or slow
                     % set_RP_tagvals(RP1, RP2, FFR_Gating, Stimuli);
@@ -365,13 +392,44 @@ while isempty(get(FIG.push.close,'Userdata'))
                     
                     %% SP: Is it necessary to clear COF?
                     invoke(RP1,'ClearCOF');
+                                     
+                    %% *** also need LOAD DATA IN
+                    if pABR_flag
+                        stimRCXfName= [prog_dir '\object\pABRwav2_polIN.rcx'];
+                         pABR_Lstim=pABRstim.leftEpochs;
+                         pABR_Rstim=pABRstim.rightEpochs;
+                        % [xp,fsp]=audioread([Stimuli.OLDDir Stimuli.filename]);
+                        % xpr=resample(xp,round(Stimuli.RPsamprate_Hz), fsp);
+                        % audiowrite([Stimuli.UPDdir Stimuli.filename], xpr, round(Stimuli.RPsamprate_Hz));
+                        % copyfile([Stimuli.UPDdir Stimuli.filename],Stimuli.STIMfile,'f')
+                        %[xp,fsp]=audioread([Stimuli.STIMfile]);
+                        
+                        % [xp2,fsp2]=audioread([Stimuli.OLDDir Stimuli.filename2]);
+                        % xpr2=resample(xp2,round(Stimuli.RPsamprate_Hz), fsp2);
+                        % audiowrite([Stimuli.UPDdir Stimuli.filename2], xpr2, round(Stimuli.RPsamprate_Hz));
+                        % copyfile([Stimuli.UPDdir Stimuli.filename2],Stimuli.STIMfile2,'f');
+                        %[xp2,fsp2]=audioread([Stimuli.STIMfile2]);
+
+                    end
                     invoke(RP1,'LoadCOF', stimRCXfName);
+                    
                     
                     %%
                     invoke(RP1, 'SetTagVal', 'StmOn', FFR_Gating.duration_ms);
                     invoke(RP1, 'SetTagVal', 'StmOff', FFR_Gating.period_ms-FFR_Gating.duration_ms);
                     invoke(RP1, 'SetTagVal', 'RiseFall', FFR_Gating.rftime_ms);
+                    
+                    if pABR_flag
+                        xpR = double(pABR_Rstim(1,:));
+                        xpL = double(pABR_Lstim(1,:));
+                        
+                        tmpR = invoke(RP1,'WriteTagV','STIM_R',0,xpR); %writing directly to buffer JL 09June2026
+                        tmpL = invoke(RP1,'WriteTagV','STIM_L',0,xpL);
+                        
+                    end
+                    
                     invoke(RP1,'Run');
+                    
                     
                     % round attenuation
                     %                     att_run = floor(Stimuli.maxSPL-Stimuli.atten_dB-20);
@@ -382,7 +440,7 @@ while isempty(get(FIG.push.close,'Userdata'))
                     %% MH/AF - convet to AEP_set_attns2
 
 
-                    AEP_set_attns2(Stimuli.atten_dB,Stimuli.channel,Stimuli.atten2_dB,Stimuli.channel2,Stimuli.KHosc,RP1,RP2);
+                    AEP_set_attns2(pABRstim.atten_dB,Stimuli.channel, pABRstim.atten2_dB,Stimuli.channel2,Stimuli.KHosc,RP1,RP2);
                     
                     % debug deal with later Khite
                     
@@ -522,8 +580,8 @@ while isempty(get(FIG.push.close,'Userdata'))
                     drawnow;
                    
                 case 101 
-                        FFRwav2_RunLevels_interleaved(FIG,Stimuli,invfiltdata, RunLevels_params, misc, FFR_Gating,...
-                        FFRnpts,interface_type, Display, NelData, data_dir, RP1, RP2, RP3, PROG, prog_dir)
+                        FFRwav2_RunLevels_pABR(FIG,Stimuli,invfiltdata, RunLevels_params, misc, FFR_Gating,...
+                        FFRnpts,interface_type, Display, NelData, data_dir, RP1, RP2, RP3, PROG, prog_dir,pABRstim )
                         veryfirstSTIM=1; ...
             end
             FIG.NewStim = 0;
