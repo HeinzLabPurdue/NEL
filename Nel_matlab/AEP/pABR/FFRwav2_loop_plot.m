@@ -18,13 +18,13 @@ FIG.radio.fast   = uicontrol(FIG.handle,'callback','FFRwav2(''fast'');','style',
 FIG.radio.slow   = uicontrol(FIG.handle,'callback','FFRwav2(''slow'');','style','radio','Enable','on','Units','normalized','position',[.27 .35 .08 .03],'string','Slow','fontsize',12,'BackgroundColor','w','value',0);
 
 %% Stimulus menu
-FIG.popup.siglabel = uicontrol(FIG.handle, 'callback', '', 'style', 'text','Units','normalized', 'position', [.35 .22 .05 .04], 'string', 'Stimulus 1:','fontsize',12,'BackgroundColor','w','FontWeight','Bold');
+FIG.popup.siglabel = uicontrol(FIG.handle, 'callback', '', 'style', 'text','Units','normalized', 'position', [.35 .22 .05 .04], 'string', 'Stimulus 1:','fontsize',10,'BackgroundColor','w','FontWeight','Bold');
 FIG.popup.stims = uicontrol(FIG.handle,'callback', 'FFRwav2(''update_stim'',''newStim'');','style','popup','Units','normalized','Userdata',Stimuli.filename,'position',[.43 .23 .4 .04],'string',{fName.name},'fontsize',12);
 FIG.push.prev_stim = uicontrol(FIG.handle,'callback','FFRwav2(''update_stim'',''prevStim'');','style','pushbutton','Units','normalized','position',[.4 .23 .03 .04],'string','<<','fontsize',12,'fontangle','normal','fontweight','normal');
 FIG.push.next_stim = uicontrol(FIG.handle,'callback','FFRwav2(''update_stim'',''nextStim'');','style','pushbutton','Units','normalized','position',[.83 .23 .03 .04],'string','>>','fontsize',12,'fontangle','normal','fontweight','normal');
 
 %% Stimulus2 menu
-FIG.popup2.siglabel = uicontrol(FIG.handle, 'callback', '', 'style', 'text','Units','normalized', 'position', [.35 .11 .05 .04], 'string', 'Stimulus 2:','fontsize',12,'BackgroundColor','w','FontWeight','Bold');
+FIG.popup2.siglabel = uicontrol(FIG.handle, 'callback', '', 'style', 'text','Units','normalized', 'position', [.35 .11 .05 .04], 'string', 'Stimulus 2:','fontsize',10,'BackgroundColor','w','FontWeight','Bold');
 FIG.popup2.stims = uicontrol(FIG.handle,'callback', 'FFRwav2(''update_stim'',''newStim2'');','style','popup','Units','normalized','Userdata',Stimuli.filename2,'position',[.43 .12 .4 .04],'string',{fName2.name},'fontsize',12,'Value',find(strcmp({fName.name},Stimuli.filename2)));
 FIG.push2.prev_stim2 = uicontrol(FIG.handle,'callback','FFRwav2(''update_stim'',''prevStim2'');','style','pushbutton','Units','normalized','position',[.4 .12 .03 .04],'string','<<','fontsize',12,'fontangle','normal','fontweight','normal');
 FIG.push2.next_stim2 = uicontrol(FIG.handle,'callback','FFRwav2(''update_stim'',''nextStim2'');','style','pushbutton','Units','normalized','position',[.83 .12 .03 .04],'string','>>','fontsize',12,'fontangle','normal','fontweight','normal');

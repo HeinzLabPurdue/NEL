@@ -1,10 +1,12 @@
 function [pABRstim] = ...
     make_toneburst_epochs(frequencies, fs, nEpochs, nStim,calib,desiredSpl)
-
+pad_ms = 10;
 Nepoch = fs;
 %desiredSPL =75;
 nEars = 2;
-earLabel = ["left","right"];
+earLabel = ["left","right"];                     
+padN = round((pad_ms/1000) * fs);                         
+paddedNepoch = Nepoch + 2*padN; 
 %JL 18June2026
 %scaling based on calibration Data to relative desired dB SPL 
 %Make sure to use inverse calib file!!!!!
@@ -23,8 +25,8 @@ scaleAdj  = 1/tempMin.*(scaleTemp); %we need to keep the signal
                                     %till we get to last PA5
 maxCalibSPL = calibTemp(ind); 
 
-leftEpochs  = zeros(nEpochs,Nepoch);
-rightEpochs = zeros(nEpochs,Nepoch);
+leftEpochs  = zeros(nEpochs,paddedNepoch);
+rightEpochs = zeros(nEpochs,paddedNepoch);
 
 toneBurst = struct();
 stimTrain = struct();
@@ -78,8 +80,8 @@ for e = 1:nEpochs
         end
     end
 
-    leftEpochs(e,:)  = epoch(1,:);
-    rightEpochs(e,:) = epoch(2,:);
+    leftEpochs(e,:)  = [zeros(1,padN), epoch(1,:), zeros(1,padN)];
+    rightEpochs(e,:) = [zeros(1,padN), epoch(2,:), zeros(1,padN)];
 end
 
 
@@ -112,9 +114,13 @@ pABRstim.rightEpochs = rightEpochs;
 pABRstim.stimTrain = stimTrain;
 pABRstim.toneBurst = toneBurst;
 pABRstim.maxSPL = maxCalibSPL;
-
-
-
+pABRstim.Gating.Dur_ms=1000;
+pABRstim.RPsamprate_Hz=50e6/1024;
+pABRstim.Gating.pABRDur_ms=2*pad_ms+1000;
+pABRstim.Gating.Period_ms=2*pad_ms+1000+500;
+pABRstim.Gating.rftime_ms=5;
+pABRstim.pad_ms=pad_ms;
+pABRstim.attenMask =0;
 
 
 end

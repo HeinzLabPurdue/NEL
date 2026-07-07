@@ -47,7 +47,7 @@ if nargin < 1
     % check how to do with 2 stim
     FFRwav2('update_stim', 'spl');
     FFRwav2('update_stim', 'spl2');
-    FFRwav2_loop; % Working
+    pABR_loop; % Working
     
 elseif strcmp(command_str,'update_stim')
     update_gating_flag= false;

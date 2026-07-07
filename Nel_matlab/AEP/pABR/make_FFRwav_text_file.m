@@ -9,36 +9,25 @@
 
 function NelData= make_FFRwav_text_file(misc, Stimuli, invfiltdata, PROG, NelData, comment, ...
     RunLevels_params, FFR_Gating,...
-    FFRdataAvg_PO1,FFRdataAvg_PO2,...
-    FFRdataAvg_NP1,FFRdataAvg_NP2,...
-    FFRdataStoreNP1,FFRdataStoreNP2, ...
-    FFRdataStorePO1,FFRdataStorePO2,...
-    Display, FFRattens, FFRinterstim, FFRdataReps1,FFRdataReps2, interface_type)
+    rightResp, leftResp,...
+    Display, pABRattens, pABRinterstim, pABR_EpochResp1, pABR_EpochResp2)
 
 [x, aux_fname, fname]=make_FFRwav_text_file_subfunc1 ...
-    (misc, Stimuli, invfiltdata, PROG, NelData, comment, RunLevels_params, FFR_Gating, Display, FFRattens,FFRinterstim );
+    (misc, Stimuli, invfiltdata, PROG, NelData, comment, RunLevels_params, FFR_Gating, Display,pABRattens,pABRinterstim );
 
 % 	FFRdataReps_dec=cell(size(RunLevels_params.attenMask));  % All Reps
 % chan 1
-for i=1:length(FFRdataAvg_NP1)
+for i=1:length( rightResp)
     if (RunLevels_params.decimateFact~=1)
-        FFRdataAvg_NP1{i} = decimate(FFRdataAvg_NP1{i}, RunLevels_params.decimateFact);
-        FFRdataAvg_PO1{i} = decimate(FFRdataAvg_PO1{i}, RunLevels_params.decimateFact);
-        if strcmp(interface_type,'SPIKES')
-            FFRdataStoreNP1{i} = decimate(FFRdataStoreNP1{i}, RunLevels_params.decimateFact);
-            FFRdataStorePO1{i} = decimate(FFRdataStorePO1{i}, RunLevels_params.decimateFact);
-        end        
+         rightResp{i} = decimate( rightResp{i}, RunLevels_params.decimateFact);
+     
     end
 end
 % chan 2
-for i=1:length(FFRdataAvg_NP2)
+for i=1:length(leftResp)
     if (RunLevels_params.decimateFact~=1)
-        FFRdataAvg_NP2{i} = decimate(FFRdataAvg_NP2{i}, RunLevels_params.decimateFact);
-        FFRdataAvg_PO2{i} = decimate(FFRdataAvg_PO2{i}, RunLevels_params.decimateFact);
-        if strcmp(interface_type,'SPIKES')
-            FFRdataStoreNP2{i} = decimate(FFRdataStoreNP2{i}, RunLevels_params.decimateFact);
-            FFRdataStorePO2{i} = decimate(FFRdataStorePO2{i}, RunLevels_params.decimateFact);
-        end        
+         leftResp{i} = decimate( leftResp{i}, RunLevels_params.decimateFact);
+     
     end
 end
 
@@ -49,32 +38,44 @@ if save_all_reps==1
     if Stimuli.rec_channel > 2
         x.AD_Data.Label{1} = 'Channel 1';
         x.AD_Data.Label{2} = 'Channel 2';
-        x.AD_Data.AD_All_V{1} = FFRdataReps1;
-        x.AD_Data.AD_All_V{2} = FFRdataReps2;
+        x.AD_Data.AD_All_V{1} =  pABR_EpochResp1;
+        x.AD_Data.AD_All_V{2} =  pABR_EpochResp2;
     elseif Stimuli.rec_channel == 2
         x.AD_Data.Label{1} = ['Channel ' num2str(Stimuli.rec_channel)];
-        x.AD_Data.AD_All_V{1} = FFRdataReps2;
+        x.AD_Data.AD_All_V{1} = pABR_EpochResp2;
     else % Ch 1 ONLY 
         x.AD_Data.Label{1} = ['Channel ' num2str(Stimuli.rec_channel)];
-        x.AD_Data.AD_All_V{1} = FFRdataReps1; 
+        x.AD_Data.AD_All_V{1} = pABR_EpochResp1; 
     end
 end
 
 if Stimuli.rec_channel > 2
     x.AD_Data.Label{1} = 'Channel 1';
     x.AD_Data.Label{2} = 'Channel 2';
-    x.AD_Data.AD_Avg_NP_V{1} = FFRdataAvg_NP1;
-    x.AD_Data.AD_Avg_PO_V{1} = FFRdataAvg_PO1;
-    x.AD_Data.AD_Avg_NP_V{2} = FFRdataAvg_NP2;
-    x.AD_Data.AD_Avg_PO_V{2} = FFRdataAvg_PO2;
+    x.AD_Data.AD_Avg_500Hz_V{1} =   rightResp{1};
+    x.AD_Data.AD_Avg_1000Hz_V{1} =  rightResp{2};
+    x.AD_Data.AD_Avg_2000Hz_V{1} =  rightResp{3};
+    x.AD_Data.AD_Avg_4000Hz_V{1} =  rightResp{4};
+    x.AD_Data.AD_Avg_8000Hz_V{1} =  rightResp{5};
+    x.AD_Data.AD_Avg_500Hz_V{2} =  leftResp{1};
+    x.AD_Data.AD_Avg_1000Hz_V{2} = leftResp{2};
+    x.AD_Data.AD_Avg_2000Hz_V{2} =  leftResp{3};
+    x.AD_Data.AD_Avg_4000Hz_V{2} =  leftResp{4};
+    x.AD_Data.AD_Avg_8000Hz_V{2} =  leftResp{5};
 elseif Stimuli.rec_channel == 2
     x.AD_Data.Label{1} = ['Channel ' num2str(Stimuli.rec_channel)];
-    x.AD_Data.AD_Avg_NP_V{1} = FFRdataAvg_NP2;
-    x.AD_Data.AD_Avg_PO_V{1} = FFRdataAvg_PO2;
+    x.AD_Data.AD_Avg_500Hz_V{1} =   rightResp{1};
+    x.AD_Data.AD_Avg_1000Hz_V{1} =  rightResp{2};
+    x.AD_Data.AD_Avg_2000Hz_V{1} =  rightResp{3};
+    x.AD_Data.AD_Avg_4000Hz_V{1} =  rightResp{4};
+    x.AD_Data.AD_Avg_8000Hz_V{1} =  rightResp{5};
 else
     x.AD_Data.Label{1} = ['Channel ' num2str(Stimuli.rec_channel)];
-    x.AD_Data.AD_Avg_NP_V{1} = FFRdataAvg_NP1;
-    x.AD_Data.AD_Avg_PO_V{1} = FFRdataAvg_PO1;
+    x.AD_Data.AD_Avg_500Hz_V{2} =  leftResp{1};
+    x.AD_Data.AD_Avg_1000Hz_V{2} = leftResp{2};
+    x.AD_Data.AD_Avg_2000Hz_V{2} =  leftResp{3};
+    x.AD_Data.AD_Avg_4000Hz_V{2} =  leftResp{4};
+    x.AD_Data.AD_Avg_8000Hz_V{2} =  leftResp{5};
 
 end
 
