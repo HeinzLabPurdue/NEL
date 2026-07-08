@@ -36,30 +36,30 @@ end
 
 if ~AutoLevel_params.ReRunFlag
     %Stimuli.MaxdBSPLCalib is TDT max atten
-%     AutoLevel_params.attenMask=[round((Stimuli.MaxdBSPLCalib-AutoLevel_params.maxdBSPLtoRUN)/AutoLevel_params.stepdB): ...
-%             min(120,ceil((Stimuli.atten_dB+AutoLevel_params.dB_below_thresh)/AutoLevel_params.stepdB))];
-
-if ~AutoLevel_params.zero_to_eighty_override
-    dBs2RUN=AutoLevel_params.stepdB*floor(max(Stimuli.MaxdBSPLCalib-Stimuli.atten_dB-...
-        AutoLevel_params.dB_below_thresh,Stimuli.MaxdBSPLCalib-120)/AutoLevel_params.stepdB)...
-        :AutoLevel_params.stepdB:min(Stimuli.MaxdBSPLCalib,AutoLevel_params.maxdBSPLtoRUN);
-    if dBs2RUN(1)<Stimuli.MaxdBSPLCalib-120 % Case: When the floor10 of -20 is not possible
-        dBs2RUN(1)=Stimuli.MaxdBSPLCalib-120;
+    %     AutoLevel_params.attenMask=[round((Stimuli.MaxdBSPLCalib-AutoLevel_params.maxdBSPLtoRUN)/AutoLevel_params.stepdB): ...
+    %             min(120,ceil((Stimuli.atten_dB+AutoLevel_params.dB_below_thresh)/AutoLevel_params.stepdB))];
+    
+    if ~AutoLevel_params.zero_to_eighty_override
+        dBs2RUN=AutoLevel_params.stepdB*floor(max(Stimuli.MaxdBSPLCalib-Stimuli.atten_dB-...
+            AutoLevel_params.dB_below_thresh,Stimuli.MaxdBSPLCalib-120)/AutoLevel_params.stepdB)...
+            :AutoLevel_params.stepdB:min(Stimuli.MaxdBSPLCalib,AutoLevel_params.maxdBSPLtoRUN);
+        if dBs2RUN(1)<Stimuli.MaxdBSPLCalib-120 % Case: When the floor10 of -20 is not possible
+            dBs2RUN(1)=Stimuli.MaxdBSPLCalib-120;
+        end
+    else
+        dBs2RUN = 0:10:80;
     end
-else
-    dBs2RUN = 0:10:80;
-end
     if Stimuli.MaxdBSPLCalib<AutoLevel_params.maxdBSPLtoRUN % Case when calibration is < 90
         AutoLevel_params.dBs2RUN=[dBs2RUN ,Stimuli.MaxdBSPLCalib];
         warning ('Calibration Below 90');
-        ding, ding, 
+        ding, ding,
         pause(0.1);
         ding, ding,
-    else 
+    else
         AutoLevel_params.dBs2RUN=dBs2RUN;
     end
     
-else 
+else
     %     AutoLevel_params.attenMask=fliplr((Stimuli.MaxdBSPLCalib-...
     %     AutoLevel_params.ReRun_dBSPL-Stimuli.cur_freq_calib_dbshift)/AutoLevel_params.stepdB);
     AutoLevel_params.dBs2RUN=AutoLevel_params.ReRun_dBSPL;
@@ -102,7 +102,7 @@ for zfrequency = frequencies %New outer loop, KH 10Jan2012
     
     for attenLevel = Atten_dBs
         attenIND=attenIND+1;
-      
+        
         CAPattens{attenIND}=attenLevel;
         %   disp(attenLevel);
         %set(FIG.statText.status, 'String', sprintf('STATUS: averaging at %dHz, -%ddB...', zfrequency, attenLevel));
@@ -138,9 +138,9 @@ for zfrequency = frequencies %New outer loop, KH 10Jan2012
             bNoSampleObtained = 1;
             while(bNoSampleObtained)
                 if(invoke(RP3,'GetTagVal','BufFlag') == 1)
-                    if(invoke(RP1,'GetTagVal','ampPolarity') > 0 || (Stimuli.fixedPhase == 1)) 
-                             % check for stim polarity, if necessary
-                             
+                    if(invoke(RP1,'GetTagVal','ampPolarity') > 0 || (Stimuli.fixedPhase == 1))
+                        % check for stim polarity, if necessary
+                        
                         % Added channel 2 JMR Sept 21
                         CAPdata1 = invoke(RP3,'ReadTagV','ADbuf',0,CAPnpts); %ABR
                         CAPdata2 = invoke(RP3,'ReadTagV','ADbuf2',0,CAPnpts); %ECochG
@@ -176,8 +176,8 @@ for zfrequency = frequencies %New outer loop, KH 10Jan2012
             bNoSampleObtained = 1;
             while(bNoSampleObtained)
                 if(invoke(RP3,'GetTagVal','BufFlag') == 1)
-                    if(invoke(RP1,'GetTagVal','ampPolarity') < 0 || (Stimuli.fixedPhase == 1)) 
-                             % check for stim polarity, if necessary
+                    if(invoke(RP1,'GetTagVal','ampPolarity') < 0 || (Stimuli.fixedPhase == 1))
+                        % check for stim polarity, if necessary
                         
                         % Added channel 2 JMR Sept 21
                         CAPdata12 = invoke(RP3,'ReadTagV','ADbuf',0,CAPnpts); %ABR
@@ -210,33 +210,33 @@ for zfrequency = frequencies %New outer loop, KH 10Jan2012
             end
             if currPair
                 if Stimuli.rec_channel>2
-                set(FIG.ax.line(1),'xdata',(1:CAPnpts)/Stimuli.RPsamprate_Hz, ...
-                    'ydata',(CAPdataAvg{freqIND,attenIND}-mean(CAPdataAvg{freqIND,attenIND}))/(2*currPair)*Display.PlotFactor);
-                set(FIG.ax.line(2),'xdata',(1:CAPnpts)/Stimuli.RPsamprate_Hz, ...
-                    'ydata',(CAPdataAvg_inverse{freqIND,attenIND}-mean(CAPdataAvg_inverse{freqIND,attenIND}))/(2*currPair)*Display.PlotFactor);
-                 set(FIG.ax.line(3),'xdata',(1:CAPnpts)/Stimuli.RPsamprate_Hz, ...
-                    'ydata',(CAPdataAvg2{freqIND,attenIND}-mean(CAPdataAvg2{freqIND,attenIND}))/(2*currPair)*Display.PlotFactor);               
-                 set(FIG.ax.line(4),'xdata',(1:CAPnpts)/Stimuli.RPsamprate_Hz, ...
-                    'ydata',(CAPdataAvg_inverse2{freqIND,attenIND}-mean(CAPdataAvg_inverse2{freqIND,attenIND}))/(2*currPair)*Display.PlotFactor); 
-                
-                set(FIG.ax.line2(1),'ydata',max([CAPobs1 CAPobs12])); %KH 2011 June 08
-                set(FIG.ax.line2(3),'ydata',max([CAPobs2 CAPobs22]));
-                
+                    set(FIG.ax.line(1),'xdata',(1:CAPnpts)/Stimuli.RPsamprate_Hz, ...
+                        'ydata',(CAPdataAvg{freqIND,attenIND}-mean(CAPdataAvg{freqIND,attenIND}))/(2*currPair)*Display.PlotFactor);
+                    set(FIG.ax.line(2),'xdata',(1:CAPnpts)/Stimuli.RPsamprate_Hz, ...
+                        'ydata',(CAPdataAvg_inverse{freqIND,attenIND}-mean(CAPdataAvg_inverse{freqIND,attenIND}))/(2*currPair)*Display.PlotFactor);
+                    set(FIG.ax.line(3),'xdata',(1:CAPnpts)/Stimuli.RPsamprate_Hz, ...
+                        'ydata',(CAPdataAvg2{freqIND,attenIND}-mean(CAPdataAvg2{freqIND,attenIND}))/(2*currPair)*Display.PlotFactor);
+                    set(FIG.ax.line(4),'xdata',(1:CAPnpts)/Stimuli.RPsamprate_Hz, ...
+                        'ydata',(CAPdataAvg_inverse2{freqIND,attenIND}-mean(CAPdataAvg_inverse2{freqIND,attenIND}))/(2*currPair)*Display.PlotFactor);
+                    
+                    set(FIG.ax.line2(1),'ydata',max([CAPobs1 CAPobs12])); %KH 2011 June 08
+                    set(FIG.ax.line2(3),'ydata',max([CAPobs2 CAPobs22]));
+                    
                 elseif Stimuli.rec_channel==2 % only channel 2
-                set(FIG.ax.line(1),'xdata',(1:CAPnpts)/Stimuli.RPsamprate_Hz, ...
-                    'ydata',(CAPdataAvg2{freqIND,attenIND}-mean(CAPdataAvg2{freqIND,attenIND}))/(2*currPair)*Display.PlotFactor);
-                set(FIG.ax.line(2),'xdata',(1:CAPnpts)/Stimuli.RPsamprate_Hz, ...
-                    'ydata',(CAPdataAvg_inverse2{freqIND,attenIND}-mean(CAPdataAvg_inverse2{freqIND,attenIND}))/(2*currPair)*Display.PlotFactor); 
-                
-                set(FIG.ax.line2(1),'ydata',max([CAPobs2 CAPobs22]));                    
+                    set(FIG.ax.line(1),'xdata',(1:CAPnpts)/Stimuli.RPsamprate_Hz, ...
+                        'ydata',(CAPdataAvg2{freqIND,attenIND}-mean(CAPdataAvg2{freqIND,attenIND}))/(2*currPair)*Display.PlotFactor);
+                    set(FIG.ax.line(2),'xdata',(1:CAPnpts)/Stimuli.RPsamprate_Hz, ...
+                        'ydata',(CAPdataAvg_inverse2{freqIND,attenIND}-mean(CAPdataAvg_inverse2{freqIND,attenIND}))/(2*currPair)*Display.PlotFactor);
+                    
+                    set(FIG.ax.line2(1),'ydata',max([CAPobs2 CAPobs22]));
                     
                 else % only channel 1
-                set(FIG.ax.line(1),'xdata',(1:CAPnpts)/Stimuli.RPsamprate_Hz, ...
-                    'ydata',(CAPdataAvg{freqIND,attenIND}-mean(CAPdataAvg{freqIND,attenIND}))/(2*currPair)*Display.PlotFactor);
-                set(FIG.ax.line(2),'xdata',(1:CAPnpts)/Stimuli.RPsamprate_Hz, ...
-                    'ydata',(CAPdataAvg_inverse{freqIND,attenIND}-mean(CAPdataAvg_inverse{freqIND,attenIND}))/(2*currPair)*Display.PlotFactor); 
-                
-                set(FIG.ax.line2(1),'ydata',max([CAPobs1 CAPobs12]));                               
+                    set(FIG.ax.line(1),'xdata',(1:CAPnpts)/Stimuli.RPsamprate_Hz, ...
+                        'ydata',(CAPdataAvg{freqIND,attenIND}-mean(CAPdataAvg{freqIND,attenIND}))/(2*currPair)*Display.PlotFactor);
+                    set(FIG.ax.line(2),'xdata',(1:CAPnpts)/Stimuli.RPsamprate_Hz, ...
+                        'ydata',(CAPdataAvg_inverse{freqIND,attenIND}-mean(CAPdataAvg_inverse{freqIND,attenIND}))/(2*currPair)*Display.PlotFactor);
+                    
+                    set(FIG.ax.line2(1),'ydata',max([CAPobs1 CAPobs12]));
                 end
                 drawnow;
             end
@@ -305,12 +305,12 @@ if (bAbort == 0)
         'Yes','No','Comment','Yes');
     
     switch ButtonName
-    case 'Yes'
-        comment='No comment.';
-    case 'No'
-        SaveFlag=0;
-    case 'Comment'
-        comment=add_comment_line;	%add a comment line before saving data file
+        case 'Yes'
+            comment='No comment.';
+        case 'No'
+            SaveFlag=0;
+        case 'Comment'
+            comment=add_comment_line;	%add a comment line before saving data file
     end
     
     %    disp(sprintf(ButtonName))

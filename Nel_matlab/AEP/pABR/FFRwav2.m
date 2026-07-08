@@ -34,6 +34,8 @@ if nargin < 1
     
     [misc, Stimuli, RunLevels_params, Display, interface_type]=FFRwav2_ins(NelData);
     
+    interface_type = 'pABR';
+    
     [FIG, FFR_Gating, Display]=FFRwav2_loop_plot(FIG,Display,Stimuli,interface_type);
     
     %     if ~(double(invoke(RP1,'GetTagVal', 'Stage')) == 2)
