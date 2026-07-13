@@ -101,8 +101,8 @@ while isempty(get(FIG.push.close,'Userdata'))
     FIG.ax.line = plot( ...
         0,0,'-',0,0,'-',0,0,'-',0,0,'-',0,0,'-', ...
         0,0,'-',0,0,'-',0,0,'-',0,0,'-',0,0,'-');
-    rightColor = [1 0 0];       
-    leftColor  = [0 0.25 1];    
+    rightColor = [1 0 0];
+    leftColor  = [0 0.25 1];
     for ii = 1:5
         set(FIG.ax.line(ii),'Color',rightColor,'LineWidth',1);
         set(FIG.ax.line(ii+5),'Color',leftColor,'LineWidth',1);
@@ -287,19 +287,51 @@ while isempty(get(FIG.push.close,'Userdata'))
                                 length(leftResp{1}), length(leftResp{2}), length(leftResp{3}), ...
                                 length(leftResp{4}), length(leftResp{5})]);
                             datax = datax(1:newlen);
-                            for ff = 1:5
-                                set(FIG.ax.line(ff), ...
-                                    'xdata',datax, ...
-                                    'ydata',rightResp{ff}(1:newlen)*Display.PlotFactor + rightY(ff));
-                                
-                                set(FIG.ax.line(ff+5), ...
-                                    'xdata',datax, ...
-                                    'ydata',leftResp{ff}(1:newlen)*Display.PlotFactor + leftY(ff));
+                            currentMax = 0;
+                            
+                            for kk = 1:5
+                                currentMax = max([currentMax, ...
+                                    max(abs(rightResp{kk}(1:newlen))), ...
+                                    max(abs(leftResp{kk}(1:newlen)))]);
+                            end
+                            
+                            plotHeight = 0.45;
+                            Display.PlotFact = plotHeight/max(currentMax, eps);
+                            if Stimuli.rec_channel > 2
+                                for ff = 1:5
+                                    set(FIG.ax.line(ff), ...
+                                        'xdata',datax, ...
+                                        'ydata',rightResp{ff}(1:newlen)*Display.PlotFact + rightY(ff));
+                                    
+                                    set(FIG.ax.line(ff+5), ...
+                                        'xdata',datax, ...
+                                        'ydata',leftResp{ff}(1:newlen)*Display.PlotFact+ leftY(ff));
+                                end
+                            elseif Stimuli.rec_channel == 1
+                                for ff = 1:5
+                                    set(FIG.ax.line(ff), ...
+                                        'xdata',datax, ...
+                                        'ydata',rightResp{ff}(1:newlen)*Display.PlotFact+ rightY(ff));
+                                    
+                                    set(FIG.ax.line(ff+5), ...
+                                        'xdata',[], ...
+                                        'ydata',[],'Visible', 'off');
+                                end
+                            elseif Stimuli.rec_channel == 2
+                                for ff = 1:5
+                                    set(FIG.ax.line(ff), ...
+                                        'xdata',[], ...
+                                        'ydata',[],'Visible', 'off');
+                                    
+                                    set(FIG.ax.line(ff+5), ...
+                                        'xdata',datax, ...
+                                        'ydata',leftResp{ff}(1:newlen)*Display.PlotFact+ leftY(ff));
+                                end
                             end
                             
                             set(FIG.ax.axis,'XLim',[0 max(datax)]);
                             
-            
+                            
                             
                             drawnow;
                         end

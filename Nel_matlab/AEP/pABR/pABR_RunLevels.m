@@ -90,8 +90,10 @@ pABR_EpochResp1 = cell(1,2*listlength);
 pABR_EpochResp2 = cell(1,2*listlength);
 
 pABRnpts = floor(pABRstim.Gating.pABRDur_ms/1000 * pABRstim.RPsamprate_Hz);
+padSamples = round((pABRstim.pad_ms/1000) * ...
+    pABRstim.RPsamprate_Hz);
 
-
+responseLength = 2 * padSamples;
 %% Main loop
 % Not looping through attens for SFR. Assuming single attenuation
 for attenIND = 1
@@ -101,11 +103,11 @@ for attenIND = 1
     
     set(FIG.statText.status, 'String', sprintf('STATUS: averaging at -%.1f dB...', attenLevel));
     
-    pABR_500Avg1{attenIND} = zeros(1,pABRnpts);                            %chan1
-    pABR_1000Avg1{attenIND} = zeros(1,pABRnpts);
-    pABR_2000Avg1{attenIND} = zeros(1,pABRnpts);
-    pABR_4000Avg1{attenIND} = zeros(1,pABRnpts);
-    pABR_8000Avg1{attenIND} = zeros(1,pABRnpts);
+    pABR_500Avg1{attenIND}  = zeros(1,responseLength);
+    pABR_1000Avg1{attenIND} = zeros(1,responseLength);
+    pABR_2000Avg1{attenIND} = zeros(1,responseLength);
+    pABR_4000Avg1{attenIND} = zeros(1,responseLength);
+    pABR_8000Avg1{attenIND} = zeros(1,responseLength);
     
     pABR_PO_CumRes1{attenIND} = zeros(1,pABRnpts);
     pABR_PO_CumRes2{attenIND} = zeros(1,pABRnpts);
@@ -114,11 +116,11 @@ for attenIND = 1
     
     
     
-    pABR_500Avg2{attenIND} = zeros(1,pABRnpts);                            %chan2
-    pABR_1000Avg2{attenIND} = zeros(1,pABRnpts);
-    pABR_2000Avg2{attenIND} = zeros(1,pABRnpts);
-    pABR_4000Avg2{attenIND} = zeros(1,pABRnpts);
-    pABR_8000Avg2{attenIND} = zeros(1,pABRnpts);
+    pABR_500Avg2{attenIND}  = zeros(1,responseLength);
+    pABR_1000Avg2{attenIND} = zeros(1,responseLength);
+    pABR_2000Avg2{attenIND} = zeros(1,responseLength);
+    pABR_4000Avg2{attenIND} = zeros(1,responseLength);
+    pABR_8000Avg2{attenIND} = zeros(1,responseLength);
     
     pABR_500CumNoise1 = 0;
     pABR_1000CumNoise1 = 0;
@@ -132,6 +134,13 @@ for attenIND = 1
     pABR_4000CumNoise2 = 0;
     pABR_8000CumNoise2 = 0;
     
+    rightResp = cell(5,1);
+    leftResp  = cell(5,1);
+    
+    for ff = 1:5
+        rightResp{ff} = zeros(1,responseLength);
+        leftResp{ff}  = zeros(1,responseLength);
+    end
     
     
     
@@ -167,13 +176,14 @@ for attenIND = 1
     
     
     totalPresentations = 2*listlength;
-    
+    positiveAccepted = false;
     for currStim = 1:totalPresentations
-        
+        if mod(currStim,2) == 1
+            positiveAccepted = false;
+        end
         loadedThisOffTime = false;
         cumVar1 = 0;
         cumVar2 = 0;
-        
         
         
         
@@ -181,7 +191,15 @@ for attenIND = 1
             set(FIG.statText.status, 'String', sprintf('STATUS: averaging at -%.1f dB [%d | %d | %d]...', ...
                 attenLevel, currStim, rejections, totalPresentations));
             
-            pABRinterstim{currStim} = max(nextStim-1,1);
+             drawnow;
+            
+            savedStimIdx = nextStim - 1;
+            
+            if savedStimIdx < 1
+                savedStimIdx = listlength;
+            end
+            
+            pABRinterstim{currStim} = savedStimIdx;
             
         end
         
@@ -221,7 +239,7 @@ for attenIND = 1
                 
                 %read response once per STIM presentation
                 
-                if ~isempty(pABRdata1) && ~isempty(pABRdata1) && length(pABRdata1)==pABRnpts ...
+                if ~isempty(pABRdata1) && ~isempty(pABRdata2) && length(pABRdata1)==pABRnpts ...
                         && length(pABRdata2)==pABRnpts
                     dataReadThisOff = true;
                     
@@ -235,6 +253,7 @@ for attenIND = 1
                                 % Positive polarity cummulative frequency response
                                 pABR_PO_CumRes1{attenIND} = pABRdata1;
                                 pABR_PO_CumRes2{attenIND} = pABRdata2;
+                                positiveAccepted = true;
                                 
                             else
                                 % Negative polarity cummulative frequency response
@@ -249,39 +268,54 @@ for attenIND = 1
                         end
                         
                         if mod(currStim,2) == 0
-                            pABR_CumRes1 = (pABR_PO_CumRes1{attenIND} + pABR_NP_CumRes1{attenIND})/2;
-                            pABR_CumRes2 = (pABR_PO_CumRes2{attenIND} + pABR_NP_CumRes2{attenIND})/2;
-                            [combFreq_1] = pABRCC( pABR_CumRes1,squeeze(pABRstim.stimTrain(nextStim,1,:)));
-                            [combFreq_2] = pABRCC(pABR_CumRes2,squeeze(pABRstim.stimTrain(nextStim,2,:)));
-                            
-                            pABR_500CumNoise1 = combFreq_1(1).var;
-                            pABR_1000CumNoise1 = combFreq_1(2).var;
-                            pABR_2000CumNoise1 = combFreq_1(3).var;
-                            pABR_4000CumNoise1 = combFreq_1(4).var;
-                            pABR_8000CumNoise1 = combFreq_1(5).var;
-                            
-                            pABR_500CumNoise2 = combFreq_2(1).var;
-                            pABR_1000CumNoise2 = combFreq_2(2).var;
-                            pABR_2000CumNoise2 = combFreq_2(3).var;
-                            pABR_4000CumNoise2 = combFreq_2(4).var;
-                            pABR_8000CumNoise2 = combFreq_2(5).var;
-                            
-                            
-                            
-                            
-                            %epoch weighted response for right ear
-                            pABR_500Avg1{attenIND} = pABR_500Avg1{attenIND} + combFreq_1(1).response*(combFreq_1(1).var/pABR_500CumNoise1);                            %chan1
-                            pABR_1000Avg1{attenIND} = pABR_1000Avg1{attenIND} + combFreq_1(2).response*(combFreq_1(2).var/pABR_1000CumNoise1);
-                            pABR_2000Avg1{attenIND} = pABR_2000Avg1{attenIND} + combFreq_1(3).response*(combFreq_1(3).var/pABR_2000CumNoise1);
-                            pABR_4000Avg1{attenIND} = pABR_4000Avg1{attenIND} + combFreq_1(4).response*(combFreq_1(4).var/pABR_4000CumNoise1);
-                            pABR_8000Avg1{attenIND} = pABR_8000Avg1{attenIND} + combFreq_1(5).response*(combFreq_1(5).var/pABR_8000CumNoise1);
-                            
-                            %epoch weighted reponse for left ear
-                            pABR_500Avg2{attenIND} = pABR_500Avg2{attenIND} + combFreq_2(1).response*(combFreq_2(1).var/pABR_500CumNoise2);                            %chan2
-                            pABR_1000Avg2{attenIND} = pABR_1000Avg2{attenIND} + combFreq_2(2).response*(combFreq_2(2).var/pABR_1000CumNoise2);
-                            pABR_2000Avg2{attenIND} = pABR_2000Avg2{attenIND} + combFreq_2(3).response*(combFreq_2(3).var/pABR_2000CumNoise2);
-                            pABR_4000Avg2{attenIND} = pABR_4000Avg2{attenIND} + combFreq_2(4).response*(combFreq_2(4).var/pABR_4000CumNoise2);
-                            pABR_8000Avg2{attenIND} = pABR_8000Avg2{attenIND} + combFreq_2(5).response*(combFreq_2(5).var/pABR_8000CumNoise2);
+                            if positiveAccepted
+                                pABR_CumRes1 = (pABR_PO_CumRes1{attenIND} + pABR_NP_CumRes1{attenIND})/2;
+                                pABR_CumRes2 = (pABR_PO_CumRes2{attenIND} + pABR_NP_CumRes2{attenIND})/2;
+                                currentStimIdx = nextStim - 1;
+                                
+                                if currentStimIdx < 1
+                                    currentStimIdx = listlength;
+                                end
+                                
+                                combFreq_1 = pABRCC(pABR_CumRes1, ...
+                                    squeeze(pABRstim.stimTrain(currentStimIdx,1,:)));
+                                
+                                combFreq_2 = pABRCC(pABR_CumRes2, ...
+                                    squeeze(pABRstim.stimTrain(currentStimIdx,2,:)));
+                                
+                                pABR_500CumNoise1 =  pABR_500CumNoise1 + combFreq_1(1).var;
+                                pABR_1000CumNoise1 = pABR_1000CumNoise1 + combFreq_1(2).var;
+                                pABR_2000CumNoise1 = pABR_2000CumNoise1 + combFreq_1(3).var;
+                                pABR_4000CumNoise1 = pABR_4000CumNoise1 + combFreq_1(4).var;
+                                pABR_8000CumNoise1 =  pABR_8000CumNoise1 + combFreq_1(5).var;
+                                
+                                pABR_500CumNoise2 = pABR_500CumNoise2 + combFreq_2(1).var;
+                                pABR_1000CumNoise2 = pABR_1000CumNoise2 + combFreq_2(2).var;
+                                pABR_2000CumNoise2 =  pABR_2000CumNoise2 + combFreq_2(3).var;
+                                pABR_4000CumNoise2 =  pABR_4000CumNoise2 + combFreq_2(4).var;
+                                pABR_8000CumNoise2 = pABR_8000CumNoise2 + combFreq_2(5).var;
+                                
+                                
+                                
+                                
+                                %epoch weighted response for right ear
+                                pABR_500Avg1{attenIND} = pABR_500Avg1{attenIND} + combFreq_1(1).response(:).'*(combFreq_1(1).var);                            %chan1
+                                pABR_1000Avg1{attenIND} = pABR_1000Avg1{attenIND} + combFreq_1(2).response(:).'*(combFreq_1(2).var);
+                                pABR_2000Avg1{attenIND} = pABR_2000Avg1{attenIND} + combFreq_1(3).response(:).'*(combFreq_1(3).var);
+                                pABR_4000Avg1{attenIND} = pABR_4000Avg1{attenIND} + combFreq_1(4).response(:).'*(combFreq_1(4).var);
+                                pABR_8000Avg1{attenIND} = pABR_8000Avg1{attenIND} + combFreq_1(5).response(:).'*(combFreq_1(5).var);
+                                
+                                %epoch weighted reponse for left ear
+                                pABR_500Avg2{attenIND} = pABR_500Avg2{attenIND} + combFreq_2(1).response(:).'*(combFreq_2(1).var);                            %chan2
+                                pABR_1000Avg2{attenIND} = pABR_1000Avg2{attenIND} + combFreq_2(2).response(:).'*(combFreq_2(2).var);
+                                pABR_2000Avg2{attenIND} = pABR_2000Avg2{attenIND} + combFreq_2(3).response(:).'*(combFreq_2(3).var);
+                                pABR_4000Avg2{attenIND} = pABR_4000Avg2{attenIND} + combFreq_2(4).response(:).'*(combFreq_2(4).var);
+                                pABR_8000Avg2{attenIND} = pABR_8000Avg2{attenIND} + combFreq_2(5).response(:).'*(combFreq_2(5).var);
+                                
+                            else
+                                disp('Skipping pair because positive polarity was rejected');
+                            end
+                            positiveAccepted = false;
                             
                         end
                         
@@ -324,66 +358,76 @@ for attenIND = 1
         if ~loadedThisOffTime && mod(currStim,2)==0
             sprintf('currStim %d: Next Stim not loaded during stage2', currStim);
         end
-        
-        rightResp = {
-            pABR_500Avg1{attenIND}
-            pABR_1000Avg1{attenIND}
-            pABR_2000Avg1{attenIND}
-            pABR_4000Avg1{attenIND}
-            pABR_8000Avg1{attenIND}
-            };
-        
-        leftResp = {
-            pABR_500Avg2{attenIND}
-            pABR_1000Avg2{attenIND}
-            pABR_2000Avg2{attenIND}
-            pABR_4000Avg2{attenIND}
-            pABR_8000Avg2{attenIND}
-            };
-        
-        rightY = [9.5 8.5 7.5 6.5 5.5];
-        leftY  = [3.7 2.7 1.7 0.7 -0.3];
-        
-        
-        if currStim > 0
-            % XData and YData need to be the same Length
-            datax = 0:(1/pABRstim.RPsamprate_Hz):(2*pABRstim.pad_ms)/1000;
-            newlen = min([ ...
-                length(datax),...
-                length(rightResp{1}), length(rightResp{2}), length(rightResp{3}), ...
-                length(rightResp{4}), length(rightResp{5}), ...
-                length(leftResp{1}), length(leftResp{2}), length(leftResp{3}), ...
-                length(leftResp{4}), length(leftResp{5})]);
-            datax = datax(1:newlen);
-            if Stimuli.rec_channel > 2
-                for ff = 1:5
-                    set(FIG.ax.line(ff), ...
-                        'xdata',datax, ...
-                        'ydata',rightResp{ff}(1:newlen)*Display.PlotFactor + rightY(ff));
-                    
-                    set(FIG.ax.line(ff+5), ...
-                        'xdata',datax, ...
-                        'ydata',leftResp{ff}(1:newlen)*Display.PlotFactor+ leftY(ff));
+        if mod(currStim,2) == 0 && pABR_500CumNoise1 > 0
+            rightResp = {
+                pABR_500Avg1{attenIND}/pABR_500CumNoise1
+                pABR_1000Avg1{attenIND}/pABR_1000CumNoise1
+                pABR_2000Avg1{attenIND}/pABR_2000CumNoise1
+                pABR_4000Avg1{attenIND}/pABR_4000CumNoise1
+                pABR_8000Avg1{attenIND}/pABR_8000CumNoise1
+                };
+            
+            leftResp = {
+                pABR_500Avg2{attenIND}/pABR_500CumNoise2
+                pABR_1000Avg2{attenIND}/pABR_1000CumNoise2
+                pABR_2000Avg2{attenIND}/pABR_2000CumNoise2
+                pABR_4000Avg2{attenIND}/pABR_4000CumNoise2
+                pABR_8000Avg2{attenIND}/pABR_8000CumNoise2
+                };
+            
+            rightY = [9.5 8.5 7.5 6.5 5.5];
+            leftY  = [3.7 2.7 1.7 0.7 -0.3];
+            
+            
+            if currStim > 0
+                % XData and YData need to be the same Length
+                datax = 0:(1/pABRstim.RPsamprate_Hz):(2*pABRstim.pad_ms)/1000;
+                newlen = min([ ...
+                    length(datax),...
+                    length(rightResp{1}), length(rightResp{2}), length(rightResp{3}), ...
+                    length(rightResp{4}), length(rightResp{5}), ...
+                    length(leftResp{1}), length(leftResp{2}), length(leftResp{3}), ...
+                    length(leftResp{4}), length(leftResp{5})]);
+                datax = datax(1:newlen);
+                currentMax = 0;
+                
+                for kk = 1:5
+                    currentMax = max([currentMax, ...
+                        max(abs(rightResp{kk}(1:newlen))), ...
+                        max(abs(leftResp{kk}(1:newlen)))]);
                 end
-            elseif Stimuli.rec_channel == 1
-                for ff = 1:5
-                    set(FIG.ax.line(ff), ...
-                        'xdata',datax, ...
-                        'ydata',rightResp{ff}(1:newlen)*Display.PlotFactor+ rightY(ff));
-                    
-                    set(FIG.ax.line(ff+5), ...
-                        'xdata',[], ...
-                        'ydata',[],'Visible', 'off');
-                end
-            elseif Stimuli.rec_channel == 2
-                for ff = 1:5
-                    set(FIG.ax.line(ff), ...
-                        'xdata',[], ...
-                        'ydata',[],'Visible', 'off');
-                    
-                    set(FIG.ax.line(ff+5), ...
-                        'xdata',datax, ...
-                        'ydata',leftResp{ff}(1:newlen)*Display.PlotFactor+ leftY(ff));
+                plotHeight = 0.45;
+                Display.PlotFact = plotHeight/max(currentMax, eps);
+                if Stimuli.rec_channel > 2
+                    for ff = 1:5
+                        set(FIG.ax.line(ff), ...
+                            'xdata',datax, ...
+                            'ydata',rightResp{ff}(1:newlen)*Display.PlotFact + rightY(ff));
+                        
+                        set(FIG.ax.line(ff+5), ...
+                            'xdata',datax, ...
+                            'ydata',leftResp{ff}(1:newlen)*Display.PlotFact+ leftY(ff));
+                    end
+                elseif Stimuli.rec_channel == 1
+                    for ff = 1:5
+                        set(FIG.ax.line(ff), ...
+                            'xdata',datax, ...
+                            'ydata',rightResp{ff}(1:newlen)*Display.PlotFact+ rightY(ff));
+                        
+                        set(FIG.ax.line(ff+5), ...
+                            'xdata',[], ...
+                            'ydata',[],'Visible', 'off');
+                    end
+                elseif Stimuli.rec_channel == 2
+                    for ff = 1:5
+                        set(FIG.ax.line(ff), ...
+                            'xdata',[], ...
+                            'ydata',[],'Visible', 'off');
+                        
+                        set(FIG.ax.line(ff+5), ...
+                            'xdata',datax, ...
+                            'ydata',leftResp{ff}(1:newlen)*Display.PlotFact+ leftY(ff));
+                    end
                 end
             end
             
