@@ -83,11 +83,11 @@ pABR_Lstim=pABRstim.leftEpochs;
 pABR_Rstim=pABRstim.rightEpochs;
 listlength = size(pABR_Rstim,1);
 
-
+nPresentations = 20;
 pABRattens = cell(size(RunLevels_params.attenMask));
-pABRinterstim= cell(1,2*listlength);
-pABR_EpochResp1 = cell(1,2*listlength);
-pABR_EpochResp2 = cell(1,2*listlength);
+pABRinterstim= cell(1,2*listlength*nPresentations);
+pABR_EpochResp1 = cell(1,2*listlength*nPresentations);
+pABR_EpochResp2 = cell(1,2*listlength*nPresentations);
 
 pABRnpts = floor(pABRstim.Gating.pABRDur_ms/1000 * pABRstim.RPsamprate_Hz);
 padSamples = round((pABRstim.pad_ms/1000) * ...
@@ -175,15 +175,14 @@ for attenIND = 1
     invoke(RP1,'SoftTrg',1);
     
     
-    totalPresentations = 2*listlength;
+    totalPresentations = 2*listlength*nPresentations;
     positiveAccepted = false;
     for currStim = 1:totalPresentations
         if mod(currStim,2) == 1
             positiveAccepted = false;
         end
         loadedThisOffTime = false;
-        cumVar1 = 0;
-        cumVar2 = 0;
+       
         
         
         
@@ -250,6 +249,7 @@ for attenIND = 1
                         
                         if currStim > 0 %might not be necessary since we start looping from 1
                             if mod(currStim,2) % odd stim presentation
+                            
                                 % Positive polarity cummulative frequency response
                                 pABR_PO_CumRes1{attenIND} = pABRdata1;
                                 pABR_PO_CumRes2{attenIND} = pABRdata2;
@@ -338,6 +338,7 @@ for attenIND = 1
                 
                 tmpR = invoke(RP1,'WriteTagV','STIM_R',0,xpR);
                 tmpL = invoke(RP1,'WriteTagV','STIM_L',0,xpL);
+                sprintf('loaded %.0d',currStim)
                 
                 if tmpR == 1 && tmpL == 1
                     loadedThisOffTime = true;
@@ -462,7 +463,7 @@ if bAbort == 0
         % chan 1
         NelData = make_FFRwav_text_file(misc, Stimuli, invfiltdata, PROG, NelData, comment, ...
             RunLevels_params, FFR_Gating, rightResp, leftResp, ...
-            Display, pABRattens, pABRinterstim, pABR_EpochResp1, pABR_EpochResp2);
+            Display, pABRattens, pABRinterstim, pABR_EpochResp1, pABR_EpochResp2,pABRstim);
         
         current_data_file('FFR',1);
         uiresume; % Allow Nel's main window to update the Title'
