@@ -83,15 +83,17 @@ pABR_Lstim=pABRstim.leftEpochs;
 pABR_Rstim=pABRstim.rightEpochs;
 listlength = size(pABR_Rstim,1);
 
-nPresentations = 20;
+nPresentations = 1;
 pABRattens = cell(size(RunLevels_params.attenMask));
 pABRinterstim= cell(1,2*listlength*nPresentations);
 pABR_EpochResp1 = cell(1,2*listlength*nPresentations);
 pABR_EpochResp2 = cell(1,2*listlength*nPresentations);
 
-pABRnpts = floor(pABRstim.Gating.pABRDur_ms/1000 * pABRstim.RPsamprate_Hz);
-padSamples = round((pABRstim.pad_ms/1000) * ...
-    pABRstim.RPsamprate_Hz);
+%pABRnpts = floor(pABRstim.Gating.pABRDur_ms/1000 * pABRstim.RPsamprate_Hz);
+pABRnpts = size(pABR_Rstim,2);
+%padSamples = round((pABRstim.pad_ms/1000) * ...
+   % pABRstim.RPsamprate_Hz);
+padSamples = pABRstim.padSamples;
 
 responseLength = 2 * padSamples;
 %% Main loop
@@ -244,11 +246,15 @@ for attenIND = 1
                     
                     % fixing the function to make sure the polarity matches, starts with 1,
                     % which must match with 1 for original
+                    fprintf('stim=%d ORG=%d expected=%d max1=%g/%g max2=%g/%g\n', ...
+                        currStim, invoke(RP1,'GetTagVal','ORG'), mod(currStim,2), ...
+                        maxpABRobs1, critVal, maxpABRobs2, critVal2);
                     if invoke(RP1,'GetTagVal','ORG') == mod(currStim,2) && ...
                             maxpABRobs1 <= critVal && maxpABRobs2 <= critVal2
                         
                         if currStim > 0 %might not be necessary since we start looping from 1
                             if mod(currStim,2) % odd stim presentation
+                                fprintf('ODD accepted: currStim = %d\n',currStim);
                             
                                 % Positive polarity cummulative frequency response
                                 pABR_PO_CumRes1{attenIND} = pABRdata1;
@@ -257,6 +263,7 @@ for attenIND = 1
                                 
                             else
                                 % Negative polarity cummulative frequency response
+                                fprintf('EVEN accepted: currStim = %d\n',currStim);
                                 pABR_NP_CumRes1{attenIND} = pABRdata1;
                                 pABR_NP_CumRes2{attenIND} = pABRdata2;
                             end
@@ -269,6 +276,7 @@ for attenIND = 1
                         
                         if mod(currStim,2) == 0
                             if positiveAccepted
+                                disp('Yes Positive')
                                 pABR_CumRes1 = (pABR_PO_CumRes1{attenIND} + pABR_NP_CumRes1{attenIND})/2;
                                 pABR_CumRes2 = (pABR_PO_CumRes2{attenIND} + pABR_NP_CumRes2{attenIND})/2;
                                 currentStimIdx = nextStim - 1;

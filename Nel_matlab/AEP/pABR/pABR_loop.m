@@ -12,7 +12,8 @@ pABR_Lstim = pABRstim.leftEpochs;
 pABR_Rstim = pABRstim.rightEpochs;
 
 %pABRnpts = pABRstim.pABRnpts;
-pABRnpts = floor(pABRstim.Gating.pABRDur_ms/1000 * Stimuli.RPsamprate_Hz);
+%pABRnpts = floor(pABRstim.Gating.pABRDur_ms/1000 * Stimuli.RPsamprate_Hz);
+pABRnpts = size(pABR_Rstim,2);
 
 freqLabels = {'0.5 kHz','1 kHz','2 kHz','4 kHz','8 kHz'};
 rightY = [9.5 8.5 7.5 6.5 5.5];

@@ -1,7 +1,7 @@
 function [pABRstim] = ...
     make_toneburst_epochs(frequencies, fs, nEpochs, nStim,calib,desiredSpl)
-pad_ms = 500;
-Nepoch = fs;
+pad_ms = 50;
+Nepoch = round(fs);
 %desiredSPL =75;
 nEars = 2;
 earLabel = ["left","right"];                     
@@ -115,12 +115,21 @@ pABRstim.stimTrain = stimTrain;
 pABRstim.toneBurst = toneBurst;
 pABRstim.maxSPL = maxCalibSPL;
 pABRstim.Gating.Dur_ms=1000;
-pABRstim.RPsamprate_Hz=50e6/1024;
-pABRstim.Gating.pABRDur_ms=2*pad_ms+1000;
-pABRstim.Gating.Period_ms=2*pad_ms+1000+100;
+%pABRstim.RPsamprate_Hz=50e6/1024;
+%pABRstim.Gating.pABRDur_ms=2*pad_ms+1000;
+%pABRstim.Gating.Period_ms=2*pad_ms+1000+300;
 pABRstim.Gating.rftime_ms=5;
 pABRstim.pad_ms=pad_ms;
 pABRstim.attenMask =0;
+pABRstim.RPsamprate_Hz = fs;
+pABRstim.padSamples = padN;
+pABRstim.Gating.Dur_ms = 1000 * Nepoch / fs;
+
+pABRstim.Gating.pABRDur_ms = ...
+    1000 * paddedNepoch / fs;
+
+pABRstim.Gating.Period_ms = ...
+    pABRstim.Gating.pABRDur_ms + 600;
 
 
 end
