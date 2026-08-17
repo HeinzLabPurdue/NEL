@@ -1,10 +1,13 @@
 function [pABRstim] = ...
     make_toneburst_epochs(frequencies, fs, nEpochs, nStim,calib,desiredSpl)
+%Author: John Love
+%Reference Article: Ross & Polonenko (pABR: Parallel Auditory Brain Stem Response)
+%Creates the pABR stimulus and randomized impulse trains
+
 pad_ms = 50;
 Nepoch = round(fs);
-%desiredSPL =75;
 nEars = 2;
-earLabel = ["left","right"];                     
+earLabel = ["right","left"];                     
 padN = round((pad_ms/1000) * fs);                         
 paddedNepoch = Nepoch + 2*padN; 
 %JL 18June2026
@@ -103,7 +106,7 @@ elseif freq > calibData(j,1)
     maxdB = calibData(j,2)+(freq-calibData(j,1))/(calibData(j+1,1)-calibData(j,1))...
         *(calibData(j+1,2)-calibData(j,2));
 else
-    maxdB = calibData(j,1);
+    maxdB = calibData(j,2);
 end
 end
 
@@ -118,6 +121,7 @@ pABRstim.Gating.Dur_ms=1000;
 %pABRstim.RPsamprate_Hz=50e6/1024;
 %pABRstim.Gating.pABRDur_ms=2*pad_ms+1000;
 %pABRstim.Gating.Period_ms=2*pad_ms+1000+300;
+%Gating for RPs
 pABRstim.Gating.rftime_ms=5;
 pABRstim.pad_ms=pad_ms;
 pABRstim.attenMask =0;
@@ -129,7 +133,7 @@ pABRstim.Gating.pABRDur_ms = ...
     1000 * paddedNepoch / fs;
 
 pABRstim.Gating.Period_ms = ...
-    pABRstim.Gating.pABRDur_ms + 600;
+    pABRstim.Gating.pABRDur_ms + 450;
 
 
 end

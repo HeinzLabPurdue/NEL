@@ -1,4 +1,4 @@
-function [combFreq] = pABRCC(cumResponse,stim)
+function [combFreq] = pABRCC(cumResponse,stim,pABRstim)
 
 global pABRstim
 

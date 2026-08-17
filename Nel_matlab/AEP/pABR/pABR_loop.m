@@ -259,10 +259,10 @@ while isempty(get(FIG.push.close,'Userdata'))
                             combinedResp2 = (firstPolResp2 + secondPolResp2)/2;
                             
                             combFreq_1 = pABRCC(combinedResp1, ...
-                                squeeze(pABRstim.stimTrain(activeStim,1,:)));
+                                squeeze(pABRstim.stimTrain(activeStim,1,:)),pABRstim);
                             
                             combFreq_2 = pABRCC(combinedResp2, ...
-                                squeeze(pABRstim.stimTrain(activeStim,2,:)));
+                                squeeze(pABRstim.stimTrain(activeStim,2,:)),pABRstim);
                             
                             rightResp = {
                                 combFreq_1(1).response
@@ -443,7 +443,7 @@ while isempty(get(FIG.push.close,'Userdata'))
                     
                 case 4
                     
-                    FFRwav2_RunLevels_pABR(FIG,Stimuli,invfiltdata,RunLevels_params,misc,FFR_Gating, ...
+                     pABR_RunLevel_Par(FIG,Stimuli,invfiltdata,RunLevels_params,misc,FFR_Gating, ...
                         pABRnpts,interface_type,Display,NelData,data_dir,RP1,RP2,RP3,PROG,prog_dir,pABRstim);
                     
                     currStim = 0;
@@ -497,8 +497,8 @@ while isempty(get(FIG.push.close,'Userdata'))
                     
                 case 101
                     
-                    pABR_RunLevels(FIG,Stimuli,invfiltdata,RunLevels_params,misc,FFR_Gating, ...
-                        pABRnpts,interface_type,Display,NelData,data_dir,RP1,RP2,RP3,PROG,prog_dir,pABRstim);
+                     pABR_RunLevel_Par(FIG,Stimuli,invfiltdata, RunLevels_params, misc, FFR_Gating,...
+                         pABRnpts,interface_type, Display, NelData, data_dir, RP1, RP2, RP3, PROG, prog_dir,pABRstim);
                     
                     currStim = 0;
             end

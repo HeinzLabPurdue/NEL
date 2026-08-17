@@ -2,7 +2,7 @@ function [firstSTIM, NelData]=pABR_RunLevels(FIG,Stimuli,invfiltdata, RunLevels_
     FFRnpts,interface_type, Display, NelData, data_dir, RP1, RP2, RP3, PROG, prog_dir,pABRstim)
 
 pABR_flag = 1;
-
+RunLevels_params.demean = true;
 % File: FFR_SNRenv_RunLevels
 % M. Heinz 18Nov2003
 % Modified for pABR Stage-2 loading logic
@@ -83,7 +83,7 @@ pABR_Lstim=pABRstim.leftEpochs;
 pABR_Rstim=pABRstim.rightEpochs;
 listlength = size(pABR_Rstim,1);
 
-nPresentations = 1;
+nPresentations = 20;
 pABRattens = cell(size(RunLevels_params.attenMask));
 pABRinterstim= cell(1,2*listlength*nPresentations);
 pABR_EpochResp1 = cell(1,2*listlength*nPresentations);
@@ -92,7 +92,7 @@ pABR_EpochResp2 = cell(1,2*listlength*nPresentations);
 %pABRnpts = floor(pABRstim.Gating.pABRDur_ms/1000 * pABRstim.RPsamprate_Hz);
 pABRnpts = size(pABR_Rstim,2);
 %padSamples = round((pABRstim.pad_ms/1000) * ...
-   % pABRstim.RPsamprate_Hz);
+% pABRstim.RPsamprate_Hz);
 padSamples = pABRstim.padSamples;
 
 responseLength = 2 * padSamples;
@@ -184,7 +184,7 @@ for attenIND = 1
             positiveAccepted = false;
         end
         loadedThisOffTime = false;
-       
+        
         
         
         
@@ -192,7 +192,7 @@ for attenIND = 1
             set(FIG.statText.status, 'String', sprintf('STATUS: averaging at -%.1f dB [%d | %d | %d]...', ...
                 attenLevel, currStim, rejections, totalPresentations));
             
-             drawnow;
+            drawnow;
             
             savedStimIdx = nextStim - 1;
             
@@ -255,7 +255,7 @@ for attenIND = 1
                         if currStim > 0 %might not be necessary since we start looping from 1
                             if mod(currStim,2) % odd stim presentation
                                 fprintf('ODD accepted: currStim = %d\n',currStim);
-                            
+                                
                                 % Positive polarity cummulative frequency response
                                 pABR_PO_CumRes1{attenIND} = pABRdata1;
                                 pABR_PO_CumRes2{attenIND} = pABRdata2;
@@ -279,11 +279,9 @@ for attenIND = 1
                                 disp('Yes Positive')
                                 pABR_CumRes1 = (pABR_PO_CumRes1{attenIND} + pABR_NP_CumRes1{attenIND})/2;
                                 pABR_CumRes2 = (pABR_PO_CumRes2{attenIND} + pABR_NP_CumRes2{attenIND})/2;
-                                currentStimIdx = nextStim - 1;
+                                savedIdx = pABRinterstim{currStim};
                                 
-                                if currentStimIdx < 1
-                                    currentStimIdx = listlength;
-                                end
+                                currentStimIdx = savedIdx;
                                 
                                 combFreq_1 = pABRCC(pABR_CumRes1, ...
                                     squeeze(pABRstim.stimTrain(currentStimIdx,1,:)));
@@ -383,6 +381,18 @@ for attenIND = 1
                 pABR_4000Avg2{attenIND}/pABR_4000CumNoise2
                 pABR_8000Avg2{attenIND}/pABR_8000CumNoise2
                 };
+            rightRespPlot = rightResp;
+            leftRespPlot  = leftResp;
+            
+            if RunLevels_params.demean
+                for ff = 1:5
+                    rightRespPlot{ff} = rightRespPlot{ff} ...
+                        - mean(rightRespPlot{ff}, 'omitnan');
+                    
+                    leftRespPlot{ff} = leftRespPlot{ff} ...
+                        - mean(leftRespPlot{ff}, 'omitnan');
+                end
+            end
             
             rightY = [9.5 8.5 7.5 6.5 5.5];
             leftY  = [3.7 2.7 1.7 0.7 -0.3];
@@ -393,17 +403,17 @@ for attenIND = 1
                 datax = 0:(1/pABRstim.RPsamprate_Hz):(2*pABRstim.pad_ms)/1000;
                 newlen = min([ ...
                     length(datax),...
-                    length(rightResp{1}), length(rightResp{2}), length(rightResp{3}), ...
-                    length(rightResp{4}), length(rightResp{5}), ...
-                    length(leftResp{1}), length(leftResp{2}), length(leftResp{3}), ...
-                    length(leftResp{4}), length(leftResp{5})]);
+                    length(rightRespPlot{1}), length(rightRespPlot{2}), length(rightRespPlot{3}), ...
+                    length(rightRespPlot{4}), length(rightRespPlot{5}), ...
+                    length(leftRespPlot{1}), length(leftRespPlot{2}), length(leftRespPlot{3}), ...
+                    length(leftRespPlot{4}), length(leftRespPlot{5})]);
                 datax = datax(1:newlen);
                 currentMax = 0;
                 
                 for kk = 1:5
                     currentMax = max([currentMax, ...
-                        max(abs(rightResp{kk}(1:newlen))), ...
-                        max(abs(leftResp{kk}(1:newlen)))]);
+                        max(abs(rightRespPlot{kk}(1:newlen))), ...
+                        max(abs(leftRespPlot{kk}(1:newlen)))]);
                 end
                 plotHeight = 0.45;
                 Display.PlotFact = plotHeight/max(currentMax, eps);
@@ -411,17 +421,17 @@ for attenIND = 1
                     for ff = 1:5
                         set(FIG.ax.line(ff), ...
                             'xdata',datax, ...
-                            'ydata',rightResp{ff}(1:newlen)*Display.PlotFact + rightY(ff));
+                            'ydata',rightRespPlot{ff}(1:newlen)*Display.PlotFact + rightY(ff));
                         
                         set(FIG.ax.line(ff+5), ...
                             'xdata',datax, ...
-                            'ydata',leftResp{ff}(1:newlen)*Display.PlotFact+ leftY(ff));
+                            'ydata',leftRespPlot{ff}(1:newlen)*Display.PlotFact+ leftY(ff));
                     end
                 elseif Stimuli.rec_channel == 1
                     for ff = 1:5
                         set(FIG.ax.line(ff), ...
                             'xdata',datax, ...
-                            'ydata',rightResp{ff}(1:newlen)*Display.PlotFact+ rightY(ff));
+                            'ydata',rightRespPlot{ff}(1:newlen)*Display.PlotFact+ rightY(ff));
                         
                         set(FIG.ax.line(ff+5), ...
                             'xdata',[], ...
@@ -435,7 +445,7 @@ for attenIND = 1
                         
                         set(FIG.ax.line(ff+5), ...
                             'xdata',datax, ...
-                            'ydata',leftResp{ff}(1:newlen)*Display.PlotFact+ leftY(ff));
+                            'ydata',leftRespPlot{ff}(1:newlen)*Display.PlotFact+ leftY(ff));
                     end
                 end
             end
