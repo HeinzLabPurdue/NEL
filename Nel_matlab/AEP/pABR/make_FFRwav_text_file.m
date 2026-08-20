@@ -13,7 +13,7 @@ function NelData= make_FFRwav_text_file(misc, Stimuli, invfiltdata, PROG, NelDat
     Display, pABRattens, pABRinterstim, pABR_EpochResp1, pABR_EpochResp2,pABRstim)
 
 [x, aux_fname, fname]=make_FFRwav_text_file_subfunc1 ...
-    (misc, pABRstim, invfiltdata, PROG, NelData, comment, RunLevels_params, FFR_Gating, Display,pABRattens,pABRinterstim );
+    (misc, pABRstim, invfiltdata, PROG, NelData, comment, RunLevels_params, FFR_Gating, Display,pABRattens,pABRinterstim,Stimuli );
 
 % 	FFRdataReps_dec=cell(size(RunLevels_params.attenMask));  % All Reps
 % chan 1
@@ -52,30 +52,30 @@ end
 if Stimuli.rec_channel > 2
     x.AD_Data.Label{1} = 'Channel 1';
     x.AD_Data.Label{2} = 'Channel 2';
-    x.AD_Data.AD_Avg_500Hz_V{1} =   rightResp{1};
-    x.AD_Data.AD_Avg_1000Hz_V{1} =  rightResp{2};
-    x.AD_Data.AD_Avg_2000Hz_V{1} =  rightResp{3};
-    x.AD_Data.AD_Avg_4000Hz_V{1} =  rightResp{4};
-    x.AD_Data.AD_Avg_8000Hz_V{1} =  rightResp{5};
-    x.AD_Data.AD_Avg_500Hz_V{2} =  leftResp{1};
-    x.AD_Data.AD_Avg_1000Hz_V{2} = leftResp{2};
-    x.AD_Data.AD_Avg_2000Hz_V{2} =  leftResp{3};
-    x.AD_Data.AD_Avg_4000Hz_V{2} =  leftResp{4};
-    x.AD_Data.AD_Avg_8000Hz_V{2} =  leftResp{5};
+    x.AD_Data.AD_Avg_500Hz_V{1} =   rightResp(1,:);
+    x.AD_Data.AD_Avg_1000Hz_V{1} =  rightResp(2,:);
+    x.AD_Data.AD_Avg_2000Hz_V{1} =  rightResp(3,:);
+    x.AD_Data.AD_Avg_4000Hz_V{1} =  rightResp(4,:);
+    x.AD_Data.AD_Avg_8000Hz_V{1} =  rightResp(5,:);
+    x.AD_Data.AD_Avg_500Hz_V{2} =  leftResp(1,:);
+    x.AD_Data.AD_Avg_1000Hz_V{2} = leftResp(2,:);
+    x.AD_Data.AD_Avg_2000Hz_V{2} =  leftResp(3,:);
+    x.AD_Data.AD_Avg_4000Hz_V{2} =  leftResp(4,:);
+    x.AD_Data.AD_Avg_8000Hz_V{2} =  leftResp{5,:};
 elseif Stimuli.rec_channel == 2
     x.AD_Data.Label{1} = ['Channel ' num2str(Stimuli.rec_channel)];
-    x.AD_Data.AD_Avg_500Hz_V{1} =   rightResp{1};
-    x.AD_Data.AD_Avg_1000Hz_V{1} =  rightResp{2};
-    x.AD_Data.AD_Avg_2000Hz_V{1} =  rightResp{3};
-    x.AD_Data.AD_Avg_4000Hz_V{1} =  rightResp{4};
-    x.AD_Data.AD_Avg_8000Hz_V{1} =  rightResp{5};
+    x.AD_Data.AD_Avg_500Hz_V{1} =   rightResp{1,:};
+    x.AD_Data.AD_Avg_1000Hz_V{1} =  rightResp{2,:};
+    x.AD_Data.AD_Avg_2000Hz_V{1} =  rightResp{3,:};
+    x.AD_Data.AD_Avg_4000Hz_V{1} =  rightResp{4,:};
+    x.AD_Data.AD_Avg_8000Hz_V{1} =  rightResp{5,:};
 else
     x.AD_Data.Label{1} = ['Channel ' num2str(Stimuli.rec_channel)];
-    x.AD_Data.AD_Avg_500Hz_V{2} =  leftResp{1};
-    x.AD_Data.AD_Avg_1000Hz_V{2} = leftResp{2};
-    x.AD_Data.AD_Avg_2000Hz_V{2} =  leftResp{3};
-    x.AD_Data.AD_Avg_4000Hz_V{2} =  leftResp{4};
-    x.AD_Data.AD_Avg_8000Hz_V{2} =  leftResp{5};
+    x.AD_Data.AD_Avg_500Hz_V{2} =  leftResp{1,:};
+    x.AD_Data.AD_Avg_1000Hz_V{2} = leftResp{2,:};
+    x.AD_Data.AD_Avg_2000Hz_V{2} =  leftResp{3,:};
+    x.AD_Data.AD_Avg_4000Hz_V{2} =  leftResp{4,:};
+    x.AD_Data.AD_Avg_8000Hz_V{2} =  leftResp{5,:};
 
 end
 

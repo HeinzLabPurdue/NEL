@@ -1,19 +1,27 @@
 function [firstSTIM, NelData]=pABR_RunLevels(FIG,Stimuli,invfiltdata, RunLevels_params, misc, FFR_Gating,...
-    FFRnpts,interface_type, Display, NelData, data_dir, RP1, RP2, RP3, PROG, prog_dir,pABRstim)
+     pABRnpts,interface_type, Display, NelData, data_dir, RP1, RP2, RP3, PROG, prog_dir,pABRstim)
 
 pABR_flag = 1;
 RunLevels_params.demean = true;
 % File: FFR_SNRenv_RunLevels
-% M. Heinz 18Nov2003
-% Modified for pABR Stage-2 loading logic
+% John Love Zedek
+% 
 
 critVal  = Stimuli.threshV;  %for artigact rejection KHZZ 2011 Nov 4
 critVal2 = Stimuli.threshV2;
 
+% Recording-channel selection (JL 19Aug2026)
+% Stimuli.channel = 1: right response only (ADbuf)
+% Stimuli.channel = 2: left response only  (ADbuf2)
+% Stimuli.channel = 3: both responses
+if ~ismember(Stimuli.channel,[1 2 3])
+    error('Stimuli.channel must be 1 (right), 2 (left), or 3 (both).');
+end
+recordRight = Stimuli.rec_channel == 1 || Stimuli.rec_channel == 3;
+recordLeft  = Stimuli.rec_channel == 2 || Stimuli.rec_channel == 3;
 
 %adding pABR flag (JL 2026)
 stimRCXfName = [prog_dir '\object\pABRwav2_polIN.rcx'];
-
 
 set(FIG.push.run_levels,'string','Abort');
 set(FIG.push.forget_now,'string','Save NOW');
@@ -25,18 +33,16 @@ for ii=1:5
     set(FIG.ax.line(ii),...
         'xdata',[],...
         'ydata',[]);
-    
+
     set(FIG.ax.line(ii+5),...
         'xdata',[],...
         'ydata',[]);
-    
 end
 
-
-if Stimuli.rec_channel > 2 %3 for two channels
+if recordRight && recordLeft
     set(FIG.ax.line2(1),'ydata',[]);
     set(FIG.ax.line2(2),'ydata',[]);
-elseif Stimuli.rec_channel == 2
+elseif recordLeft
     set(FIG.ax.line2(2),'ydata',[]);
 else
     set(FIG.ax.line2(1),'ydata',[]);
@@ -44,9 +50,19 @@ end
 
 drawnow;
 
-if numel(RunLevels_params.attenMask) ~= 1
-    warning('Length of RunLevels_params.attenMask should be one');
+pABRlevels = RunLevels_params.attenMask(:).';
+
+if isempty(pABRlevels)
+    error('RunLevels_params.attenMask is empty.');
 end
+
+pABRlevels = 0:10:70;
+pABRlevelAtten = zeros(1,length(pABRlevels));
+for i=1:numel(pABRlevels)
+    pABRlevelAtten(:,i) = pABRstim.maxSPL - pABRlevels(i);
+end
+    
+nLevels = numel(pABRlevels);
 
 %%
 %updated by SP on 22Jul19: before it was saving the weighted average for
@@ -56,409 +72,385 @@ end
 % updated by JMR to save second channel
 % chan 1
 
-pABR_500Avg1 = cell(size(pABRstim.attenMask)); %#ok<*PREALL,*NASGU>
-pABR_1000Avg1 = cell(size(pABRstim.attenMask));
-pABR_2000Avg1 = cell(size(pABRstim.attenMask));
-pABR_4000Avg1 = cell(size(pABRstim.attenMask));
-pABR_8000Avg1 = cell(size(pABRstim.attenMask));
-
-pABR_PO_CumRes1= cell(size(pABRstim.attenMask));
-pABR_PO_CumRes2= cell(size(pABRstim.attenMask));
-
-pABR_NP_CumRes1= cell(size(pABRstim.attenMask));
-pABR_NP_CumRes2= cell(size(pABRstim.attenMask));
-
 % chan 1
+pABR_PO_CumRes1 = cell(1,nLevels);
+pABR_PO_CumRes2 = cell(1,nLevels);
 
-pABR_500Avg2 = cell(size(pABRstim.attenMask)); %#ok<*NASGU>
-pABR_1000Avg2 = cell(size(pABRstim.attenMask));
-pABR_2000Avg2 = cell(size(pABRstim.attenMask));
-pABR_4000Avg2 = cell(size(pABRstim.attenMask));
-pABR_8000Avg2 = cell(size(pABRstim.attenMask));
-
-
+pABR_NP_CumRes1 = cell(1,nLevels);
+pABR_NP_CumRes2 = cell(1,nLevels);
 
 %loading pABR stimuli JL 08jun26
 pABR_Lstim=pABRstim.leftEpochs;
 pABR_Rstim=pABRstim.rightEpochs;
 listlength = size(pABR_Rstim,1);
 
-nPresentations = 20;
-pABRattens = cell(size(RunLevels_params.attenMask));
-pABRinterstim= cell(1,2*listlength*nPresentations);
-pABR_EpochResp1 = cell(1,2*listlength*nPresentations);
-pABR_EpochResp2 = cell(1,2*listlength*nPresentations);
+nPresentations = 7;
+totalPresentations = 2*listlength*nPresentations;
+pABRattens = num2cell(pABRlevels);
+pABRinterstim = cell(nLevels,totalPresentations);
+pABR_EpochResp1 = cell(nLevels,totalPresentations);
+pABR_EpochResp2 = cell(nLevels,totalPresentations);
 
 %pABRnpts = floor(pABRstim.Gating.pABRDur_ms/1000 * pABRstim.RPsamprate_Hz);
 pABRnpts = size(pABR_Rstim,2);
 %padSamples = round((pABRstim.pad_ms/1000) * ...
 % pABRstim.RPsamprate_Hz);
-padSamples = pABRstim.padSamples;
+%padSamples = pABRstim.padSamples;
 
-responseLength = 2 * padSamples;
+%responseLength = 2 * padSamples;
+
+realtimeDir = 'C:\pABR_Realtime';
+resultFile = fullfile(realtimeDir,'pABR_results.mat');
+
+if ~exist(realtimeDir,'dir')
+    mkdir(realtimeDir);
+end
+
+delete(fullfile(realtimeDir,'pABR_epoch_*.mat'));
+delete(fullfile(realtimeDir,'pABR_level_*_epoch_*.mat'));
+
+if exist(resultFile,'file')
+    delete(resultFile);
+end
+
+stimFile = fullfile(realtimeDir,'pABRstim.mat');
+
+if exist(stimFile,'file')
+    delete(stimFile);
+end
+
+stimSavingFile = fullfile(realtimeDir,'pABRstim_saving.mat');
+
+if exist(stimSavingFile,'file')
+    delete(stimSavingFile);
+end
+
+savedPairCount = zeros(1,nLevels);
+
+recordingCondition = Stimuli.rec_channel; %#ok<NASGU>
+
+builtin('save', ...
+    stimSavingFile, ...
+    'pABRstim', ...
+    'pABRlevels', ...
+    'recordingCondition', ...
+    'recordRight', ...
+    'recordLeft');
+
+movefile( ...
+    stimSavingFile, ...
+    stimFile, ...
+    'f');
+
 %% Main loop
-% Not looping through attens for SFR. Assuming single attenuation
-for attenIND = 1
-    attenLevel = pABRstim.atten_dB;
+% Looping through all attenuation levels
+for attenIND = 1:nLevels
+    attenLevel = pABRlevels(attenIND);
+    atten = pABRlevelAtten(attenIND);
     rejections = 0;   %for artifact rejection KHZZ 2011 Nov 4
     pABRattens{attenIND} = attenLevel;
-    
+
     set(FIG.statText.status, 'String', sprintf('STATUS: averaging at -%.1f dB...', attenLevel));
-    
-    pABR_500Avg1{attenIND}  = zeros(1,responseLength);
-    pABR_1000Avg1{attenIND} = zeros(1,responseLength);
-    pABR_2000Avg1{attenIND} = zeros(1,responseLength);
-    pABR_4000Avg1{attenIND} = zeros(1,responseLength);
-    pABR_8000Avg1{attenIND} = zeros(1,responseLength);
-    
-    pABR_PO_CumRes1{attenIND} = zeros(1,pABRnpts);
-    pABR_PO_CumRes2{attenIND} = zeros(1,pABRnpts);
-    pABR_NP_CumRes1{attenIND} = zeros(1,pABRnpts);
-    pABR_NP_CumRes2{attenIND} = zeros(1,pABRnpts);
-    
-    
-    
-    pABR_500Avg2{attenIND}  = zeros(1,responseLength);
-    pABR_1000Avg2{attenIND} = zeros(1,responseLength);
-    pABR_2000Avg2{attenIND} = zeros(1,responseLength);
-    pABR_4000Avg2{attenIND} = zeros(1,responseLength);
-    pABR_8000Avg2{attenIND} = zeros(1,responseLength);
-    
-    pABR_500CumNoise1 = 0;
-    pABR_1000CumNoise1 = 0;
-    pABR_2000CumNoise1 = 0;
-    pABR_4000CumNoise1 = 0;
-    pABR_8000CumNoise1 = 0;
-    
-    pABR_500CumNoise2 = 0;
-    pABR_1000CumNoise2 = 0;
-    pABR_2000CumNoise2 = 0;
-    pABR_4000CumNoise2 = 0;
-    pABR_8000CumNoise2 = 0;
-    
-    rightResp = cell(5,1);
-    leftResp  = cell(5,1);
-    
-    for ff = 1:5
-        rightResp{ff} = zeros(1,responseLength);
-        leftResp{ff}  = zeros(1,responseLength);
-    end
-    
-    
-    
-    
-    
+
     % load stimulus before first pulse train since it starts with the rising edge, no off time. JL 2026 Jun 8
-    
+
     invoke(RP1,'ClearCOF');
     invoke(RP1,'LoadCOF', stimRCXfName);
     invoke(RP1,'Run');
-    
+
     invoke(RP1, 'SetTagVal', 'StmOn',  pABRstim.Gating.pABRDur_ms);
     invoke(RP1, 'SetTagVal', 'StmOff',  pABRstim.Gating.Period_ms - pABRstim.Gating.pABRDur_ms);
     invoke(RP1, 'SetTagVal', 'RiseFall', pABRstim.Gating.rftime_ms);
-    
+
     nextStim = 1;
-    
+
     xpR = double(pABR_Rstim(nextStim,:));
     xpL = double(pABR_Lstim(nextStim,:));
-    
+
     tmpR = invoke(RP1,'WriteTagV','STIM_R',0,xpR); %writing directly to buffer JL 09June2026
     tmpL = invoke(RP1,'WriteTagV','STIM_L',0,xpL);
-    
+
     if tmpR ~= 1 || tmpL ~= 1            %check if writing stimulus to buffer succeeded. JL 2026 Jun 8
         error('First pABR stimulus failed to load');
     end
-    
+
     nextStim = nextStim + 1;
-    
-    AEP_set_attns2( pABRstim.atten_dB,Stimuli.channel, pABRstim.atten2_dB,Stimuli.channel2,Stimuli.KHosc,RP1,RP2);
+
+    pABR_set_attns(atten,Stimuli.channel, ...
+        atten,Stimuli.channel2, ...
+        Stimuli.KHosc,RP1,RP2);
+
     % Start the pulse train once. JL 2026 Jun 8
     invoke(RP1,'SoftTrg',1);
-    
-    
-    totalPresentations = 2*listlength*nPresentations;
+
     positiveAccepted = false;
+
     for currStim = 1:totalPresentations
         if mod(currStim,2) == 1
             positiveAccepted = false;
         end
+
         loadedThisOffTime = false;
-        
-        
-        
-        
+        pairReadyToSave = false;
+
         if currStim
             set(FIG.statText.status, 'String', sprintf('STATUS: averaging at -%.1f dB [%d | %d | %d]...', ...
                 attenLevel, currStim, rejections, totalPresentations));
-            
+
             drawnow;
-            
+
             savedStimIdx = nextStim - 1;
-            
+
             if savedStimIdx < 1
                 savedStimIdx = listlength;
             end
-            
-            pABRinterstim{currStim} = savedStimIdx;
-            
+
+            pABRinterstim{attenIND,currStim} = savedStimIdx;
         end
-        
+
         if (strcmp(get(FIG.push.forget_now, 'Userdata'), 'save') && ~mod(currStim,2))
             save = 1;
-            RunLevels_params.nPairs_actual = currStim/2;
+            RunLevels_params.nPairs_actual(attenIND) = currStim/2;
             break;
         end
-        
+
         if strcmp(get(FIG.push.run_levels, 'Userdata'), 'abort')
             bAbort = 1;
             break;
         end
-        
+
         %setup to monitor run and off times JL 07Jul2026
         %load new stimulus during the off time at the end of +- pol
         % Stage 1 = ON/play time. Wait until it ends.
-        
+
         while invoke(RP1,'GetTagVal','Stage') == 1
             %do nothing
         end
-        
+
         % Stage 2 = OFF time. JL 07Jul2026
         % During this window:
         %   1. Keep checking for acquired data.
         %   2. Load the next pABR stimulus only once, after + - polarity completes.
         dataReadThisOff = false;
+
         while invoke(RP1,'GetTagVal','Stage') == 2
-            
+
             %pABR_set_attns2(120,Stimuli.channel,Stimuli.atten2_dB,120,Stimuli.KHosc,RP1,RP2)
-            
+
             if ~dataReadThisOff && invoke(RP3,'GetTagVal','BufFlag') == 1
-                pABRdata1 = invoke(RP3,'ReadTagV','ADbuf',0,pABRnpts);
-                pABRdata2 = invoke(RP3,'ReadTagV','ADbuf2',0,pABRnpts);
-                maxpABRobs1 = max(abs( pABRdata1));  %Artifact rejection KHZZ 2011 Nov 4
-                maxpABRobs2 = max(abs(pABRdata2));
-                
+                % Read only the response channel(s) used by this condition.
+                pABRdata1 = [];
+                pABRdata2 = [];
+                maxpABRobs1 = NaN;
+                maxpABRobs2 = NaN;
+
+                if recordRight
+                    pABRdata1 = invoke(RP3,'ReadTagV','ADbuf',0,pABRnpts);
+                    if ~isempty(pABRdata1)
+                        maxpABRobs1 = max(abs(pABRdata1));
+                    end
+                end
+
+                if recordLeft
+                    pABRdata2 = invoke(RP3,'ReadTagV','ADbuf2',0,pABRnpts);
+                    if ~isempty(pABRdata2)
+                        maxpABRobs2 = max(abs(pABRdata2));
+                    end
+                end
+
+                rightDataValid = ~recordRight || ...
+                    (~isempty(pABRdata1) && length(pABRdata1)==pABRnpts);
+                leftDataValid = ~recordLeft || ...
+                    (~isempty(pABRdata2) && length(pABRdata2)==pABRnpts);
+                dataValid = rightDataValid && leftDataValid;
+
+                rightArtifactFree = ~recordRight || maxpABRobs1 <= critVal;
+                leftArtifactFree = ~recordLeft || maxpABRobs2 <= critVal2;
+                artifactFree = rightArtifactFree && leftArtifactFree;
+
                 %read response once per STIM presentation
-                
-                if ~isempty(pABRdata1) && ~isempty(pABRdata2) && length(pABRdata1)==pABRnpts ...
-                        && length(pABRdata2)==pABRnpts
+
+                if dataValid
+
                     dataReadThisOff = true;
-                    
+
                     % fixing the function to make sure the polarity matches, starts with 1,
                     % which must match with 1 for original
                     fprintf('stim=%d ORG=%d expected=%d max1=%g/%g max2=%g/%g\n', ...
                         currStim, invoke(RP1,'GetTagVal','ORG'), mod(currStim,2), ...
                         maxpABRobs1, critVal, maxpABRobs2, critVal2);
-                    if invoke(RP1,'GetTagVal','ORG') == mod(currStim,2) && ...
-                            maxpABRobs1 <= critVal && maxpABRobs2 <= critVal2
-                        
+
+                    if invoke(RP1,'GetTagVal','ORG') == mod(currStim,2) && artifactFree
+
                         if currStim > 0 %might not be necessary since we start looping from 1
                             if mod(currStim,2) % odd stim presentation
                                 fprintf('ODD accepted: currStim = %d\n',currStim);
-                                
+
                                 % Positive polarity cummulative frequency response
-                                pABR_PO_CumRes1{attenIND} = pABRdata1;
-                                pABR_PO_CumRes2{attenIND} = pABRdata2;
+                                if recordRight
+                                    pABR_PO_CumRes1{attenIND} = pABRdata1;
+                                end
+                                if recordLeft
+                                    pABR_PO_CumRes2{attenIND} = pABRdata2;
+                                end
                                 positiveAccepted = true;
-                                
+
                             else
                                 % Negative polarity cummulative frequency response
                                 fprintf('EVEN accepted: currStim = %d\n',currStim);
-                                pABR_NP_CumRes1{attenIND} = pABRdata1;
-                                pABR_NP_CumRes2{attenIND} = pABRdata2;
+
+                                if positiveAccepted
+                                    if recordRight
+                                        pABR_NP_CumRes1{attenIND} = pABRdata1;
+                                    end
+                                    if recordLeft
+                                        pABR_NP_CumRes2{attenIND} = pABRdata2;
+                                    end
+
+                                    epochData.currentStimIdx = pABRinterstim{attenIND,currStim};
+                                    epochData.attenIND = attenIND;
+                                    epochData.attenLevel = attenLevel;
+                                    epochData.recordingCondition = Stimuli.rec_channel;
+                                    epochData.recordRight = recordRight;
+                                    epochData.recordLeft = recordLeft;
+
+                                    % Keep both fields for a stable file format,
+                                    % but leave the inactive response empty.
+                                    epochData.pABR_CumRes1 = [];
+                                    epochData.pABR_CumRes2 = [];
+
+                                    if recordRight
+                                        epochData.pABR_CumRes1 = ...
+                                            (pABR_PO_CumRes1{attenIND} + ...
+                                            pABR_NP_CumRes1{attenIND})/2;
+                                    end
+
+                                    if recordLeft
+                                        epochData.pABR_CumRes2 = ...
+                                            (pABR_PO_CumRes2{attenIND} + ...
+                                            pABR_NP_CumRes2{attenIND})/2;
+                                    end
+
+                                    pairReadyToSave = true;
+                                end
                             end
                         end
-                        
+
                         if currStim
-                            pABR_EpochResp1{currStim} = pABRdata1;  %added DA 7/23/13 %changed to pABR JL 6/30/26
-                            pABR_EpochResp2{currStim} = pABRdata2;
-                        end
-                        
-                        if mod(currStim,2) == 0
-                            if positiveAccepted
-                                disp('Yes Positive')
-                                pABR_CumRes1 = (pABR_PO_CumRes1{attenIND} + pABR_NP_CumRes1{attenIND})/2;
-                                pABR_CumRes2 = (pABR_PO_CumRes2{attenIND} + pABR_NP_CumRes2{attenIND})/2;
-                                savedIdx = pABRinterstim{currStim};
-                                
-                                currentStimIdx = savedIdx;
-                                
-                                combFreq_1 = pABRCC(pABR_CumRes1, ...
-                                    squeeze(pABRstim.stimTrain(currentStimIdx,1,:)));
-                                
-                                combFreq_2 = pABRCC(pABR_CumRes2, ...
-                                    squeeze(pABRstim.stimTrain(currentStimIdx,2,:)));
-                                
-                                pABR_500CumNoise1 =  pABR_500CumNoise1 + combFreq_1(1).var;
-                                pABR_1000CumNoise1 = pABR_1000CumNoise1 + combFreq_1(2).var;
-                                pABR_2000CumNoise1 = pABR_2000CumNoise1 + combFreq_1(3).var;
-                                pABR_4000CumNoise1 = pABR_4000CumNoise1 + combFreq_1(4).var;
-                                pABR_8000CumNoise1 =  pABR_8000CumNoise1 + combFreq_1(5).var;
-                                
-                                pABR_500CumNoise2 = pABR_500CumNoise2 + combFreq_2(1).var;
-                                pABR_1000CumNoise2 = pABR_1000CumNoise2 + combFreq_2(2).var;
-                                pABR_2000CumNoise2 =  pABR_2000CumNoise2 + combFreq_2(3).var;
-                                pABR_4000CumNoise2 =  pABR_4000CumNoise2 + combFreq_2(4).var;
-                                pABR_8000CumNoise2 = pABR_8000CumNoise2 + combFreq_2(5).var;
-                                
-                                
-                                
-                                
-                                %epoch weighted response for right ear
-                                pABR_500Avg1{attenIND} = pABR_500Avg1{attenIND} + combFreq_1(1).response(:).'*(combFreq_1(1).var);                            %chan1
-                                pABR_1000Avg1{attenIND} = pABR_1000Avg1{attenIND} + combFreq_1(2).response(:).'*(combFreq_1(2).var);
-                                pABR_2000Avg1{attenIND} = pABR_2000Avg1{attenIND} + combFreq_1(3).response(:).'*(combFreq_1(3).var);
-                                pABR_4000Avg1{attenIND} = pABR_4000Avg1{attenIND} + combFreq_1(4).response(:).'*(combFreq_1(4).var);
-                                pABR_8000Avg1{attenIND} = pABR_8000Avg1{attenIND} + combFreq_1(5).response(:).'*(combFreq_1(5).var);
-                                
-                                %epoch weighted reponse for left ear
-                                pABR_500Avg2{attenIND} = pABR_500Avg2{attenIND} + combFreq_2(1).response(:).'*(combFreq_2(1).var);                            %chan2
-                                pABR_1000Avg2{attenIND} = pABR_1000Avg2{attenIND} + combFreq_2(2).response(:).'*(combFreq_2(2).var);
-                                pABR_2000Avg2{attenIND} = pABR_2000Avg2{attenIND} + combFreq_2(3).response(:).'*(combFreq_2(3).var);
-                                pABR_4000Avg2{attenIND} = pABR_4000Avg2{attenIND} + combFreq_2(4).response(:).'*(combFreq_2(4).var);
-                                pABR_8000Avg2{attenIND} = pABR_8000Avg2{attenIND} + combFreq_2(5).response(:).'*(combFreq_2(5).var);
-                                
-                            else
-                                disp('Skipping pair because positive polarity was rejected');
+                            if recordRight
+                                pABR_EpochResp1{attenIND,currStim} = pABRdata1;
                             end
-                            positiveAccepted = false;
-                            
+                            if recordLeft
+                                pABR_EpochResp2{attenIND,currStim} = pABRdata2;
+                            end
                         end
-                        
-                        
-                        
-                        
-                        
-                    elseif maxpABRobs1 > critVal || maxpABRobs2 > critVal2
+
+                    elseif ~artifactFree
                         rejections = rejections + 1;
                     end %End for artifact rejection KH 2011 June 08
-                    
+
                     invoke(RP3,'SoftTrg',2);
                 end
             end
-            
+
             % pABR: load next stimulus once during OFF time, after + and - are done.
             if pABR_flag && ~loadedThisOffTime && mod(currStim,2)==0 && nextStim <= listlength
                 xpR = double(pABR_Rstim(nextStim,:));
                 xpL = double(pABR_Lstim(nextStim,:));
-                
+
                 tmpR = invoke(RP1,'WriteTagV','STIM_R',0,xpR);
                 tmpL = invoke(RP1,'WriteTagV','STIM_L',0,xpL);
                 sprintf('loaded %.0d',currStim)
-                
+
                 if tmpR == 1 && tmpL == 1
                     loadedThisOffTime = true;
                     nextStim = nextStim + 1;
-                    
-                    if nextStim >  listlength
+
+                    if nextStim > listlength
                         nextStim = 1;
                     end
                 end
-                
-                
             end
         end
-        
+
+        if pairReadyToSave
+            pairSavingFile = fullfile(realtimeDir, ...
+                sprintf('pABR_level_%03d_epoch_%04d_saving.mat',attenIND,currStim/2));
+
+            pairFile = fullfile(realtimeDir, ...
+                sprintf('pABR_level_%03d_epoch_%04d.mat',attenIND,currStim/2));
+
+            builtin('save', ...
+                pairSavingFile, ...
+                '-struct', ...
+                'epochData');
+
+            movefile( ...
+                pairSavingFile, ...
+                pairFile, ...
+                'f');
+
+            savedPairCount(attenIND) = savedPairCount(attenIND) + 1;
+        end
+
         if ~dataReadThisOff
             sprintf('currStim %d: Data not read during stage2', currStim);
         end
+
         if ~loadedThisOffTime && mod(currStim,2)==0
             sprintf('currStim %d: Next Stim not loaded during stage2', currStim);
         end
-        if mod(currStim,2) == 0 && pABR_500CumNoise1 > 0
-            rightResp = {
-                pABR_500Avg1{attenIND}/pABR_500CumNoise1
-                pABR_1000Avg1{attenIND}/pABR_1000CumNoise1
-                pABR_2000Avg1{attenIND}/pABR_2000CumNoise1
-                pABR_4000Avg1{attenIND}/pABR_4000CumNoise1
-                pABR_8000Avg1{attenIND}/pABR_8000CumNoise1
-                };
-            
-            leftResp = {
-                pABR_500Avg2{attenIND}/pABR_500CumNoise2
-                pABR_1000Avg2{attenIND}/pABR_1000CumNoise2
-                pABR_2000Avg2{attenIND}/pABR_2000CumNoise2
-                pABR_4000Avg2{attenIND}/pABR_4000CumNoise2
-                pABR_8000Avg2{attenIND}/pABR_8000CumNoise2
-                };
-            rightRespPlot = rightResp;
-            leftRespPlot  = leftResp;
-            
-            if RunLevels_params.demean
-                for ff = 1:5
-                    rightRespPlot{ff} = rightRespPlot{ff} ...
-                        - mean(rightRespPlot{ff}, 'omitnan');
-                    
-                    leftRespPlot{ff} = leftRespPlot{ff} ...
-                        - mean(leftRespPlot{ff}, 'omitnan');
-                end
-            end
-            
-            rightY = [9.5 8.5 7.5 6.5 5.5];
-            leftY  = [3.7 2.7 1.7 0.7 -0.3];
-            
-            
-            if currStim > 0
-                % XData and YData need to be the same Length
-                datax = 0:(1/pABRstim.RPsamprate_Hz):(2*pABRstim.pad_ms)/1000;
-                newlen = min([ ...
-                    length(datax),...
-                    length(rightRespPlot{1}), length(rightRespPlot{2}), length(rightRespPlot{3}), ...
-                    length(rightRespPlot{4}), length(rightRespPlot{5}), ...
-                    length(leftRespPlot{1}), length(leftRespPlot{2}), length(leftRespPlot{3}), ...
-                    length(leftRespPlot{4}), length(leftRespPlot{5})]);
-                datax = datax(1:newlen);
-                currentMax = 0;
-                
-                for kk = 1:5
-                    currentMax = max([currentMax, ...
-                        max(abs(rightRespPlot{kk}(1:newlen))), ...
-                        max(abs(leftRespPlot{kk}(1:newlen)))]);
-                end
-                plotHeight = 0.45;
-                Display.PlotFact = plotHeight/max(currentMax, eps);
-                if Stimuli.rec_channel > 2
-                    for ff = 1:5
-                        set(FIG.ax.line(ff), ...
-                            'xdata',datax, ...
-                            'ydata',rightRespPlot{ff}(1:newlen)*Display.PlotFact + rightY(ff));
-                        
-                        set(FIG.ax.line(ff+5), ...
-                            'xdata',datax, ...
-                            'ydata',leftRespPlot{ff}(1:newlen)*Display.PlotFact+ leftY(ff));
-                    end
-                elseif Stimuli.rec_channel == 1
-                    for ff = 1:5
-                        set(FIG.ax.line(ff), ...
-                            'xdata',datax, ...
-                            'ydata',rightRespPlot{ff}(1:newlen)*Display.PlotFact+ rightY(ff));
-                        
-                        set(FIG.ax.line(ff+5), ...
-                            'xdata',[], ...
-                            'ydata',[],'Visible', 'off');
-                    end
-                elseif Stimuli.rec_channel == 2
-                    for ff = 1:5
-                        set(FIG.ax.line(ff), ...
-                            'xdata',[], ...
-                            'ydata',[],'Visible', 'off');
-                        
-                        set(FIG.ax.line(ff+5), ...
-                            'xdata',datax, ...
-                            'ydata',leftRespPlot{ff}(1:newlen)*Display.PlotFact+ leftY(ff));
-                    end
-                end
-            end
-            
-            set(FIG.ax.axis,'XLim',[0 max(datax)]);
-            drawnow;
-        end
     end
-    
-    
-    
+
+    RunLevels_params.nPairs_actual(attenIND) = savedPairCount(attenIND);
+
     if bAbort == 1 || save == 1  % not sure if the right place to abort/save
         break;
+    end
+end
+
+if bAbort == 0
+    if sum(savedPairCount) == 0
+        error('No accepted pABR pairs were saved.');
+    end
+
+    set(FIG.statText.status, ...
+        'String', ...
+        'STATUS: waiting for pABR processing...');
+
+    while true
+        epochFiles = dir(fullfile(realtimeDir,'pABR_level_*_epoch_*.mat'));
+        epochNames = string({epochFiles.name});
+        epochNames = epochNames(~contains(epochNames,'_saving'));
+
+        if isempty(epochNames)
+            break;
+        end
+
+        pause(0.05);
+        drawnow;
+    end
+
+    while ~exist(resultFile,'file')
+        pause(0.05);
+        drawnow;
+    end
+
+    resultData = load(resultFile);
+
+    rightResp = [];
+    leftResp = [];
+    if recordRight
+        if ~isfield(resultData,'rightResp')
+            error('The processing result does not contain rightResp.');
+        end
+        rightResp = resultData.rightResp;
+    end
+    if recordLeft
+        if ~isfield(resultData,'leftResp')
+            error('The processing result does not contain leftResp.');
+        end
+        leftResp = resultData.leftResp;
     end
 end
 
@@ -466,14 +458,14 @@ end
 if bAbort == 0
     beep;
     ButtonName = 'Yes';
-    
+
     switch ButtonName
         case 'Yes'
             comment = 'No comment.';
         case 'Comment'
             comment = add_comment_line; %add a comment line before saving data file
     end
-    
+
     if ~strcmp(ButtonName,'No')
         AEP_set_attns2(120,Stimuli.channel,120,Stimuli.channel2,Stimuli.KHosc,RP1,RP2);
         PAset([120;120;120;120]);
@@ -482,7 +474,7 @@ if bAbort == 0
         NelData = make_FFRwav_text_file(misc, Stimuli, invfiltdata, PROG, NelData, comment, ...
             RunLevels_params, FFR_Gating, rightResp, leftResp, ...
             Display, pABRattens, pABRinterstim, pABR_EpochResp1, pABR_EpochResp2,pABRstim);
-        
+
         current_data_file('FFR',1);
         uiresume; % Allow Nel's main window to update the Title'
         %% From NEL: "update_nel_title"
@@ -491,6 +483,7 @@ if bAbort == 0
         else
             display_dir = NelData.File_Manager.dirname;
         end
+
         set(NelData.General.main_handle,'Name', ...
             ['Running pABR ...  -  ''' display_dir '''   (' int2str(NelData.File_Manager.picture) ' Saved Pictures)']);
     end
@@ -514,13 +507,11 @@ for ii=1:5
     set(FIG.ax.line(ii),...
         'xdata',[],...
         'ydata',[]);
-    
+
     set(FIG.ax.line(ii+5),...
         'xdata',[],...
         'ydata',[]);
-    
 end
-
 
 % change the legends back
 %set(FIG.ax.line(1),'DisplayName', 'Ch 1 Neg');

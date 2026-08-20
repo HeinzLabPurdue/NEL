@@ -1,4 +1,4 @@
-function [error, converge, ADdata_V_raw] = TDTdaq
+function [error, converge, ADdata_V_raw] = TDTdaq(micChannel)
 % Modified SP on 8/22/19 to return TDT buffer data: so that we can test new
 % line detection algorithm and compare old/new amplitude and phase
 % calculation
@@ -137,9 +137,15 @@ for index = 1:15   % THIS IS THE LOOP TO RUN UNTIL VALUES CONVERGE
         DataIndex = invoke(COMM.handle.RP2_2, 'GetTagVal', 'Index');
     end
     
-    ADdata_V_raw = invoke(COMM.handle.RP2_2,'ReadTagV','ADbuf',0,ADdur_pts);
-    ADsignal_V = invoke(COMM.handle.RP2_2,'ReadTagV','ADbuf2',0,ADdur_pts);
-    
+     ADmic1 = invoke(COMM.handle.RP2_2,'ReadTagV','ADbuf',0,ADdur_pts);%ADdata_V_raw
+     ADmic2= invoke(COMM.handle.RP2_2,'ReadTagV','ADbuf2',0,ADdur_pts); %ADsignal_V
+     
+     if micChannel == 1
+         ADdata_V_raw = ADmic2;
+     elseif micChannel == 2
+         ADdata_V_raw = ADmic1;
+     end
+     
     %% Save ADdata_V here to test line spectrum detection algorithm 
     
     

@@ -10,6 +10,16 @@ RunLevels_params.demean = true;
 critVal  = Stimuli.threshV;  %for artigact rejection KHZZ 2011 Nov 4
 critVal2 = Stimuli.threshV2;
 
+% Recording-channel selection (JL 19Aug2026)
+% Stimuli.channel = 1: right response only (ADbuf)
+% Stimuli.channel = 2: left response only  (ADbuf2)
+% Stimuli.channel = 3: both responses
+if ~ismember(Stimuli.channel,[1 2 3])
+    error('Stimuli.channel must be 1 (right), 2 (left), or 3 (both).');
+end
+recordRight = Stimuli.channel == 1 || Stimuli.channel == 3;
+recordLeft  = Stimuli.channel == 2 || Stimuli.channel == 3;
+
 %adding pABR flag (JL 2026)
 stimRCXfName = [prog_dir '\object\pABRwav2_polIN.rcx'];
 
@@ -29,10 +39,10 @@ for ii=1:5
         'ydata',[]);
 end
 
-if Stimuli.rec_channel > 2 %3 for two channels
+if recordRight && recordLeft
     set(FIG.ax.line2(1),'ydata',[]);
     set(FIG.ax.line2(2),'ydata',[]);
-elseif Stimuli.rec_channel == 2
+elseif recordLeft
     set(FIG.ax.line2(2),'ydata',[]);
 else
     set(FIG.ax.line2(1),'ydata',[]);
@@ -117,10 +127,15 @@ end
 
 savedPairCount = zeros(1,nLevels);
 
+recordingCondition = Stimuli.channel; %#ok<NASGU>
+
 builtin('save', ...
     stimSavingFile, ...
     'pABRstim', ...
-    'pABRlevels');
+    'pABRlevels', ...
+    'recordingCondition', ...
+    'recordRight', ...
+    'recordLeft');
 
 movefile( ...
     stimSavingFile, ...
@@ -223,15 +238,39 @@ for attenIND = 1:nLevels
             %pABR_set_attns2(120,Stimuli.channel,Stimuli.atten2_dB,120,Stimuli.KHosc,RP1,RP2)
 
             if ~dataReadThisOff && invoke(RP3,'GetTagVal','BufFlag') == 1
-                pABRdata1 = invoke(RP3,'ReadTagV','ADbuf',0,pABRnpts);
-                pABRdata2 = invoke(RP3,'ReadTagV','ADbuf2',0,pABRnpts);
-                maxpABRobs1 = max(abs(pABRdata1));  %Artifact rejection KHZZ 2011 Nov 4
-                maxpABRobs2 = max(abs(pABRdata2));
+                % Read only the response channel(s) used by this condition.
+                pABRdata1 = [];
+                pABRdata2 = [];
+                maxpABRobs1 = NaN;
+                maxpABRobs2 = NaN;
+
+                if recordRight
+                    pABRdata1 = invoke(RP3,'ReadTagV','ADbuf',0,pABRnpts);
+                    if ~isempty(pABRdata1)
+                        maxpABRobs1 = max(abs(pABRdata1));
+                    end
+                end
+
+                if recordLeft
+                    pABRdata2 = invoke(RP3,'ReadTagV','ADbuf2',0,pABRnpts);
+                    if ~isempty(pABRdata2)
+                        maxpABRobs2 = max(abs(pABRdata2));
+                    end
+                end
+
+                rightDataValid = ~recordRight || ...
+                    (~isempty(pABRdata1) && length(pABRdata1)==pABRnpts);
+                leftDataValid = ~recordLeft || ...
+                    (~isempty(pABRdata2) && length(pABRdata2)==pABRnpts);
+                dataValid = rightDataValid && leftDataValid;
+
+                rightArtifactFree = ~recordRight || maxpABRobs1 <= critVal;
+                leftArtifactFree = ~recordLeft || maxpABRobs2 <= critVal2;
+                artifactFree = rightArtifactFree && leftArtifactFree;
 
                 %read response once per STIM presentation
 
-                if ~isempty(pABRdata1) && ~isempty(pABRdata2) && length(pABRdata1)==pABRnpts ...
-                        && length(pABRdata2)==pABRnpts
+                if dataValid
 
                     dataReadThisOff = true;
 
@@ -241,16 +280,19 @@ for attenIND = 1:nLevels
                         currStim, invoke(RP1,'GetTagVal','ORG'), mod(currStim,2), ...
                         maxpABRobs1, critVal, maxpABRobs2, critVal2);
 
-                    if invoke(RP1,'GetTagVal','ORG') == mod(currStim,2) && ...
-                            maxpABRobs1 <= critVal && maxpABRobs2 <= critVal2
+                    if invoke(RP1,'GetTagVal','ORG') == mod(currStim,2) && artifactFree
 
                         if currStim > 0 %might not be necessary since we start looping from 1
                             if mod(currStim,2) % odd stim presentation
                                 fprintf('ODD accepted: currStim = %d\n',currStim);
 
                                 % Positive polarity cummulative frequency response
-                                pABR_PO_CumRes1{attenIND} = pABRdata1;
-                                pABR_PO_CumRes2{attenIND} = pABRdata2;
+                                if recordRight
+                                    pABR_PO_CumRes1{attenIND} = pABRdata1;
+                                end
+                                if recordLeft
+                                    pABR_PO_CumRes2{attenIND} = pABRdata2;
+                                end
                                 positiveAccepted = true;
 
                             else
@@ -258,20 +300,36 @@ for attenIND = 1:nLevels
                                 fprintf('EVEN accepted: currStim = %d\n',currStim);
 
                                 if positiveAccepted
-                                    pABR_NP_CumRes1{attenIND} = pABRdata1;
-                                    pABR_NP_CumRes2{attenIND} = pABRdata2;
+                                    if recordRight
+                                        pABR_NP_CumRes1{attenIND} = pABRdata1;
+                                    end
+                                    if recordLeft
+                                        pABR_NP_CumRes2{attenIND} = pABRdata2;
+                                    end
 
                                     epochData.currentStimIdx = pABRinterstim{attenIND,currStim};
                                     epochData.attenIND = attenIND;
                                     epochData.attenLevel = attenLevel;
+                                    epochData.recordingCondition = Stimuli.channel;
+                                    epochData.recordRight = recordRight;
+                                    epochData.recordLeft = recordLeft;
 
-                                    epochData.pABR_CumRes1 = ...
-                                        (pABR_PO_CumRes1{attenIND} + ...
-                                        pABR_NP_CumRes1{attenIND})/2;
+                                    % Keep both fields for a stable file format,
+                                    % but leave the inactive response empty.
+                                    epochData.pABR_CumRes1 = [];
+                                    epochData.pABR_CumRes2 = [];
 
-                                    epochData.pABR_CumRes2 = ...
-                                        (pABR_PO_CumRes2{attenIND} + ...
-                                        pABR_NP_CumRes2{attenIND})/2;
+                                    if recordRight
+                                        epochData.pABR_CumRes1 = ...
+                                            (pABR_PO_CumRes1{attenIND} + ...
+                                            pABR_NP_CumRes1{attenIND})/2;
+                                    end
+
+                                    if recordLeft
+                                        epochData.pABR_CumRes2 = ...
+                                            (pABR_PO_CumRes2{attenIND} + ...
+                                            pABR_NP_CumRes2{attenIND})/2;
+                                    end
 
                                     pairReadyToSave = true;
                                 end
@@ -279,11 +337,15 @@ for attenIND = 1:nLevels
                         end
 
                         if currStim
-                            pABR_EpochResp1{attenIND,currStim} = pABRdata1;  %added DA 7/23/13 %changed to pABR JL 6/30/26
-                            pABR_EpochResp2{attenIND,currStim} = pABRdata2;
+                            if recordRight
+                                pABR_EpochResp1{attenIND,currStim} = pABRdata1;
+                            end
+                            if recordLeft
+                                pABR_EpochResp2{attenIND,currStim} = pABRdata2;
+                            end
                         end
 
-                    elseif maxpABRobs1 > critVal || maxpABRobs2 > critVal2
+                    elseif ~artifactFree
                         rejections = rejections + 1;
                     end %End for artifact rejection KH 2011 June 08
 
@@ -374,10 +436,22 @@ if bAbort == 0
         drawnow;
     end
 
-    resultData = load(resultFile,'rightResp','leftResp');
+    resultData = load(resultFile);
 
-    rightResp = resultData.rightResp;
-    leftResp = resultData.leftResp;
+    rightResp = [];
+    leftResp = [];
+    if recordRight
+        if ~isfield(resultData,'rightResp')
+            error('The processing result does not contain rightResp.');
+        end
+        rightResp = resultData.rightResp;
+    end
+    if recordLeft
+        if ~isfield(resultData,'leftResp')
+            error('The processing result does not contain leftResp.');
+        end
+        leftResp = resultData.leftResp;
+    end
 end
 
 %% SAVE FILE

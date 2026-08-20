@@ -1,19 +1,12 @@
 % Sets naming structure for file and relevant stimuli metadata
 
-function [x, aux_fname, fname]=make_FFRwav_text_file_subfunc1 ...
-    (misc, pABRstim, invfiltdata, PROG, NelData, comment, RunLevels_params, FFR_Gating, Display, FFRattens, FFRinterstim,Stimuli)
+function [x, aux_fname, fname]=make_Bic_text_file_subfunc1 ...
+    (misc, pABRstim, invfiltdata, PROG, NelData, comment, RunLevels_params, FFR_Gating, Display, FFRattens, FFRinterstim)
 
     %fname = current_data_file(...
        % [misc.fileExtension strrep(Stimuli.filename(1:end-4),'-','_m')],1);
-       if  Stimuli.rec_channel == 2
-           label = 'pABR_Left_Allfreqs';
-       elseif Stimuli.rec_channel == 1
-             label = 'pABR_Right_Allfreqs';
-       elseif Stimuli.rec_channel > 2
-             label = 'pABR_Left_Right_Allfreqs';
-       end
         
-        fname = current_data_file(label,1);
+        fname = current_data_file('pABR_BIC',1);
 
 % if isfield(Stimuli, 'SNR_dB')
 %     fname = current_data_file(...

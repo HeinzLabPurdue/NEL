@@ -196,7 +196,8 @@ elseif strcmp(command_str,'calibrate')
             % Read amplitude of response
             if ~error && isempty(get(FIG.push.stop,'userdata'))
                 %             tic;
-                [error,converge, ~] = TDTdaq;
+                inp = ears(e);
+                [error,converge, ~] = TDTdaq(inp);
                 %             temp_calib_time=toc;
             end
             % Correct for probe microphone calibration IF a calibration file was
