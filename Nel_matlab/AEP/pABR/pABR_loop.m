@@ -443,8 +443,10 @@ while isempty(get(FIG.push.close,'Userdata'))
                     
                 case 4
                     
-                    pABR_BIC(FIG,Stimuli,invfiltdata,RunLevels_params,misc,FFR_Gating,...
-                        pABRnpts,interface_type,Display,NelData,data_dir,RP1,RP2,RP3,PROG,prog_dir,pABRstim);
+                    %pABR_BIC(FIG,Stimuli,invfiltdata,RunLevels_params,misc,FFR_Gating,...
+                        %pABRnpts,interface_type,Display,NelData,data_dir,RP1,RP2,RP3,PROG,prog_dir,pABRstim);
+                        [firstSTIM, NelData]=pABR_BIC_RunLevels(FIG,Stimuli,invfiltdata, RunLevels_params, misc, FFR_Gating,...
+                            pABRnpts,interface_type, Display, NelData, data_dir, RP1, RP2, RP3, PROG, prog_dir,pABRstim);
                     
                     currStim = 0;
                     

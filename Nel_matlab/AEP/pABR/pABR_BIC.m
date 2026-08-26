@@ -215,14 +215,14 @@ for conditionIND=1:nConditions
     end
     % Reproduce the full end-of-run reset used by pABR_RunLevels before
     % switching automatically to the next BIC condition.
-    AEP_set_attns2(120,Stimuli.channel, ...
-        120,Stimuli.channel2, ...
-        Stimuli.KHosc,RP1,RP2);
-
-    PAset([120;120;120;120]);
-    invoke(RP1,'Halt');
-    invoke(RP1,'ClearCOF');
-    pause(0.2);
+%     AEP_set_attns2(120,Stimuli.channel, ...
+%         120,Stimuli.channel2, ...
+%         Stimuli.KHosc,RP1,RP2);
+% 
+%     PAset([120;120;120;120]);
+%     invoke(RP1,'Halt');
+%     invoke(RP1,'ClearCOF');
+%     pause(0.2);
 
     if bAbort || saveNow, break; end
 end

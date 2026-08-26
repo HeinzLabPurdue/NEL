@@ -5,12 +5,15 @@ function [x, aux_fname, fname]=make_FFRwav_text_file_subfunc1 ...
 
     %fname = current_data_file(...
        % [misc.fileExtension strrep(Stimuli.filename(1:end-4),'-','_m')],1);
-       if  Stimuli.rec_channel == 2
-           label = 'pABR_Left_Allfreqs';
+       level = FFRattens{1};
+       if Stimuli.rec_channel == 2
+           label = sprintf('pABR_Left_Allfreqs_%gdB', level);
+           
        elseif Stimuli.rec_channel == 1
-             label = 'pABR_Right_Allfreqs';
+           label = sprintf('pABR_Right_Allfreqs_%gdB', level);
+           
        elseif Stimuli.rec_channel > 2
-             label = 'pABR_Left_Right_Allfreqs';
+           label = sprintf('pABR_Left_Right_Allfreqs_%gdB', level);
        end
         
         fname = current_data_file(label,1);

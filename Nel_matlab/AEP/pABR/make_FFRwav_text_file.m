@@ -50,32 +50,44 @@ if save_all_reps==1
 end
 
 if Stimuli.rec_channel > 2
+
+    % Both channels
     x.AD_Data.Label{1} = 'Channel 1';
     x.AD_Data.Label{2} = 'Channel 2';
-    x.AD_Data.AD_Avg_500Hz_V{1} =   rightResp(1,:);
-    x.AD_Data.AD_Avg_1000Hz_V{1} =  rightResp(2,:);
-    x.AD_Data.AD_Avg_2000Hz_V{1} =  rightResp(3,:);
-    x.AD_Data.AD_Avg_4000Hz_V{1} =  rightResp(4,:);
-    x.AD_Data.AD_Avg_8000Hz_V{1} =  rightResp(5,:);
-    x.AD_Data.AD_Avg_500Hz_V{2} =  leftResp(1,:);
+
+    x.AD_Data.AD_Avg_500Hz_V{1}  = rightResp(1,:);
+    x.AD_Data.AD_Avg_1000Hz_V{1} = rightResp(2,:);
+    x.AD_Data.AD_Avg_2000Hz_V{1} = rightResp(3,:);
+    x.AD_Data.AD_Avg_4000Hz_V{1} = rightResp(4,:);
+    x.AD_Data.AD_Avg_8000Hz_V{1} = rightResp(5,:);
+
+    x.AD_Data.AD_Avg_500Hz_V{2}  = leftResp(1,:);
     x.AD_Data.AD_Avg_1000Hz_V{2} = leftResp(2,:);
-    x.AD_Data.AD_Avg_2000Hz_V{2} =  leftResp(3,:);
-    x.AD_Data.AD_Avg_4000Hz_V{2} =  leftResp(4,:);
-    x.AD_Data.AD_Avg_8000Hz_V{2} =  leftResp{5,:};
+    x.AD_Data.AD_Avg_2000Hz_V{2} = leftResp(3,:);
+    x.AD_Data.AD_Avg_4000Hz_V{2} = leftResp(4,:);
+    x.AD_Data.AD_Avg_8000Hz_V{2} = leftResp(5,:);
+
 elseif Stimuli.rec_channel == 2
-    x.AD_Data.Label{1} = ['Channel ' num2str(Stimuli.rec_channel)];
-    x.AD_Data.AD_Avg_500Hz_V{1} =   rightResp{1,:};
-    x.AD_Data.AD_Avg_1000Hz_V{1} =  rightResp{2,:};
-    x.AD_Data.AD_Avg_2000Hz_V{1} =  rightResp{3,:};
-    x.AD_Data.AD_Avg_4000Hz_V{1} =  rightResp{4,:};
-    x.AD_Data.AD_Avg_8000Hz_V{1} =  rightResp{5,:};
+
+    % Left channel only
+    x.AD_Data.Label{1} = 'Channel 2';
+
+    x.AD_Data.AD_Avg_500Hz_V{1}  = leftResp(1,:);
+    x.AD_Data.AD_Avg_1000Hz_V{1} = leftResp(2,:);
+    x.AD_Data.AD_Avg_2000Hz_V{1} = leftResp(3,:);
+    x.AD_Data.AD_Avg_4000Hz_V{1} = leftResp(4,:);
+    x.AD_Data.AD_Avg_8000Hz_V{1} = leftResp(5,:);
+
 else
-    x.AD_Data.Label{1} = ['Channel ' num2str(Stimuli.rec_channel)];
-    x.AD_Data.AD_Avg_500Hz_V{2} =  leftResp{1,:};
-    x.AD_Data.AD_Avg_1000Hz_V{2} = leftResp{2,:};
-    x.AD_Data.AD_Avg_2000Hz_V{2} =  leftResp{3,:};
-    x.AD_Data.AD_Avg_4000Hz_V{2} =  leftResp{4,:};
-    x.AD_Data.AD_Avg_8000Hz_V{2} =  leftResp{5,:};
+
+    % Right channel only
+    x.AD_Data.Label{1} = 'Channel 1';
+
+    x.AD_Data.AD_Avg_500Hz_V{1}  = rightResp(1,:);
+    x.AD_Data.AD_Avg_1000Hz_V{1} = rightResp(2,:);
+    x.AD_Data.AD_Avg_2000Hz_V{1} = rightResp(3,:);
+    x.AD_Data.AD_Avg_4000Hz_V{1} = rightResp(4,:);
+    x.AD_Data.AD_Avg_8000Hz_V{1} = rightResp(5,:);
 
 end
 
