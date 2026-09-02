@@ -140,9 +140,9 @@ for index = 1:15   % THIS IS THE LOOP TO RUN UNTIL VALUES CONVERGE
      ADmic1 = invoke(COMM.handle.RP2_2,'ReadTagV','ADbuf',0,ADdur_pts);%ADdata_V_raw
      ADmic2= invoke(COMM.handle.RP2_2,'ReadTagV','ADbuf2',0,ADdur_pts); %ADsignal_V
      
-     if micChannel == 1
+     if micChannel == 2
          ADdata_V_raw = ADmic2;
-     elseif micChannel == 2
+     elseif micChannel == 1
          ADdata_V_raw = ADmic1;
      end
      
