@@ -79,5 +79,3 @@ AutoLevel_params = struct ( ...  %%added by SP
  'dBaboveTHRman_for_autoTHRcorr', 30, ... %number of dB above manual threshold estimate to use as template in Ken's corr code
  'dBs2RUN',[] ...%what are the dB values to run based on manThresh, MaxCalibValue
  ); 
-
-

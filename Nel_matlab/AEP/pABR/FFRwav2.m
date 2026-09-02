@@ -878,39 +878,79 @@ elseif strcmp(command_str,'attenCalib') %AS/MH/MP | Sprint 2023 Update
         
         
         calib_to_use = find(calib_to_use);
-        
+
+        if numel(calib_to_use) ~= 1
+            error('Could not uniquely match Stimuli.ear to a calibration curve.');
+        end
+
         if calib_to_use == 2
-            CalibData=cal.CalibData2(:,1:2);
-            frequencies = [500 1000 2000 4000 8000];
-            if ~isfield(pABRstim,'isBuilt') || ~pABRstim.isBuilt
-                [pABRstim] = make_toneburst_epochs(frequencies,  round(Stimuli.RPsamprate_Hz), 30, 40,CalibData,desiredSpl);
-                 pABRstim.isBuilt = true;
-            end
+            CalibData = cal.CalibData2(:,1:2);
         else
             CalibData = cal.CalibData(:,1:2);
-            frequencies = [500 1000 2000 4000 8000];
-            if ~isfield(pABRstim,'isBuilt') || ~pABRstim.isBuilt
-                [pABRstim] = make_toneburst_epochs(frequencies,  round(Stimuli.RPsamprate_Hz), 30, 40,CalibData,desiredSpl);
-                 pABRstim.isBuilt = true;
-            end
-            
-            
         end
     else %both ears
         %use mean of the inv calib curves
         CalibData(:,1) = cal.CalibData(:,1);
         CalibData(:,2) = (cal.CalibData(:,2)+cal.CalibData2(:,2))/2;
         frequencies = [500 1000 2000 4000 8000];
-       
-        if ~isfield(pABRstim,'isBuilt') || ~pABRstim.isBuilt
-                [pABRstim] = make_toneburst_epochs(frequencies,  round(Stimuli.RPsamprate_Hz), 30, 40,CalibData,desiredSpl);
-                 pABRstim.isBuilt = true;
-        end
-       
+    end
+
+    %% Build pABR with independent right- and left-ear calibrations.
+    % Do not use CalibData averaged across ears for pABR generation.
+    % Identify the physical ear associated with CalibData and CalibData2.
+    frequencies = [500 1000 2000 4000 8000];
+
+    if strcmp(NelData.Metadata.calib_type,'SPL')
+        calibrationEarLabels = string(cal.ear_ord);
+    elseif strcmp(NelData.Metadata.calib_type,'FPL')
+        calibrationEarLabels = string(cal.FPLearData.ear);
+    else
+        error('Unsupported calibration type: %s.',NelData.Metadata.calib_type);
+    end
+
+    rightCalibrationIndex = find( ...
+        contains(calibrationEarLabels,'right','IgnoreCase',true) | ...
+        strcmpi(strtrim(calibrationEarLabels),'R'),1);
+
+    leftCalibrationIndex = find( ...
+        contains(calibrationEarLabels,'left','IgnoreCase',true) | ...
+        strcmpi(strtrim(calibrationEarLabels),'L'),1);
+
+    if isempty(rightCalibrationIndex) || isempty(leftCalibrationIndex)
+        error(['Both right- and left-ear calibration curves are required ' ...
+            'for independently calibrated pABR playback.']);
+    end
+
+    calibrationCurves = { ...
+        cal.CalibData(:,1:2), ...
+        cal.CalibData2(:,1:2)};
+
+    if rightCalibrationIndex > numel(calibrationCurves) || ...
+            leftCalibrationIndex > numel(calibrationCurves)
+        error('Calibration ear labels do not match the available calibration curves.');
+    end
+
+    pABRCalibRight = calibrationCurves{rightCalibrationIndex};
+    pABRCalibLeft = calibrationCurves{leftCalibrationIndex};
+
+    if ~isfield(pABRstim,'isBuilt') || ~pABRstim.isBuilt
+        pABRstim = make_toneburst_epochs( ...
+            frequencies, ...
+            round(Stimuli.RPsamprate_Hz), ...
+            30, ...
+            40, ...
+            pABRCalibRight, ...
+            pABRCalibLeft, ...
+            desiredSpl);
+
+        pABRstim.isBuilt = true;
+        pABRstim.calibrationPic = invfiltdata.CalibPICnum2use;
+        pABRstim.rightCalibrationIndex = rightCalibrationIndex;
+        pABRstim.leftCalibrationIndex = leftCalibrationIndex;
     end
     
     Stimuli.calib_dBSPLout= get_SPL_from_calib(sig, fs, CalibData, false);
-    pABRstim.calib_dBSPLout= pABRstim.maxSPL;
+    pABRstim.calib_dBSPLout = pABRstim.maxSPLRight;
     set(FIG.asldr.SPL,'string',sprintf('%.1f dB SPL',Stimuli.calib_dBSPLout-abs(str2double(get(FIG.asldr.val, 'string')))));
     
     %     set(FIG.asldr.SPL, 'string', sprintf('%.1f dB SPL', Stimuli.MaxdBSPLCalib-Stimuli.atten_dB));
@@ -939,7 +979,7 @@ elseif strcmp(command_str,'attenCalib') %AS/MH/MP | Sprint 2023 Update
     
     %%%% AF how to change this for FPL ????
     Stimuli.calib_dBSPLout2= get_SPL_from_calib(sig2, fs2, CalibData, false);
-    pABRstim.calib_dBSPLout2= pABRstim.maxSPL;
+    pABRstim.calib_dBSPLout2 = pABRstim.maxSPLLeft;
     set(FIG.asldr2.SPL,'string',sprintf('%.1f dB SPL',Stimuli.calib_dBSPLout2-abs(str2double(get(FIG.asldr2.val, 'string')))));
     
     

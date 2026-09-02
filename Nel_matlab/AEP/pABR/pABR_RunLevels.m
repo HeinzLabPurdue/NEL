@@ -56,11 +56,13 @@ if isempty(pABRlevels)
     error('RunLevels_params.attenMask is empty.');
 end
 
-pABRlevels = 60:10:70;
-
-pABRlevelAtten = zeros(1,length(pABRlevels));
+pABRlevels = 80:-10:10;
+%pABRlevels = 0;
+pABRlevelAttenRight = zeros(1,length(pABRlevels));
+pABRlevelAttenLeft = zeros(1,length(pABRlevels));
 for i=1:numel(pABRlevels)
-    pABRlevelAtten(:,i) = pABRstim.maxSPL - pABRlevels(i);
+    pABRlevelAttenRight(:,i) = pABRstim.maxSPLRight - pABRlevels(i);
+    pABRlevelAttenLeft(:,i) = pABRstim.maxSPLLeft - pABRlevels(i);
 end
     
 nLevels = numel(pABRlevels);
@@ -85,7 +87,7 @@ pABR_Lstim=pABRstim.leftEpochs;
 pABR_Rstim=pABRstim.rightEpochs;
 listlength = size(pABR_Rstim,1);
 
-nPresentations = 1;
+nPresentations = 3;
 totalPresentations = 2*listlength*nPresentations;
 pABRattens = num2cell(pABRlevels);
 pABRinterstim = cell(nLevels,totalPresentations);
@@ -100,7 +102,7 @@ pABRnpts = size(pABR_Rstim,2);
 
 %responseLength = 2 * padSamples;
 
-realtimeDir = 'C:\pABR_Realtime';
+realtimeDir =  'D:\pABR_Realtime' ;
 resultFile = fullfile(realtimeDir,'pABR_results.mat');
 
 if ~exist(realtimeDir,'dir')
@@ -147,7 +149,8 @@ movefile( ...
 % Looping through all attenuation levels
 for attenIND = 1:nLevels
     attenLevel = pABRlevels(attenIND);
-    atten = pABRlevelAtten(attenIND);
+    attenRight = pABRlevelAttenRight(attenIND);
+    attenLeft = pABRlevelAttenLeft(attenIND);
     rejections = 0;   %for artifact rejection KHZZ 2011 Nov 4
     pABRattens{attenIND} = attenLevel;
 
@@ -177,8 +180,8 @@ for attenIND = 1:nLevels
 
     nextStim = nextStim + 1;
 
-    pABR_set_attns(atten,Stimuli.channel, ...
-        atten,Stimuli.channel2, ...
+    pABR_set_attns(attenRight,Stimuli.channel, ...
+        attenLeft,Stimuli.channel2, ...
         Stimuli.KHosc,RP1,RP2);
 
     % Start the pulse train once. JL 2026 Jun 8
